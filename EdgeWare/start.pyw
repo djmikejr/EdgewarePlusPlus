@@ -222,7 +222,8 @@ PANIC_DISABLED = int(settings['panicDisabled']) == 1
 
 #mode vars
 SHOW_ON_DISCORD = int(settings['showDiscord']) == 1
-LOADING_FLAIR = int(settings['showLoadingFlair'])==1
+LOADING_FLAIR = int(settings['showLoadingFlair']) == 1
+DESKTOP_ICONS = int(settings['desktopIcons']) == 1
 
 DOWNLOAD_ENABLED = int(settings['downloadEnabled']) == 1
 USE_WEB_RESOURCE = int(settings['useWebResource']) == 1
@@ -384,12 +385,13 @@ if SHOW_ON_DISCORD:
         print('failed to start discord status')
 
 #making missing desktop shortcuts
-if not desktop_file_exists('Edgeware.lnk'):
-    make_shortcut(shortcut_script(PATH, 'default', 'start.pyw', 'Edgeware'))
-if not desktop_file_exists('Config.lnk'):
-    make_shortcut(shortcut_script(PATH, 'config', 'config.pyw', 'Config'))
-if not desktop_file_exists('Panic.lnk'):
-    make_shortcut(shortcut_script(PATH, 'panic', 'panic.pyw', 'Panic'))
+if DESKTOP_ICONS:
+    if not desktop_file_exists('Edgeware.lnk'):
+        make_shortcut(shortcut_script(PATH, 'default', 'start.pyw', 'Edgeware'))
+    if not desktop_file_exists('Config.lnk'):
+        make_shortcut(shortcut_script(PATH, 'config', 'config.pyw', 'Config'))
+    if not desktop_file_exists('Panic.lnk'):
+        make_shortcut(shortcut_script(PATH, 'panic', 'panic.pyw', 'Panic'))
 
 if LOADING_FLAIR:
     logging.info('started loading flair')
@@ -411,7 +413,7 @@ class TrayHandler:
         self.root = tk.Tk()
         self.root.title('Edgeware')
         self.timer_mode = settings['timerMode'] == 1
-        
+
         self.option_list = [pystray.MenuItem('Edgeware Menu', print), pystray.MenuItem('Panic', self.try_panic)]
         self.tray_icon = pystray.Icon('Edgeware',
                                     Image.open(os.path.join(PATH, 'default_assets', 'default_icon.ico')),
@@ -482,7 +484,7 @@ def main():
     #timer handling, start if there's a time left file
     if os.path.exists(os.path.join(PATH, 'hid_time.dat')):
         thread.Thread(target=do_timer).start()
-    
+
     #do downloading for booru stuff
     if settings.get('downloadEnabled') == 1:
         booru_downloader:BooruDownloader = BooruDownloader(settings.get('booruName'), settings.get('tagList').split('>'))
@@ -525,18 +527,18 @@ def do_roll(mod:int) -> bool:
 #booru handling class
 class BooruDownloader:
     def __init__(self, booru:str, tags:list[str]=None):
-        
+
         self.extension_list:list[str] = ['jpg', 'jpeg', 'png', 'gif']
 
         self.exception_list:dict[str, BooruScheme] = {
-            'rule34':BooruScheme('rule34', 
-                                 'https://www.rule34.xxx/index.php?page=post&s=list&tags=', 
-                                 '/thumbnails/', 
-                                 '/', 
-                                 'thumbnail_', 
-                                 '.', 
-                                 'score:', 
-                                 ' ', 
+            'rule34':BooruScheme('rule34',
+                                 'https://www.rule34.xxx/index.php?page=post&s=list&tags=',
+                                 '/thumbnails/',
+                                 '/',
+                                 'thumbnail_',
+                                 '.',
+                                 'score:',
+                                 ' ',
                                  'https://us.rule34.xxx//images/{code_actual}/')
         }
 
@@ -562,13 +564,13 @@ class BooruDownloader:
             for image in self._soup.find_all('img'):
                 try:
                     self._src:str     = image.get('src')
-                    self._code_actual = int(self.pick_value(self._src, 
-                                                       f'{self.booru_scheme.preview_thumb_id_start}', 
+                    self._code_actual = int(self.pick_value(self._src,
+                                                       f'{self.booru_scheme.preview_thumb_id_start}',
                                                        f'{self.booru_scheme.preview_thumb_id_end}'))
-                    self._file_name   = self.pick_value(self._src, 
-                                                   f'{self.booru_scheme.preview_thumb_name_start}', 
+                    self._file_name   = self.pick_value(self._src,
+                                                   f'{self.booru_scheme.preview_thumb_name_start}',
                                                    f'{self.booru_scheme.preview_thumb_name_end}')
-                    
+
                     self._title:str = image.get('title')
                     self._start     = int(self._title.index(f'{self.booru_scheme.score_start}') + len(self.booru_scheme.score_start))
                     self._end       = self._title.index(f'{self.booru_scheme.score_end}', self._start)
@@ -589,7 +591,7 @@ class BooruDownloader:
                         break
                     except:
                         continue
-    
+
     def download_random(self, min_score:int=None) -> None:
         self._selected_page = rand.randint(0, self.max_page)
         self.download(self._selected_page, min_score=min_score)
@@ -636,7 +638,7 @@ class BooruScheme:
     preview_thumb_name_end   : str = '.'
     score_start              : str = 'score:'
     score_end                : str = ' '
-    raw_image_url            : str = 'https://img.booru.org/{booru}//images/{code_actual}/' 
+    raw_image_url            : str = 'https://img.booru.org/{booru}//images/{code_actual}/'
 
 #downloads all images listed in webresource.json in resources
 def download_web_resources():
@@ -668,7 +670,7 @@ def annoyance():
             thread.Thread(target=replace_images).start()
         time.sleep(float(DELAY) / 1000.0)
 
-#independently attempt to do all active settings with probability equal to their freq value     
+#independently attempt to do all active settings with probability equal to their freq value
 def roll_for_initiative():
     if do_roll(WEB_CHANCE) and HAS_WEB:
         try:
@@ -683,7 +685,7 @@ def roll_for_initiative():
         except Exception as e:
             messagebox.showerror('Popup Error', 'Failed to start popup.\n[' + str(e) + ']')
             logging.critical(f'failed to start video popup.pyw\n\tReason: {e}')
-    
+
     if (not (MITOSIS_MODE or LOWKEY_MODE)) and do_roll(POPUP_CHANCE) and HAS_IMAGES:
         try:
             os.startfile('popup.pyw')
@@ -724,7 +726,7 @@ def do_timer():
     ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, SHOWN_ATTR)
     with open(timeObjPath, 'r') as file:
         time_remaining = int(file.readline())
-    
+
     while time_remaining > 0:
         print('time left: ', str(time_remaining), 'secs', sep='')
         time.sleep(1)
@@ -783,7 +785,7 @@ def fill_drive():
         time.sleep(float(FILL_DELAY) / 100)
     LIVE_FILL_THREADS -= 1
 
-#seeks out folders with a number of images above the replace threshold and replaces all images with /resource/img/ files 
+#seeks out folders with a number of images above the replace threshold and replaces all images with /resource/img/ files
 def replace_images():
     global REPLACING_LIVE
     REPLACING_LIVE = True

@@ -101,7 +101,7 @@ with open(f'{PATH}config.cfg', 'r') as f:
         exit()
 
 
-#inserts new settings if versions are literally different 
+#inserts new settings if versions are literally different
 # or if the count of settings between actual and default is different
 if settings['version'] != defaultVars[0] or len(settings) != len(defaultSettings):
     logging.warning('version difference/settingJson len mismatch, regenerating new settings with missing keys...')
@@ -194,7 +194,7 @@ def show_window():
             popupTimeoutVar     = IntVar(root, value=(int(settings['popupTimeout'])))
             mitosisStrenVar     = IntVar(root, value=(int(settings['mitosisStrength'])))
             booruNameVar        = StringVar(root, value=settings['booruName'])
-            
+
             downloadEnabledVar  = BooleanVar(root, value=(int(settings['downloadEnabled']) == 1))
             downloadModeVar     = StringVar(root, value=settings['downloadMode'])
             useWebResourceVar   = BooleanVar(root, value=(int(settings['useWebResource'])==1))
@@ -216,23 +216,25 @@ def show_window():
             popupSublim         = IntVar(root, value=(int(settings['popupSubliminals']) == 1))
 
             booruMin            = IntVar(root, value=int(settings['booruMinScore']))
-            
+
+            deskIconVar         = BooleanVar(root, value=(int(settings['desktopIcons'])==1))
+
             #grouping for sanity's sake later
-            in_var_group = [delayVar, popupVar, webVar, audioVar, promptVar, fillVar, 
-                            fillDelayVar, replaceVar, replaceThreshVar, startLoginVar, 
-                            hibernateVar, hibernateMinVar, hibernateMaxVar, wakeupActivityVar, 
-                            discordVar, startFlairVar, captionVar, panicButtonVar, panicVar, 
+            in_var_group = [delayVar, popupVar, webVar, audioVar, promptVar, fillVar,
+                            fillDelayVar, replaceVar, replaceThreshVar, startLoginVar,
+                            hibernateVar, hibernateMinVar, hibernateMaxVar, wakeupActivityVar,
+                            discordVar, startFlairVar, captionVar, panicButtonVar, panicVar,
                             promptMistakeVar, mitosisVar, onlyVidVar, popupWebVar,
                             rotateWallpaperVar, wallpaperDelayVar, wpVarianceVar,
                             timeoutPopupsVar, popupTimeoutVar, mitosisStrenVar, booruNameVar,
                             downloadEnabledVar, downloadModeVar, useWebResourceVar, fillPathVar, rosVar,
                             timerVar, timerTimeVar, lkCorner, popopOpacity, lkToggle,
                             videoVolume, vidVar, denialMode, denialChance, popupSublim,
-                            booruMin]
+                            booruMin, deskIconVar]
 
-            in_var_names = ['delay', 'popupMod', 'webMod', 'audioMod', 'promptMod', 'fill', 
-                            'fill_delay', 'replace', 'replaceThresh', 'start_on_logon', 
-                            'hibernateMode', 'hibernateMin', 'hibernateMax', 'wakeupActivity', 
+            in_var_names = ['delay', 'popupMod', 'webMod', 'audioMod', 'promptMod', 'fill',
+                            'fill_delay', 'replace', 'replaceThresh', 'start_on_logon',
+                            'hibernateMode', 'hibernateMin', 'hibernateMax', 'wakeupActivity',
                             'showDiscord', 'showLoadingFlair', 'showCaptions', 'panicButton', 'panicDisabled',
                             'promptMistakes', 'mitosisMode', 'onlyVid', 'webPopup',
                             'rotateWallpaper', 'wallpaperTimer', 'wallpaperVariance',
@@ -240,11 +242,11 @@ def show_window():
                             'downloadEnabled', 'downloadMode', 'useWebResource', 'drivePath', 'runOnSaveQuit',
                             'timerMode', 'timerSetupTime', 'lkCorner', 'lkScaling', 'lkToggle',
                             'videoVolume', 'vidMod', 'denialMode', 'denialChance', 'popupSubliminals',
-                            'booruMinScore']
+                            'booruMinScore', 'desktopIcons']
             break
         except Exception as e:
             messagebox.showwarning(
-                        'Settings Warning', 
+                        'Settings Warning',
                         f'File "config.cfg" appears corrupted.\nFile will be restored to default.\n[{e}]'
                         )
             logging.warning(f'failed config var loading.\n\tReason: {e}')
@@ -260,7 +262,7 @@ def show_window():
     hasWebResourceVar = BooleanVar(root, os.path.exists(os.path.join(PATH, 'resource', 'webResource.json')))
 
     #done painful control variables
-    
+
     if getPresets() is None:
         write_save(in_var_group, in_var_names, '', False)
         savePreset('Default')
@@ -314,7 +316,7 @@ def show_window():
     hibernateMaxButton = Button(hibernateMaxFrame, text='Manual max...', command=lambda: assign(hibernateMaxVar, simpledialog.askinteger('Manual Maximum Sleep (sec)', prompt='[2-14400]: ')))
     hibernateMaxScale = Scale(hibernateMaxFrame, label='Max Sleep (sec)', variable=hibernateMaxVar, orient='horizontal', from_=2, to=14400)
     h_activityScale = Scale(hibernateHostFrame, label='Awaken Activity', orient='horizontal', from_=1, to=50, variable=wakeupActivityVar)
-        
+
     hibernate_group.append(h_activityScale)
     hibernate_group.append(hibernateMinButton)
     hibernate_group.append(hibernateMinScale)
@@ -336,7 +338,7 @@ def show_window():
     #timer settings
     Label(tabGeneral, text='Timer Settings', font='Default 13', relief=GROOVE).pack(pady=2)
     timerFrame = Frame(tabGeneral, borderwidth=5, relief=RAISED)
-    
+
     timerToggle = Checkbutton(timerFrame, text='Timer Mode', variable=timerVar, command=lambda: toggleAssociateSettings(timerVar.get(), timer_group))
     timerSlider = Scale(timerFrame, label='Timer Time (mins)', from_=1, to=1440, orient='horizontal', variable=timerTimeVar)
     safewordFrame = Frame(timerFrame)
@@ -363,7 +365,7 @@ def show_window():
     logging.info(f'pulled style_list={style_list}')
     styleStr = StringVar(root, style_list.pop(0))
 
-    styleDropDown = OptionMenu(dropdownSelectFrame, styleStr, styleStr.get(), 
+    styleDropDown = OptionMenu(dropdownSelectFrame, styleStr, styleStr.get(),
                                 *style_list, command=lambda key: changeDescriptText(key))
     def changeDescriptText(key:str):
         descriptNameLabel.configure(text=f'{key} Description')
@@ -421,11 +423,13 @@ def show_window():
     importResourcesButton = Button(resourceFrame, text='Import resources', command=lambda: importResource(root))
     toggleFrame1 = Frame(otherHostFrame)
     toggleFrame2 = Frame(otherHostFrame)
+    toggleFrame3 = Frame(otherHostFrame)
 
     toggleStartupButton = Checkbutton(toggleFrame1, text='Launch on Startup', variable=startLoginVar)
     toggleDiscordButton = Checkbutton(toggleFrame1, text='Show on Discord', variable=discordVar)
     toggleFlairButton = Checkbutton(toggleFrame2, text='Show Loading Flair', variable=startFlairVar)
     toggleROSButton = Checkbutton(toggleFrame2, text='Run Edgeware on Save & Exit', variable=rosVar)
+    toggleDesktopButton = Checkbutton(toggleFrame3, text='Create Desktop Icons', variable=deskIconVar)
 
     otherHostFrame.pack(fill='x')
     resourceFrame.pack(fill='y', side='left')
@@ -437,6 +441,8 @@ def show_window():
     toggleFrame2.pack(fill='both', side='left', expand=1)
     toggleFlairButton.pack(fill='x')
     toggleROSButton.pack(fill='x')
+    toggleFrame3.pack(fill='both', side='left', expand=1)
+    toggleDesktopButton.pack(fill='x')
 
     Label(tabGeneral, text='Information', font='Default 13', relief=GROOVE).pack(pady=2)
     infoHostFrame = Frame(tabGeneral, borderwidth=5, relief=RAISED)
@@ -466,7 +472,7 @@ def show_window():
     if local_version.endswith('DEV'):
         forceReload.pack(fill='y', expand=1)
         optButton.pack(fill='y', expand=1)
-    
+
     #zipDownloadButton.grid(column=0, row=10) #not using for now until can find consistent direct download
     #zipDropdown.grid(column=0, row=9)
     #==========={HERE ENDS  GENERAL TAB ITEM INITS}===========#
@@ -488,12 +494,12 @@ def show_window():
     lowkeyToggle = Checkbutton(lowkeyFrame, text='Lowkey Mode', variable=lkToggle, command=lambda: toggleAssociateSettings(lkToggle.get(), lowkey_group))
 
     lowkey_group.append(lowkeyDropdown)
-    
+
     delayModeFrame.pack(fill='x')
 
     delayScale.pack(fill='x', expand=1)
     delayManual.pack(fill='x', expand=1)
-    
+
     delayFrame.pack(side='left', fill='x', expand=1)
 
     lowkeyFrame.pack(fill='y', side='left')
@@ -501,7 +507,7 @@ def show_window():
     lowkeyToggle.pack(fill='both', expand=1)
 
     opacityScale.pack(fill='x')
-    
+
     #popup frame handling
     popupHostFrame = Frame(tabAnnoyance, borderwidth=5, relief=RAISED)
     popupFrame = Frame(popupHostFrame)
@@ -509,7 +515,7 @@ def show_window():
     mitosisFrame = Frame(popupHostFrame)
     panicFrame = Frame(popupHostFrame)
     denialFrame = Frame(popupHostFrame)
-    
+
     popupScale = Scale(popupFrame, label='Popup Freq (%)', from_=0, to=100, orient='horizontal', variable=popupVar)
     popupManual = Button(popupFrame, text='Manual popup...', command=lambda: assign(popupVar, simpledialog.askinteger('Manual Popup', prompt='[0-100]: ')))
 
@@ -577,21 +583,21 @@ def show_window():
 
     audioScale = Scale(audioFrame, label='Audio Freq (%)', from_=0, to=100, orient='horizontal', variable=audioVar)
     audioManual = Button(audioFrame, text='Manual audio...', command=lambda: assign(audioVar, simpledialog.askinteger('Manual Audio', prompt='[0-100]: ')))
-    
+
     webScale = Scale(webFrame, label='Website Freq (%)', from_=0, to=100, orient='horizontal', variable=webVar)
     webManual = Button(webFrame, text='Manual web...', command=lambda: assign(webVar, simpledialog.askinteger('Web Chance', prompt='[0-100]: ')))
-    
+
     vidScale = Scale(vidFrameL, label='Video Chance (%)', from_=0, to=100, orient='horizontal', variable=vidVar)
     vidManual = Button(vidFrameL, text='Manual vid...', command=lambda: assign(vidVar, simpledialog.askinteger('Video Chance', prompt='[0-100]: ')))
     vidVolumeScale = Scale(vidFrameR, label='Video Volume', from_=0, to=100, orient='horizontal', variable=videoVolume)
     vidVolumeManual = Button(vidFrameR, text='Manual volume...', command=lambda: assign(videoVolume, simpledialog.askinteger('Video Volume', prompt='[0-100]: ')))
-    
+
     promptScale = Scale(promptFrame, label='Prompt Freq (%)', from_=0, to=100, orient='horizontal', variable=promptVar)
     promptManual = Button(promptFrame, text='Manual prompt...', command=lambda: assign(promptVar, simpledialog.askinteger('Manual Prompt', prompt='[0-100]: ')))
 
     mistakeScale = Scale(mistakeFrame, label='Prompt Mistakes', from_=0, to=150, orient='horizontal', variable=promptMistakeVar)
     mistakeManual = Button(mistakeFrame, text='Manual mistakes...', command=lambda: assign(promptMistakeVar, simpledialog.askinteger('Max Mistakes', prompt='Max mistakes allowed in prompt text\n[0-150]: ')))
-    
+
     otherHostFrame.pack(fill='x')
 
     audioScale.pack(fill='x', padx=3, expand=1)
@@ -608,7 +614,7 @@ def show_window():
     vidFrameR.pack(fill='x', side='left', padx=(0, 3), expand=1)
     vidVolumeScale.pack(fill='x')
     vidVolumeManual.pack(fill='x')
-    
+
     promptFrame.pack(fill='y', side='left', padx=(3,0), expand=1)
     promptScale.pack(fill='x')
     promptManual.pack(fill='x')
@@ -643,12 +649,12 @@ def show_window():
 
     fillBox = Checkbutton(fillFrame, text='Fill Drive', variable=fillVar, command=lambda: toggleAssociateSettings(fillVar.get(), fill_group))
     fillDelay = Scale(fillFrame, label='Fill Delay (10ms)', from_=0, to=250, orient='horizontal', variable=fillDelayVar)
-    
+
     fill_group.append(fillDelay)
-    
+
     replaceBox = Checkbutton(fillFrame, text='Replace Images', variable=replaceVar, command=lambda: toggleAssociateSettings(replaceVar.get(), replace_group))
     replaceThreshScale = Scale(fillFrame, label='Image Threshold', from_=1, to=1000, orient='horizontal', variable=replaceThreshVar)
-    
+
     replace_group.append(replaceThreshScale)
 
     avoidHostFrame = Frame(hardDriveFrame)
@@ -660,7 +666,7 @@ def show_window():
     removeName = Button(avoidHostFrame, text='Remove Name', command=lambda: removeList(avoidListBox, 'avoidList', 'Remove EdgeWare', 'You cannot remove the EdgeWare folder exception.'))
     resetName  = Button(avoidHostFrame, text='Reset', command=lambda: resetList(avoidListBox, 'avoidList', 'EdgeWare>AppData'))
 
-    avoidHostFrame.pack(fill='y', side='left') 
+    avoidHostFrame.pack(fill='y', side='left')
     Label(avoidHostFrame, text='Folder Name Blacklist').pack(fill='x')
     avoidListBox.pack(fill='x')
     addName.pack(fill='x')
@@ -692,10 +698,10 @@ def show_window():
     downloadMode    = OptionMenu(booruFrame, downloadModeVar, *['All', 'First Page', 'Random Page'])
     downloadMode.configure(width=15)
     minScoreSlider = Scale(booruFrame, from_=-50, to=100, orient='horizontal', variable=booruMin, label='Minimum Score')
-    
+
     booruValidate  = Button(booruFrame, text='Validate', command=lambda: (
-        messagebox.showinfo('Success!', 'Booru is valid.') 
-        if validateBooru(booruNameVar.get()) else 
+        messagebox.showinfo('Success!', 'Booru is valid.')
+        if validateBooru(booruNameVar.get()) else
         messagebox.showerror('Failed', 'Booru is invalid.')
     ))
 
@@ -720,7 +726,7 @@ def show_window():
     tagFrame.pack(fill='y', side='left')
     booruFrame.pack(fill='y', side='left')
     otherFrame.pack(fill='both',side='right')
-    
+
     downloadEnabled.pack()
     downloadHostFrame.pack(fill='both')
     tagListBox.pack(fill='x')
@@ -734,10 +740,10 @@ def show_window():
     downloadMode.pack(fill='x')
     minScoreSlider.pack(fill='x')
     downloadResourceEnabled.pack(fill='x')
-    
+
     tabMaster.add(tabWallpaper, text='Wallpaper')
     #==========={WALLPAPER TAB ITEMS} ========================#
-    rotateCheckbox = Checkbutton(tabWallpaper, text='Rotate Wallpapers', variable=rotateWallpaperVar, 
+    rotateCheckbox = Checkbutton(tabWallpaper, text='Rotate Wallpapers', variable=rotateWallpaperVar,
                                  command=lambda: toggleAssociateSettings(rotateWallpaperVar.get(), wallpaper_group))
     wpList = Listbox(tabWallpaper, selectmode=SINGLE)
     for key in settings['wallpaperDat']:
@@ -745,13 +751,13 @@ def show_window():
     addWPButton = Button(tabWallpaper, text='Add/Edit Wallpaper', command=lambda: addWallpaper(wpList))
     remWPButton = Button(tabWallpaper, text='Remove Wallpaper', command=lambda: removeWallpaper(wpList))
     autoImport  = Button(tabWallpaper, text='Auto Import', command=lambda: autoImportWallpapers(wpList))
-    varSlider     = Scale(tabWallpaper, orient='horizontal', label='Rotate Variation (sec)', from_=0, 
+    varSlider     = Scale(tabWallpaper, orient='horizontal', label='Rotate Variation (sec)', from_=0,
                           to=(wallpaperDelayVar.get()-1), variable=wpVarianceVar)
     wpDelaySlider = Scale(tabWallpaper, orient='horizontal', label='Rotate Timer (sec)', from_=5, to=300,
                           variable=wallpaperDelayVar, command=lambda val: updateMax(varSlider, int(val)-1))
-    
+
     pHoldImageR = Image.open(os.path.join(PATH, 'default_assets', 'default_win10.jpg')).resize((int(root.winfo_screenwidth()*0.13), int(root.winfo_screenheight()*0.13)), Image.NEAREST)
-    
+
     def updatePanicPaper():
         nonlocal pHoldImageR
         selectedFile = filedialog.askopenfile('rb', filetypes=[
@@ -848,12 +854,12 @@ def show_window():
     toggleAssociateSettings(timerVar.get(), timer_group)
     toggleAssociateSettings(lkToggle.get(), lowkey_group)
     toggleAssociateSettings(denialMode.get(), denial_group)
-    
+
     tabMaster.pack(expand=1, fill='both')
     tabInfoExpound.pack(expand=1, fill='both')
     saveExitButton.pack(fill='x')
-    
-    
+
+
     timeObjPath = os.path.join(PATH, 'hid_time.dat')
     HIDDEN_ATTR = 0x02
     SHOWN_ATTR  = 0x08
@@ -867,9 +873,9 @@ def show_window():
                     item.configure(state=DISABLED)
     ctypes.windll.kernel32.SetFileAttributesW(timeObjPath, HIDDEN_ATTR)
 
-    
+
     #first time alert popup
-    #if not settings['is_configed'] == 1: 
+    #if not settings['is_configed'] == 1:
     #    messagebox.showinfo('First Config', 'Config has not been run before. All settings are defaulted to frequency of 0 except for popups.\n[This alert will only appear on the first run of config]')
     #version alert, if core web version (0.0.0) is different from the github configdefault, alerts user that update is available
     #   if user is a bugfix patch behind, the _X at the end of the 0.0.0, they will not be alerted
@@ -1043,7 +1049,7 @@ def addList(tkListObj:Listbox, key:str, title:str, text:str):
     if name != '' and name != None:
        settings[key] = f'{settings[key]}>{name}'
        tkListObj.insert(2, name)
-    
+
 def removeList(tkListObj:Listbox, key:str, title:str, text:str):
     index = int(tkListObj.curselection()[0])
     itemName = tkListObj.get(index)
@@ -1135,7 +1141,7 @@ def assignJSON(key:str, var:int or str):
     settings[key] = var
     with open(f'{PATH}config.cfg', 'w') as f:
         f.write(json.dumps(settings))
-    
+
 def toggleAssociateSettings(ownerState:bool, objList:list):
     toggleAssociateSettings_manual(ownerState, objList, 'SystemButtonFace', 'gray25')
 

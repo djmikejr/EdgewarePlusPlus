@@ -1,3 +1,24 @@
+#Edgeware++
+My goal with this extension of Edgeware is to add or modify features that I felt were missing or incomplete in the original version. I want to try to be as minimally intrusive as possible, i'm not aiming to remove or neuter any previous features, just add more functionality to the base program.
+
+I have prior programming experience, but have never touched python before this project- so it's mostly going to be trial and error. Half of this is a learning experience made easier by horny motivation.
+
+Previous config files might not work at all with this version, if you are planning on switching over, make sure you write down your settings! (or go into your config file and manually update it, if you're so inclined)
+
+Current things i'd like to add but haven't yet:
+•*Dark Mode*
+•*Toggle for deleting desktop icons on panic* (could cause panic instability, looking into it)
+•*Giving mitosis a percentage activation slider*
+•*Being able to change subliminal graphics*
+•*Giving hibernate new modes, offering alternatives like "slowly ramping up over time"*
+•*Giving a use to prompt/caption "moods", initial inspiration was giving people the ability to make "one handed" prompt modes, for those who are too "preoccupied" to type multiple full sentences*
+•*Actually making the version number work with Edgeware++ updates, it's not exciting but would be good to learn how to do properly*
+
+Version 1
+•*Added a option under "misc" to enable/disable desktop icon generation*
+•*Old presets from the original edgeware still exist, but may have compatibility issues.*
+
+Original Edgeware patchnotes included below for posterity.
 
 # Edgeware
 **First and foremost as a disclaimer: this is NOT actually malicious software. It is intended for entertainment purposes only. Any and all damage caused to your files or computer is _YOUR_ responsibility. If you're worried about losing things, BACK THEM UP.**
@@ -31,7 +52,7 @@ Version 2.4.1 Update
 Version 2.4.0 Updates
 
    _**[Large Additions]**_
-   
+
 •**Timer Mode** *Timed runs can now be set, during which the Panic features cannot be used (unless a password is set and used). Run on startup is also forcibly enabled during this time.*
 
 •**Mode Presets** *Config files can now be saved as "Presets," and can be freely swapped between in the config menu itself. These can have descriptions along with them, stored as [preset name].txt text files inside the preset folder.*
@@ -47,7 +68,7 @@ Version 2.4.0 Updates
 •**Booru Downloader Update** *The previous booru downloader was incompatible with Rule34, and had actually completely broken due to a Booru update. The new version is more efficient and easier to maintain/fix if the issue arises again, and is also now able to handle exceptions to standard Booru URLs like Rule34.*
 
   _**[Small Additions]**_
-  
+
 •**Logging** *Start, config, and popup now all generate log files detailing their operation and any errors they encounter with greater detail.*
 
 •**Panic Wallpaper** *Panic wallpaper is now previewed in the config menu, and can be changed to an image of your choice there, under the wallpaper tab.*
@@ -79,7 +100,7 @@ Version 2.4.0 Updates
 •**Advanced Tab** *Minor adjustments to the Advanced tab layout, bringing it into line with the rest of the config menu.*
 
    _**[Bugfixes]**_
-   
+
 •**Popup Borders** *Popups now properly have borders that go all the way around the image instead of just the top and left sides.*
 
 •**Config/Start Crash** *Fixed bug where the config file would be corrupted by config.cfg saving wallpapers in a certain configuration.*
@@ -89,7 +110,7 @@ Version 2.4.0 Updates
 •**Run on Startup Failure** *Fixed bug where the startup bat would not be placed into the windows startup folder. (This should be fixed, but it's always possible I just fixed a different but connected issue instead.)*
 
    _**[Additional Note]**_**
-   
+
 Hello! This will likely be the last update (or at least, last main release version) of Edgeware for the time being. Unfortunately with the constraints of life and my declining interest in porn, it's become more and more difficult to maintain the project as I had originally planned to. It does make me very happy that so many people enjoy my work, and I hope that this update can at least make it feel a bit more complete for you all. I'm very thankful for all the kind words I've received regarding the project, and maybe one day I'll be back to make more updates, but for now I'll be focusing on life and other projects. I'll also be sporadically available on my Twitter to answer tech support questions or just chat. I love you all and please take care of yourselves! <3
 
 _**[How to Use]**_
@@ -97,7 +118,7 @@ _**[How to Use]**_
 Start by downloading this repository as a zip, and then extracting it somewhere on your computer.
 
 (*If not using a premade package, skip this step.* )
-Download one of the premade packages listed below. Once it's downloaded (if using a premade package), place it into the Edgeware folder inside Edgeware-main. 
+Download one of the premade packages listed below. Once it's downloaded (if using a premade package), place it into the Edgeware folder inside Edgeware-main.
 
 Double click "EdgewareSetup.bat" and follow the instructions. It should check your Python version, and then automatically download the correct installer from python.org and run it. Once you finish with that installation, it will run start.pyw, which will walk through an automated first time setup. Once this setup is complete, it will provide you with the config window to select your settings, and then run! (The installations only need to be performed on the first run)
 
@@ -199,7 +220,7 @@ Obviously you need to have Python installed, but other than that there should be
 __**Packages**__
 
   Packages must be structured as follows:
-  
+
     (name).zip
        ->aud
          (Audio Files) (Optional)
@@ -215,20 +236,20 @@ __**Packages**__
        prompt.json (Optional)
 	   discord.dat (Optional)
 	   captions.json (Optional)
-   
+
   The web.json file should contain two sets:
-  
+
     {"urls":["url1", "url2", ...], "args":["arg1,arg2,arg3", "", "arg1,arg2", ...]}
     ->urls - set of urls
     ->args - corresponding set of arguments; even if a url should take no argument, there must be a "" in this
       ->args are separated by commas within their strings, eg "arg1,arg2,arg3"
       ->ensure that urls and args are aligned; if the first URL can take the args "a,b" the first args value should be "a,b"
       ->args will be selected randomly and appended to the end of the url
-        ->eg, "https://www.google.com/" with args "penis,cock,ass" cound randomly return one of 
+        ->eg, "https://www.google.com/" with args "penis,cock,ass" cound randomly return one of
         ->https://www.google.com/penis  https://www.google.com/cock  https://www.google.com/ass
-        
+
   The prompt.json file should contain any number of sets:
-  
+
     {"moods":["mood1", "mood2", "angryMood"], "freqList":[10, 40, 50], "minLen":2, "maxLen"=4, "mood1":["mood1 sentence 1.", "mood1 sentence 2."], "mood2":["mood2 only has 1 sentence."], "angryMood":["angryMood also has one sentence."]}
         ->moods - names don't matter, as long as they're accounted for later in the set.
         ->freqList - correspond to each value in moods, define the frequency of that mood being selected.
@@ -236,7 +257,7 @@ __**Packages**__
         ->mood name
             ->can contain any number of mood related sentences.
             ->will ONLY select from this set if that mood is selected.
-            
+
 If resources are present, but not properly structured, the application could crash or exhibit strange behavior.
 
 *(If you like my work and would like to help me pay for food, please feel free to donate; Cashapp is $PetitTournesol)*
