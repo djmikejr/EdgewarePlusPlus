@@ -15,9 +15,13 @@ Previous config files might not work at all with this version, if you are planni
 
 •*Being able to change subliminal graphics*
 
+•*Being able to change startup graphics*
+
 •*Giving hibernate new modes, offering alternatives like "slowly ramping up over time"*
 
 •*Giving a use to prompt/caption "moods", initial inspiration was giving people the ability to make "one handed" prompt modes, for those who are too "preoccupied" to type multiple full sentences*
+
+•*Adding a "max videos" and "max audio" feature, both for performance and audio overlap reasons*
 
 •*Actually making the version number work with Edgeware++ updates, it's not exciting but would be good to learn how to do properly*
 
