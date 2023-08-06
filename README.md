@@ -1,21 +1,30 @@
-#Edgeware++
+# Edgeware++
 My goal with this extension of Edgeware is to add or modify features that I felt were missing or incomplete in the original version. I want to try to be as minimally intrusive as possible, i'm not aiming to remove or neuter any previous features, just add more functionality to the base program.
 
 I have prior programming experience, but have never touched python before this project- so it's mostly going to be trial and error. Half of this is a learning experience made easier by horny motivation.
 
 Previous config files might not work at all with this version, if you are planning on switching over, make sure you write down your settings! (or go into your config file and manually update it, if you're so inclined)
 
-Current things i'd like to add but haven't yet:
+**Current things i'd like to add but haven't yet:**
+
 •*Dark Mode*
+
 •*Toggle for deleting desktop icons on panic* (could cause panic instability, looking into it)
+
 •*Giving mitosis a percentage activation slider*
+
 •*Being able to change subliminal graphics*
+
 •*Giving hibernate new modes, offering alternatives like "slowly ramping up over time"*
+
 •*Giving a use to prompt/caption "moods", initial inspiration was giving people the ability to make "one handed" prompt modes, for those who are too "preoccupied" to type multiple full sentences*
+
 •*Actually making the version number work with Edgeware++ updates, it's not exciting but would be good to learn how to do properly*
 
-Version 1
+**Version 1**
+
 •*Added a option under "misc" to enable/disable desktop icon generation*
+
 •*Old presets from the original edgeware still exist, but may have compatibility issues.*
 
 Original Edgeware patchnotes included below for posterity.
