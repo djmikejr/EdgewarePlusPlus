@@ -26,6 +26,7 @@ Previous config files might not work at all with this version, if you are planni
 •*Actually making the version number work with Edgeware++ updates, it's not exciting but would be good to learn how to do properly*
 
 **Version 1.1**
+
 •*Added change notes in about section*
 
 **Version 1**
