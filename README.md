@@ -13,7 +13,7 @@ Previous config files might not work at all with this version, if you are planni
 
 •*Giving mitosis a percentage activation slider*
 
-•*Being able to change subliminal graphics*
+~~•*Being able to change subliminal graphics*~~ (turns out this already exists but since it's not on the pack editor literally nobody uses it)
 
 •*Being able to change startup graphics*
 
@@ -21,9 +21,25 @@ Previous config files might not work at all with this version, if you are planni
 
 •*Giving a use to prompt/caption "moods", initial inspiration was giving people the ability to make "one handed" prompt modes, for those who are too "preoccupied" to type multiple full sentences*
 
-•*Adding a "max videos" and "max audio" feature, both for performance and audio overlap reasons*
+•*Making a toggle to "check for dangerous options and confirm with user before closing" config setting, because I know many people (including myself!) are probably anxious about accidentally setting a discord setting or overwriting files on their computer*
 
 •*Actually making the version number work with Edgeware++ updates, it's not exciting but would be good to learn how to do properly*
+
+**Version 2**
+
+•*Added feature to cap audio, and removed the hard-coded limit of 1 so multiple audio can play at the same time. The number goes down when audio finishes*
+>I assume the intention of audio popups were things like long hypno files, which makes sense to limit to one. I wanted to expand this functionality to allow people to make packs that can layer shorter files, like layering multiple sex sounds on top of eachother. The default is still set to CAP ON with MAX 1 so if you are using old packs and don't want to touch this setting you don't have to do anything.
+
+•*Added feature to cap videos in the config window, but is currently half implemented, so beware!*
+>For specifics, the video capping feature works in the sense that it will cap the number of videos after a specific amount, but does NOT factor in video windows closing to lower the current videos playing count. I've been bashing my head against this problem for a while as it's much more complicated than other issues i've tackled in this project so far, but ended up wanting to take a break and finish/release some other elements of the program. I figured that since it technically "sort of" works and doesn't cause any instability or crashes (as far as i'm aware), I might as well include it in the release instead of commenting it out.
+If you want technical details, start.pyw calls popup.pyw as a subprocess, and passing variables to and from files like that is tricky (at least to me, with minimal python experience at time of writing). I've currently got start.pyw running a limiter "video number" variable that increases as it spawns new windows, but have struggled to find a way to get popup.pyw to reliably report back that a **video window** has closed and to get start.pyw to update the number whenever that happens. I will continue to try and figure out ways to do this without causing major performance/stability issues.
+
+•*Moved the Subliminals option down to it's own section*
+
+•*Added feature to give subliminals a percentage chance to activate. Defaults at 100, which is the same as the original EdgeWare*
+
+•*Added option in the config menu to limit max number of subliminals, but it currently does nothing*
+>Pretty much the exact same issue as the max video problem above, although this one might be easier to solve. However, unlike the max video slider, this truly does absolutely nothing and won't impact anything in the current version. I'm probably unprofessional for not disabling or removing this in the current version.
 
 **Version 1.1**
 

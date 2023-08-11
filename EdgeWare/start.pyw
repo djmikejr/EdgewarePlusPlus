@@ -220,6 +220,13 @@ VIDEOS_ONLY = int(settings['onlyVid']) == 1
 
 PANIC_DISABLED = int(settings['panicDisabled']) == 1
 
+AUDIO_CAP = int(settings['maxAudioBool']) == 1
+AUDIO_MAX = int(settings['maxAudio'])
+VIDEO_CAP = int(settings['maxVideoBool']) == 1
+VIDEO_MAX = int(settings['maxVideos'])
+AUDIO_NUMBER = 0
+VIDEO_NUMBER = 0
+
 #mode vars
 SHOW_ON_DISCORD = int(settings['showDiscord']) == 1
 LOADING_FLAIR = int(settings['showLoadingFlair']) == 1
@@ -680,24 +687,41 @@ def roll_for_initiative():
             messagebox.showerror('Web Error', 'Failed to open website.\n[' + str(e) + ']')
             logging.critical(f'failed to open website {url}\n\tReason: {e}')
     if do_roll(VIDEO_CHANCE) and VIDEOS:
-        try:
-            thread.Thread(target=lambda: subprocess.call('pyw popup.pyw -video', shell=False)).start()
-        except Exception as e:
-            messagebox.showerror('Popup Error', 'Failed to start popup.\n[' + str(e) + ']')
-            logging.critical(f'failed to start video popup.pyw\n\tReason: {e}')
-
+        global VIDEO_NUMBER
+        if VIDEO_CAP:
+            if VIDEO_NUMBER < VIDEO_MAX:
+                try:
+                    thread.Thread(target=lambda: subprocess.call('pyw popup.pyw -video', shell=False)).start()
+                    VIDEO_NUMBER += 1
+                except Exception as e:
+                    messagebox.showerror('Popup Error', 'Failed to start popup.\n[' + str(e) + ']')
+                    logging.critical(f'failed to start video popup.pyw\n\tReason: {e}')
+        else:
+            try:
+                thread.Thread(target=lambda: subprocess.call('pyw popup.pyw -video', shell=False)).start()
+            except Exception as e:
+                messagebox.showerror('Popup Error', 'Failed to start popup.\n[' + str(e) + ']')
+                logging.critical(f'failed to start video popup.pyw\n\tReason: {e}')
     if (not (MITOSIS_MODE or LOWKEY_MODE)) and do_roll(POPUP_CHANCE) and HAS_IMAGES:
         try:
             os.startfile('popup.pyw')
         except Exception as e:
             messagebox.showerror('Popup Error', 'Failed to start popup.\n[' + str(e) + ']')
             logging.critical(f'failed to start popup.pyw\n\tReason: {e}')
-    if do_roll(AUDIO_CHANCE) and not PLAYING_AUDIO and AUDIO:
-        try:
-            thread.Thread(target=play_audio).start()
-        except:
-            messagebox.showerror('Audio Error', 'Failed to play audio.\n[' + str(e) + ']')
-            logging.critical(f'failed to play audio\n\tReason: {e}')
+    if do_roll(AUDIO_CHANCE) and AUDIO:
+        if AUDIO_CAP:
+            if AUDIO_NUMBER < AUDIO_MAX:
+                try:
+                    thread.Thread(target=play_audio).start()
+                except:
+                    messagebox.showerror('Audio Error', 'Failed to play audio.\n[' + str(e) + ']')
+                    logging.critical(f'failed to play audio\n\tReason: {e}')
+        else:
+            try:
+                thread.Thread(target=play_audio).start()
+            except:
+                messagebox.showerror('Audio Error', 'Failed to play audio.\n[' + str(e) + ']')
+                logging.critical(f'failed to play audio\n\tReason: {e}')
     if do_roll(PROMPT_CHANCE) and HAS_PROMPTS:
         try:
             subprocess.call('pythonw prompt.pyw')
@@ -749,13 +773,16 @@ def do_timer():
 #if audio is not playing, selects and plays random audio file from /aud/ folder
 def play_audio():
     global PLAYING_AUDIO
+    global AUDIO_NUMBER
     if not AUDIO:
         return
     logging.info('starting audio playback')
     PLAYING_AUDIO = True
+    AUDIO_NUMBER += 1
     #winsound.PlaySound(AUDIO[rand.randrange(len(AUDIO))], winsound.SND_FILENAME)
     playsound.playsound(AUDIO[rand.randrange(len(AUDIO))])
     PLAYING_AUDIO = False
+    AUDIO_NUMBER -= 1
     logging.info('finished audio playback')
 
 #fills drive with copies of images from /resource/img/

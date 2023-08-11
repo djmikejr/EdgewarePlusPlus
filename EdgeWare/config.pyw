@@ -59,7 +59,7 @@ WALLPAPER_TEXT          = 'The Wallpaper section allows you to set up rotating w
 HIBERNATE_TEXT          = 'The Hibernate feature is an entirely different mode for Edgeware to operate in.\nInstead of constantly shoving popups, lewd websites, audio, and prompts in your face, hibernate starts quiet and waits for a random amount of time between its provided min and max before exploding with a rapid assortment of your chosen payloads. Once it finishes its barrage, it settles back down again for another random amount of time, ready to strike again when the time is right.\n\n\nThis feature is intend to be a much "calmer" way to use Edgeware; instead of explicitly using it to edge yourself or get off, it\'s supposed to lie in wait for you and perform bursts of self-sabotage to keep drawing you back to porn.'
 ADVANCED_TEXT           = 'The Advanced section is also something previously only accessible by directly editing the config.cfg file. It offers full and complete customization of all setting values without any limitations outside of variable typing.\n\n\nPlease use this feature with discretion, as any erroneous values will result in a complete deletion and regeneration of the config file from the default, and certain value ranges are likely to result in crashes or unexpected glitches in the program.'
 THANK_AND_ABOUT_TEXT    = 'Thank you so much to all the fantastic artists who create and freely distribute the art that allows programs like this to exist, to all the people who helped me work through the various installation problems as we set the software up (especially early on), and honestly thank you to ALL of the people who are happily using Edgeware. \n\nIt truly makes me happy to know that my work is actually being put to good use by people who enjoy it. After all, at the end of the day that\'s really all I\'ve ever really wanted, but figured was beyond reach of a stupid degreeless neet.\nI love you all <3\n\n\n\nIf you like my work, please feel free to help support my neet lifestyle by donating to $PetitTournesol on Cashapp; by no means are you obligated or expected to, but any and all donations are greatly appreciated!'
-PLUSPLUS_TEXT           = 'Thanks for taking the time to check out this extension on EdgeWare! However you found it, I appreciate that it interested you enough to give it a download.\n\nI am not an expert programmer by any means, so apologies if there are any bugs or errors in this version. My goal is to not do anything crazy ambitious like rewrite the entire program or fix up the backend, but rather just add on functionality that I thought could improve the base version. Because of this, i\'m hoping that compatability between those who use normal EdgeWare and those who use this version stays relatively stable.\n\nCurrent changes:\n\n•Added a option under "misc" to enable/disable desktop icon generation'
+PLUSPLUS_TEXT           = 'Thanks for taking the time to check out this extension on EdgeWare! However you found it, I appreciate that it interested you enough to give it a download.\n\nI am not an expert programmer by any means, so apologies if there are any bugs or errors in this version. My goal is to not do anything crazy ambitious like rewrite the entire program or fix up the backend, but rather just add on functionality that I thought could improve the base version. Because of this, i\'m hoping that compatability between those who use normal EdgeWare and those who use this version stays relatively stable.\n\nCurrent changes:\n\n•Added a option under "misc" to enable/disable desktop icon generation\n\n•Added options to cap the number of audio popups and video popups.\nNOTE: AS OF VERSION 2 VIDEO CAPPING IS HALF IMPLEMENTED, LEAVE IT DISABLED OR PREPARE TO FACE WEIRDNESS!\n\n•Added a chance slider for subliminals, and a max subliminals slider (which currently does nothing!)'
 #all booru consts
 BOORU_FLAG = '<BOORU_INSERT>'                                                      #flag to replace w/ booru name
 BOORU_URL  = f'https://{BOORU_FLAG}.booru.org/index.php?page=post&s=list&tags='    #basic url
@@ -219,6 +219,14 @@ def show_window():
 
             deskIconVar         = BooleanVar(root, value=(int(settings['desktopIcons'])==1))
 
+            maxAToggleVar       = BooleanVar(root, value=(int(settings['maxAudioBool'])==1))
+            maxAudioVar         = IntVar(root, value=(int(settings['maxAudio'])))
+            maxVToggleVar       = BooleanVar(root, value=(int(settings['maxVideoBool'])==1))
+            maxVideoVar         = IntVar(root, value=(int(settings['maxVideos'])))
+
+            subliminalsChanceVar        = IntVar(root, value=int(settings['subliminalsChance']))
+            maxSubliminalsVar           = IntVar(root, value=int(settings['maxSubliminals']))
+
             #grouping for sanity's sake later
             in_var_group = [delayVar, popupVar, webVar, audioVar, promptVar, fillVar,
                             fillDelayVar, replaceVar, replaceThreshVar, startLoginVar,
@@ -230,7 +238,8 @@ def show_window():
                             downloadEnabledVar, downloadModeVar, useWebResourceVar, fillPathVar, rosVar,
                             timerVar, timerTimeVar, lkCorner, popopOpacity, lkToggle,
                             videoVolume, vidVar, denialMode, denialChance, popupSublim,
-                            booruMin, deskIconVar]
+                            booruMin, deskIconVar, maxAToggleVar, maxAudioVar, maxVToggleVar,
+                            maxVideoVar, subliminalsChanceVar, maxSubliminalsVar]
 
             in_var_names = ['delay', 'popupMod', 'webMod', 'audioMod', 'promptMod', 'fill',
                             'fill_delay', 'replace', 'replaceThresh', 'start_on_logon',
@@ -242,7 +251,8 @@ def show_window():
                             'downloadEnabled', 'downloadMode', 'useWebResource', 'drivePath', 'runOnSaveQuit',
                             'timerMode', 'timerSetupTime', 'lkCorner', 'lkScaling', 'lkToggle',
                             'videoVolume', 'vidMod', 'denialMode', 'denialChance', 'popupSubliminals',
-                            'booruMinScore', 'desktopIcons']
+                            'booruMinScore', 'desktopIcons', 'maxAudioBool', 'maxAudio', 'maxVideoBool',
+                            'maxVideos', 'subliminalsChance', 'maxSubliminals']
             break
         except Exception as e:
             messagebox.showwarning(
@@ -279,6 +289,9 @@ def show_window():
     timer_group     = []
     lowkey_group    = []
     denial_group    = []
+    maxAudio_group  = []
+    maxVideo_group  = []
+    subliminals_group = []
 
     #tab display code start
     tabMaster    = ttk.Notebook(root)       #tab manager
@@ -538,7 +551,6 @@ def show_window():
 
     popupWebToggle= Checkbutton(popupHostFrame, text='Popup close opens web page', variable=popupWebVar)
     toggleCaptionsButton = Checkbutton(popupHostFrame, text='Popup Captions', variable=captionVar)
-    toggleSubliminalButton = Checkbutton(popupHostFrame, text='Popup Subliminals', variable=popupSublim)
 
     timeoutToggle = Checkbutton(timeoutFrame, text='Popup Timeout', variable=timeoutPopupsVar, command=lambda: toggleAssociateSettings(timeoutPopupsVar.get(), timeout_group))
     timeoutSlider = Scale(timeoutFrame, label='Time (sec)', from_=1, to=120, orient='horizontal', variable=popupTimeoutVar)
@@ -569,7 +581,6 @@ def show_window():
     panicDisableButton.pack(fill='x')
     popupWebToggle.pack(fill='x')
     toggleCaptionsButton.pack(fill='x')
-    toggleSubliminalButton.pack(fill='x')
     #popup frame handle end
 
     #other start
@@ -623,6 +634,68 @@ def show_window():
     mistakeScale.pack(fill='x')
     mistakeManual.pack(fill='x')
     #end web
+
+    #max start
+    maxPopupFrame = Frame(tabAnnoyance, borderwidth=5, relief=RAISED)
+
+    maxAudioFrame = Frame(maxPopupFrame)
+    maxVideoFrame = Frame(maxPopupFrame)
+    subliminalsFrame = Frame(maxPopupFrame)
+
+    subliminalsChanceFrame = Frame(subliminalsFrame)
+    maxSubliminalsFrame = Frame(subliminalsFrame)
+    #extra space for one more?
+
+    maxAudioToggle = Checkbutton(maxAudioFrame, text='Cap Audio', variable=maxAToggleVar, command=lambda: toggleAssociateSettings(maxAToggleVar.get(), maxAudio_group))
+    maxAudioScale = Scale(maxAudioFrame, label='Max Audio Popups', from_=1, to=50, orient='horizontal', variable=maxAudioVar)
+    maxAudioManual = Button(maxAudioFrame, text='Manual Max Audio...', command=lambda: assign(maxAudioVar, simpledialog.askinteger('Manual Max Audio', prompt='[1-50]: ')))
+
+    maxAudio_group.append(maxAudioScale)
+    maxAudio_group.append(maxAudioManual)
+
+    maxVideoToggle = Checkbutton(maxVideoFrame, text='Cap Videos', variable=maxVToggleVar, command=lambda: toggleAssociateSettings(maxVToggleVar.get(), maxVideo_group))
+    maxVideoScale = Scale(maxVideoFrame, label='Max Video Popups', from_=1, to=50, orient='horizontal', variable=maxVideoVar)
+    maxVideoManual = Button(maxVideoFrame, text='Manual Max Videos...', command=lambda: assign(maxVideoVar, simpledialog.askinteger('Manual Max Videos', prompt='[1-50]: ')))
+
+    maxVideo_group.append(maxVideoScale)
+    maxVideo_group.append(maxVideoManual)
+
+    toggleSubliminalButton = Checkbutton(subliminalsFrame, text='Popup Subliminals', variable=popupSublim, command=lambda: toggleAssociateSettings(popupSublim.get(), subliminals_group))
+
+    subliminalsChanceScale = Scale(subliminalsChanceFrame, label='Sublim. Chance (%)', from_=1, to=100, orient='horizontal', variable=subliminalsChanceVar)
+    subliminalsChanceManual = Button(subliminalsChanceFrame, text='Manual Sub Chance...', command=lambda: assign(subliminalsChanceVar, simpledialog.askinteger('Manual Subliminal Chance', prompt='[1-100]: ')))
+
+    subliminals_group.append(subliminalsChanceScale)
+    subliminals_group.append(subliminalsChanceManual)
+
+    maxSubliminalsScale = Scale(maxSubliminalsFrame, label='Max Subliminals', from_=1, to=200, orient='horizontal', variable=maxSubliminalsVar)
+    maxSubliminalsManual = Button(maxSubliminalsFrame, text='Manual Max Sub...', command=lambda: assign(maxSubliminalsVar, simpledialog.askinteger('Manual Max Subliminals', prompt='[1-200]: ')))
+
+    subliminals_group.append(maxSubliminalsScale)
+    subliminals_group.append(maxSubliminalsManual)
+
+    maxPopupFrame.pack(fill='x')
+
+    maxAudioFrame.pack(side='left')
+    maxAudioToggle.pack(fill='x')
+    maxAudioScale.pack(fill='x', padx=1, expand=1)
+    maxAudioManual.pack(fill='x')
+
+    maxVideoFrame.pack(fill='y', side='left', padx=3, expand=1)
+    maxVideoToggle.pack(fill='x')
+    maxVideoScale.pack(fill='x', padx=1, expand=1)
+    maxVideoManual.pack(fill='x')
+
+    subliminalsFrame.pack(side='left')
+    toggleSubliminalButton.pack(fill='x')
+
+    subliminalsChanceFrame.pack(fill='y', side='left', padx=3, expand=1)
+    subliminalsChanceScale.pack(fill='x', padx=1, expand=1)
+    subliminalsChanceManual.pack(fill='x')
+
+    maxSubliminalsFrame.pack(fill='y', side='left', padx=3, expand=1)
+    maxSubliminalsScale.pack(fill='x', padx=1, expand=1)
+    maxSubliminalsManual.pack(fill='x')
     #===================={DRIVE}==============================#
     tabMaster.add(tabDrive, text='Drive')
 
@@ -857,6 +930,9 @@ def show_window():
     toggleAssociateSettings(timerVar.get(), timer_group)
     toggleAssociateSettings(lkToggle.get(), lowkey_group)
     toggleAssociateSettings(denialMode.get(), denial_group)
+    toggleAssociateSettings(maxAToggleVar.get(), maxAudio_group)
+    toggleAssociateSettings(maxVToggleVar.get(), maxVideo_group)
+    toggleAssociateSettings(popupSublim.get(), subliminals_group)
 
     tabMaster.pack(expand=1, fill='both')
     tabInfoExpound.pack(expand=1, fill='both')

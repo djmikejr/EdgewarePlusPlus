@@ -105,6 +105,8 @@ FADE_OUT_TIME = 1.5
 DENIAL_MODE = False
 DENIAL_CHANCE = 0
 SUBLIMINAL_MODE = False
+SUBLIMINAL_CHANCE = 100
+MAX_SUBLIMINALS = 200
 
 with open(PATH + '\\config.cfg', 'r') as cfg:
     settings = json.loads(cfg.read())
@@ -125,11 +127,12 @@ with open(PATH + '\\config.cfg', 'r') as cfg:
     VIDEO_VOLUME = float(settings['videoVolume']) / 100
 
     VIDEO_VOLUME = min(max(0, VIDEO_VOLUME), 1)
-        
+
     DENIAL_MODE = check_setting('denialMode')
     DENIAL_CHANCE = int(settings['denialChance'])
     SUBLIMINAL_MODE = check_setting('popupSubliminals')
-
+    SUBLIMINAL_CHANCE = int(settings['subliminalsChance'])
+    MAX_SUBLIMINALS = int(settings['maxSubliminals'])
 #functions for script mode, unused for now
 if checkTag('timeout='):
     HAS_LIFESPAN = True
@@ -203,7 +206,7 @@ class VideoLabel(tk.Label):
         import imageio
         from moviepy.editor import AudioFileClip
         from videoprops import get_video_properties
-        
+
         self.path = path
         self.configure(background='black')
         self.wid = resized_width
@@ -221,7 +224,7 @@ class VideoLabel(tk.Label):
             self.duration = None
         self.video_frames = imageio.get_reader(path)
         self.delay = 1 / self.fps
-        
+
     def play(self):
         from types import NoneType
         if not isinstance(self.audio_track, NoneType):
@@ -248,11 +251,11 @@ def run():
 
     while item.split('.')[-1].lower() == 'ini':
         item = arr[rand.randrange(len(arr))]
-    if len(SYS_ARGS) >= 1 and SYS_ARGS[0] != '%RAND%': 
+    if len(SYS_ARGS) >= 1 and SYS_ARGS[0] != '%RAND%':
         item = rand.choice(os.listdir(os.path.join(PATH, 'resource', 'vid')))
     if len(SYS_ARGS) >= 1 and SYS_ARGS[0] == '-video':
         video_mode = True
-    
+
     if not video_mode:
         while True:
             try:
@@ -292,6 +295,8 @@ def run():
     resized_image = resize(image)
 
     do_deny = check_deny()
+    if SUBLIMINAL_MODE:
+        check_subliminal()
 
     if do_deny and not gif_bool:
         blur_modes = [ImageFilter.GaussianBlur(5), ImageFilter.GaussianBlur(10), ImageFilter.GaussianBlur(20),
@@ -364,10 +369,10 @@ def run():
             locY = data_list[3] - (resized_image.height)
 
     root.geometry(f'{resized_image.width + border_wid_const - 1}x{resized_image.height + border_wid_const - 1}+{locX}+{locY}')
-    
+
     if gif_bool:
         label.next_frame()
-    
+
     if HAS_LIFESPAN or LOWKEY_MODE:
         thread.Thread(target=lambda: live_life(root, LIFESPAN if not LOWKEY_MODE else DELAY / 1000), daemon=True).start()
 
@@ -385,6 +390,11 @@ def run():
 
 def check_deny() -> bool:
     return DENIAL_MODE and rand.randint(1, 100) <= DENIAL_CHANCE
+
+def check_subliminal():
+    global SUBLIMINAL_MODE
+    if rand.randint(1, 100) > SUBLIMINAL_CHANCE:
+        SUBLIMINAL_MODE = False
 
 def live_life(parent:tk, length:int):
     time.sleep(length)
