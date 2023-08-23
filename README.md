@@ -15,8 +15,6 @@ Previous config files might not work at all with this version, if you are planni
 
 ~~•*Being able to change subliminal graphics*~~ (turns out this already exists but since it's not on the pack editor literally nobody uses it)
 
-•*Being able to change startup graphics*
-
 •*Giving hibernate new modes, offering alternatives like "slowly ramping up over time"*
 
 •*Giving a use to prompt/caption "moods", initial inspiration was giving people the ability to make "one handed" prompt modes, for those who are too "preoccupied" to type multiple full sentences*
@@ -24,6 +22,14 @@ Previous config files might not work at all with this version, if you are planni
 •*Making a toggle to "check for dangerous options and confirm with user before closing" config setting, because I know many people (including myself!) are probably anxious about accidentally setting a discord setting or overwriting files on their computer*
 
 •*Actually making the version number work with Edgeware++ updates, it's not exciting but would be good to learn how to do properly*
+
+**Version 3**
+
+•*Added feature to change startup graphics per pack. File MUST be named "loading_splash.png" inside the resource directory. If none is found, automatically adjusts to the default.*
+>After I set out to do most of what I want to accomplish i'm hoping to add these features to the pack editor so people actually know they exist
+
+•*Actually made max video slider work properly. Max subliminals is still unfinished, but will be fixed next version (hopefully!)*
+>Thank god! I spent double-digit hours trying to figure out how do to this the most gracefully (or at least efficiently) without rewriting the entire subprocess code, but in the end I opted for the easy/hacky way out. You'll see two new files appear in your edgeware directory, max_videos.dat, and max_subliminals.dat. These are files that only contain a single number, which is accessed and edited by the various popups to properly change the active number of popups. It's 4 AM right now and I want to push this before I forget, so right now only the video cap is fixed, but subliminals should be an easy addition now and will be done when I next work on EW++.
 
 **Version 2**
 

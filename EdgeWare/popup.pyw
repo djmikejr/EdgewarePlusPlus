@@ -269,6 +269,7 @@ def run():
         video_properties = get_video_properties(video_path)
         image = Image.new('RGB', (video_properties['width'], video_properties['height']))
 
+
     gif_bool = item.split('.')[-1].lower() == 'gif'
     border_wid_const = 5
     monitor_data = monitor_areas()
@@ -403,6 +404,13 @@ def live_life(parent:tk, length:int):
         time.sleep(FADE_OUT_TIME / 100)
     if LOWKEY_MODE:
         os.startfile('popup.pyw')
+    if len(SYS_ARGS) >= 1 and SYS_ARGS[0] == '-video':
+        with open(os.path.join(PATH, 'max_videos.dat'), 'r+') as f:
+            i = int(f.readline())
+            if i > 0:
+                f.seek(0)
+                f.write(str(i-1))
+                f.truncate()
     os.kill(os.getpid(), 9)
 
 def do_roll(mod:int):
@@ -418,6 +426,13 @@ def die():
     if MITOSIS_MODE or LOWKEY_MODE:
         for i in (range(0, MITOSIS_STRENGTH) if not LOWKEY_MODE else [1]):
             os.startfile('popup.pyw')
+    if len(SYS_ARGS) >= 1 and SYS_ARGS[0] == '-video':
+        with open(os.path.join(PATH, 'max_videos.dat'), 'r+') as f:
+            i = int(f.readline())
+            if i > 0:
+                f.seek(0)
+                f.write(str(i-1))
+                f.truncate()
     os.kill(os.getpid(), 9)
 
 def select_caption(filename:str) -> str:

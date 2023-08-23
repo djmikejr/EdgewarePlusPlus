@@ -402,7 +402,10 @@ if DESKTOP_ICONS:
 
 if LOADING_FLAIR:
     logging.info('started loading flair')
-    subprocess.call('pythonw startup_flair.pyw')
+    if os.path.exists(PATH + '\\resource\\loading_splash.png'):
+        subprocess.call('pythonw startup_flair.pyw -custom')
+    else:
+        subprocess.call('pythonw startup_flair.pyw')
 
 #set wallpaper
 if not HIBERNATE_MODE:
@@ -491,6 +494,12 @@ def main():
     #timer handling, start if there's a time left file
     if os.path.exists(os.path.join(PATH, 'hid_time.dat')):
         thread.Thread(target=do_timer).start()
+
+    #max value handling creation/cleaning
+    with open(os.path.join(PATH, 'max_videos.dat'), 'w') as f:
+        f.write('0')
+    with open(os.path.join(PATH, 'max_subliminals.dat'), 'w') as f:
+        f.write('0')
 
     #do downloading for booru stuff
     if settings.get('downloadEnabled') == 1:
@@ -689,10 +698,13 @@ def roll_for_initiative():
     if do_roll(VIDEO_CHANCE) and VIDEOS:
         global VIDEO_NUMBER
         if VIDEO_CAP:
+            with open(os.path.join(PATH, 'max_videos.dat'), 'r') as f:
+                VIDEO_NUMBER = int(f.readline())
             if VIDEO_NUMBER < VIDEO_MAX:
                 try:
                     thread.Thread(target=lambda: subprocess.call('pyw popup.pyw -video', shell=False)).start()
-                    VIDEO_NUMBER += 1
+                    with open(os.path.join(PATH, 'max_videos.dat'), 'w') as f:
+                        f.write(str(VIDEO_NUMBER+1))
                 except Exception as e:
                     messagebox.showerror('Popup Error', 'Failed to start popup.\n[' + str(e) + ']')
                     logging.critical(f'failed to start video popup.pyw\n\tReason: {e}')
