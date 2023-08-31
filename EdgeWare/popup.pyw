@@ -326,17 +326,23 @@ def run():
             label = Label(root, image=photoimage_image, bg='black')
             label.pack()
         else:
-            label = GifLabel(root)
-            subliminal_path = os.path.join(PATH, 'default_assets', 'default_spiral.gif')
+            with open(os.path.join(PATH, 'max_subliminals.dat'), 'r+') as f:
+                i = int(f.readline())
+                label = GifLabel(root)
+                subliminal_path = os.path.join(PATH, 'default_assets', 'default_spiral.gif')
 
-            if os.path.exists(os.path.join(PATH, 'resource', 'subliminals')):
-                subliminal_options = [file for file in os.listdir(os.path.join(PATH, 'resource', 'subliminals')) if file.lower().endswith('.gif')]
-                if len(subliminal_options) > 0:
-                    subliminal_path = os.path.join(PATH, 'resource', 'subliminals', str(rand.choice(subliminal_options)))
+                if os.path.exists(os.path.join(PATH, 'resource', 'subliminals')):
+                    subliminal_options = [file for file in os.listdir(os.path.join(PATH, 'resource', 'subliminals')) if file.lower().endswith('.gif')]
+                    if len(subliminal_options) > 0:
+                        subliminal_path = os.path.join(PATH, 'resource', 'subliminals', str(rand.choice(subliminal_options)))
 
-            label.load(subliminal_path, photoimage_image.width(), photoimage_image.height(), back_image=resized_image)
-            label.pack()
-            label.next_frame()
+                label.load(subliminal_path, photoimage_image.width(), photoimage_image.height(), back_image=resized_image)
+                label.pack()
+                label.next_frame()
+
+                f.seek(0)
+                f.write(str(i+1))
+                f.truncate()
 
         if do_deny:
             deny_options = CAPTIONS.get('denial')
@@ -394,8 +400,11 @@ def check_deny() -> bool:
 
 def check_subliminal():
     global SUBLIMINAL_MODE
-    if rand.randint(1, 100) > SUBLIMINAL_CHANCE:
-        SUBLIMINAL_MODE = False
+    with open(os.path.join(PATH, 'max_subliminals.dat'), 'r') as f:
+        if int(f.readline()) >= MAX_SUBLIMINALS:
+            SUBLIMINAL_MODE = False
+        elif rand.randint(1, 100) > SUBLIMINAL_CHANCE:
+            SUBLIMINAL_MODE = False
 
 def live_life(parent:tk, length:int):
     time.sleep(length)
@@ -406,6 +415,13 @@ def live_life(parent:tk, length:int):
         os.startfile('popup.pyw')
     if len(SYS_ARGS) >= 1 and SYS_ARGS[0] == '-video':
         with open(os.path.join(PATH, 'max_videos.dat'), 'r+') as f:
+            i = int(f.readline())
+            if i > 0:
+                f.seek(0)
+                f.write(str(i-1))
+                f.truncate()
+    if SUBLIMINAL_MODE:
+        with open(os.path.join(PATH, 'max_subliminals.dat'), 'r+') as f:
             i = int(f.readline())
             if i > 0:
                 f.seek(0)
@@ -428,6 +444,13 @@ def die():
             os.startfile('popup.pyw')
     if len(SYS_ARGS) >= 1 and SYS_ARGS[0] == '-video':
         with open(os.path.join(PATH, 'max_videos.dat'), 'r+') as f:
+            i = int(f.readline())
+            if i > 0:
+                f.seek(0)
+                f.write(str(i-1))
+                f.truncate()
+    if SUBLIMINAL_MODE:
+        with open(os.path.join(PATH, 'max_subliminals.dat'), 'r+') as f:
             i = int(f.readline())
             if i > 0:
                 f.seek(0)

@@ -13,6 +13,7 @@ import sys
 import logging
 import time
 from tkinter import Tk, ttk, simpledialog, messagebox, filedialog, IntVar, BooleanVar, StringVar, Frame, Checkbutton, Button, Scale, Label, Toplevel, Entry, OptionMenu, Listbox, SINGLE, DISABLED, GROOVE, RAISED
+from tk_ToolTip_class101 import CreateToolTip
 
 PATH = f'{str(pathlib.Path(__file__).parent.absolute())}\\'
 os.chdir(PATH)
@@ -59,7 +60,8 @@ WALLPAPER_TEXT          = 'The Wallpaper section allows you to set up rotating w
 HIBERNATE_TEXT          = 'The Hibernate feature is an entirely different mode for Edgeware to operate in.\nInstead of constantly shoving popups, lewd websites, audio, and prompts in your face, hibernate starts quiet and waits for a random amount of time between its provided min and max before exploding with a rapid assortment of your chosen payloads. Once it finishes its barrage, it settles back down again for another random amount of time, ready to strike again when the time is right.\n\n\nThis feature is intend to be a much "calmer" way to use Edgeware; instead of explicitly using it to edge yourself or get off, it\'s supposed to lie in wait for you and perform bursts of self-sabotage to keep drawing you back to porn.'
 ADVANCED_TEXT           = 'The Advanced section is also something previously only accessible by directly editing the config.cfg file. It offers full and complete customization of all setting values without any limitations outside of variable typing.\n\n\nPlease use this feature with discretion, as any erroneous values will result in a complete deletion and regeneration of the config file from the default, and certain value ranges are likely to result in crashes or unexpected glitches in the program.'
 THANK_AND_ABOUT_TEXT    = 'Thank you so much to all the fantastic artists who create and freely distribute the art that allows programs like this to exist, to all the people who helped me work through the various installation problems as we set the software up (especially early on), and honestly thank you to ALL of the people who are happily using Edgeware. \n\nIt truly makes me happy to know that my work is actually being put to good use by people who enjoy it. After all, at the end of the day that\'s really all I\'ve ever really wanted, but figured was beyond reach of a stupid degreeless neet.\nI love you all <3\n\n\n\nIf you like my work, please feel free to help support my neet lifestyle by donating to $PetitTournesol on Cashapp; by no means are you obligated or expected to, but any and all donations are greatly appreciated!'
-PLUSPLUS_TEXT           = 'Thanks for taking the time to check out this extension on EdgeWare! However you found it, I appreciate that it interested you enough to give it a download.\n\nI am not an expert programmer by any means, so apologies if there are any bugs or errors in this version. My goal is to not do anything crazy ambitious like rewrite the entire program or fix up the backend, but rather just add on functionality that I thought could improve the base version. Because of this, i\'m hoping that compatability between those who use normal EdgeWare and those who use this version stays relatively stable.\n\nCurrent changes:\n\n•Added a option under "misc" to enable/disable desktop icon generation\n\n•Added options to cap the number of audio popups and video popups.\nNOTE: AS OF VERSION 2 VIDEO CAPPING IS HALF IMPLEMENTED, LEAVE IT DISABLED OR PREPARE TO FACE WEIRDNESS!\n\n•Added a chance slider for subliminals, and a max subliminals slider (which currently does nothing!)'
+
+PLUSPLUS_TEXT           = 'Thanks for taking the time to check out this extension on EdgeWare! However you found it, I appreciate that it interested you enough to give it a download.\n\nI am not an expert programmer by any means, so apologies if there are any bugs or errors in this version. My goal is to not do anything crazy ambitious like rewrite the entire program or fix up the backend, but rather just add on functionality that I thought could improve the base version. Because of this, i\'m hoping that compatability between those who use normal EdgeWare and those who use this version stays relatively stable.\n\nCurrent changes:\n\n•Added a option under "misc" to enable/disable desktop icon generation.\n\n•Added options to cap the number of audio popups and video popups.\n\n•Added a chance slider for subliminals, and a max subliminals slider.\n\n•Added feature to change Startup Graphic per pack. (name the file \"loading_splash.png\" in the resource folder)\n\n•Added feature to enable warnings for \"Dangerous Settings\".\n\n•Added hover tooltips on some things to make the program easier to understand.'
 #all booru consts
 BOORU_FLAG = '<BOORU_INSERT>'                                                      #flag to replace w/ booru name
 BOORU_URL  = f'https://{BOORU_FLAG}.booru.org/index.php?page=post&s=list&tags='    #basic url
@@ -227,6 +229,8 @@ def show_window():
             subliminalsChanceVar        = IntVar(root, value=int(settings['subliminalsChance']))
             maxSubliminalsVar           = IntVar(root, value=int(settings['maxSubliminals']))
 
+            safeModeVar         = BooleanVar(root, value=(int(settings['safeMode'])==1))
+
             #grouping for sanity's sake later
             in_var_group = [delayVar, popupVar, webVar, audioVar, promptVar, fillVar,
                             fillDelayVar, replaceVar, replaceThreshVar, startLoginVar,
@@ -239,7 +243,7 @@ def show_window():
                             timerVar, timerTimeVar, lkCorner, popopOpacity, lkToggle,
                             videoVolume, vidVar, denialMode, denialChance, popupSublim,
                             booruMin, deskIconVar, maxAToggleVar, maxAudioVar, maxVToggleVar,
-                            maxVideoVar, subliminalsChanceVar, maxSubliminalsVar]
+                            maxVideoVar, subliminalsChanceVar, maxSubliminalsVar, safeModeVar]
 
             in_var_names = ['delay', 'popupMod', 'webMod', 'audioMod', 'promptMod', 'fill',
                             'fill_delay', 'replace', 'replaceThresh', 'start_on_logon',
@@ -252,7 +256,7 @@ def show_window():
                             'timerMode', 'timerSetupTime', 'lkCorner', 'lkScaling', 'lkToggle',
                             'videoVolume', 'vidMod', 'denialMode', 'denialChance', 'popupSubliminals',
                             'booruMinScore', 'desktopIcons', 'maxAudioBool', 'maxAudio', 'maxVideoBool',
-                            'maxVideos', 'subliminalsChance', 'maxSubliminals']
+                            'maxVideos', 'subliminalsChance', 'maxSubliminals', 'safeMode']
             break
         except Exception as e:
             messagebox.showwarning(
@@ -444,6 +448,7 @@ def show_window():
     toggleFlairButton = Checkbutton(toggleFrame2, text='Show Loading Flair', variable=startFlairVar)
     toggleROSButton = Checkbutton(toggleFrame2, text='Run Edgeware on Save & Exit', variable=rosVar)
     toggleDesktopButton = Checkbutton(toggleFrame3, text='Create Desktop Icons', variable=deskIconVar)
+    toggleSafeMode = Checkbutton(toggleFrame3, text='Warn if \"Dangerous\" Settings Active', variable=safeModeVar, cursor='question_arrow')
 
     otherHostFrame.pack(fill='x')
     resourceFrame.pack(fill='y', side='left')
@@ -457,6 +462,16 @@ def show_window():
     toggleROSButton.pack(fill='x')
     toggleFrame3.pack(fill='both', side='left', expand=1)
     toggleDesktopButton.pack(fill='x')
+    toggleSafeMode.pack(fill='x')
+
+    safeModettp = CreateToolTip(toggleSafeMode, 'Asks you to confirm before saving if certain settings are enabled.\n'
+                    'Things defined as Dangerous Settings:\n\n'
+                    'Major (very dangerous, can affect your computer):\n'
+                    'Launch on Startup, Fill Drive\n\n'
+                    'Medium (can lead to embarassment or reduced control over EdgeWare):\n'
+                    'Timer Mode, Show on Discord\n\n'
+                    'Minor (low risk but could lead to unwanted interactions):\n'
+                    'Disable Panic Hotkey, Run on Save & Exit')
 
     Label(tabGeneral, text='Information', font='Default 13', relief=GROOVE).pack(pady=2)
     infoHostFrame = Frame(tabGeneral, borderwidth=5, relief=RAISED)
@@ -1002,7 +1017,7 @@ def importResource(parent:Tk) -> bool:
         if openLocation == None:
             return False
         if os.path.exists(f'{PATH}resource\\'):
-            resp = confirmBox(parent, 'Current resource folder will be deleted and overwritten. Is this okay?')
+            resp = confirmBox(parent, 'Confirm', 'Current resource folder will be deleted and overwritten. Is this okay?')
             if not resp:
                 logging.info('exited import resource overwrite')
                 return False
@@ -1017,7 +1032,7 @@ def importResource(parent:Tk) -> bool:
         messagebox.showerror('Read Error', f'Failed to import resources from file.\n[{e}]')
         return False
 
-def confirmBox(parent:Tk, message:str) -> bool:
+def confirmBox(parent:Tk, btitle:str, message:str) -> bool:
     allow = False
     root = Toplevel(parent)
     def complete(state:bool) -> bool:
@@ -1028,7 +1043,7 @@ def confirmBox(parent:Tk, message:str) -> bool:
     root.resizable(False, False)
     root.wm_attributes('-toolwindow', 1)
     root.focus_force()
-    root.title('Confirm')
+    root.title(btitle)
     Label(root, text=message, wraplength=212).pack(fill='x')
     #Label(root).pack()
     Button(root, text='Continue', command=lambda: complete(True)).pack()
@@ -1043,6 +1058,9 @@ def confirmBox(parent:Tk, message:str) -> bool:
 #helper funcs for lambdas =======================================================
 
 def write_save(varList:list[StringVar | IntVar | BooleanVar], nameList:list[str], passVar:str, exitAtEnd:bool):
+    if int(varList[nameList.index('safeMode')].get()) == 1 and exitAtEnd:
+        if safeCheck(varList, nameList) == False:
+            return
     logging.info('starting config save write...')
     temp = json.loads('{}')
     settings['wallpaperDat'] = str(settings['wallpaperDat'])
@@ -1110,6 +1128,46 @@ def write_save(varList:list[StringVar | IntVar | BooleanVar], nameList:list[str]
     if exitAtEnd:
         logging.info('exiting config')
         os.kill(os.getpid(), 9)
+
+#i'm sure there's a better way to do this but I also have a habit of taking the easy way out
+def safeCheck(varList:list[StringVar | IntVar | BooleanVar], nameList:list[str]) -> bool:
+    dangersList = []
+    numDangers = 0
+    logging.info('running through danger list...')
+    if int(varList[nameList.index('start_on_logon')].get()) == 1 or int(varList[nameList.index('fill')].get()) == 1:
+        logging.info('major dangers found.')
+        dangersList.append('\n\nMajor:')
+        if int(varList[nameList.index('start_on_logon')].get()) == 1:
+            numDangers += 1
+            dangersList.append('\n•Launch on Startup is enabled! This will run EdgeWare when you start your computer!')
+        if int(varList[nameList.index('fill')].get()) == 1:
+            numDangers += 1
+            dangersList.append('\n•Fill Drive is enabled! Edgeware will replace files on your computer! Even if you want this, make sure the protected directories are right!')
+    if int(varList[nameList.index('timerMode')].get()) == 1 or int(varList[nameList.index('showDiscord')].get()) == 1:
+        logging.info('medium dangers found.')
+        dangersList.append('\n\nMedium:')
+        if int(varList[nameList.index('timerMode')].get()) == 1:
+            numDangers += 1
+            dangersList.append('\n•Timer mode is enabled! Panic cannot be used until a specific time! Make sure you know your Safeword!')
+        if int(varList[nameList.index('showDiscord')].get()) == 1:
+            numDangers += 1
+            dangersList.append('\n•Show on Discord is enabled! This could lead to potential embarassment if you\'re on your main account!')
+    if int(varList[nameList.index('panicDisabled')].get()) == 1 or int(varList[nameList.index('runOnSaveQuit')].get()) == 1:
+        logging.info('minor dangers found.')
+        dangersList.append('\n\nMinor:')
+        if int(varList[nameList.index('panicDisabled')].get()) == 1:
+            numDangers += 1
+            dangersList.append('\n•Panic Hotkey is disabled! Don\'t worry, you can still panic by using the system tray or desktop icons!')
+        if int(varList[nameList.index('runOnSaveQuit')].get()) == 1:
+            numDangers += 1
+            dangersList.append('\n•EdgeWare will run on Save & Exit (AKA: when you hit Yes!)')
+    dangers = ' '.join(dangersList)
+    if numDangers > 0:
+        logging.info('safe mode intercepted save! asking user...')
+        if messagebox.askyesno('Dangerous Setting Detected!', f'There are {numDangers} potentially dangerous settings detected! Do you want to save these settings anyways? {dangers}', icon='warning') == False:
+            logging.info('user cancelled save.')
+            return False
+
 
 def validateBooru(name:str) -> bool:
     return requests.get(BOORU_URL.replace(BOORU_FLAG, name)).status_code == 200
@@ -1183,7 +1241,7 @@ def removeWallpaper(tkListObj):
         messagebox.showwarning('Remove Default', 'You cannot remove the default wallpaper.')
 
 def autoImportWallpapers(tkListObj:Listbox):
-    allow_ = confirmBox(tkListObj, 'Current list will be cleared before new list is imported from the /resource folder. Is that okay?')
+    allow_ = confirmBox(tkListObj, 'Confirm', 'Current list will be cleared before new list is imported from the /resource folder. Is that okay?')
     if allow_:
         #clear list
         while True:

@@ -19,9 +19,19 @@ Previous config files might not work at all with this version, if you are planni
 
 •*Giving a use to prompt/caption "moods", initial inspiration was giving people the ability to make "one handed" prompt modes, for those who are too "preoccupied" to type multiple full sentences*
 
-•*Making a toggle to "check for dangerous options and confirm with user before closing" config setting, because I know many people (including myself!) are probably anxious about accidentally setting a discord setting or overwriting files on their computer*
-
 •*Actually making the version number work with Edgeware++ updates, it's not exciting but would be good to learn how to do properly*
+
+**Version 4**
+
+•*Finished max subliminals*
+
+•*Added feature to receive warnings on having "dangerous" options enabled, will confirm with you before saving*
+>The list of dangerous options are as follows: Run on Startup, Fill Drive, Timer Mode, Show on Discord, Disable Panic Hotkey, Run on Save & Quit. They are categorized into varying levels of severity.
+
+•*Added tooltips on hover in the config window*
+>Currently only added to the Warning on "Dangerous" Setting, mostly added to clarify which settings are considered "dangerous", but I might add it to more settings in the future so you don't have to cross reference the "about" page.
+
+•*Added these patch notes in the "EdgeWare++" about page, because I forgot to do that last time*
 
 **Version 3**
 
