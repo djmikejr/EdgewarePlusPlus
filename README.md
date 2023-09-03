@@ -1,4 +1,6 @@
 # Edgeware++
+**If you don't know what EdgeWare is, please go to the original page or scroll down to the original patchnotes at the bottom! This is just a modified version that adds new features!**
+
 My goal with this extension of Edgeware is to add or modify features that I felt were missing or incomplete in the original version. I want to try to be as minimally intrusive as possible, i'm not aiming to remove or neuter any previous features, just add more functionality to the base program.
 
 I have prior programming experience, but have never touched python before this project- so it's mostly going to be trial and error. Half of this is a learning experience made easier by horny motivation.
@@ -9,17 +11,31 @@ Previous config files might not work at all with this version, if you are planni
 
 •*Dark Mode*
 
-•*Toggle for deleting desktop icons on panic* (could cause panic instability, looking into it)
+•*Toggle for deleting desktop icons on panic*
 
 •*Giving mitosis a percentage activation slider*
-
-~~•*Being able to change subliminal graphics*~~ (turns out this already exists but since it's not on the pack editor literally nobody uses it)
 
 •*Giving hibernate new modes, offering alternatives like "slowly ramping up over time"*
 
 •*Giving a use to prompt/caption "moods", initial inspiration was giving people the ability to make "one handed" prompt modes, for those who are too "preoccupied" to type multiple full sentences*
 
-•*Actually making the version number work with Edgeware++ updates, it's not exciting but would be good to learn how to do properly*
+•*A tab where you can view current pack resources, primarily captions/prompts/moods*
+
+•*Rewriting all the old config presets to work with the new version, and a few new ones as well!* (will probably do this when theres very few variables left to add)
+
+I'm also wanting to add features to the pack editor, will probably do that when this is in a state where I feel mostly done with what I wanted to accomplish.
+
+**Version 4.5**
+
+•*Added version number, and EdgeWare Config checks to see if the GitHub is more up-to-date than your current version*
+>I'm not planning on messing with any of the failsafes and auto-updates for the moment, and because of that I took out the not-implemented "download ZIP" button from the original release. This is so far the only thing i've removed from the original EdgeWare, but it also didn't do anything.
+
+•*Added way more tooltips to things*
+
+•*Fixed some dangerous option tooltip errors and added "Replace Images" as a dangerous option*
+>I never used Replace Images and it turns out that it does what I thought "Fill Drive" did, so i'm glad I caught it while making tooltips!
+
+•*Very minor changes on some button/slider labels for improved clarity*
 
 **Version 4**
 

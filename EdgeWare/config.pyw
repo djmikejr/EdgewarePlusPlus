@@ -72,6 +72,9 @@ BOORU_PTAG = '&pid='                                                            
 UPDCHECK_URL = 'http://raw.githubusercontent.com/PetitTournesol/Edgeware/main/EdgeWare/configDefault.dat'
 local_version = '0.0.0_NOCONNECT'
 
+UPDCHECK_PP_URL = 'http://raw.githubusercontent.com/araten10/EdgewarePlusPlus/main/EdgeWare/configDefault.dat'
+local_pp_version = '0.0.0_NOCONNECT'
+
 logging.info('opening configDefault')
 with open(f'{PATH}configDefault.dat') as r:
     defaultSettingLines = r.readlines()
@@ -81,6 +84,7 @@ with open(f'{PATH}configDefault.dat') as r:
 logging.info(f'done with configDefault\n\tdefault={defaultVars}')
 
 local_version = defaultVars[0]
+local_pp_version = defaultVars[1]
 
 settings = {}
 for var in varNames:
@@ -144,7 +148,9 @@ pass_ = ''
 
 def show_window():
     global settings, defaultSettings
-    webv = getLiveVersion()
+    webv = getLiveVersion(UPDCHECK_URL, 0)
+    webvpp = getLiveVersion(UPDCHECK_PP_URL, 1)
+
 
     #window things
     root = Tk()
@@ -328,13 +334,16 @@ def show_window():
     hibernateMinFrame = Frame(hibernateHostFrame)
     hibernateMaxFrame = Frame(hibernateHostFrame)
 
-    toggleHibernateButton = Checkbutton(hibernateHostFrame, text='Hibernate Mode', variable=hibernateVar, command=lambda: toggleAssociateSettings(hibernateVar.get(), hibernate_group))
+    toggleHibernateButton = Checkbutton(hibernateHostFrame, text='Hibernate Mode', variable=hibernateVar, command=lambda: toggleAssociateSettings(hibernateVar.get(), hibernate_group), cursor='question_arrow')
     hibernateMinButton = Button(hibernateMinFrame, text='Manual min...', command=lambda: assign(hibernateMinVar, simpledialog.askinteger('Manual Minimum Sleep (sec)', prompt='[1-7200]: ')))
     hibernateMinScale = Scale(hibernateMinFrame, label='Min Sleep (sec)', variable=hibernateMinVar, orient='horizontal', from_=1, to=7200)
     hibernateMaxButton = Button(hibernateMaxFrame, text='Manual max...', command=lambda: assign(hibernateMaxVar, simpledialog.askinteger('Manual Maximum Sleep (sec)', prompt='[2-14400]: ')))
     hibernateMaxScale = Scale(hibernateMaxFrame, label='Max Sleep (sec)', variable=hibernateMaxVar, orient='horizontal', from_=2, to=14400)
     h_activityScale = Scale(hibernateHostFrame, label='Awaken Activity', orient='horizontal', from_=1, to=50, variable=wakeupActivityVar)
 
+    hibernatettp = CreateToolTip(toggleHibernateButton, 'Runs EdgeWare silently without any popups.\n\n'
+                                    'After a random time in the specified range, EdgeWare activates and barrages the user with popups '
+                                    'based on the \"Awaken Activity\" value, then goes back to \"sleep\".')
     hibernate_group.append(h_activityScale)
     hibernate_group.append(hibernateMinButton)
     hibernate_group.append(hibernateMinScale)
@@ -357,9 +366,12 @@ def show_window():
     Label(tabGeneral, text='Timer Settings', font='Default 13', relief=GROOVE).pack(pady=2)
     timerFrame = Frame(tabGeneral, borderwidth=5, relief=RAISED)
 
-    timerToggle = Checkbutton(timerFrame, text='Timer Mode', variable=timerVar, command=lambda: toggleAssociateSettings(timerVar.get(), timer_group))
+    timerToggle = Checkbutton(timerFrame, text='Timer Mode', variable=timerVar, command=lambda: toggleAssociateSettings(timerVar.get(), timer_group), cursor='question_arrow')
     timerSlider = Scale(timerFrame, label='Timer Time (mins)', from_=1, to=1440, orient='horizontal', variable=timerTimeVar)
     safewordFrame = Frame(timerFrame)
+
+    timerttp = CreateToolTip(timerToggle, 'Enables \"Run on Startup\" and disables the Panic function until the time limit is reached.\n\n'
+                                '\"Safeword\" allows you to set a password to re-enable Panic, if need be.')
 
     Label(safewordFrame, text='Emergency Safeword').pack()
     timerSafeword = Entry(safewordFrame, show='*', textvariable=safewordVar)
@@ -444,8 +456,8 @@ def show_window():
     toggleFrame3 = Frame(otherHostFrame)
 
     toggleStartupButton = Checkbutton(toggleFrame1, text='Launch on Startup', variable=startLoginVar)
-    toggleDiscordButton = Checkbutton(toggleFrame1, text='Show on Discord', variable=discordVar)
-    toggleFlairButton = Checkbutton(toggleFrame2, text='Show Loading Flair', variable=startFlairVar)
+    toggleDiscordButton = Checkbutton(toggleFrame1, text='Show on Discord', variable=discordVar, cursor='question_arrow')
+    toggleFlairButton = Checkbutton(toggleFrame2, text='Show Loading Flair', variable=startFlairVar, cursor='question_arrow')
     toggleROSButton = Checkbutton(toggleFrame2, text='Run Edgeware on Save & Exit', variable=rosVar)
     toggleDesktopButton = Checkbutton(toggleFrame3, text='Create Desktop Icons', variable=deskIconVar)
     toggleSafeMode = Checkbutton(toggleFrame3, text='Warn if \"Dangerous\" Settings Active', variable=safeModeVar, cursor='question_arrow')
@@ -464,8 +476,12 @@ def show_window():
     toggleDesktopButton.pack(fill='x')
     toggleSafeMode.pack(fill='x')
 
+    discordttp = CreateToolTip(toggleDiscordButton, 'Displays a lewd status on discord (if your discord is open), which can be set per-pack by the pack creator.')
+    loadingFlairttp = CreateToolTip(toggleFlairButton, 'Displays a brief \"loading\" image before EdgeWare startup, which can be set per-pack by the pack creator.')
     safeModettp = CreateToolTip(toggleSafeMode, 'Asks you to confirm before saving if certain settings are enabled.\n'
                     'Things defined as Dangerous Settings:\n\n'
+                    'Extreme (code red! code red! read the documentation in \"about\"!):\n'
+                    'Replace Images\n\n'
                     'Major (very dangerous, can affect your computer):\n'
                     'Launch on Startup, Fill Drive\n\n'
                     'Medium (can lead to embarassment or reduced control over EdgeWare):\n'
@@ -479,18 +495,28 @@ def show_window():
     verFrame = Frame(infoHostFrame)
     #zipDropdown = OptionMenu(tabGeneral, zipDropVar, *DOWNLOAD_STRINGS)
     #zipDownloadButton = Button(tabGeneral, text='Download Zip', command=lambda: downloadZip(zipDropVar.get(), zipLabel))
-    zipLabel = Label(zipGitFrame, text=f'Current Zip:\n{pickZip()}', background='lightgray', wraplength=100)
-    local_verLabel = Label(verFrame, text=f'Local Version:\n{defaultVars[0]}')
-    web_verLabel = Label(verFrame, text=f'GitHub Version:\n{webv}', bg=('SystemButtonFace' if (defaultVars[0] == webv) else 'red'))
-    openGitButton = Button(zipGitFrame, text='Open Github', command=lambda: webbrowser.open('https://github.com/PetitTournesol/Edgeware'))
+    #zipLabel = Label(zipGitFrame, text=f'Current Zip:\n{pickZip()}', background='lightgray', wraplength=100)
+    local_verLabel = Label(verFrame, text=f'EdgeWare Local Version:\n{defaultVars[0]}')
+    web_verLabel = Label(verFrame, text=f'EdgeWare GitHub Version:\n{webv}', bg=('SystemButtonFace' if (defaultVars[0] == webv) else 'red'))
+    openGitButton = Button(zipGitFrame, text='Open Github (EdgeWare Base)', command=lambda: webbrowser.open('https://github.com/PetitTournesol/Edgeware'))
+
+    verPlusFrame = Frame(infoHostFrame)
+    local_verPlusLabel = Label(verPlusFrame, text=f'EdgeWare++ Local Version:\n{defaultVars[1]}')
+    web_verPlusLabel = Label(verPlusFrame, text=f'EdgeWare++ GitHub Version:\n{webvpp}', bg=('SystemButtonFace' if (defaultVars[1] == webvpp) else 'red'))
+    openGitPlusButton = Button(zipGitFrame, text='Open Github (EdgeWare++)', command=lambda: webbrowser.open('https://github.com/araten10/EdgewarePlusPlus'))
 
     infoHostFrame.pack(fill='x')
     zipGitFrame.pack(fill='both', side='left', expand=1)
-    zipLabel.pack(fill='x')
+    #zipLabel.pack(fill='x')
     openGitButton.pack(fill='both', expand=1)
     verFrame.pack(fill='both', side='left', expand=1)
     local_verLabel.pack(fill='x')
     web_verLabel.pack(fill='x')
+
+    verPlusFrame.pack(fill='both', side='left', expand=1)
+    local_verPlusLabel.pack(fill='x')
+    web_verPlusLabel.pack(fill='x')
+    openGitPlusButton.pack(fill='both', expand=1)
 
     forceReload = Button(infoHostFrame, text='Force Reload', command=refresh)
     optButton   = Button(infoHostFrame, text='Test Func', command=lambda: getDescriptText('default'))
@@ -513,14 +539,17 @@ def show_window():
     delayFrame = Frame(delayModeFrame)
     lowkeyFrame = Frame(delayModeFrame)
 
-    delayScale = Scale(delayFrame, label='Timer Delay (ms)', from_=10, to=60000, orient='horizontal', variable=delayVar)
+    delayScale = Scale(delayFrame, label='Popup Timer Delay (ms)', from_=10, to=60000, orient='horizontal', variable=delayVar)
     delayManual = Button(delayFrame, text='Manual delay...', command=lambda: assign(delayVar, simpledialog.askinteger('Manual Delay', prompt='[10-60000]: ')))
     opacityScale = Scale(tabAnnoyance, label='Popup Opacity (%)', from_=5, to=100, orient='horizontal', variable=popopOpacity)
 
     posList = ['Top Right', 'Top Left', 'Bottom Left', 'Bottom Right', 'Random']
     lkItemVar = StringVar(root, posList[lkCorner.get()])
     lowkeyDropdown = OptionMenu(lowkeyFrame, lkItemVar, *posList, command=lambda x: (lkCorner.set(posList.index(x))))
-    lowkeyToggle = Checkbutton(lowkeyFrame, text='Lowkey Mode', variable=lkToggle, command=lambda: toggleAssociateSettings(lkToggle.get(), lowkey_group))
+    lowkeyToggle = Checkbutton(lowkeyFrame, text='Lowkey Mode', variable=lkToggle, command=lambda: toggleAssociateSettings(lkToggle.get(), lowkey_group), cursor='question_arrow')
+
+    lowkeyttp = CreateToolTip(lowkeyToggle, 'Makes popups appear in a corner of the screen instead of the middle.\n\n'
+                                'Best used with Popup Timeout or high delay as popups will stack.')
 
     lowkey_group.append(lowkeyDropdown)
 
@@ -555,14 +584,22 @@ def show_window():
         toggleAssociateSettings(not mitosisVar.get(), mitosis_group)
         toggleAssociateSettings(mitosisVar.get(), mitosis_cGroup)
 
-    mitosisToggle = Checkbutton(mitosisFrame, text='Mitosis Mode', variable=mitosisVar, command=toggleMitosis)
+    mitosisToggle = Checkbutton(mitosisFrame, text='Mitosis Mode', variable=mitosisVar, command=toggleMitosis, cursor='question_arrow')
     mitosisStren  = Scale(mitosisFrame, label='Mitosis Strength', orient='horizontal', from_=2, to=10, variable=mitosisStrenVar)
+
+    mitosisttp = CreateToolTip(mitosisToggle, 'When a popup is closed, more popups will spawn in it\'s place based on the mitosis strength.')
 
     mitosis_cGroup.append(mitosisStren)
 
     setPanicButtonButton = Button(panicFrame, text=f'Set Panic Button\n<{panicButtonVar.get()}>', command=lambda:getKeyboardInput(setPanicButtonButton, panicButtonVar))
     doPanicButton = Button(panicFrame, text='Perform Panic', command=lambda: os.startfile('panic.pyw'))
-    panicDisableButton = Checkbutton(popupHostFrame, text='Disable Panic Hotkey', variable=panicVar)
+    panicDisableButton = Checkbutton(popupHostFrame, text='Disable Panic Hotkey', variable=panicVar, cursor='question_arrow')
+
+    disablePanicttp = CreateToolTip(panicDisableButton, 'This not only disables the panic hotkey, but also the panic function in the system tray as well.\n\n'
+                        'If you want to use Panic after this, you can still:\n'
+                        '•Directly run \"panic.pyw\"\n'
+                        '•Keep the config window open and press \"Perform Panic\"\n'
+                        '•Use the panic desktop icon (if you kept those enabled)')
 
     popupWebToggle= Checkbutton(popupHostFrame, text='Popup close opens web page', variable=popupWebVar)
     toggleCaptionsButton = Checkbutton(popupHostFrame, text='Popup Captions', variable=captionVar)
@@ -573,8 +610,9 @@ def show_window():
     timeout_group.append(timeoutSlider)
 
     denialSlider = Scale(denialFrame, label='Denial Chance', orient='horizontal', variable=denialChance)
-    denialToggle = Checkbutton(denialFrame, text='Denial Mode', variable=denialMode, command=lambda: toggleAssociateSettings(denialMode.get(), denial_group))
+    denialToggle = Checkbutton(denialFrame, text='Denial Mode', variable=denialMode, command=lambda: toggleAssociateSettings(denialMode.get(), denial_group), cursor='question_arrow')
 
+    denialttp = CreateToolTip(denialToggle, 'Adds a percentage chance to \"censor\" an image.')
     denial_group.append(denialSlider)
 
     popupHostFrame.pack(fill='x')
@@ -623,7 +661,10 @@ def show_window():
     promptManual = Button(promptFrame, text='Manual prompt...', command=lambda: assign(promptVar, simpledialog.askinteger('Manual Prompt', prompt='[0-100]: ')))
 
     mistakeScale = Scale(mistakeFrame, label='Prompt Mistakes', from_=0, to=150, orient='horizontal', variable=promptMistakeVar)
-    mistakeManual = Button(mistakeFrame, text='Manual mistakes...', command=lambda: assign(promptMistakeVar, simpledialog.askinteger('Max Mistakes', prompt='Max mistakes allowed in prompt text\n[0-150]: ')))
+    mistakeManual = Button(mistakeFrame, text='Manual mistakes...', command=lambda: assign(promptMistakeVar, simpledialog.askinteger('Max Mistakes', prompt='Max mistakes allowed in prompt text\n[0-150]: ')), cursor='question_arrow')
+
+    mistakettp = CreateToolTip(mistakeManual, 'The number of allowed mistakes when filling out a prompt.\n\n'
+                                'Good for when you can\'t think straight, or typing with one hand...')
 
     otherHostFrame.pack(fill='x')
 
@@ -675,7 +716,9 @@ def show_window():
     maxVideo_group.append(maxVideoScale)
     maxVideo_group.append(maxVideoManual)
 
-    toggleSubliminalButton = Checkbutton(subliminalsFrame, text='Popup Subliminals', variable=popupSublim, command=lambda: toggleAssociateSettings(popupSublim.get(), subliminals_group))
+    toggleSubliminalButton = Checkbutton(subliminalsFrame, text='Popup Subliminals', variable=popupSublim, command=lambda: toggleAssociateSettings(popupSublim.get(), subliminals_group), cursor='question_arrow')
+
+    subliminalttp = CreateToolTip(toggleSubliminalButton, 'Overlays transparent gifs on popups.\n\nThis feature can be CPU intensive, try a low max limit to start!')
 
     subliminalsChanceScale = Scale(subliminalsChanceFrame, label='Sublim. Chance (%)', from_=1, to=100, orient='horizontal', variable=subliminalsChanceVar)
     subliminalsChanceManual = Button(subliminalsChanceFrame, text='Manual Sub Chance...', command=lambda: assign(subliminalsChanceVar, simpledialog.askinteger('Manual Subliminal Chance', prompt='[1-100]: ')))
@@ -736,13 +779,21 @@ def show_window():
     pathBox.insert(1, settings['drivePath'])
     pathBox.configure(state='disabled')
 
-    fillBox = Checkbutton(fillFrame, text='Fill Drive', variable=fillVar, command=lambda: toggleAssociateSettings(fillVar.get(), fill_group))
+    fillBox = Checkbutton(fillFrame, text='Fill Drive', variable=fillVar, command=lambda: toggleAssociateSettings(fillVar.get(), fill_group), cursor='question_arrow')
     fillDelay = Scale(fillFrame, label='Fill Delay (10ms)', from_=0, to=250, orient='horizontal', variable=fillDelayVar)
+
+    fillttp = CreateToolTip(fillBox, 'Fills folders on your harddrive with images from the resource folder.\n\n'
+                'This can cause space issues, potential embarassment, navigation difficulties... Please read the full documentation in the About tab!!!')
 
     fill_group.append(fillDelay)
 
-    replaceBox = Checkbutton(fillFrame, text='Replace Images', variable=replaceVar, command=lambda: toggleAssociateSettings(replaceVar.get(), replace_group))
+    replaceBox = Checkbutton(fillFrame, text='Replace Images', variable=replaceVar, command=lambda: toggleAssociateSettings(replaceVar.get(), replace_group), cursor='question_arrow')
     replaceThreshScale = Scale(fillFrame, label='Image Threshold', from_=1, to=1000, orient='horizontal', variable=replaceThreshVar)
+
+    replacettp = CreateToolTip(replaceBox, 'Seeks out folders with more images than the threshold value, then replaces all of them. No, there is no automated backup!\n\n'
+                                'I am begging you to read the full documentation in the \"About\" tab before even thinking about enabling this feature!\n\n'
+                                'We are not responsible for any pain, suffering, miserere, or despondence caused by your files being deleted! '
+                                'At the very least, back them up and use the blacklist!')
 
     replace_group.append(replaceThreshScale)
 
@@ -1134,6 +1185,12 @@ def safeCheck(varList:list[StringVar | IntVar | BooleanVar], nameList:list[str])
     dangersList = []
     numDangers = 0
     logging.info('running through danger list...')
+    if int(varList[nameList.index('replace')].get()) == 1:
+        logging.info('extreme dangers found.')
+        dangersList.append('\n\nExtreme:')
+        if int(varList[nameList.index('replace')].get()) == 1:
+            numDangers += 1
+            dangersList.append('\n•Replace Images is enabled! THIS WILL DELETE FILES ON YOUR COMPUTER! Only enable this willingly and cautiously! Read the documentation in the \"About\" tab!')
     if int(varList[nameList.index('start_on_logon')].get()) == 1 or int(varList[nameList.index('fill')].get()) == 1:
         logging.info('major dangers found.')
         dangersList.append('\n\nMajor:')
@@ -1157,7 +1214,7 @@ def safeCheck(varList:list[StringVar | IntVar | BooleanVar], nameList:list[str])
         dangersList.append('\n\nMinor:')
         if int(varList[nameList.index('panicDisabled')].get()) == 1:
             numDangers += 1
-            dangersList.append('\n•Panic Hotkey is disabled! Don\'t worry, you can still panic by using the system tray or desktop icons!')
+            dangersList.append('\n•Panic Hotkey is disabled! If you want to easily close EdgeWare, read the tooltip in the Annoyance tab for other ways to panic!')
         if int(varList[nameList.index('runOnSaveQuit')].get()) == 1:
             numDangers += 1
             dangersList.append('\n•EdgeWare will run on Save & Exit (AKA: when you hit Yes!)')
@@ -1172,11 +1229,11 @@ def safeCheck(varList:list[StringVar | IntVar | BooleanVar], nameList:list[str])
 def validateBooru(name:str) -> bool:
     return requests.get(BOORU_URL.replace(BOORU_FLAG, name)).status_code == 200
 
-def getLiveVersion() -> str:
+def getLiveVersion(url:str, id:int) -> str:
     try:
         logging.info('fetching github version')
-        with open(urllib.request.urlretrieve(UPDCHECK_URL)[0], 'r') as liveDCfg:
-            return(liveDCfg.read().split('\n')[1].split(',')[0])
+        with open(urllib.request.urlretrieve(url)[0], 'r') as liveDCfg:
+            return(liveDCfg.read().split('\n')[1].split(',')[id])
     except Exception as e:
         logging.warning('failed to fetch github version.\n\tReason: {e}')
         return 'Could not check version.'
