@@ -25,6 +25,14 @@ Previous config files might not work at all with this version, if you are planni
 
 I'm also wanting to add features to the pack editor, will probably do that when this is in a state where I feel mostly done with what I wanted to accomplish.
 
+**Version 4.75**
+
+•*Added troubleshooting tab and a setting to change from the antialiasing algorithm to lanczos*
+>Some kind users on discord pointed out that popups weren't working, turns out somebody figured out that changing the resize algorithm from antialiasing to lanczos worked for them. This is code I didn't change for EdgeWare++, so maybe this has been a problem all the way from the original EdgeWare. Antialias has always worked for me, so to keep things as compatible as possible, i've added a toggle rather than just changing it over to the new algorithm. Hopefully this fixes some issues for people!
+
+•*Added "buttonless" mode that allows you to click anywhere on the popup to close it*
+>A feature request from discord, which somebody else already implemented for people who wanted it! Decided to add it as a toggle here. Thanks!
+
 **Version 4.5**
 
 •*Added version number, and EdgeWare Config checks to see if the GitHub is more up-to-date than your current version*

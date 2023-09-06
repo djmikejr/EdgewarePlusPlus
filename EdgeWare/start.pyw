@@ -256,6 +256,8 @@ TIMER_MODE = int(settings['timerMode']) == 1
 
 DRIVE_PATH = settings['drivePath']
 
+LANCZOS_MODE = int(settings['antiOrLanczos']) == 1
+
 def shortcut_script(pth_str:str, keyword:str, script:str, title:str):
     #strings for batch script to write vbs script to create shortcut on desktop
     #stupid and confusing? yes. the only way i could find to do this? also yes.
@@ -403,9 +405,17 @@ if DESKTOP_ICONS:
 if LOADING_FLAIR:
     logging.info('started loading flair')
     if os.path.exists(PATH + '\\resource\\loading_splash.png'):
-        subprocess.call('pythonw startup_flair.pyw -custom')
+        if LANCZOS_MODE:
+            logging.info('using lanczos for loading flair')
+            subprocess.call('pythonw startup_flair.pyw -custom -lanczos')
+        else:
+            subprocess.call('pythonw startup_flair.pyw -custom')
     else:
-        subprocess.call('pythonw startup_flair.pyw')
+        if LANCZOS_MODE:
+            logging.info('using lanczos for loading flair')
+            subprocess.call('pythonw startup_flair.pyw -lanczos')
+        else:
+            subprocess.call('pythonw startup_flair.pyw')
 
 #set wallpaper
 if not HIBERNATE_MODE:

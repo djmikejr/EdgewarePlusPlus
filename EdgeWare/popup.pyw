@@ -133,6 +133,10 @@ with open(PATH + '\\config.cfg', 'r') as cfg:
     SUBLIMINAL_MODE = check_setting('popupSubliminals')
     SUBLIMINAL_CHANCE = int(settings['subliminalsChance'])
     MAX_SUBLIMINALS = int(settings['maxSubliminals'])
+
+    LANCZOS_MODE = check_setting('antiOrLanczos')
+
+    BUTTONLESS = check_setting('buttonless')
 #functions for script mode, unused for now
 if checkTag('timeout='):
     HAS_LIFESPAN = True
@@ -291,7 +295,10 @@ def run():
         size_source = max(img.width, img.height) / min(screen_width, screen_height)
         size_target = rand.randint(30, 70) / 100 if not LOWKEY_MODE else rand.randint(20, 50) / 100
         resize_factor = size_target / size_source
-        return image.resize((int(image.width * resize_factor), int(image.height * resize_factor)), Image.ANTIALIAS)
+        if LANCZOS_MODE:
+            return image.resize((int(image.width * resize_factor), int(image.height * resize_factor)), Image.LANCZOS)
+        else:
+            return image.resize((int(image.width * resize_factor), int(image.height * resize_factor)), Image.ANTIALIAS)
 
     resized_image = resize(image)
 
@@ -389,8 +396,11 @@ def run():
             captionLabel = Label(root, text=caption_text, wraplength=resized_image.width - border_wid_const)
             captionLabel.place(x=5, y=5)
 
-    submit_button = Button(root, text=SUBMISSION_TEXT, command=die)
-    submit_button.place(x=resized_image.width - 5 - submit_button.winfo_reqwidth(), y=resized_image.height - 5 - submit_button.winfo_reqheight())
+    if BUTTONLESS:
+        label.bind("<ButtonRelease-1>", buttonless_die)
+    else:
+        submit_button = Button(root, text=SUBMISSION_TEXT, command=die)
+        submit_button.place(x=resized_image.width - 5 - submit_button.winfo_reqwidth(), y=resized_image.height - 5 - submit_button.winfo_reqheight())
 
     root.attributes('-alpha', OPACITY / 100)
     root.mainloop()
@@ -434,6 +444,9 @@ def do_roll(mod:int):
 
 def select_url(arg:str):
     return web_dict['urls'][arg] + web_dict['args'][arg].split(',')[rand.randrange(len(web_dict['args'][arg].split(',')))]
+
+def buttonless_die(event):
+    die()
 
 def die():
     if WEB_OPEN and web_dict and do_roll((100-WEB_PROB) / 2) and not LOWKEY_MODE:

@@ -61,7 +61,7 @@ HIBERNATE_TEXT          = 'The Hibernate feature is an entirely different mode f
 ADVANCED_TEXT           = 'The Advanced section is also something previously only accessible by directly editing the config.cfg file. It offers full and complete customization of all setting values without any limitations outside of variable typing.\n\n\nPlease use this feature with discretion, as any erroneous values will result in a complete deletion and regeneration of the config file from the default, and certain value ranges are likely to result in crashes or unexpected glitches in the program.'
 THANK_AND_ABOUT_TEXT    = 'Thank you so much to all the fantastic artists who create and freely distribute the art that allows programs like this to exist, to all the people who helped me work through the various installation problems as we set the software up (especially early on), and honestly thank you to ALL of the people who are happily using Edgeware. \n\nIt truly makes me happy to know that my work is actually being put to good use by people who enjoy it. After all, at the end of the day that\'s really all I\'ve ever really wanted, but figured was beyond reach of a stupid degreeless neet.\nI love you all <3\n\n\n\nIf you like my work, please feel free to help support my neet lifestyle by donating to $PetitTournesol on Cashapp; by no means are you obligated or expected to, but any and all donations are greatly appreciated!'
 
-PLUSPLUS_TEXT           = 'Thanks for taking the time to check out this extension on EdgeWare! However you found it, I appreciate that it interested you enough to give it a download.\n\nI am not an expert programmer by any means, so apologies if there are any bugs or errors in this version. My goal is to not do anything crazy ambitious like rewrite the entire program or fix up the backend, but rather just add on functionality that I thought could improve the base version. Because of this, i\'m hoping that compatability between those who use normal EdgeWare and those who use this version stays relatively stable.\n\nCurrent changes:\n\n•Added a option under "misc" to enable/disable desktop icon generation.\n\n•Added options to cap the number of audio popups and video popups.\n\n•Added a chance slider for subliminals, and a max subliminals slider.\n\n•Added feature to change Startup Graphic per pack. (name the file \"loading_splash.png\" in the resource folder)\n\n•Added feature to enable warnings for \"Dangerous Settings\".\n\n•Added hover tooltips on some things to make the program easier to understand.'
+PLUSPLUS_TEXT           = 'Thanks for taking the time to check out this extension on EdgeWare! However you found it, I appreciate that it interested you enough to give it a download.\n\nI am not an expert programmer by any means, so apologies if there are any bugs or errors in this version. My goal is to not do anything crazy ambitious like rewrite the entire program or fix up the backend, but rather just add on functionality that I thought could improve the base version. Because of this, i\'m hoping that compatability between those who use normal EdgeWare and those who use this version stays relatively stable.\n\nCurrent changes:\n\n•Added a option under "misc" to enable/disable desktop icon generation.\n•Added options to cap the number of audio popups and video popups.\n•Added a chance slider for subliminals, and a max subliminals slider.\n•Added feature to change Startup Graphic per pack. (name the file \"loading_splash.png\" in the resource folder)\n•Added feature to enable warnings for \"Dangerous Settings\".\n•Added hover tooltips on some things to make the program easier to understand.\n•Added troubleshooting tab under \"advanced\" with some settings to fix things for certain users.\n•Added feature to click anywhere on popup to close.'
 #all booru consts
 BOORU_FLAG = '<BOORU_INSERT>'                                                      #flag to replace w/ booru name
 BOORU_URL  = f'https://{BOORU_FLAG}.booru.org/index.php?page=post&s=list&tags='    #basic url
@@ -154,7 +154,7 @@ def show_window():
 
     #window things
     root = Tk()
-    root.title('Edgeware Config')
+    root.title('Edgeware++ Config')
     root.geometry('740x675')
     try:
         root.iconbitmap(f'{PATH}default_assets\\config_icon.ico')
@@ -237,6 +237,10 @@ def show_window():
 
             safeModeVar         = BooleanVar(root, value=(int(settings['safeMode'])==1))
 
+            antiOrLanczosVar    = BooleanVar(root, value=(int(settings['antiOrLanczos'])==1))
+
+            buttonlessVar       = BooleanVar(root, value=(int(settings['buttonless'])==1))
+
             #grouping for sanity's sake later
             in_var_group = [delayVar, popupVar, webVar, audioVar, promptVar, fillVar,
                             fillDelayVar, replaceVar, replaceThreshVar, startLoginVar,
@@ -249,7 +253,8 @@ def show_window():
                             timerVar, timerTimeVar, lkCorner, popopOpacity, lkToggle,
                             videoVolume, vidVar, denialMode, denialChance, popupSublim,
                             booruMin, deskIconVar, maxAToggleVar, maxAudioVar, maxVToggleVar,
-                            maxVideoVar, subliminalsChanceVar, maxSubliminalsVar, safeModeVar]
+                            maxVideoVar, subliminalsChanceVar, maxSubliminalsVar, safeModeVar,
+                            antiOrLanczosVar, buttonlessVar]
 
             in_var_names = ['delay', 'popupMod', 'webMod', 'audioMod', 'promptMod', 'fill',
                             'fill_delay', 'replace', 'replaceThresh', 'start_on_logon',
@@ -262,7 +267,8 @@ def show_window():
                             'timerMode', 'timerSetupTime', 'lkCorner', 'lkScaling', 'lkToggle',
                             'videoVolume', 'vidMod', 'denialMode', 'denialChance', 'popupSubliminals',
                             'booruMinScore', 'desktopIcons', 'maxAudioBool', 'maxAudio', 'maxVideoBool',
-                            'maxVideos', 'subliminalsChance', 'maxSubliminals', 'safeMode']
+                            'maxVideos', 'subliminalsChance', 'maxSubliminals', 'safeMode', 'antiOrLanczos',
+                            'buttonless']
             break
         except Exception as e:
             messagebox.showwarning(
@@ -575,7 +581,10 @@ def show_window():
     denialFrame = Frame(popupHostFrame)
 
     popupScale = Scale(popupFrame, label='Popup Freq (%)', from_=0, to=100, orient='horizontal', variable=popupVar)
-    popupManual = Button(popupFrame, text='Manual popup...', command=lambda: assign(popupVar, simpledialog.askinteger('Manual Popup', prompt='[0-100]: ')))
+    popupManual = Button(popupFrame, text='Manual popup...', command=lambda: assign(popupVar, simpledialog.askinteger('Manual Popup', prompt='[0-100]: ')), cursor='question_arrow')
+
+    popupManualttp = CreateToolTip(popupManual, 'Whenever the timer is reached to spawn a new popup, this value is rolled to see if it spawns or not.\n\n'
+                                    'Leave at 100 for a more consistent experience, and make it less for a more random one.')
 
     mitosis_group.append(popupScale)
     mitosis_group.append(popupManual)
@@ -591,10 +600,11 @@ def show_window():
 
     mitosis_cGroup.append(mitosisStren)
 
-    setPanicButtonButton = Button(panicFrame, text=f'Set Panic Button\n<{panicButtonVar.get()}>', command=lambda:getKeyboardInput(setPanicButtonButton, panicButtonVar))
+    setPanicButtonButton = Button(panicFrame, text=f'Set Panic Button\n<{panicButtonVar.get()}>', command=lambda:getKeyboardInput(setPanicButtonButton, panicButtonVar), cursor='question_arrow')
     doPanicButton = Button(panicFrame, text='Perform Panic', command=lambda: os.startfile('panic.pyw'))
     panicDisableButton = Checkbutton(popupHostFrame, text='Disable Panic Hotkey', variable=panicVar, cursor='question_arrow')
 
+    setpanicttp = CreateToolTip(setPanicButtonButton, 'NOTE: To use this hotkey you must be \"focused\" on a EdgeWare popup. Click on a popup before using.')
     disablePanicttp = CreateToolTip(panicDisableButton, 'This not only disables the panic hotkey, but also the panic function in the system tray as well.\n\n'
                         'If you want to use Panic after this, you can still:\n'
                         '•Directly run \"panic.pyw\"\n'
@@ -603,6 +613,10 @@ def show_window():
 
     popupWebToggle= Checkbutton(popupHostFrame, text='Popup close opens web page', variable=popupWebVar)
     toggleCaptionsButton = Checkbutton(popupHostFrame, text='Popup Captions', variable=captionVar)
+    toggleEasierButton = Checkbutton(popupHostFrame, text='Buttonless Closing Popups', variable=buttonlessVar, cursor='question_arrow')
+
+    buttonlessttp = CreateToolTip(toggleEasierButton, 'Disables the \"close button\" on popups and allows you to click anywhere on the popup to close it.\n\n'
+                                    'IMPORTANT: The panic keyboard hotkey will only work in this mode if you use it while *holding down* the mouse button over a popup!')
 
     timeoutToggle = Checkbutton(timeoutFrame, text='Popup Timeout', variable=timeoutPopupsVar, command=lambda: toggleAssociateSettings(timeoutPopupsVar.get(), timeout_group))
     timeoutSlider = Scale(timeoutFrame, label='Time (sec)', from_=1, to=120, orient='horizontal', variable=popupTimeoutVar)
@@ -634,6 +648,7 @@ def show_window():
     panicDisableButton.pack(fill='x')
     popupWebToggle.pack(fill='x')
     toggleCaptionsButton.pack(fill='x')
+    toggleEasierButton.pack(fill='x')
     #popup frame handle end
 
     #other start
@@ -964,6 +979,21 @@ def show_window():
     applyButton.pack(padx=2, fill='x', side='right')
     expectedLabel.pack()
     #==========={HERE ENDS  ADVANCED TAB ITEM INITS}===========#
+    Label(tabAdvanced, text='Troubleshooting', font='Default 13', relief=GROOVE).pack(pady=2)
+    troubleshootingHostFrame = Frame(tabAdvanced, borderwidth=5, relief=RAISED)
+    troubleshootingFrame1 = Frame(troubleshootingHostFrame)
+
+    toggleLanczos = Checkbutton(troubleshootingFrame1, text='Use Lanczos instead of Antialias', variable=antiOrLanczosVar, cursor='question_arrow')
+
+    troubleshootingHostFrame.pack(fill='x')
+    troubleshootingFrame1.pack(fill='both', side='left', expand=1)
+    toggleLanczos.pack(fill='x')
+
+    lanczosttp = CreateToolTip(toggleLanczos, 'Are popups and the startup image inexplicably not showing up for you? Try this setting.\n\n'
+                                'I am not entirely sure why, but the Lanczos image resizing algorithm sometimes works for people when the antialiasing one does not.\n\n'
+                                'This is not something changed in EdgeWare++, so if normal EdgeWare also didn\'t work for you, this might fix it?')
+
+
     tabMaster.add(tabInfo, text='About')
     #==========={IN HERE IS ABOUT TAB ITEM INITS}===========#
     tabInfoExpound.add(tab_annoyance, text='Annoyance')

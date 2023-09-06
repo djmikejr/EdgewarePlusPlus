@@ -24,8 +24,10 @@ def doAnimation():
         img_ = Image.open(os.path.join(PATH, 'resource', 'loading_splash.png'))
     else:
         img_ = Image.open(os.path.join(PATH, 'default_assets', 'loading_splash.png'))
-
-    img = ImageTk.PhotoImage(img_.resize((int(img_.width * scalar), int(img_.height * scalar)), resample=Image.ANTIALIAS))
+    if len(SYS_ARGS) >= 2 and SYS_ARGS[1] == '-lanczos' or len(SYS_ARGS) == 1 and SYS_ARGS[0] == '-lanczos':
+        img = ImageTk.PhotoImage(img_.resize((int(img_.width * scalar), int(img_.height * scalar)), resample=Image.LANCZOS))
+    else:
+        img = ImageTk.PhotoImage(img_.resize((int(img_.width * scalar), int(img_.height * scalar)), resample=Image.ANTIALIAS))
     root.geometry('{}x{}+{}+{}'.format(img.width(), img.height(), int((root.winfo_screenwidth() - img.width()) / 2), int((root.winfo_screenheight() - img.height()) / 2)))
     lbl = Label(root, image=img)
     lbl.pack()
