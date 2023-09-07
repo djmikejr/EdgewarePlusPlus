@@ -30,9 +30,9 @@ I'm also wanting to add features to the pack editor, will probably do that when 
 
 •+1.0 to version number: multiple new features, or a single large feature
 
-•+0.5 to version number: new feature, but a smaller one or something not as essential, or lots of bugfixes
+•+0.5-0.25 to version number: new feature, but a smaller one or something not as essential, or lots of bugfixes
 
-•+0.1-0.2 to version number: very small update, usually just a bugfix, accessibility options, UI tweaks
+•+0.2-0.1 to version number: very small update, usually just a bugfix, accessibility options, UI tweaks
 
 **Version 4.8**
 
