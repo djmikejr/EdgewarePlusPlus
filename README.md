@@ -7,7 +7,7 @@ I have prior programming experience, but have never touched python before this p
 
 Previous config files might not work at all with this version, if you are planning on switching over, make sure you write down your settings! (or go into your config file and manually update it, if you're so inclined)
 
-**Current things i'd like to add but haven't yet:**
+##Planned Additions:
 
 •*Dark Mode*
 
@@ -24,6 +24,24 @@ Previous config files might not work at all with this version, if you are planni
 •*Rewriting all the old config presets to work with the new version, and a few new ones as well!* (will probably do this when theres very few variables left to add)
 
 I'm also wanting to add features to the pack editor, will probably do that when this is in a state where I feel mostly done with what I wanted to accomplish.
+
+##EdgeWare++ Patch Notes
+**If you see that there's a new update and are somebody (like me) who is lazy and doesn't like installing every single update unnecessary, here is how I do versioning:**
+
+•+1.0 to version number: multiple new features, or a single large feature
+
+•+0.5 to version number: new feature, but a smaller one or something not as essential, or lots of bugfixes
+
+•+0.1-0.2 to version number: very small update, usually just a bugfix, accessibility options, UI tweaks
+
+**Version 4.8**
+
+Wow, lots of small updates in a row!
+
+•*Edited EdgewareSetup.bat to have easier to read text and also be more clear on next steps. It also now goes to config.pyw on completion rather than starting it immediately*
+>Was helping somebody set up Edgeware and realized how confusing the initial startup is for some new users. Tried my best to demystify some of how to use it if you're not totally familiar with python programs. Changing it from start to config was so it didn't start barraging you with popups containing black circles before you even know what's going on
+
+•*Further clarified a few things in the config window, added a tooltip or two, and
 
 **Version 4.75**
 

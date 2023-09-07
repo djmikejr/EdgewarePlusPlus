@@ -61,7 +61,7 @@ HIBERNATE_TEXT          = 'The Hibernate feature is an entirely different mode f
 ADVANCED_TEXT           = 'The Advanced section is also something previously only accessible by directly editing the config.cfg file. It offers full and complete customization of all setting values without any limitations outside of variable typing.\n\n\nPlease use this feature with discretion, as any erroneous values will result in a complete deletion and regeneration of the config file from the default, and certain value ranges are likely to result in crashes or unexpected glitches in the program.'
 THANK_AND_ABOUT_TEXT    = 'Thank you so much to all the fantastic artists who create and freely distribute the art that allows programs like this to exist, to all the people who helped me work through the various installation problems as we set the software up (especially early on), and honestly thank you to ALL of the people who are happily using Edgeware. \n\nIt truly makes me happy to know that my work is actually being put to good use by people who enjoy it. After all, at the end of the day that\'s really all I\'ve ever really wanted, but figured was beyond reach of a stupid degreeless neet.\nI love you all <3\n\n\n\nIf you like my work, please feel free to help support my neet lifestyle by donating to $PetitTournesol on Cashapp; by no means are you obligated or expected to, but any and all donations are greatly appreciated!'
 
-PLUSPLUS_TEXT           = 'Thanks for taking the time to check out this extension on EdgeWare! However you found it, I appreciate that it interested you enough to give it a download.\n\nI am not an expert programmer by any means, so apologies if there are any bugs or errors in this version. My goal is to not do anything crazy ambitious like rewrite the entire program or fix up the backend, but rather just add on functionality that I thought could improve the base version. Because of this, i\'m hoping that compatability between those who use normal EdgeWare and those who use this version stays relatively stable.\n\nCurrent changes:\n\n•Added a option under "misc" to enable/disable desktop icon generation.\n•Added options to cap the number of audio popups and video popups.\n•Added a chance slider for subliminals, and a max subliminals slider.\n•Added feature to change Startup Graphic per pack. (name the file \"loading_splash.png\" in the resource folder)\n•Added feature to enable warnings for \"Dangerous Settings\".\n•Added hover tooltips on some things to make the program easier to understand.\n•Added troubleshooting tab under \"advanced\" with some settings to fix things for certain users.\n•Added feature to click anywhere on popup to close.'
+PLUSPLUS_TEXT           = 'Thanks for taking the time to check out this extension on EdgeWare! However you found it, I appreciate that it interested you enough to give it a download.\n\nI am not an expert programmer by any means, so apologies if there are any bugs or errors in this version. My goal is to not do anything crazy ambitious like rewrite the entire program or fix up the backend, but rather just add on functionality that I thought could improve the base version. Because of this, i\'m hoping that compatability between those who use normal EdgeWare and those who use this version stays relatively stable.\n\nCurrent changes:\n\n•Added a option under "misc" to enable/disable desktop icon generation.\n•Added options to cap the number of audio popups and video popups.\n•Added a chance slider for subliminals, and a max subliminals slider.\n•Added feature to change Startup Graphic per pack. (name the file \"loading_splash.png\" in the resource folder)\n•Added feature to enable warnings for \"Dangerous Settings\".\n•Added hover tooltips on some things to make the program easier to understand.\n•Added troubleshooting tab under \"advanced\" with some settings to fix things for certain users.\n•Added feature to click anywhere on popup to close.\n•Made the EdgewareSetup.bat more clear with easier to read text. Hopefully if you\'re seeing this it all worked out!'
 #all booru consts
 BOORU_FLAG = '<BOORU_INSERT>'                                                      #flag to replace w/ booru name
 BOORU_URL  = f'https://{BOORU_FLAG}.booru.org/index.php?page=post&s=list&tags='    #basic url
@@ -932,8 +932,12 @@ def show_window():
     panicWPFrameL = Frame(panicWPFrame)
     panicWPFrameR = Frame(panicWPFrame)
     panicWallpaperImage = ImageTk.PhotoImage(pHoldImageR)
-    panicWallpaperButton = Button(panicWPFrameL, text='Change Panic Wallpaper', command=updatePanicPaper)
+    panicWallpaperButton = Button(panicWPFrameL, text='Change Panic Wallpaper', command=updatePanicPaper, cursor='question_arrow')
     panicWallpaperLabel = Label(panicWPFrameR, text='Current Panic Wallpaper', image=panicWallpaperImage)
+
+    panicWallpaperttp = CreateToolTip(panicWallpaperButton, 'When you use panic, the wallpaper will be set to this image.\n\n'
+                                        'This is useful since most packs have a custom wallpaper, which is usually porn...!\n\n'
+                                        'It is recommended to find your preferred/original desktop wallpaper and set it to that.')
 
     wallpaper_group.append(wpList)
     wallpaper_group.append(addWPButton)
@@ -955,7 +959,7 @@ def show_window():
     panicWallpaperButton.pack(fill='x', padx=5, pady=5, expand=1)
     Label(panicWPFrameR, text='Current Panic Wallpaper').pack(fill='x')
     panicWallpaperLabel.pack()
-    tabMaster.add(tabAdvanced, text='Advanced')
+    tabMaster.add(tabAdvanced, text='Advanced/Troubleshooting')
     #==========={IN HERE IS ADVANCED TAB ITEM INITS}===========#
     itemList = []
     for settingName in settings:
@@ -1098,7 +1102,8 @@ def importResource(parent:Tk) -> bool:
         if openLocation == None:
             return False
         if os.path.exists(f'{PATH}resource\\'):
-            resp = confirmBox(parent, 'Confirm', 'Current resource folder will be deleted and overwritten. Is this okay?')
+            resp = confirmBox(parent, 'Confirm', 'Current resource folder will be deleted and overwritten. Is this okay?'
+                                '\nNOTE: This might take a while when importing larger packs, please be patient!')
             if not resp:
                 logging.info('exited import resource overwrite')
                 return False
@@ -1120,12 +1125,12 @@ def confirmBox(parent:Tk, btitle:str, message:str) -> bool:
         nonlocal allow
         allow=state
         root.quit()
-    root.geometry('220x120')
+    root.geometry('300x150')
     root.resizable(False, False)
     root.wm_attributes('-toolwindow', 1)
     root.focus_force()
     root.title(btitle)
-    Label(root, text=message, wraplength=212).pack(fill='x')
+    Label(root, text=message, wraplength=292).pack(fill='x')
     #Label(root).pack()
     Button(root, text='Continue', command=lambda: complete(True)).pack()
     Button(root, text='Cancel', command=lambda: complete(False)).pack()
