@@ -21,6 +21,14 @@ Previous config files might not work at all with this version, if you are planni
 
 I'm also wanting to add features to the pack editor, will probably do that when this is in a state where I feel mostly done with what I wanted to accomplish.
 
+**Suggestions**
+
+Suggestions I got from people who used the software and I thought would be interesting enough to try. Lower priority than my own planned additions, but still something I hope to add (or attempt to) in the future!
+
+•*New type of popup: full screen text, taken from caption file. Like subliminals but briefly flashing on full screen.*
+
+•*Randomized settings button. Might implement when i'm mostly done adding new config vars, but also gave me the idea for pack creators to be able to make "recommended settings" that you can switch to in the pack info tab*
+
 ## EdgeWare++ Patch Notes
 **If you see that there's a new update and are somebody (like me) who is lazy and doesn't like installing every single update unnecessary, here is how I do versioning:**
 
