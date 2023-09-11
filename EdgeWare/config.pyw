@@ -61,12 +61,24 @@ HIBERNATE_TEXT          = 'The Hibernate feature is an entirely different mode f
 ADVANCED_TEXT           = 'The Advanced section is also something previously only accessible by directly editing the config.cfg file. It offers full and complete customization of all setting values without any limitations outside of variable typing.\n\n\nPlease use this feature with discretion, as any erroneous values will result in a complete deletion and regeneration of the config file from the default, and certain value ranges are likely to result in crashes or unexpected glitches in the program.'
 THANK_AND_ABOUT_TEXT    = 'Thank you so much to all the fantastic artists who create and freely distribute the art that allows programs like this to exist, to all the people who helped me work through the various installation problems as we set the software up (especially early on), and honestly thank you to ALL of the people who are happily using Edgeware. \n\nIt truly makes me happy to know that my work is actually being put to good use by people who enjoy it. After all, at the end of the day that\'s really all I\'ve ever really wanted, but figured was beyond reach of a stupid degreeless neet.\nI love you all <3\n\n\n\nIf you like my work, please feel free to help support my neet lifestyle by donating to $PetitTournesol on Cashapp; by no means are you obligated or expected to, but any and all donations are greatly appreciated!'
 
-PLUSPLUS_TEXT           = 'Thanks for taking the time to check out this extension on EdgeWare! However you found it, I appreciate that it interested you enough to give it a download.\n\nI am not an expert programmer by any means, so apologies if there are any bugs or errors in this version. My goal is to not do anything crazy ambitious like rewrite the entire program or fix up the backend, but rather just add on functionality that I thought could improve the base version. Because of this, i\'m hoping that compatability between those who use normal EdgeWare and those who use this version stays relatively stable.\n\nCurrent changes:\n\n•Added a option under "misc" to enable/disable desktop icon generation.\n•Added options to cap the number of audio popups and video popups.\n•Added a chance slider for subliminals, and a max subliminals slider.\n•Added feature to change Startup Graphic per pack. (name the file \"loading_splash.png\" in the resource folder)\n•Added feature to enable warnings for \"Dangerous Settings\".\n•Added hover tooltips on some things to make the program easier to understand.\n•Added troubleshooting tab under \"advanced\" with some settings to fix things for certain users.\n•Added feature to click anywhere on popup to close.\n•Made the EdgewareSetup.bat more clear with easier to read text. Hopefully if you\'re seeing this it all worked out!'
+PLUSPLUS_TEXT           = 'Thanks for taking the time to check out this extension on EdgeWare! However you found it, I appreciate that it interested you enough to give it a download.\n\nI am not an expert programmer by any means, so apologies if there are any bugs or errors in this version. My goal is to not do anything crazy ambitious like rewrite the entire program or fix up the backend, but rather just add on functionality that I thought could improve the base version. Because of this, i\'m hoping that compatability between those who use normal EdgeWare and those who use this version stays relatively stable.\n\nCurrent changes:\n\n•Added a option under "misc" to enable/disable desktop icon generation.\n•Added options to cap the number of audio popups and video popups.\n•Added a chance slider for subliminals, and a max subliminals slider.\n•Added feature to change Startup Graphic per pack. (name the file \"loading_splash.png\" in the resource folder)\n•Added feature to enable warnings for \"Dangerous Settings\".\n•Added hover tooltips on some things to make the program easier to understand.\n•Added troubleshooting tab under \"advanced\" with some settings to fix things for certain users.\n•Added feature to click anywhere on popup to close.\n•Made the EdgewareSetup.bat more clear with easier to read text. Hopefully if you\'re seeing this it all worked out!\n•Moved the import/export resources button to be visible on every page, because honestly they\'re pretty important\n•Added the \"Pack Info\" tab with lots of fun goodies and stats so you know what you\'re getting into with each pack.'
+PACKINFO_TEXT          = 'The pack info section contains an overview for whatever pack is currently loaded.\n\nThe \"Status\" tab allows you to see what features are included in the current pack (or if a pack is even loaded at all), but keep in mind all of these features have default fallbacks if they aren\'t included.\n\nThe \"Information\" tab gets info on the pack from //resource//info.json, which is a new addition to EdgeWare++. This feature was added to allow pack creators to give the pack a formal name and description without having to worry about details being lost if transferred from person to person. Think of it like a readme. Also included in this section is the discord status info, which gives what your discord status will be set to if that setting is turned on, along with the image. As of time of writing (or if I forget to update this later), the image cannot be previewed as it is \"hard coded\" into EdgeWare\'s discord application and accessed through the API. As I am not the original creator of EdgeWare, and am not sure how to contact them, the best I could do is low-res screenshots or the name of each image. I chose the latter. Because of this hard-coding, the only person i\'ve run into so far who use these images is PetitTournesol themselves, but it should be noted that anyone can use them as long as they know what to add to the discord.dat file. This is partially the reason I left this information in.\n\nThe \"Stats\" tab lets you see a lot of fun stats relating to the pack, including almost everything you\'ll see while using EdgeWare. Keep in mind that certain things having \"0\" as a stat doesn\'t mean you can\'t use it, for example, having 0 subliminals uses the default spiral and having 0 images displays a very un-sexy circle.'
+
 #all booru consts
 BOORU_FLAG = '<BOORU_INSERT>'                                                      #flag to replace w/ booru name
 BOORU_URL  = f'https://{BOORU_FLAG}.booru.org/index.php?page=post&s=list&tags='    #basic url
 BOORU_VIEW = f'https://{BOORU_FLAG}.booru.org/index.php?page=post&s=view&id='      #post view url
 BOORU_PTAG = '&pid='                                                               #page id tag
+
+#info defaults & vars
+INFO_NAME_DEFAULT = 'N/A'
+INFO_DESCRIPTION_DEFAULT = 'No pack loaded, or the pack does not have an \'info.json\' file.'
+INFO_CREATOR_DEFAULT = 'Anonymous'
+INFO_DISCORD_DEFAULT = ['[No pack loaded, or the pack does not have a \'discord.dat\' file.]', 'default']
+
+info_name = INFO_NAME_DEFAULT
+info_description = INFO_DESCRIPTION_DEFAULT
+info_creator = INFO_CREATOR_DEFAULT
 
 #url to check online version
 UPDCHECK_URL = 'http://raw.githubusercontent.com/PetitTournesol/Edgeware/main/EdgeWare/configDefault.dat'
@@ -155,7 +167,7 @@ def show_window():
     #window things
     root = Tk()
     root.title('Edgeware++ Config')
-    root.geometry('740x675')
+    root.geometry('740x680')
     try:
         root.iconbitmap(f'{PATH}default_assets\\config_icon.ico')
         logging.info('set iconbitmap.')
@@ -308,6 +320,8 @@ def show_window():
     maxAudio_group  = []
     maxVideo_group  = []
     subliminals_group = []
+    info_group = []
+    discord_group = []
 
     #tab display code start
     tabMaster    = ttk.Notebook(root)       #tab manager
@@ -318,6 +332,7 @@ def show_window():
     tabJSON      = ttk.Frame(None)          #tab for JSON editor (unused)
     tabAdvanced  = ttk.Frame(None)          #advanced tab, will have settings pertaining to startup, hibernation mode settings
     tabInfo      = ttk.Frame(None)          #info, github, version, about, etc.
+    tabPackInfo  = ttk.Frame(None)          #pack information
 
     style = ttk.Style(root)                 #style setting for left aligned tabs
     style.configure('lefttab.TNotebook', tabposition='wn')
@@ -331,6 +346,7 @@ def show_window():
     tab_advanced = ttk.Frame(None)
     tab_thanksAndAbout = ttk.Frame(None)
     tab_plusPlus = ttk.Frame(None)
+    tab_packInfo = ttk.Frame(None)
 
     tabMaster.add(tabGeneral, text='General')
     #==========={IN HERE IS GENERAL TAB ITEM INITS}===========#
@@ -454,9 +470,6 @@ def show_window():
     #other
     Label(tabGeneral, text='Other', font='Default 13', relief=GROOVE).pack(pady=2)
     otherHostFrame = Frame(tabGeneral, borderwidth=5, relief=RAISED)
-    resourceFrame = Frame(otherHostFrame)
-    exportResourcesButton = Button(resourceFrame, text='Export resource', command=exportResource)
-    importResourcesButton = Button(resourceFrame, text='Import resources', command=lambda: importResource(root))
     toggleFrame1 = Frame(otherHostFrame)
     toggleFrame2 = Frame(otherHostFrame)
     toggleFrame3 = Frame(otherHostFrame)
@@ -469,9 +482,6 @@ def show_window():
     toggleSafeMode = Checkbutton(toggleFrame3, text='Warn if \"Dangerous\" Settings Active', variable=safeModeVar, cursor='question_arrow')
 
     otherHostFrame.pack(fill='x')
-    resourceFrame.pack(fill='y', side='left')
-    exportResourcesButton.pack(fill='x')
-    importResourcesButton.pack(fill='x')
     toggleFrame1.pack(fill='both', side='left', expand=1)
     toggleStartupButton.pack(fill='x')
     toggleDiscordButton.pack(fill='x')
@@ -527,7 +537,10 @@ def show_window():
     forceReload = Button(infoHostFrame, text='Force Reload', command=refresh)
     optButton   = Button(infoHostFrame, text='Test Func', command=lambda: getDescriptText('default'))
 
-    saveExitButton = Button(root, text='Save & Exit', command=lambda: write_save(in_var_group, in_var_names, safewordVar, True))
+    resourceFrame = Frame(root)
+    exportResourcesButton = Button(resourceFrame, text='Export Resource Pack', command=exportResource)
+    importResourcesButton = Button(resourceFrame, text='Import Resource Pack', command=lambda: importResource(root))
+    saveExitButton = Button(root, height=5, text='Save & Exit', command=lambda: write_save(in_var_group, in_var_names, safewordVar, True))
 
     #force reload button for debugging, only appears on DEV versions
     if local_version.endswith('DEV'):
@@ -959,8 +972,232 @@ def show_window():
     panicWallpaperButton.pack(fill='x', padx=5, pady=5, expand=1)
     Label(panicWPFrameR, text='Current Panic Wallpaper').pack(fill='x')
     panicWallpaperLabel.pack()
-    tabMaster.add(tabAdvanced, text='Advanced/Troubleshooting')
+    #==========={EDGEWARE++ "PACK INFO" TAB STARTS HERE}===========#
+    tabMaster.add(tabPackInfo, text='Pack Info')
+
+    #Status
+    Label(tabPackInfo, text='Status', font='Default 13', relief=GROOVE).pack(pady=2)
+    infoStatusFrame = Frame(tabPackInfo, borderwidth=5, relief=RAISED)
+    statusPackFrame = Frame(infoStatusFrame)
+    statusAboutFrame = Frame(infoStatusFrame)
+    statusWallpaperFrame = Frame(infoStatusFrame)
+    statusStartupFrame = Frame(infoStatusFrame)
+    statusDiscordFrame = Frame(infoStatusFrame)
+
+    if os.path.exists(PATH + '\\resource\\'):
+        statusPack = True
+        statusAbout = True if os.path.isfile(PATH + '\\resource\\info.json') else False
+        statusWallpaper = True if os.path.isfile(PATH + '\\resource\\wallpaper.png') else False
+        statusStartup = True if os.path.isfile(PATH + '\\resource\\loading_splash.png') else False
+        statusDiscord = True if os.path.isfile(PATH + '\\resource\\discord.dat') else False
+    else:
+        statusPack = False
+        statusAbout = False
+        statusWallpaper = False
+        statusStartup = False
+        statusDiscord = False
+
+    statusPackFrameVarLabel = Label(statusPackFrame, text=('✓' if statusPack else '✗'), font='Default 14', fg=('green' if statusPack else 'red'))
+    statusAboutFrameVarLabel = Label(statusAboutFrame, text=('✓' if statusAbout else '✗'), font='Default 14', fg=('green' if statusAbout else 'red'))
+    statusWallpaperFrameVarLabel = Label(statusWallpaperFrame, text=('✓' if statusWallpaper else '✗'), font='Default 14', fg=('green' if statusWallpaper else 'red'))
+    statusStartupFrameVarLabel = Label(statusStartupFrame, text=('✓' if statusStartup else '✗'), font='Default 14', fg=('green' if statusStartup else 'red'))
+    statusDiscordFrameVarLabel = Label(statusDiscordFrame, text=('✓' if statusDiscord else '✗'), font='Default 14', fg=('green' if statusDiscord else 'red'))
+
+    infoStatusFrame.pack(fill='x', padx=3, expand=1)
+    statusPackFrame.pack(fill='x', side='left', expand=1)
+    Label(statusPackFrame, text='Pack loaded', font='Default 10').pack(padx=2, pady=2, side='top')
+    statusPackFrameVarLabel.pack(padx=2, pady=2, side='top')
+    statusAboutFrame.pack(fill='x', side='left', expand=1)
+    Label(statusAboutFrame, text='Pack has info file', font='Default 10').pack(padx=2, pady=2, side='top')
+    statusAboutFrameVarLabel.pack(padx=2, pady=2, side='top')
+    statusWallpaperFrame.pack(fill='x', side='left', expand=1)
+    Label(statusWallpaperFrame, text='Pack has wallpaper', font='Default 10').pack(padx=2, pady=2, side='top')
+    statusWallpaperFrameVarLabel.pack(padx=2, pady=2, side='top')
+    statusStartupFrame.pack(fill='x', side='left', expand=1)
+    Label(statusStartupFrame, text='Pack has custom startup', font='Default 10').pack(padx=2, pady=2, side='top')
+    statusStartupFrameVarLabel.pack(padx=2, pady=2, side='top')
+    statusDiscordFrame.pack(fill='x', side='left', expand=1)
+    Label(statusDiscordFrame, text='Pack has custom discord status', font='Default 10').pack(padx=2, pady=2, side='top')
+    statusDiscordFrameVarLabel.pack(padx=2, pady=2, side='top')
+
+    #Information
+    Label(tabPackInfo, text='Information', font='Default 13', relief=GROOVE).pack(pady=2)
+    infoDescFrame = Frame(tabPackInfo, borderwidth=5, relief=RAISED)
+    subInfoFrame = Frame(infoDescFrame, borderwidth=2, relief=GROOVE)
+    descriptionFrame = Frame(infoDescFrame, borderwidth=2, relief=GROOVE)
+    subInfoSep = ttk.Separator(subInfoFrame, orient='horizontal')
+
+    nameFrame = Frame(subInfoFrame)
+    nameLabel = Label(nameFrame, text='Pack Name:', font='Default 10')
+    nameVarLabel = Label(nameFrame, text=f'{info_name}')
+    nameSep = ttk.Separator(nameFrame, orient='vertical')
+    creatorFrame = Frame(subInfoFrame)
+    creatorLabel = Label(creatorFrame, text='Author Name:', font='Default 10')
+    creatorVarLabel = Label(creatorFrame, text=f'{info_creator}')
+    descriptionLabel = Label(descriptionFrame, text='Description', font='Default 10')
+    descriptionVarLabel = Label(descriptionFrame, text=f'{info_description}', wraplength=580)
+
+    infoDescFrame.pack(fill='x', padx=3, expand=1)
+    subInfoFrame.pack(fill='x', side='left', expand=1)
+
+    nameFrame.pack(fill='x')
+    nameLabel.pack(padx=6, pady=2, side='left')
+    nameSep.pack(fill='y', side='left')
+    nameVarLabel.pack(padx=2, pady=2, side='left')
+    subInfoSep.pack(fill='x')
+
+    creatorFrame.pack(fill='x')
+    creatorLabel.pack(padx=2, pady=2, side='left')
+    ttk.Separator(creatorFrame, orient='vertical').pack(fill='y', side='left')
+    creatorVarLabel.pack(padx=2, pady=2, side='left')
+
+    descriptionFrame.pack(fill='both', side='right', expand=1)
+    descriptionLabel.pack(padx=2, pady=2, side='top')
+    ttk.Separator(descriptionFrame, orient='horizontal').pack(fill='x', side='top')
+    descriptionVarLabel.pack(padx=2, pady=2, side='top')
+
+    info_group.append(infoDescFrame)
+    info_group.append(nameFrame)
+    info_group.append(nameLabel)
+    info_group.append(nameVarLabel)
+    info_group.append(creatorFrame)
+    info_group.append(creatorLabel)
+    info_group.append(creatorVarLabel)
+    info_group.append(descriptionFrame)
+    info_group.append(descriptionLabel)
+    info_group.append(descriptionVarLabel)
+    toggleAssociateSettings(statusAbout, info_group)
+
+    discordStatusFrame = Frame(tabPackInfo, borderwidth=5, relief=RAISED)
+    discordStatusLabel = Label(discordStatusFrame, text='Custom Discord Status:', font='Default 10')
+    discordStatusImageLabel = Label(discordStatusFrame, text='Discord Status Image:', font='Default 10')
+    if statusDiscord:
+        with open((PATH + '\\resource\\discord.dat'), 'r') as f:
+            datfile = f.read()
+            if not datfile == '':
+                info_discord = datfile.split('\n')
+                if len(info_discord) < 2:
+                    info_discord.append(INFO_DISCORD_DEFAULT[1])
+    else:
+        info_discord = INFO_DISCORD_DEFAULT.copy()
+
+    discordStatusVarLabel = Label(discordStatusFrame, text=f'{info_discord[0]}')
+    discordStatusImageVarLabel = Label(discordStatusFrame, text=f'{info_discord[1]}', cursor='question_arrow')
+
+    discordStatusFrame.pack(fill='x', padx=3, expand=1)
+    discordStatusLabel.pack(padx=2, pady=2, side='left')
+    ttk.Separator(discordStatusFrame, orient='vertical').pack(fill='y', side='left')
+    discordStatusVarLabel.pack(padx=2, pady=2, side='left', expand=1)
+    ttk.Separator(discordStatusFrame, orient='vertical').pack(fill='y', side='left')
+    discordStatusImageLabel.pack(padx=2, pady=2, side='left')
+    ttk.Separator(discordStatusFrame, orient='vertical').pack(fill='y', side='left')
+    discordStatusImageVarLabel.pack(padx=2, pady=2, side='left')
+
+    discord_group.append(discordStatusFrame)
+    discord_group.append(discordStatusLabel)
+    discord_group.append(discordStatusImageLabel)
+    discord_group.append(discordStatusVarLabel)
+    discord_group.append(discordStatusImageVarLabel)
+    toggleAssociateSettings(statusDiscord, discord_group)
+
+    discordimagettp = CreateToolTip(discordStatusImageVarLabel, 'As much as I would like to show you this image, it\'s fetched from the discord '
+                                    'application API- which I cannot access without permissions, as far as i\'m aware.\n\n'
+                                    'Because of this, only packs created by the original EdgeWare creator, PetitTournesol, have custom status images.\n\n'
+                                    'Nevertheless, I have decided to put this here not only for those packs, but also for other '
+                                    'packs that tap in to the same image IDs.')
+
+    #Stats
+    Label(tabPackInfo, text='Stats', font='Default 13', relief=GROOVE).pack(pady=2)
+
+    statsFrame = Frame(tabPackInfo, borderwidth=5, relief=RAISED)
+    statsFrame1 = Frame(statsFrame)
+    statsFrame2 = Frame(statsFrame)
+    imageStatsFrame = Frame(statsFrame1)
+    audioStatsFrame = Frame(statsFrame1)
+    videoStatsFrame = Frame(statsFrame1)
+    webStatsFrame = Frame(statsFrame1)
+    promptStatsFrame = Frame(statsFrame2)
+    captionsStatsFrame = Frame(statsFrame2)
+    subliminalsStatsFrame = Frame(statsFrame2)
+
+    imageStat = len(os.listdir(PATH + '\\resource\\img\\')) if os.path.exists(PATH + '\\resource\\img\\') else 0
+    audioStat = len(os.listdir(PATH + '\\resource\\aud\\')) if os.path.exists(PATH + '\\resource\\aud\\') else 0
+    videoStat = len(os.listdir(PATH + '\\resource\\vid\\')) if os.path.exists(PATH + '\\resource\\vid\\') else 0
+
+    if os.path.exists(PATH + '\\resource\\web.json'):
+        with open(PATH + '\\resource\\web.json', 'r') as f:
+            webStat = len(json.loads(f.read())['urls'])
+    else:
+        webStat = 0
+
+    if os.path.exists(PATH + '\\resource\\prompt.json'):
+        #frankly really ugly but the easiest way I found to do it
+        with open(PATH + '\\resource\\prompt.json', 'r') as f:
+            l = json.loads(f.read())
+            i = 0
+            if 'moods' in l: del l['moods']
+            if 'minLen' in l: del l['minLen']
+            if 'maxLen' in l: del l['maxLen']
+            if 'freqList' in l: del l['freqList']
+            if 'subtext' in l: del l['subtext']
+            if 'commandtext' in l: del l['commandtext']
+            for x in l:
+                i += len(l[x])
+            promptStat = i
+    else:
+        promptStat = 0
+
+    if os.path.exists(PATH + '\\resource\\captions.json'):
+        #don't think these have moods currently but will implement this just in case
+        with open(PATH + '\\resource\\captions.json', 'r') as f:
+            l = json.loads(f.read())
+            i = 0
+            if 'prefix' in l: del l['prefix']
+            if 'subtext' in l: del l['subtext']
+            for x in l:
+                i += len(l[x])
+            captionStat = i
+    else:
+        captionStat = 0
+
+    subliminalStat = len(os.listdir(PATH + '\\resource\\subliminals\\')) if os.path.exists(PATH + '\\resource\\subliminals\\') else 0
+
+    statsFrame.pack(fill='x', padx=3, expand=1, pady=1)
+    statsFrame1.pack(fill='x', side='top')
+    imageStatsFrame.pack(fill='x', side='left', expand=1)
+    Label(imageStatsFrame, text='Images', font='Default 10').pack(pady=2, side='top')
+    ttk.Separator(imageStatsFrame, orient='horizontal').pack(fill='x', side='top', padx=10)
+    Label(imageStatsFrame, text=f'{imageStat}').pack(pady=2, side='top')
+    audioStatsFrame.pack(fill='x', side='left', expand=1)
+    Label(audioStatsFrame, text='Audio Files', font='Default 10').pack(pady=2, side='top')
+    ttk.Separator(audioStatsFrame, orient='horizontal').pack(fill='x', side='top', padx=10)
+    Label(audioStatsFrame, text=f'{audioStat}').pack(pady=2, side='top')
+    videoStatsFrame.pack(fill='x', side='left', expand=1)
+    Label(videoStatsFrame, text='Videos', font='Default 10').pack(pady=2, side='top')
+    ttk.Separator(videoStatsFrame, orient='horizontal').pack(fill='x', side='top', padx=10)
+    Label(videoStatsFrame, text=f'{videoStat}').pack(pady=2, side='top')
+    webStatsFrame.pack(fill='x', side='left', expand=1)
+    Label(webStatsFrame, text='Web Links', font='Default 10').pack(pady=2, side='top')
+    ttk.Separator(webStatsFrame, orient='horizontal').pack(fill='x', side='top', padx=10)
+    Label(webStatsFrame, text=f'{webStat}').pack(pady=2, side='top')
+
+    statsFrame2.pack(fill='x', side='top', pady=1)
+    promptStatsFrame.pack(fill='x', side='left', expand=1)
+    Label(promptStatsFrame, text='Prompts', font='Default 10').pack(pady=2, side='top')
+    ttk.Separator(promptStatsFrame, orient='horizontal').pack(fill='x', side='top', padx=20)
+    Label(promptStatsFrame, text=f'{promptStat}').pack(pady=2, side='top')
+    captionsStatsFrame.pack(fill='x', side='left', expand=1)
+    Label(captionsStatsFrame, text='Captions', font='Default 10').pack(pady=2, side='top')
+    ttk.Separator(captionsStatsFrame, orient='horizontal').pack(fill='x', side='top', padx=20)
+    Label(captionsStatsFrame, text=f'{captionStat}').pack(pady=2, side='top')
+    subliminalsStatsFrame.pack(fill='x', side='left', expand=1)
+    Label(subliminalsStatsFrame, text='Subliminals', font='Default 10').pack(pady=2, side='top')
+    ttk.Separator(subliminalsStatsFrame, orient='horizontal').pack(fill='x', side='top', padx=20)
+    Label(subliminalsStatsFrame, text=f'{subliminalStat}').pack(pady=2, side='top')
+
+
     #==========={IN HERE IS ADVANCED TAB ITEM INITS}===========#
+    tabMaster.add(tabAdvanced, text='Advanced/Troubleshooting')
     itemList = []
     for settingName in settings:
         itemList.append(settingName)
@@ -1017,6 +1254,8 @@ def show_window():
     Label(tab_thanksAndAbout, text=THANK_AND_ABOUT_TEXT, anchor='nw', wraplength=460).pack()
     tabInfoExpound.add(tab_plusPlus, text='EdgeWare++')
     Label(tab_plusPlus, text=PLUSPLUS_TEXT, anchor='nw', wraplength=460).pack()
+    tabInfoExpound.add(tab_packInfo, text='Pack Info')
+    Label(tab_packInfo, text=PACKINFO_TEXT, anchor='nw', wraplength=460).pack()
     #==========={HERE ENDS  ABOUT TAB ITEM INITS}===========#
 
     toggleAssociateSettings(fillVar.get(), fill_group)
@@ -1036,7 +1275,10 @@ def show_window():
 
     tabMaster.pack(expand=1, fill='both')
     tabInfoExpound.pack(expand=1, fill='both')
-    saveExitButton.pack(fill='x')
+    resourceFrame.pack(fill='x')
+    importResourcesButton.pack(fill='x', side='left', expand=1)
+    exportResourcesButton.pack(fill='x', side='left', expand=1)
+    saveExitButton.pack(fill='both',expand=1)
 
 
     timeObjPath = os.path.join(PATH, 'hid_time.dat')
@@ -1113,6 +1355,7 @@ def importResource(parent:Tk) -> bool:
             zip.extractall(f'{PATH}resource\\')
             logging.info('extracted all from zip')
         messagebox.showinfo('Done', 'Resource importing completed.')
+        refresh()
         return True
     except Exception as e:
         messagebox.showerror('Read Error', f'Failed to import resources from file.\n[{e}]')
@@ -1142,6 +1385,7 @@ def confirmBox(parent:Tk, btitle:str, message:str) -> bool:
     return allow
 
 #helper funcs for lambdas =======================================================
+#def checkInfo():
 
 def write_save(varList:list[StringVar | IntVar | BooleanVar], nameList:list[str], passVar:str, exitAtEnd:bool):
     if int(varList[nameList.index('safeMode')].get()) == 1 and exitAtEnd:
@@ -1377,7 +1621,8 @@ def toggleAssociateSettings(ownerState:bool, objList:list):
 def toggleAssociateSettings_manual(ownerState:bool, objList:list, colorOn:int, colorOff:int):
     logging.info(f'toggling state of {objList} to {ownerState}')
     for tkObject in objList:
-        tkObject.configure(state=('normal' if ownerState else 'disabled'))
+        if not tkObject.winfo_class() == 'Frame' and not tkObject.winfo_class() == 'Label':
+            tkObject.configure(state=('normal' if ownerState else 'disabled'))
         tkObject.configure(bg=(colorOn if ownerState else colorOff))
 
 def shortcut_script(pth_str:str, startup_path:str, title:str):

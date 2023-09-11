@@ -11,15 +11,11 @@ Previous config files might not work at all with this version, if you are planni
 
 •*Dark Mode*
 
-•*Toggle for deleting desktop icons on panic*
-
 •*Giving mitosis a percentage activation slider*
 
 •*Giving hibernate new modes, offering alternatives like "slowly ramping up over time"*
 
 •*Giving a use to prompt/caption "moods", initial inspiration was giving people the ability to make "one handed" prompt modes, for those who are too "preoccupied" to type multiple full sentences*
-
-•*A tab where you can view current pack resources, primarily captions/prompts/moods*
 
 •*Rewriting all the old config presets to work with the new version, and a few new ones as well!* (will probably do this when theres very few variables left to add)
 
@@ -33,6 +29,16 @@ I'm also wanting to add features to the pack editor, will probably do that when 
 •+0.5-0.25 to version number: new feature, but a smaller one or something not as essential, or lots of bugfixes
 
 •+0.2-0.1 to version number: very small update, usually just a bugfix, accessibility options, UI tweaks
+
+**Version 5**
+
+Probably the **biggest** version yet if we're going by code added! But there's only two things changed:
+
+•*Moved the import and export resources buttons to the bottom of the config window, and made them visible wherever you go*
+>The people I have helped figure out EdgeWare with no prior experience had a near 100% confusion rate on what to do with packs, so I wanted to make it at least a little more clear. Might add a tooltip for them later.
+
+•*Added a new tab: Pack Info, which allows you to see a ton of stats relating to the currently loaded pack. Current sections are Status, About, and Stats*
+>This was a lot to add, so if there's any bugs with EW++ so far it'll all be here. Hopefully manages to be stable enough. Currently adding an about.json to your pack does nothing, but I wanted to add the framework for it since it's probably going to be one of my next added features.
 
 **Version 4.8**
 
