@@ -333,7 +333,7 @@ def run():
             label = Label(root, image=photoimage_image, bg='black')
             label.pack()
         else:
-            with open(os.path.join(PATH, 'max_subliminals.dat'), 'r+') as f:
+            with open(PATH + '\\data\\max_subliminals.dat', 'r+') as f:
                 i = int(f.readline())
                 label = GifLabel(root)
                 subliminal_path = os.path.join(PATH, 'default_assets', 'default_spiral.gif')
@@ -410,7 +410,7 @@ def check_deny() -> bool:
 
 def check_subliminal():
     global SUBLIMINAL_MODE
-    with open(os.path.join(PATH, 'max_subliminals.dat'), 'r') as f:
+    with open(PATH + '\\data\\max_subliminals.dat', 'r') as f:
         if int(f.readline()) >= MAX_SUBLIMINALS:
             SUBLIMINAL_MODE = False
         elif rand.randint(1, 100) > SUBLIMINAL_CHANCE:
@@ -424,14 +424,14 @@ def live_life(parent:tk, length:int):
     if LOWKEY_MODE:
         os.startfile('popup.pyw')
     if len(SYS_ARGS) >= 1 and SYS_ARGS[0] == '-video':
-        with open(os.path.join(PATH, 'max_videos.dat'), 'r+') as f:
+        with open(PATH + '\\data\\max_videos.dat', 'r+') as f:
             i = int(f.readline())
             if i > 0:
                 f.seek(0)
                 f.write(str(i-1))
                 f.truncate()
     if SUBLIMINAL_MODE:
-        with open(os.path.join(PATH, 'max_subliminals.dat'), 'r+') as f:
+        with open(PATH + '\\data\\max_subliminals.dat', 'r+') as f:
             i = int(f.readline())
             if i > 0:
                 f.seek(0)
@@ -456,14 +456,14 @@ def die():
         for i in (range(0, MITOSIS_STRENGTH) if not LOWKEY_MODE else [1]):
             os.startfile('popup.pyw')
     if len(SYS_ARGS) >= 1 and SYS_ARGS[0] == '-video':
-        with open(os.path.join(PATH, 'max_videos.dat'), 'r+') as f:
+        with open(PATH + '\\data\\max_videos.dat', 'r+') as f:
             i = int(f.readline())
             if i > 0:
                 f.seek(0)
                 f.write(str(i-1))
                 f.truncate()
     if SUBLIMINAL_MODE:
-        with open(os.path.join(PATH, 'max_subliminals.dat'), 'r+') as f:
+        with open(PATH + '\\data\\max_subliminals.dat', 'r+') as f:
             i = int(f.readline())
             if i > 0:
                 f.seek(0)

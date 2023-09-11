@@ -506,9 +506,9 @@ def main():
         thread.Thread(target=do_timer).start()
 
     #max value handling creation/cleaning
-    with open(os.path.join(PATH, 'max_videos.dat'), 'w') as f:
+    with open(PATH + '\\data\\max_videos.dat', 'w') as f:
         f.write('0')
-    with open(os.path.join(PATH, 'max_subliminals.dat'), 'w') as f:
+    with open(PATH + '\\data\\max_subliminals.dat', 'w') as f:
         f.write('0')
 
     #do downloading for booru stuff
@@ -708,12 +708,12 @@ def roll_for_initiative():
     if do_roll(VIDEO_CHANCE) and VIDEOS:
         global VIDEO_NUMBER
         if VIDEO_CAP:
-            with open(os.path.join(PATH, 'max_videos.dat'), 'r') as f:
+            with open(PATH + '\\data\\max_videos.dat', 'r') as f:
                 VIDEO_NUMBER = int(f.readline())
             if VIDEO_NUMBER < VIDEO_MAX:
                 try:
                     thread.Thread(target=lambda: subprocess.call('pyw popup.pyw -video', shell=False)).start()
-                    with open(os.path.join(PATH, 'max_videos.dat'), 'w') as f:
+                    with open(PATH + '\\data\\max_videos.dat', 'w') as f:
                         f.write(str(VIDEO_NUMBER+1))
                 except Exception as e:
                     messagebox.showerror('Popup Error', 'Failed to start popup.\n[' + str(e) + ']')

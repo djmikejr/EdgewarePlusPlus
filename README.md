@@ -30,13 +30,23 @@ Suggestions I got from people who used the software and I thought would be inter
 •*Randomized settings button. Might implement when i'm mostly done adding new config vars, but also gave me the idea for pack creators to be able to make "recommended settings" that you can switch to in the pack info tab*
 
 ## EdgeWare++ Patch Notes
-**If you see that there's a new update and are somebody (like me) who is lazy and doesn't like installing every single update unnecessary, here is how I do versioning:**
+**If you see that there's a new update and are somebody (like me) who is lazy and doesn't like installing every single update if unnecessary, here is how I do versioning:**
 
 •+1.0 to version number: multiple new features, or a single large feature
 
 •+0.5-0.25 to version number: new feature, but a smaller one or something not as essential, or lots of bugfixes
 
 •+0.2-0.1 to version number: very small update, usually just a bugfix, accessibility options, UI tweaks
+
+**Version 5.1**
+
+It's the cleanup update!!!!!!! I recommend you do a fresh install, or at least delete the old clutter.
+
+•*Moved max_subliminals and max_videos to /data/, because frankly I dont know what I was doing putting them in the root and I hated looking at them. The old ones can be safely deleted*
+
+•*Deleted config-old, which was an ancient version of EdgeWare that didn't even run anymore*
+
+•*Made the decision to turn on lanczos in the default config settings, because most people i've run into need to use it*
 
 **Version 5**
 

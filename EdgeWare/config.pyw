@@ -1232,7 +1232,8 @@ def show_window():
 
     lanczosttp = CreateToolTip(toggleLanczos, 'Are popups and the startup image inexplicably not showing up for you? Try this setting.\n\n'
                                 'I am not entirely sure why, but the Lanczos image resizing algorithm sometimes works for people when the antialiasing one does not.\n\n'
-                                'This is not something changed in EdgeWare++, so if normal EdgeWare also didn\'t work for you, this might fix it?')
+                                'This is not something changed in EdgeWare++, so if normal EdgeWare also didn\'t work for you, this might fix it?\n\n'
+                                'Enabled by default as i\'ve encountered way more people where antialiasing doesn\'t work than people who have it work fine.')
 
 
     tabMaster.add(tabInfo, text='About')
