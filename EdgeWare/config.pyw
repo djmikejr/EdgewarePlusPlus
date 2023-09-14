@@ -61,7 +61,7 @@ HIBERNATE_TEXT          = 'The Hibernate feature is an entirely different mode f
 ADVANCED_TEXT           = 'The Advanced section is also something previously only accessible by directly editing the config.cfg file. It offers full and complete customization of all setting values without any limitations outside of variable typing.\n\n\nPlease use this feature with discretion, as any erroneous values will result in a complete deletion and regeneration of the config file from the default, and certain value ranges are likely to result in crashes or unexpected glitches in the program.'
 THANK_AND_ABOUT_TEXT    = 'Thank you so much to all the fantastic artists who create and freely distribute the art that allows programs like this to exist, to all the people who helped me work through the various installation problems as we set the software up (especially early on), and honestly thank you to ALL of the people who are happily using Edgeware. \n\nIt truly makes me happy to know that my work is actually being put to good use by people who enjoy it. After all, at the end of the day that\'s really all I\'ve ever really wanted, but figured was beyond reach of a stupid degreeless neet.\nI love you all <3\n\n\n\nIf you like my work, please feel free to help support my neet lifestyle by donating to $PetitTournesol on Cashapp; by no means are you obligated or expected to, but any and all donations are greatly appreciated!'
 
-PLUSPLUS_TEXT           = 'Thanks for taking the time to check out this extension on EdgeWare! However you found it, I appreciate that it interested you enough to give it a download.\n\nI am not an expert programmer by any means, so apologies if there are any bugs or errors in this version. My goal is to not do anything crazy ambitious like rewrite the entire program or fix up the backend, but rather just add on functionality that I thought could improve the base version. Because of this, i\'m hoping that compatability between those who use normal EdgeWare and those who use this version stays relatively stable.\n\nCurrent changes:\n\n•Added a option under "misc" to enable/disable desktop icon generation.\n•Added options to cap the number of audio popups and video popups.\n•Added a chance slider for subliminals, and a max subliminals slider.\n•Added feature to change Startup Graphic per pack. (name the file \"loading_splash.png\" in the resource folder)\n•Added feature to enable warnings for \"Dangerous Settings\".\n•Added hover tooltips on some things to make the program easier to understand.\n•Added troubleshooting tab under \"advanced\" with some settings to fix things for certain users.\n•Added feature to click anywhere on popup to close.\n•Made the EdgewareSetup.bat more clear with easier to read text. Hopefully if you\'re seeing this it all worked out!\n•Moved the import/export resources button to be visible on every page, because honestly they\'re pretty important\n•Added the \"Pack Info\" tab with lots of fun goodies and stats so you know what you\'re getting into with each pack.'
+PLUSPLUS_TEXT           = 'Thanks for taking the time to check out this extension on EdgeWare! However you found it, I appreciate that it interested you enough to give it a download.\n\nI am not an expert programmer by any means, so apologies if there are any bugs or errors in this version. My goal is to not do anything crazy ambitious like rewrite the entire program or fix up the backend, but rather just add on functionality that I thought could improve the base version. Because of this, i\'m hoping that compatability between those who use normal EdgeWare and those who use this version stays relatively stable.\n\nCurrent changes:\n\n•Added a option under "misc" to enable/disable desktop icon generation.\n•Added options to cap the number of audio popups and video popups.\n•Added a chance slider for subliminals, and a max subliminals slider.\n•Added feature to change Startup Graphic and Icon per pack. (name the file(s) \"loading_splash.png\" and/or \"icon.ico\" in the resource folder)\n•Added feature to enable warnings for \"Dangerous Settings\".\n•Added hover tooltips on some things to make the program easier to understand.\n•Added troubleshooting tab under \"advanced\" with some settings to fix things for certain users.\n•Added feature to click anywhere on popup to close.\n•Made the EdgewareSetup.bat more clear with easier to read text. Hopefully if you\'re seeing this it all worked out!\n•Moved the import/export resources button to be visible on every page, because honestly they\'re pretty important\n•Added the \"Pack Info\" tab with lots of fun goodies and stats so you know what you\'re getting into with each pack.'
 PACKINFO_TEXT          = 'The pack info section contains an overview for whatever pack is currently loaded.\n\nThe \"Status\" tab allows you to see what features are included in the current pack (or if a pack is even loaded at all), but keep in mind all of these features have default fallbacks if they aren\'t included.\n\nThe \"Information\" tab gets info on the pack from //resource//info.json, which is a new addition to EdgeWare++. This feature was added to allow pack creators to give the pack a formal name and description without having to worry about details being lost if transferred from person to person. Think of it like a readme. Also included in this section is the discord status info, which gives what your discord status will be set to if that setting is turned on, along with the image. As of time of writing (or if I forget to update this later), the image cannot be previewed as it is \"hard coded\" into EdgeWare\'s discord application and accessed through the API. As I am not the original creator of EdgeWare, and am not sure how to contact them, the best I could do is low-res screenshots or the name of each image. I chose the latter. Because of this hard-coding, the only person i\'ve run into so far who use these images is PetitTournesol themselves, but it should be noted that anyone can use them as long as they know what to add to the discord.dat file. This is partially the reason I left this information in.\n\nThe \"Stats\" tab lets you see a lot of fun stats relating to the pack, including almost everything you\'ll see while using EdgeWare. Keep in mind that certain things having \"0\" as a stat doesn\'t mean you can\'t use it, for example, having 0 subliminals uses the default spiral and having 0 images displays a very un-sexy circle.'
 
 #all booru consts
@@ -983,6 +983,7 @@ def show_window():
     statusWallpaperFrame = Frame(infoStatusFrame)
     statusStartupFrame = Frame(infoStatusFrame)
     statusDiscordFrame = Frame(infoStatusFrame)
+    statusIconFrame = Frame(infoStatusFrame)
 
     if os.path.exists(PATH + '\\resource\\'):
         statusPack = True
@@ -990,35 +991,47 @@ def show_window():
         statusWallpaper = True if os.path.isfile(PATH + '\\resource\\wallpaper.png') else False
         statusStartup = True if os.path.isfile(PATH + '\\resource\\loading_splash.png') else False
         statusDiscord = True if os.path.isfile(PATH + '\\resource\\discord.dat') else False
+        statusIcon = True if os.path.isfile(PATH + '\\resource\\icon.ico') else False
     else:
         statusPack = False
         statusAbout = False
         statusWallpaper = False
         statusStartup = False
         statusDiscord = False
+        statusIcon = False
 
     statusPackFrameVarLabel = Label(statusPackFrame, text=('✓' if statusPack else '✗'), font='Default 14', fg=('green' if statusPack else 'red'))
     statusAboutFrameVarLabel = Label(statusAboutFrame, text=('✓' if statusAbout else '✗'), font='Default 14', fg=('green' if statusAbout else 'red'))
     statusWallpaperFrameVarLabel = Label(statusWallpaperFrame, text=('✓' if statusWallpaper else '✗'), font='Default 14', fg=('green' if statusWallpaper else 'red'))
-    statusStartupFrameVarLabel = Label(statusStartupFrame, text=('✓' if statusStartup else '✗'), font='Default 14', fg=('green' if statusStartup else 'red'))
+    statusStartupFrameVarLabel = Label(statusStartupFrame, text=('✓' if statusStartup else '✗'), font='Default 14', fg=('green' if statusStartup else 'red'), cursor='question_arrow')
     statusDiscordFrameVarLabel = Label(statusDiscordFrame, text=('✓' if statusDiscord else '✗'), font='Default 14', fg=('green' if statusDiscord else 'red'))
+    statusIconFrameVarLabel = Label(statusIconFrame, text=('✓' if statusIcon else '✗'), font='Default 14', fg=('green' if statusIcon else 'red'), cursor='question_arrow')
 
     infoStatusFrame.pack(fill='x', padx=3, expand=1)
     statusPackFrame.pack(fill='x', side='left', expand=1)
-    Label(statusPackFrame, text='Pack loaded', font='Default 10').pack(padx=2, pady=2, side='top')
+    Label(statusPackFrame, text='Pack Loaded', font='Default 10').pack(padx=2, pady=2, side='top')
     statusPackFrameVarLabel.pack(padx=2, pady=2, side='top')
     statusAboutFrame.pack(fill='x', side='left', expand=1)
-    Label(statusAboutFrame, text='Pack has info file', font='Default 10').pack(padx=2, pady=2, side='top')
+    Label(statusAboutFrame, text='Pack has Info File', font='Default 10').pack(padx=2, pady=2, side='top')
     statusAboutFrameVarLabel.pack(padx=2, pady=2, side='top')
     statusWallpaperFrame.pack(fill='x', side='left', expand=1)
-    Label(statusWallpaperFrame, text='Pack has wallpaper', font='Default 10').pack(padx=2, pady=2, side='top')
+    Label(statusWallpaperFrame, text='Pack has Wallpaper', font='Default 10').pack(padx=2, pady=2, side='top')
     statusWallpaperFrameVarLabel.pack(padx=2, pady=2, side='top')
     statusStartupFrame.pack(fill='x', side='left', expand=1)
-    Label(statusStartupFrame, text='Pack has custom startup', font='Default 10').pack(padx=2, pady=2, side='top')
+    Label(statusStartupFrame, text='Custom Startup', font='Default 10').pack(padx=2, pady=2, side='top')
     statusStartupFrameVarLabel.pack(padx=2, pady=2, side='top')
     statusDiscordFrame.pack(fill='x', side='left', expand=1)
-    Label(statusDiscordFrame, text='Pack has custom discord status', font='Default 10').pack(padx=2, pady=2, side='top')
+    Label(statusDiscordFrame, text='Custom Discord Status', font='Default 10').pack(padx=2, pady=2, side='top')
     statusDiscordFrameVarLabel.pack(padx=2, pady=2, side='top')
+    statusIconFrame.pack(fill='x', side='left', expand=1)
+    Label(statusIconFrame, text='Custom Icon', font='Default 10').pack(padx=2, pady=2, side='top')
+    statusIconFrameVarLabel.pack(padx=2, pady=2, side='top')
+
+    statusStartupttp = CreateToolTip(statusStartupFrameVarLabel, 'If you are looking to add this to packs made before EdgeWare++,'
+                                        ' put the desired file in /resource/ and name it \"loading_splash.png\".')
+    statusIconttp = CreateToolTip(statusIconFrameVarLabel, 'If you are looking to add this to packs made before EdgeWare++,'
+                                        ' put the desired file in /resource/ and name it \"icon.ico\". (the file must be'
+                                        ' a .ico file! make sure you convert properly!)')
 
     #Information
     Label(tabPackInfo, text='Information', font='Default 13', relief=GROOVE).pack(pady=2)

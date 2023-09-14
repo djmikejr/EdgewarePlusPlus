@@ -7,6 +7,30 @@ I have prior programming experience, but have never touched python before this p
 
 Previous config files might not work at all with this version, if you are planning on switching over, make sure you write down your settings! (or go into your config file and manually update it, if you're so inclined)
 
+## New Features In Edgeware++:
+
+•*Toggle that switches from antialiasing to lanczos, if Edgeware wasn't displaying popups for you this will fix that! (probably)*
+
+•*Toggle to enable/disable desktop icon generation*
+
+•*Ability to cap audio/video popups if so desired, audio was previously limited to 1 and videos were uncapped*
+
+•*Subliminals now have a % chance slider, and can also be capped*
+
+•*Can now change startup graphic and icon per pack, defaults are used if not included*
+
+•*Added feature to ask you to confirm before saving if there are any settings enabled that could be "potentially dangerous", for those of you like me who initially wondered if edgeware would fuck up their computer*
+
+•*Hover tooltips everywhere to help new users get a grasp on things without having to weed through documentation*
+
+•*Edgeware installation now actually readable and gives info on first steps*
+
+•*Toggle that allows you to close a popup by clicking anywhere on it*
+
+•*Import/Export buttons are now in full view at all times at the bottom of the window*
+
+•*Brand shiny new "Pack Info" tab that gives stats and information on the currently loaded pack*
+
 ## Planned Additions:
 
 •*Dark Mode*
@@ -17,7 +41,11 @@ Previous config files might not work at all with this version, if you are planni
 
 •*Giving a use to prompt/caption "moods", initial inspiration was giving people the ability to make "one handed" prompt modes, for those who are too "preoccupied" to type multiple full sentences*
 
-•*Rewriting all the old config presets to work with the new version, and a few new ones as well!* (will probably do this when theres very few variables left to add)
+•*Rewriting all the old config presets ~~to work with the new version~~, and a few new ones as well!* (turns out the old configs work fine (at least for me), but they could do with a little updating for new settings)
+
+•*Allowing pack creators to somehow make Edgeware "change over time", for example, getting more depraved or having the themes change the longer it runs. Would likely use the mood system.*
+
+•*Adding more in depth info to the pack info tab, but to do so I would like to make it so there's a "reveal spoilers" button*
 
 I'm also wanting to add features to the pack editor, will probably do that when this is in a state where I feel mostly done with what I wanted to accomplish.
 
@@ -37,6 +65,16 @@ Suggestions I got from people who used the software and I thought would be inter
 •+0.5-0.25 to version number: new feature, but a smaller one or something not as essential, or lots of bugfixes
 
 •+0.2-0.1 to version number: very small update, usually just a bugfix, accessibility options, UI tweaks
+
+**Version 5.2**
+
+Small version while I mentally prepare for what i'm planning to do next...
+
+•*Added feature to change icon file per pack. Uses "icon.ico" in the resources folder if there's one there, and default if not*
+
+•*More tooltips!!!*
+
+•*Added all of the currently added features to the top of the readme because honestly who wants to scroll down this far to get to the good stuff (is this even worth putting in the patch notes?)*
 
 **Version 5.1**
 

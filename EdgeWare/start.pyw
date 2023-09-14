@@ -435,10 +435,16 @@ class TrayHandler:
         self.timer_mode = settings['timerMode'] == 1
 
         self.option_list = [pystray.MenuItem('Edgeware Menu', print), pystray.MenuItem('Panic', self.try_panic)]
-        self.tray_icon = pystray.Icon('Edgeware',
-                                    Image.open(os.path.join(PATH, 'default_assets', 'default_icon.ico')),
-                                    'Edgeware',
-                                    self.option_list)
+        if os.path.isfile(PATH + '\\resource\\icon.ico'):
+            self.tray_icon = pystray.Icon('Edgeware',
+                                        Image.open(os.path.join(PATH, 'resource', 'icon.ico')),
+                                        'Edgeware',
+                                        self.option_list)
+        else:
+            self.tray_icon = pystray.Icon('Edgeware',
+                                        Image.open(os.path.join(PATH, 'default_assets', 'default_icon.ico')),
+                                        'Edgeware',
+                                        self.option_list)
 
         self.root.withdraw()
 
