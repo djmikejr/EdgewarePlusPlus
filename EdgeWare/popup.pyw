@@ -137,6 +137,10 @@ with open(PATH + '\\config.cfg', 'r') as cfg:
     LANCZOS_MODE = check_setting('antiOrLanczos')
 
     BUTTONLESS = check_setting('buttonless')
+
+    HIBERNATE_TYPE = settings['hibernateType']
+    HIBERNATE_MODE = check_setting('hibernateMode')
+
 #functions for script mode, unused for now
 if checkTag('timeout='):
     HAS_LIFESPAN = True
@@ -387,7 +391,7 @@ def run():
     if gif_bool:
         label.next_frame()
 
-    if HAS_LIFESPAN or LOWKEY_MODE:
+    if HAS_LIFESPAN or LOWKEY_MODE and not (HIBERNATE_TYPE == 'Pump-Scare' and HIBERNATE_MODE):
         thread.Thread(target=lambda: live_life(root, LIFESPAN if not LOWKEY_MODE else DELAY / 1000), daemon=True).start()
 
     if SHOW_CAPTIONS and CAPTIONS:
@@ -401,6 +405,13 @@ def run():
     else:
         submit_button = Button(root, text=SUBMISSION_TEXT, command=die)
         submit_button.place(x=resized_image.width - 5 - submit_button.winfo_reqwidth(), y=resized_image.height - 5 - submit_button.winfo_reqheight())
+
+    if HIBERNATE_MODE and check_setting('fixWallpaper'):
+        with open(PATH + '\\data\\hibernate_handler.dat', 'r+') as f:
+            i = int(f.readline())
+            f.seek(0)
+            f.write(str(i+1))
+            f.truncate()
 
     root.attributes('-alpha', OPACITY / 100)
     root.mainloop()
@@ -423,6 +434,13 @@ def live_life(parent:tk, length:int):
         time.sleep(FADE_OUT_TIME / 100)
     if LOWKEY_MODE:
         os.startfile('popup.pyw')
+    if HIBERNATE_MODE and check_setting('fixWallpaper'):
+        with open(PATH + '\\data\\hibernate_handler.dat', 'r+') as f:
+            i = int(f.readline())
+            if i > 0:
+                f.seek(0)
+                f.write(str(i-1))
+                f.truncate()
     if len(SYS_ARGS) >= 1 and SYS_ARGS[0] == '-video':
         with open(PATH + '\\data\\max_videos.dat', 'r+') as f:
             i = int(f.readline())
@@ -455,6 +473,13 @@ def die():
     if MITOSIS_MODE or LOWKEY_MODE:
         for i in (range(0, MITOSIS_STRENGTH) if not LOWKEY_MODE else [1]):
             os.startfile('popup.pyw')
+    if HIBERNATE_MODE and check_setting('fixWallpaper'):
+        with open(PATH + '\\data\\hibernate_handler.dat', 'r+') as f:
+            i = int(f.readline())
+            if i > 0:
+                f.seek(0)
+                f.write(str(i-1))
+                f.truncate()
     if len(SYS_ARGS) >= 1 and SYS_ARGS[0] == '-video':
         with open(PATH + '\\data\\max_videos.dat', 'r+') as f:
             i = int(f.readline())
@@ -506,8 +531,14 @@ def panic(key):
         if not PANIC_DISABLED and key_condition:
             os.startfile('panic.pyw')
 
+def pumpScare():
+    if HIBERNATE_TYPE == 'Pump-Scare' and HIBERNATE_MODE:
+        time.sleep(2.5)
+        die()
+
 if __name__ == '__main__':
     try:
+        thread.Thread(target=pumpScare).start()
         run()
     except Exception as e:
         if not os.path.exists(os.path.join(PATH, 'logs')):

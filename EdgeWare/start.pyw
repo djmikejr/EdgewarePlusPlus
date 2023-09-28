@@ -4,6 +4,7 @@ import ctypes
 import hashlib
 import os
 import subprocess
+import multiprocessing
 import ast
 import time
 import webbrowser
@@ -24,7 +25,8 @@ os.chdir(PATH)
 #starting logging
 if not os.path.exists(os.path.join(PATH, 'logs')):
     os.mkdir(os.path.join(PATH, 'logs'))
-logging.basicConfig(filename=os.path.join(PATH, 'logs', time.asctime().replace(' ', '_').replace(':', '-') + '-ew_start.txt'), format='%(levelname)s:%(message)s', level=logging.DEBUG)
+if __name__ == '__main__':
+    logging.basicConfig(filename=os.path.join(PATH, 'logs', time.asctime().replace(' ', '_').replace(':', '-') + '-ew_start.txt'), format='%(levelname)s:%(message)s', level=logging.DEBUG)
 logging.info('Started start logging successfully.')
 
 SYS_ARGS = sys.argv.copy()
@@ -152,11 +154,11 @@ except:
     pip_install('pystray')
 
 try:
-    import playsound
+    import playsound as ps
 except:
     logging.warning('failed to import playsound module')
     pip_install('playsound==1.2.2')
-    import playsound
+    import playsound as ps
 
 try:
     import videoprops
@@ -241,6 +243,10 @@ HIBERNATE_MODE = int(settings['hibernateMode']) == 1
 HIBERNATE_MIN = int(settings['hibernateMin'])
 HIBERNATE_MAX = int(settings['hibernateMax'])
 WAKEUP_ACTIVITY = int(settings['wakeupActivity'])
+HIBERNATE_TYPE = settings['hibernateType']
+HIBERNATE_TRUTH = settings['hibernateType']
+HIBERNATE_LENGTH = int(settings['hibernateLength'])
+FIX_WALLPAPER = int(settings['fixWallpaper']) == 1
 
 FILL_MODE = int(settings['fill']) == 1
 FILL_DELAY = int(settings['fill_delay'])
@@ -257,6 +263,10 @@ TIMER_MODE = int(settings['timerMode']) == 1
 DRIVE_PATH = settings['drivePath']
 
 LANCZOS_MODE = int(settings['antiOrLanczos']) == 1
+
+hiberWait = thread.Event()
+wallpaperWait = thread.Event()
+runningHibernate = thread.Event()
 
 def shortcut_script(pth_str:str, keyword:str, script:str, title:str):
     #strings for batch script to write vbs script to create shortcut on desktop
@@ -435,6 +445,9 @@ class TrayHandler:
         self.timer_mode = settings['timerMode'] == 1
 
         self.option_list = [pystray.MenuItem('Edgeware Menu', print), pystray.MenuItem('Panic', self.try_panic)]
+        if settings['toggleHibSkip']:
+            self.option_list.append(pystray.MenuItem('Skip to Hibernate', self.hib_skip))
+
         if os.path.isfile(PATH + '\\resource\\icon.ico'):
             self.tray_icon = pystray.Icon('Edgeware',
                                         Image.open(os.path.join(PATH, 'resource', 'icon.ico')),
@@ -449,6 +462,13 @@ class TrayHandler:
         self.root.withdraw()
 
         self.password_setup()
+
+    def hib_skip(self):
+        if HIBERNATE_MODE:
+            try:
+                hiberWait.set()
+            except Exception as e:
+                logging.critical(f'failed to skip to hibernate start. {e}')
 
     def password_setup(self):
         if self.timer_mode:
@@ -512,10 +532,16 @@ def main():
         thread.Thread(target=do_timer).start()
 
     #max value handling creation/cleaning
-    with open(PATH + '\\data\\max_videos.dat', 'w') as f:
-        f.write('0')
-    with open(PATH + '\\data\\max_subliminals.dat', 'w') as f:
-        f.write('0')
+    try:
+        with open(PATH + '\\data\\max_videos.dat', 'w') as f:
+            f.write('0')
+        with open(PATH + '\\data\\max_subliminals.dat', 'w') as f:
+            f.write('0')
+        with open(PATH + '\\data\\hibernate_handler.dat', 'w') as f:
+            f.write('0')
+    except Exception as e:
+        logging.warning(f'failed to clean or create data files\n\tReason: {e}')
+        print('failed to clean or create data files')
 
     #do downloading for booru stuff
     if settings.get('downloadEnabled') == 1:
@@ -542,15 +568,118 @@ def main():
     #run annoyance thread or do hibernate mode
     if HIBERNATE_MODE:
         logging.info('starting in hibernate mode')
+        triggerThread = thread.Thread(target=checkWallpaperStatus)
+        if FIX_WALLPAPER:
+            triggerThread.start()
         while True:
+            hiberWait.clear()
             waitTime = rand.randint(HIBERNATE_MIN, HIBERNATE_MAX)
-            time.sleep(float(waitTime))
+            if HIBERNATE_TRUTH == 'Chaos':
+                try:
+                    global HIBERNATE_TYPE
+                    #reminder for version 6.X to make 'Pump-Scare' eligible because I want to get this update out now and can't be bothered
+                    HIBERNATE_TYPE = rand.choice(['Original', 'Spaced', 'Glitch', 'Ramp'])
+                    logging.info(f'hibernate type is chaos, and has switched to {HIBERNATE_TYPE}')
+                except Exception as e:
+                    logging.warning(f'failed to successfully run chaos hibernate.\n\tReason: {e}')
+            hiberWait.wait(float(waitTime))
+            runningHibernate.clear()
             ctypes.windll.user32.SystemParametersInfoW(20, 0, PATH + '\\resource\\wallpaper.png', 0)
-            for i in range(0, rand.randint(int(WAKEUP_ACTIVITY / 2), WAKEUP_ACTIVITY)):
-                roll_for_initiative()
+            wallpaperWait.clear()
+            if HIBERNATE_TYPE == 'Original':
+                try:
+                    logging.info(f'running original hibernate. number of popups estimated between {int(WAKEUP_ACTIVITY / 2)} and {WAKEUP_ACTIVITY}.')
+                    for i in range(0, rand.randint(int(WAKEUP_ACTIVITY / 2), WAKEUP_ACTIVITY)):
+                        roll_for_initiative()
+                except Exception as e:
+                    logging.warning(f'failed to successfully run {HIBERNATE_TYPE} hibernate.\n\tReason: {e}')
+            if HIBERNATE_TYPE == 'Spaced':
+                try:
+                    endTime = time.monotonic() + float(HIBERNATE_LENGTH)
+                    logging.info(f'running spaced hibernate. current time is {time.monotonic()}, end time is {endTime}')
+                    while time.monotonic() < endTime:
+                        roll_for_initiative()
+                        time.sleep(float(DELAY) / 1000.0)
+                except Exception as e:
+                    logging.warning(f'failed to successfully run {HIBERNATE_TYPE} hibernate.\n\tReason: {e}')
+            if HIBERNATE_TYPE == 'Glitch':
+                try:
+                    glitchSleep = HIBERNATE_LENGTH / WAKEUP_ACTIVITY
+                    totalTime = time.monotonic()
+                    endTime = time.monotonic() + float(HIBERNATE_LENGTH)
+                    logging.info(f'running glitch hibernate. the end time is {endTime} with {WAKEUP_ACTIVITY} popups, total time is {HIBERNATE_LENGTH} and glitchSleep median is {glitchSleep}')
+                    for i in range(0, WAKEUP_ACTIVITY):
+                        if endTime <= time.monotonic():
+                            break
+                        rgl = rand.randint(1,4)
+                        rt = rand.randint(2,4)
+                        if rgl == 1 and (endTime - totalTime) > glitchSleep:
+                            time.sleep(float(glitchSleep))
+                            totalTime = totalTime + glitchSleep
+                        if rgl == 2 and (endTime - totalTime) > (glitchSleep / rt):
+                            time.sleep(float(glitchSleep / rt))
+                            totalTime = totalTime + (glitchSleep / rt)
+                        if rgl == 3 and (endTime - totalTime) > (glitchSleep * rt):
+                            time.sleep(float(glitchSleep * rt))
+                            totalTime = totalTime + (glitchSleep * rt)
+                        logging.info(f'time {endTime - totalTime}, rgl {rgl}, rt {rt}')
+                        roll_for_initiative()
+                    if endTime > time.monotonic(): time.sleep(float(endTime - time.monotonic()))
+                    roll_for_initiative()
+                except Exception as e:
+                    logging.warning(f'failed to successfully run {HIBERNATE_TYPE} hibernate.\n\tReason: {e}')
+            if HIBERNATE_TYPE == 'Ramp':
+                try:
+                    logging.info(f'hibernate type is ramp. ramping up speed for {HIBERNATE_LENGTH}, max speed is {DELAY*0.9}, and popups at max speed is {WAKEUP_ACTIVITY}')
+                    endTime = time.monotonic() + float(HIBERNATE_LENGTH)
+                    x = HIBERNATE_LENGTH / 4
+                    accelerate = 1
+                    while True:
+                        if (time.monotonic() > endTime) and ((DELAY/1000) + 0.1 > rampSleep):
+                            break
+                        if ((endTime - time.monotonic()) / HIBERNATE_LENGTH) > 0.5:
+                            accelerate = accelerate * 1.10
+                        else:
+                            accelerate = accelerate * 1.05
+                        x = x / accelerate
+                        rampSleep = (DELAY / 1000) + x
+                        #logging.info(f'rampsleep {rampSleep} accelerate {accelerate}, {((endTime - time.monotonic()) / HIBERNATE_LENGTH)} time left {endTime - time.monotonic()}')
+                        roll_for_initiative()
+                        time.sleep(float(rampSleep))
+                    for i in range(0, WAKEUP_ACTIVITY):
+                        roll_for_initiative()
+                        time.sleep(float(DELAY*0.9) / 1000.0)
+                except Exception as e:
+                    logging.warning(f'failed to successfully run {HIBERNATE_TYPE} hibernate.\n\tReason: {e}')
+            if HIBERNATE_TYPE == 'Pump-Scare':
+                try:
+                    logging.info(f'hibernate type is pump-scare.')
+                    roll_for_initiative()
+                except Exception as e:
+                    logging.warning(f'failed to successfully run {HIBERNATE_TYPE} hibernate.\n\tReason: {e}')
+            time.sleep(0.5)
+            runningHibernate.set()
+
     else:
         logging.info('starting annoyance loop')
         annoyance()
+
+def checkWallpaperStatus():
+    with open(PATH + '\\data\\hibernate_handler.dat', 'r') as f:
+        while True:
+            runningHibernate.wait()
+            #logging.info('hibernate processing is over, waiting for popups to close')
+            while True:
+                if not runningHibernate.is_set():
+                    break
+                if not wallpaperWait.is_set():
+                        f.seek(0)
+                        i = int(f.readline())
+                        if i < 1:
+                            wallpaperWait.set()
+                            #logging.info('hibernate popups are all dead')
+                            ctypes.windll.user32.SystemParametersInfoW(20, 0, PATH + '\\default_assets\\default_win10.jpg', 0)
+                            break
 
 #just checking %chance of doing annoyance options
 def do_roll(mod:int) -> bool:
@@ -704,58 +833,79 @@ def annoyance():
 
 #independently attempt to do all active settings with probability equal to their freq value
 def roll_for_initiative():
-    if do_roll(WEB_CHANCE) and HAS_WEB:
-        try:
-            url = url_select(rand.randrange(len(WEB_DICT['urls']))) if HAS_WEB else None
-            webbrowser.open_new(url)
-        except Exception as e:
-            messagebox.showerror('Web Error', 'Failed to open website.\n[' + str(e) + ']')
-            logging.critical(f'failed to open website {url}\n\tReason: {e}')
-    if do_roll(VIDEO_CHANCE) and VIDEOS:
-        global VIDEO_NUMBER
-        if VIDEO_CAP:
-            with open(PATH + '\\data\\max_videos.dat', 'r') as f:
-                VIDEO_NUMBER = int(f.readline())
-            if VIDEO_NUMBER < VIDEO_MAX:
-                try:
-                    thread.Thread(target=lambda: subprocess.call('pyw popup.pyw -video', shell=False)).start()
-                    with open(PATH + '\\data\\max_videos.dat', 'w') as f:
-                        f.write(str(VIDEO_NUMBER+1))
-                except Exception as e:
-                    messagebox.showerror('Popup Error', 'Failed to start popup.\n[' + str(e) + ']')
-                    logging.critical(f'failed to start video popup.pyw\n\tReason: {e}')
-        else:
+    if HIBERNATE_TYPE == 'Pump-Scare' and HIBERNATE_MODE:
+        if HAS_IMAGES:
             try:
-                thread.Thread(target=lambda: subprocess.call('pyw popup.pyw -video', shell=False)).start()
+                os.startfile('popup.pyw')
             except Exception as e:
                 messagebox.showerror('Popup Error', 'Failed to start popup.\n[' + str(e) + ']')
-                logging.critical(f'failed to start video popup.pyw\n\tReason: {e}')
-    if (not (MITOSIS_MODE or LOWKEY_MODE)) and do_roll(POPUP_CHANCE) and HAS_IMAGES:
-        try:
-            os.startfile('popup.pyw')
-        except Exception as e:
-            messagebox.showerror('Popup Error', 'Failed to start popup.\n[' + str(e) + ']')
-            logging.critical(f'failed to start popup.pyw\n\tReason: {e}')
-    if do_roll(AUDIO_CHANCE) and AUDIO:
-        if AUDIO_CAP:
-            if AUDIO_NUMBER < AUDIO_MAX:
+                logging.critical(f'failed to start popup.pyw\n\tReason: {e}')
+            if AUDIO_CAP:
+                if AUDIO_NUMBER < AUDIO_MAX:
+                    try:
+                        thread.Thread(target=play_audio).start()
+                    except:
+                        messagebox.showerror('Audio Error', 'Failed to play audio.\n[' + str(e) + ']')
+                        logging.critical(f'failed to play audio\n\tReason: {e}')
+            else:
                 try:
                     thread.Thread(target=play_audio).start()
                 except:
                     messagebox.showerror('Audio Error', 'Failed to play audio.\n[' + str(e) + ']')
                     logging.critical(f'failed to play audio\n\tReason: {e}')
-        else:
+    else:
+        if do_roll(WEB_CHANCE) and HAS_WEB:
             try:
-                thread.Thread(target=play_audio).start()
+                url = url_select(rand.randrange(len(WEB_DICT['urls']))) if HAS_WEB else None
+                webbrowser.open_new(url)
+            except Exception as e:
+                messagebox.showerror('Web Error', 'Failed to open website.\n[' + str(e) + ']')
+                logging.critical(f'failed to open website {url}\n\tReason: {e}')
+        if do_roll(VIDEO_CHANCE) and VIDEOS:
+            global VIDEO_NUMBER
+            if VIDEO_CAP:
+                with open(PATH + '\\data\\max_videos.dat', 'r') as f:
+                    VIDEO_NUMBER = int(f.readline())
+                if VIDEO_NUMBER < VIDEO_MAX:
+                    try:
+                        thread.Thread(target=lambda: subprocess.call('pyw popup.pyw -video', shell=False)).start()
+                        with open(PATH + '\\data\\max_videos.dat', 'w') as f:
+                            f.write(str(VIDEO_NUMBER+1))
+                    except Exception as e:
+                        messagebox.showerror('Popup Error', 'Failed to start popup.\n[' + str(e) + ']')
+                        logging.critical(f'failed to start video popup.pyw\n\tReason: {e}')
+            else:
+                try:
+                    thread.Thread(target=lambda: subprocess.call('pyw popup.pyw -video', shell=False)).start()
+                except Exception as e:
+                    messagebox.showerror('Popup Error', 'Failed to start popup.\n[' + str(e) + ']')
+                    logging.critical(f'failed to start video popup.pyw\n\tReason: {e}')
+        if (not (MITOSIS_MODE or LOWKEY_MODE)) and do_roll(POPUP_CHANCE) and HAS_IMAGES:
+            try:
+                os.startfile('popup.pyw')
+            except Exception as e:
+                messagebox.showerror('Popup Error', 'Failed to start popup.\n[' + str(e) + ']')
+                logging.critical(f'failed to start popup.pyw\n\tReason: {e}')
+        if do_roll(AUDIO_CHANCE) and AUDIO:
+            if AUDIO_CAP:
+                if AUDIO_NUMBER < AUDIO_MAX:
+                    try:
+                        thread.Thread(target=play_audio).start()
+                    except:
+                        messagebox.showerror('Audio Error', 'Failed to play audio.\n[' + str(e) + ']')
+                        logging.critical(f'failed to play audio\n\tReason: {e}')
+            else:
+                try:
+                    thread.Thread(target=play_audio).start()
+                except:
+                    messagebox.showerror('Audio Error', 'Failed to play audio.\n[' + str(e) + ']')
+                    logging.critical(f'failed to play audio\n\tReason: {e}')
+        if do_roll(PROMPT_CHANCE) and HAS_PROMPTS:
+            try:
+                subprocess.call('pythonw prompt.pyw')
             except:
-                messagebox.showerror('Audio Error', 'Failed to play audio.\n[' + str(e) + ']')
-                logging.critical(f'failed to play audio\n\tReason: {e}')
-    if do_roll(PROMPT_CHANCE) and HAS_PROMPTS:
-        try:
-            subprocess.call('pythonw prompt.pyw')
-        except:
-            messagebox.showerror('Prompt Error', 'Could not start prompt.\n[' + str(e) + ']')
-            logging.critical(f'failed to start prompt.pyw\n\tReason: {e}')
+                messagebox.showerror('Prompt Error', 'Could not start prompt.\n[' + str(e) + ']')
+                logging.critical(f'failed to start prompt.pyw\n\tReason: {e}')
 
 def rotate_wallpapers():
     prv = 'default'
@@ -797,6 +947,8 @@ def do_timer():
     except:
         os.startfile('panic.pyw')
 
+def audioHelper():
+    ps.playsound(AUDIO[rand.randrange(len(AUDIO))])
 
 #if audio is not playing, selects and plays random audio file from /aud/ folder
 def play_audio():
@@ -807,8 +959,17 @@ def play_audio():
     logging.info('starting audio playback')
     PLAYING_AUDIO = True
     AUDIO_NUMBER += 1
+    try:
+        if HIBERNATE_TYPE == 'Pump-Scare' and HIBERNATE_MODE:
+            p = multiprocessing.Process(target=audioHelper)
+            p.start()
+            time.sleep(3)
+            p.terminate()
+        else:
+            ps.playsound(AUDIO[rand.randrange(len(AUDIO))])
+    except Exception as e:
+        logging.warning(f'Could not play sound. {e}')
     #winsound.PlaySound(AUDIO[rand.randrange(len(AUDIO))], winsound.SND_FILENAME)
-    playsound.playsound(AUDIO[rand.randrange(len(AUDIO))])
     PLAYING_AUDIO = False
     AUDIO_NUMBER -= 1
     logging.info('finished audio playback')

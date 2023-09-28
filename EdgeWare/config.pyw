@@ -12,7 +12,8 @@ import ctypes
 import sys
 import logging
 import time
-from tkinter import Tk, ttk, simpledialog, messagebox, filedialog, IntVar, BooleanVar, StringVar, Frame, Checkbutton, Button, Scale, Label, Toplevel, Entry, OptionMenu, Listbox, SINGLE, DISABLED, GROOVE, RAISED
+import textwrap
+from tkinter import Tk, ttk, simpledialog, messagebox, filedialog, IntVar, BooleanVar, StringVar, Frame, Checkbutton, Button, Scale, Label, Toplevel, Entry, OptionMenu, Listbox, SINGLE, DISABLED, GROOVE, RAISED, Text, END
 from tk_ToolTip_class101 import CreateToolTip
 
 PATH = f'{str(pathlib.Path(__file__).parent.absolute())}\\'
@@ -57,12 +58,15 @@ ANNOYANCE_TEXT          = 'The "Annoyance" section consists of the 5 main config
 DRIVE_TEXT              = 'The "Drive" portion of Edgeware has three features: fill drive, replace images, and Booru downloader.\n\n"Fill Drive" does exactly what it says: it attempts to fill your hard drive with as much porn from /resource/img/ as possible. It does, however, have some restrictions. It will (should) not place ANY images into folders that start with a "." or have their names listed in the folder name blacklist.\nIt will also ONLY place images into the User folder and its subfolders.\nFill drive has one modifier, which is its own forced delay. Because it runs with between 1 and 8 threads at any given time, when unchecked it can fill your drive VERY quickly. To ensure that you get that nice slow fill, you can adjust the delay between each folder sweep it performs and the max number of threads.\n\n"Replace Images" is more complicated. Its searching is the exact same as fill drive, but instead of throwing images everywhere, it will seek out folders with large numbers of images (more than the threshold value) and when it finds one, it will replace ALL of the images with porn from /resource/img/. REMEMBER THAT IF YOU CARE ABOUT YOUR PHOTOS, AND THEY\'RE IN A FOLDER WITH MORE IMAGES THAN YOUR CHOSEN THRESHOLD VALUE, EITHER BACK THEM UP IN A ZIP OR SOMETHING OR DO. NOT. USE. THIS SETTING. I AM NOT RESPONSIBLE FOR YOUR OWN DECISION TO RUIN YOUR PHOTOS.\n\nBooru downloader allows you to download new items from a Booru of your choice. For the booru name, ONLY the literal name is used, like "censored" or "blacked" instead of the full url. This is not case sensitive. Use the "Validate" button to ensure that downloading will be successful before running. For tagging, if you want to have mutliple tags, they can be combined using "tag1+tag2+tag3" or if you want to add blacklist tags, type your tag and append a "+-blacklist_tag" after the desired tag.'
 STARTUP_TEXT            = 'Start on launch does exactly what it says it does and nothing more: it allows Edgeware to start itself whenever you start up and log into your PC.\n\nPlease note that the method used does NOT edit registry or schedule any tasks. The "lazy startup" method was used for both convenience of implementation and convenience of cleaning.\n\nIf you forget to turn off the "start on logon" setting before uninstalling, you will need to manually go to your Startup folder and remove "edgeware.bat".'
 WALLPAPER_TEXT          = 'The Wallpaper section allows you to set up rotating wallpapers of your choice from any location, or auto import all images from the /resource/ folder (NOT /resource/img/ folder) to use as wallpapers.\n\nThe rotate timer is the amount of time the program will wait before rotating to another randomly selected wallpaper, and the rotate variation is the amount above or below that set value that can randomly be selected as the actual wait time.'
-HIBERNATE_TEXT          = 'The Hibernate feature is an entirely different mode for Edgeware to operate in.\nInstead of constantly shoving popups, lewd websites, audio, and prompts in your face, hibernate starts quiet and waits for a random amount of time between its provided min and max before exploding with a rapid assortment of your chosen payloads. Once it finishes its barrage, it settles back down again for another random amount of time, ready to strike again when the time is right.\n\n\nThis feature is intend to be a much "calmer" way to use Edgeware; instead of explicitly using it to edge yourself or get off, it\'s supposed to lie in wait for you and perform bursts of self-sabotage to keep drawing you back to porn.'
+HIBERNATE_TEXT          = 'The Hibernate feature is an entirely different mode for Edgeware to operate in.\nInstead of constantly shoving popups, lewd websites, audio, and prompts in your face, hibernate starts quiet and waits for a random amount of time between its provided min and max before exploding with a rapid assortment of your chosen payloads. Once it finishes its barrage, it settles back down again for another random amount of time, ready to strike again when the time is right.\n\n\nThis feature is intend to be a much "calmer" way to use Edgeware; instead of explicitly using it to edge yourself or get off, it\'s supposed to lie in wait for you and perform bursts of self-sabotage to keep drawing you back to porn.\n\n In EdgeWare++, the hibernate function has been expanded with two key features: fix wallpaper and hibernate types. Fix wallpaper is fairly straightforward, it changes your wallpaper back to your panic wallpaper after hibernate is finished. Hibernate types are a bit more complicated, as each one changes the the way hibernate handles payloads. There is a short-form description next to the dropdown menu for quick reference, but you can check the about tab labelled \"Hibernate Types\" for a more detailed description of each type. Also, if you wish to trial out any of these types and don\'t want to wait, you can enable the \"Toggle Tray Hibernate Skip\" option in the troubleshooting tab to immediately skip to hibernate starting, on command.'
+HIBERNATE_TYPE_TEXT     = 'Check the \"Hibernate\" about tab for more information on what this is and how it works.\n\nOriginal: The original hibernate type that came with base EdgeWare. Spawns a barrage of popups instantly, the max possible amount is based on your awaken activity.\n\nSpaced: Essentially runs EdgeWare normally, but over a brief period of time before ceasing generation of new popups. Because of this awaken activity isn\'t used, instead popup delay is looked at for frequency of popups.\n\nGlitch: Creates popups at random-ish intervals over a period of time. The total amount of popups spawned is based on the awaken activity. Perfect for those who want a \'virus-like\' experience, or just something different every time.\n\nRamp: Similar to spaced, only the popup frequency gets faster and faster over the hibernate length. After reaching the max duration, it will spawn a number of popups equal to the awaken activity at a speed slightly faster than your popup delay. Best used with long hibernate length values and fairly short popup delay. (keep in mind that if the popup delay is too short though, popups can potentially not appear or lag behind)\n\nPump-Scare: Do you like haunted houses or scary movies? Don\'t you wish that instead of screamers and jumpscares, they had porn pop out at you instead? This is kind of like that. When hibernate is triggered a popup with audio will appear for around a second or two, then immediately disappear. This works best on packs with short, immediate audio files: old EdgeWare packs that contain half-hour long hypno files will likely not reach meaningful audio in time. Large audio files can also hamper effectiveness of the audio and lead to desync with the popup.\n\nChaos: Every time hibernate activates, it randomly selects any of the other hibernate modes.'
 ADVANCED_TEXT           = 'The Advanced section is also something previously only accessible by directly editing the config.cfg file. It offers full and complete customization of all setting values without any limitations outside of variable typing.\n\n\nPlease use this feature with discretion, as any erroneous values will result in a complete deletion and regeneration of the config file from the default, and certain value ranges are likely to result in crashes or unexpected glitches in the program.'
 THANK_AND_ABOUT_TEXT    = 'Thank you so much to all the fantastic artists who create and freely distribute the art that allows programs like this to exist, to all the people who helped me work through the various installation problems as we set the software up (especially early on), and honestly thank you to ALL of the people who are happily using Edgeware. \n\nIt truly makes me happy to know that my work is actually being put to good use by people who enjoy it. After all, at the end of the day that\'s really all I\'ve ever really wanted, but figured was beyond reach of a stupid degreeless neet.\nI love you all <3\n\n\n\nIf you like my work, please feel free to help support my neet lifestyle by donating to $PetitTournesol on Cashapp; by no means are you obligated or expected to, but any and all donations are greatly appreciated!'
 
-PLUSPLUS_TEXT           = 'Thanks for taking the time to check out this extension on EdgeWare! However you found it, I appreciate that it interested you enough to give it a download.\n\nI am not an expert programmer by any means, so apologies if there are any bugs or errors in this version. My goal is to not do anything crazy ambitious like rewrite the entire program or fix up the backend, but rather just add on functionality that I thought could improve the base version. Because of this, i\'m hoping that compatability between those who use normal EdgeWare and those who use this version stays relatively stable.\n\nCurrent changes:\n\n•Added a option under "misc" to enable/disable desktop icon generation.\n•Added options to cap the number of audio popups and video popups.\n•Added a chance slider for subliminals, and a max subliminals slider.\n•Added feature to change Startup Graphic and Icon per pack. (name the file(s) \"loading_splash.png\" and/or \"icon.ico\" in the resource folder)\n•Added feature to enable warnings for \"Dangerous Settings\".\n•Added hover tooltips on some things to make the program easier to understand.\n•Added troubleshooting tab under \"advanced\" with some settings to fix things for certain users.\n•Added feature to click anywhere on popup to close.\n•Made the EdgewareSetup.bat more clear with easier to read text. Hopefully if you\'re seeing this it all worked out!\n•Moved the import/export resources button to be visible on every page, because honestly they\'re pretty important\n•Added the \"Pack Info\" tab with lots of fun goodies and stats so you know what you\'re getting into with each pack.'
+PLUSPLUS_TEXT           = 'Thanks for taking the time to check out this extension on EdgeWare! However you found it, I appreciate that it interested you enough to give it a download.\n\nI am not an expert programmer by any means, so apologies if there are any bugs or errors in this version. My goal is to not do anything crazy ambitious like rewrite the entire program or fix up the backend, but rather just add on functionality that I thought could improve the base version. Because of this, i\'m hoping that compatability between those who use normal EdgeWare and those who use this version stays relatively stable.\n\nCurrent changes:\n\n•Added a option under "misc" to enable/disable desktop icon generation.\n•Added options to cap the number of audio popups and video popups.\n•Added a chance slider for subliminals, and a max subliminals slider.\n•Added feature to change Startup Graphic and Icon per pack. (name the file(s) \"loading_splash.png\" and/or \"icon.ico\" in the resource folder)\n•Added feature to enable warnings for \"Dangerous Settings\".\n•Added hover tooltips on some things to make the program easier to understand.\n•Added troubleshooting tab under \"advanced\" with some settings to fix things for certain users.\n•Added feature to click anywhere on popup to close.\n•Made the EdgewareSetup.bat more clear with easier to read text. Hopefully if you\'re seeing this it all worked out!\n•Moved the import/export resources button to be visible on every page, because honestly they\'re pretty important\n•Added the \"Pack Info\" tab with lots of fun goodies and stats so you know what you\'re getting into with each pack.\n•Added a simplified error console in the \"advanced\" tab.\n•Overhauled Hibernate with a bunch of new modes and features'
 PACKINFO_TEXT          = 'The pack info section contains an overview for whatever pack is currently loaded.\n\nThe \"Status\" tab allows you to see what features are included in the current pack (or if a pack is even loaded at all), but keep in mind all of these features have default fallbacks if they aren\'t included.\n\nThe \"Information\" tab gets info on the pack from //resource//info.json, which is a new addition to EdgeWare++. This feature was added to allow pack creators to give the pack a formal name and description without having to worry about details being lost if transferred from person to person. Think of it like a readme. Also included in this section is the discord status info, which gives what your discord status will be set to if that setting is turned on, along with the image. As of time of writing (or if I forget to update this later), the image cannot be previewed as it is \"hard coded\" into EdgeWare\'s discord application and accessed through the API. As I am not the original creator of EdgeWare, and am not sure how to contact them, the best I could do is low-res screenshots or the name of each image. I chose the latter. Because of this hard-coding, the only person i\'ve run into so far who use these images is PetitTournesol themselves, but it should be noted that anyone can use them as long as they know what to add to the discord.dat file. This is partially the reason I left this information in.\n\nThe \"Stats\" tab lets you see a lot of fun stats relating to the pack, including almost everything you\'ll see while using EdgeWare. Keep in mind that certain things having \"0\" as a stat doesn\'t mean you can\'t use it, for example, having 0 subliminals uses the default spiral and having 0 images displays a very un-sexy circle.'
+
+errors_list = []
 
 #all booru consts
 BOORU_FLAG = '<BOORU_INSERT>'                                                      #flag to replace w/ booru name
@@ -74,11 +78,32 @@ BOORU_PTAG = '&pid='                                                            
 INFO_NAME_DEFAULT = 'N/A'
 INFO_DESCRIPTION_DEFAULT = 'No pack loaded, or the pack does not have an \'info.json\' file.'
 INFO_CREATOR_DEFAULT = 'Anonymous'
+INFO_VERSION_DEFAULT = '0'
 INFO_DISCORD_DEFAULT = ['[No pack loaded, or the pack does not have a \'discord.dat\' file.]', 'default']
 
-info_name = INFO_NAME_DEFAULT
-info_description = INFO_DESCRIPTION_DEFAULT
-info_creator = INFO_CREATOR_DEFAULT
+if os.path.isfile(PATH + '\\resource\\info.json'):
+    try:
+        info_dict = ''
+        with open(f'{PATH}\\resource\\info.json') as r:
+            info_dict = json.loads(r.read())
+        info_name = info_dict['name'] if info_dict['name'] else 'Unnamed Pack'
+        info_description = info_dict['description'] if info_dict['description'] else 'No description set.'
+        info_creator = info_dict['creator'] if info_dict['creator'] else 'Anonymous'
+        info_version = info_dict['version'] if info_dict['version'] else '1.0'
+    except Exception as e:
+        logging.warning(f'error copying info.json data to pack info page. {e}')
+        errors_list.append('Could not use the info.json file for pack info!\n')
+        info_name = INFO_NAME_DEFAULT
+        info_description = INFO_DESCRIPTION_DEFAULT
+        info_creator = INFO_CREATOR_DEFAULT
+        info_version = INFO_VERSION_DEFAULT
+else:
+    info_name = INFO_NAME_DEFAULT
+    info_description = INFO_DESCRIPTION_DEFAULT
+    info_creator = INFO_CREATOR_DEFAULT
+    info_version = INFO_VERSION_DEFAULT
+
+
 
 #url to check online version
 UPDCHECK_URL = 'http://raw.githubusercontent.com/PetitTournesol/Edgeware/main/EdgeWare/configDefault.dat'
@@ -193,7 +218,10 @@ def show_window():
             hibernateVar        = BooleanVar(root, value=(settings['hibernateMode']==1))
             hibernateMinVar     = IntVar(root, value=int(settings['hibernateMin']))
             hibernateMaxVar     = IntVar(root, value=(settings['hibernateMax']))
+            hibernateTypeVar    = StringVar(root, value=(settings['hibernateType'].strip()))
             wakeupActivityVar   = IntVar(root, value=(settings['wakeupActivity']))
+            hibernateLengthVar  = IntVar(root, value=(settings['hibernateLength']))
+            fixWallpaperVar     = BooleanVar(root, value=(settings['fixWallpaper']==1))
 
             discordVar          = BooleanVar(root, value=(int(settings['showDiscord'])==1))
             startFlairVar       = BooleanVar(root, value=(int(settings['showLoadingFlair'])==1))
@@ -250,6 +278,8 @@ def show_window():
             safeModeVar         = BooleanVar(root, value=(int(settings['safeMode'])==1))
 
             antiOrLanczosVar    = BooleanVar(root, value=(int(settings['antiOrLanczos'])==1))
+            toggleInternetVar   = BooleanVar(root, value=(int(settings['toggleInternet'])==1))
+            toggleHibSkipVar    = BooleanVar(root, value=(int(settings['toggleHibSkip'])==1))
 
             buttonlessVar       = BooleanVar(root, value=(int(settings['buttonless'])==1))
 
@@ -266,7 +296,8 @@ def show_window():
                             videoVolume, vidVar, denialMode, denialChance, popupSublim,
                             booruMin, deskIconVar, maxAToggleVar, maxAudioVar, maxVToggleVar,
                             maxVideoVar, subliminalsChanceVar, maxSubliminalsVar, safeModeVar,
-                            antiOrLanczosVar, buttonlessVar]
+                            antiOrLanczosVar, toggleInternetVar, buttonlessVar, hibernateTypeVar,
+                            hibernateLengthVar, fixWallpaperVar, toggleHibSkipVar]
 
             in_var_names = ['delay', 'popupMod', 'webMod', 'audioMod', 'promptMod', 'fill',
                             'fill_delay', 'replace', 'replaceThresh', 'start_on_logon',
@@ -280,7 +311,8 @@ def show_window():
                             'videoVolume', 'vidMod', 'denialMode', 'denialChance', 'popupSubliminals',
                             'booruMinScore', 'desktopIcons', 'maxAudioBool', 'maxAudio', 'maxVideoBool',
                             'maxVideos', 'subliminalsChance', 'maxSubliminals', 'safeMode', 'antiOrLanczos',
-                            'buttonless']
+                            'toggleInternet', 'buttonless', 'hibernateType', 'hibernateLength', 'fixWallpaper',
+                            'toggleHibSkip']
             break
         except Exception as e:
             messagebox.showwarning(
@@ -307,6 +339,8 @@ def show_window():
 
     #grouping for enable/disable
     hibernate_group = []
+    hlength_group   = []
+    hactivity_group = []
     fill_group      = []
     replace_group   = []
     mitosis_group   = []
@@ -320,8 +354,8 @@ def show_window():
     maxAudio_group  = []
     maxVideo_group  = []
     subliminals_group = []
-    info_group = []
-    discord_group = []
+    info_group     = []
+    discord_group  = []
 
     #tab display code start
     tabMaster    = ttk.Notebook(root)       #tab manager
@@ -343,6 +377,7 @@ def show_window():
     tab_wallpaper = ttk.Frame(None)
     tab_launch = ttk.Frame(None)
     tab_hibernate = ttk.Frame(None)
+    tab_hibernateType = ttk.Frame(None)
     tab_advanced = ttk.Frame(None)
     tab_thanksAndAbout = ttk.Frame(None)
     tab_plusPlus = ttk.Frame(None)
@@ -351,38 +386,114 @@ def show_window():
     tabMaster.add(tabGeneral, text='General')
     #==========={IN HERE IS GENERAL TAB ITEM INITS}===========#
     #init
+    hibernate_types = ['Original', 'Spaced', 'Glitch', 'Ramp', 'Pump-Scare', 'Chaos']
+
     hibernateHostFrame = Frame(tabGeneral, borderwidth=5, relief=RAISED)
+    hibernateTypeFrame = Frame(hibernateHostFrame)
+    hibernateTypeDescriptionFrame = Frame(hibernateHostFrame, borderwidth=2, relief=GROOVE)
     hibernateFrame = Frame(hibernateHostFrame)
     hibernateMinFrame = Frame(hibernateHostFrame)
     hibernateMaxFrame = Frame(hibernateHostFrame)
+    hibernateActivityFrame = Frame(hibernateHostFrame)
+    hibernateLengthFrame = Frame(hibernateHostFrame)
 
-    toggleHibernateButton = Checkbutton(hibernateHostFrame, text='Hibernate Mode', variable=hibernateVar, command=lambda: toggleAssociateSettings(hibernateVar.get(), hibernate_group), cursor='question_arrow')
+    toggleHibernateButton = Checkbutton(hibernateTypeFrame, text='Hibernate Mode', variable=hibernateVar, command=lambda: hibernateHelper(hibernateTypeVar.get()), cursor='question_arrow')
+    fixWallpaperButton = Checkbutton(hibernateTypeFrame, text='Fix Wallpaper', variable=fixWallpaperVar, cursor='question_arrow')
+    hibernateTypeDropdown = OptionMenu(hibernateTypeFrame, hibernateTypeVar, *hibernate_types, command=lambda key: hibernateHelper(key))
+    hibernateTypeDescription = Label(hibernateTypeDescriptionFrame, text='Error loading Hibernate Description!', wraplength=175)
+    def hibernateHelper(key:str):
+        if key == 'Original':
+            hibernateTypeDescription.configure(text='Creates an immediate quantity of popups on wakeup based on the awaken activity.\n\n')
+            if hibernateVar.get():
+                toggleAssociateSettings(False, hlength_group)
+                toggleAssociateSettings(True, hactivity_group)
+                toggleAssociateSettings(True, hibernate_group)
+        if key == 'Spaced':
+            hibernateTypeDescription.configure(text='Creates popups consistently over the hibernate length, based on popup delay.\n\n')
+            if hibernateVar.get():
+                toggleAssociateSettings(False, hactivity_group)
+                toggleAssociateSettings(True, hlength_group)
+                toggleAssociateSettings(True, hibernate_group)
+        if key == 'Glitch':
+            hibernateTypeDescription.configure(text='Creates popups at random times over the hibernate length, with the max amount spawned based on awaken activity.\n')
+            if hibernateVar.get():
+                toggleAssociateSettings(True, hlength_group)
+                toggleAssociateSettings(True, hactivity_group)
+                toggleAssociateSettings(True, hibernate_group)
+        if key == 'Ramp':
+            hibernateTypeDescription.configure(text='Creates a ramping amount of popups over the hibernate length, popups at fastest speed based on awaken activity, fastest speed based on popup delay.')
+            if hibernateVar.get():
+                toggleAssociateSettings(True, hlength_group)
+                toggleAssociateSettings(True, hactivity_group)
+                toggleAssociateSettings(True, hibernate_group)
+        if key == 'Pump-Scare':
+            hibernateTypeDescription.configure(text='Spawns a popup, usually accompanied by audio, then quickly deletes it. Best used on packs with short audio files. Like a horror game, but horny?')
+            if hibernateVar.get():
+                toggleAssociateSettings(False, hlength_group)
+                toggleAssociateSettings(False, hactivity_group)
+                toggleAssociateSettings(True, hibernate_group)
+        if key == 'Chaos':
+            hibernateTypeDescription.configure(text='Every time hibernate activates, a random type (other than chaos) is selected.\n\n')
+            if hibernateVar.get():
+                toggleAssociateSettings(True, hlength_group)
+                toggleAssociateSettings(True, hactivity_group)
+                toggleAssociateSettings(True, hibernate_group)
+        if not hibernateVar.get():
+            toggleAssociateSettings(False, hlength_group)
+            toggleAssociateSettings(False, hactivity_group)
+            toggleAssociateSettings(False, hibernate_group)
+
+    hibernateHelper(hibernateTypeVar.get())
+
     hibernateMinButton = Button(hibernateMinFrame, text='Manual min...', command=lambda: assign(hibernateMinVar, simpledialog.askinteger('Manual Minimum Sleep (sec)', prompt='[1-7200]: ')))
     hibernateMinScale = Scale(hibernateMinFrame, label='Min Sleep (sec)', variable=hibernateMinVar, orient='horizontal', from_=1, to=7200)
     hibernateMaxButton = Button(hibernateMaxFrame, text='Manual max...', command=lambda: assign(hibernateMaxVar, simpledialog.askinteger('Manual Maximum Sleep (sec)', prompt='[2-14400]: ')))
     hibernateMaxScale = Scale(hibernateMaxFrame, label='Max Sleep (sec)', variable=hibernateMaxVar, orient='horizontal', from_=2, to=14400)
-    h_activityScale = Scale(hibernateHostFrame, label='Awaken Activity', orient='horizontal', from_=1, to=50, variable=wakeupActivityVar)
+    h_activityScale = Scale(hibernateActivityFrame, label='Awaken Activity', orient='horizontal', from_=1, to=50, variable=wakeupActivityVar)
+    h_activityButton = Button(hibernateActivityFrame, text='Manual act...', command=lambda: assign(wakeupActivityVar, simpledialog.askinteger('Manual Wakeup Activity', prompt='[1-50]: ')))
+    hibernateLengthScale = Scale(hibernateLengthFrame, label='Max Length (sec)', variable=hibernateLengthVar, orient='horizontal', from_=5, to=300)
+    hibernateLengthButton = Button(hibernateLengthFrame, text='Manual length...', command=lambda: assign(hibernateLengthVar, simpledialog.askinteger('Manual Hibernate Length', prompt='[5-300]: ')))
 
     hibernatettp = CreateToolTip(toggleHibernateButton, 'Runs EdgeWare silently without any popups.\n\n'
                                     'After a random time in the specified range, EdgeWare activates and barrages the user with popups '
-                                    'based on the \"Awaken Activity\" value, then goes back to \"sleep\".')
-    hibernate_group.append(h_activityScale)
+                                    'based on the \"Awaken Activity\" value (depending on the hibernate type), then goes back to \"sleep\".\n\n'
+                                    'Check the \"About\" tab for more detailed information on each hibernate type.')
+    fixwallpaperttp = CreateToolTip(fixWallpaperButton, '\"fixes\" your wallpaper after hibernate is finished by changing it to'
+                                        ' your panic wallpaper. If left off, it will keep the pack\'s wallpaper on until you panic'
+                                        ' or change it back yourself.')
+
     hibernate_group.append(hibernateMinButton)
     hibernate_group.append(hibernateMinScale)
     hibernate_group.append(hibernateMaxButton)
     hibernate_group.append(hibernateMaxScale)
 
+    hlength_group.append(hibernateLengthButton)
+    hlength_group.append(hibernateLengthScale)
+
+    hactivity_group.append(h_activityScale)
+    hactivity_group.append(h_activityButton)
+
     Label(tabGeneral, text='Hibernate Settings', font='Default 13', relief=GROOVE).pack(pady=2)
     hibernateHostFrame.pack(fill='x')
     hibernateFrame.pack(fill='y', side='left')
-    toggleHibernateButton.pack(fill='x', side='left', expand=1)
-    hibernateMinFrame.pack(fill='y', side='left')
+    hibernateTypeFrame.pack(fill='x', side='left')
+    toggleHibernateButton.pack(fill='x', side='top')
+    fixWallpaperButton.pack(fill='x', side='top')
+    hibernateTypeDropdown.pack(fill='x', side='top')
+    hibernateTypeDescriptionFrame.pack(fill='both', side='left', expand=1, padx=2, pady=2)
+    hibernateTypeDescription.pack(fill='y', pady=2)
     hibernateMinScale.pack(fill='y')
     hibernateMinButton.pack(fill='y')
+    hibernateMinFrame.pack(fill='x', side='left')
     hibernateMaxScale.pack(fill='y')
     hibernateMaxButton.pack(fill='y')
     hibernateMaxFrame.pack(fill='x', side='left')
-    h_activityScale.pack(fill='y', side='left')
+    h_activityScale.pack(fill='y')
+    h_activityButton.pack(fill='y')
+    hibernateActivityFrame.pack(fill='x', side='left')
+    hibernateLengthScale.pack(fill='y')
+    hibernateLengthButton.pack(fill='y')
+    hibernateLengthFrame.pack(fill='x', side='left')
 
     #timer settings
     Label(tabGeneral, text='Timer Settings', font='Default 13', relief=GROOVE).pack(pady=2)
@@ -421,7 +532,7 @@ def show_window():
                                 *style_list, command=lambda key: changeDescriptText(key))
     def changeDescriptText(key:str):
         descriptNameLabel.configure(text=f'{key} Description')
-        descriptLabel.configure(text=getDescriptText(key))
+        descriptLabel.configure(text=presetDescriptionWrap.fill(text=getDescriptText(key)))
 
     def updateHelperFunc(key:str):
         styleStr.set(key)
@@ -451,7 +562,8 @@ def show_window():
     presetDescriptFrame = Frame(presetFrame, borderwidth=2, relief=GROOVE)
 
     descriptNameLabel = Label(presetDescriptFrame, text='Default Description', font='Default 15')
-    descriptLabel = Label(presetDescriptFrame, text='Default Text Here', relief=GROOVE, wraplength=580)
+    presetDescriptionWrap = textwrap.TextWrapper(width=100, max_lines=5)
+    descriptLabel = Label(presetDescriptFrame, text=presetDescriptionWrap.fill(text=f'Default Text Here'), relief=GROOVE)
     changeDescriptText('Default')
 
     dropdownSelectFrame.pack(side='left', fill='x', padx=6)
@@ -501,7 +613,7 @@ def show_window():
                     'Major (very dangerous, can affect your computer):\n'
                     'Launch on Startup, Fill Drive\n\n'
                     'Medium (can lead to embarassment or reduced control over EdgeWare):\n'
-                    'Timer Mode, Show on Discord\n\n'
+                    'Timer Mode, Show on Discord, short hibernate cooldown\n\n'
                     'Minor (low risk but could lead to unwanted interactions):\n'
                     'Disable Panic Hotkey, Run on Save & Exit')
 
@@ -1038,31 +1150,39 @@ def show_window():
     infoDescFrame = Frame(tabPackInfo, borderwidth=5, relief=RAISED)
     subInfoFrame = Frame(infoDescFrame, borderwidth=2, relief=GROOVE)
     descriptionFrame = Frame(infoDescFrame, borderwidth=2, relief=GROOVE)
-    subInfoSep = ttk.Separator(subInfoFrame, orient='horizontal')
 
     nameFrame = Frame(subInfoFrame)
     nameLabel = Label(nameFrame, text='Pack Name:', font='Default 10')
     nameVarLabel = Label(nameFrame, text=f'{info_name}')
-    nameSep = ttk.Separator(nameFrame, orient='vertical')
     creatorFrame = Frame(subInfoFrame)
     creatorLabel = Label(creatorFrame, text='Author Name:', font='Default 10')
     creatorVarLabel = Label(creatorFrame, text=f'{info_creator}')
+    versionFrame = Frame(subInfoFrame)
+    versionLabel = Label(versionFrame, text='Version:', font='Default 10')
+    versionVarLabel = Label(versionFrame, text=f'{info_version}')
     descriptionLabel = Label(descriptionFrame, text='Description', font='Default 10')
-    descriptionVarLabel = Label(descriptionFrame, text=f'{info_description}', wraplength=580)
+    infoDescriptionWrap = textwrap.TextWrapper(width=80, max_lines=5)
+    descriptionVarLabel = Label(descriptionFrame, text=infoDescriptionWrap.fill(text=f'{info_description}'))
 
     infoDescFrame.pack(fill='x', padx=3, expand=1)
     subInfoFrame.pack(fill='x', side='left', expand=1)
 
     nameFrame.pack(fill='x')
     nameLabel.pack(padx=6, pady=2, side='left')
-    nameSep.pack(fill='y', side='left')
+    ttk.Separator(nameFrame, orient='vertical').pack(fill='y', side='left')
     nameVarLabel.pack(padx=2, pady=2, side='left')
-    subInfoSep.pack(fill='x')
+    ttk.Separator(subInfoFrame, orient='horizontal').pack(fill='x')
 
     creatorFrame.pack(fill='x')
     creatorLabel.pack(padx=2, pady=2, side='left')
     ttk.Separator(creatorFrame, orient='vertical').pack(fill='y', side='left')
     creatorVarLabel.pack(padx=2, pady=2, side='left')
+    ttk.Separator(subInfoFrame, orient='horizontal').pack(fill='x')
+
+    versionFrame.pack(fill='x')
+    versionLabel.pack(padx=18, pady=2, side='left')
+    ttk.Separator(versionFrame, orient='vertical').pack(fill='y', side='left')
+    versionVarLabel.pack(padx=2, pady=2, side='left')
 
     descriptionFrame.pack(fill='both', side='right', expand=1)
     descriptionLabel.pack(padx=2, pady=2, side='top')
@@ -1079,18 +1199,26 @@ def show_window():
     info_group.append(descriptionFrame)
     info_group.append(descriptionLabel)
     info_group.append(descriptionVarLabel)
+    info_group.append(versionFrame)
+    info_group.append(versionLabel)
+    info_group.append(versionVarLabel)
     toggleAssociateSettings(statusAbout, info_group)
 
     discordStatusFrame = Frame(tabPackInfo, borderwidth=5, relief=RAISED)
     discordStatusLabel = Label(discordStatusFrame, text='Custom Discord Status:', font='Default 10')
     discordStatusImageLabel = Label(discordStatusFrame, text='Discord Status Image:', font='Default 10')
     if statusDiscord:
-        with open((PATH + '\\resource\\discord.dat'), 'r') as f:
-            datfile = f.read()
-            if not datfile == '':
-                info_discord = datfile.split('\n')
-                if len(info_discord) < 2:
-                    info_discord.append(INFO_DISCORD_DEFAULT[1])
+        try:
+            with open((PATH + '\\resource\\discord.dat'), 'r') as f:
+                datfile = f.read()
+                if not datfile == '':
+                    info_discord = datfile.split('\n')
+                    if len(info_discord) < 2:
+                        info_discord.append(INFO_DISCORD_DEFAULT[1])
+        except Exception as e:
+            logging.warning(f'error in discord.dat. Aborting preview load. {e}')
+            errors_list.append('Something is wrong with the currently loaded discord.dat file!\n')
+            info_discord = INFO_DISCORD_DEFAULT.copy()
     else:
         info_discord = INFO_DISCORD_DEFAULT.copy()
 
@@ -1138,38 +1266,53 @@ def show_window():
     videoStat = len(os.listdir(PATH + '\\resource\\vid\\')) if os.path.exists(PATH + '\\resource\\vid\\') else 0
 
     if os.path.exists(PATH + '\\resource\\web.json'):
-        with open(PATH + '\\resource\\web.json', 'r') as f:
-            webStat = len(json.loads(f.read())['urls'])
+        try:
+            with open(PATH + '\\resource\\web.json', 'r') as f:
+                webStat = len(json.loads(f.read())['urls'])
+        except Exception as e:
+            logging.warning(f'error in web.json. Aborting preview load. {e}')
+            errors_list.append('Something is wrong with the currently loaded web.json file!\n')
+            webStat = 0
     else:
         webStat = 0
 
     if os.path.exists(PATH + '\\resource\\prompt.json'):
         #frankly really ugly but the easiest way I found to do it
-        with open(PATH + '\\resource\\prompt.json', 'r') as f:
-            l = json.loads(f.read())
-            i = 0
-            if 'moods' in l: del l['moods']
-            if 'minLen' in l: del l['minLen']
-            if 'maxLen' in l: del l['maxLen']
-            if 'freqList' in l: del l['freqList']
-            if 'subtext' in l: del l['subtext']
-            if 'commandtext' in l: del l['commandtext']
-            for x in l:
-                i += len(l[x])
-            promptStat = i
+        try:
+            with open(PATH + '\\resource\\prompt.json', 'r') as f:
+                l = json.loads(f.read())
+                i = 0
+                if 'moods' in l: del l['moods']
+                if 'minLen' in l: del l['minLen']
+                if 'maxLen' in l: del l['maxLen']
+                if 'freqList' in l: del l['freqList']
+                if 'subtext' in l: del l['subtext']
+                if 'commandtext' in l: del l['commandtext']
+                for x in l:
+                    i += len(l[x])
+                promptStat = i
+        except Exception as e:
+            logging.warning(f'error in prompt.json. Aborting preview load. {e}')
+            errors_list.append('Something is wrong with the currently loaded prompt.json file!\n')
+            promptStat = 0
     else:
         promptStat = 0
 
     if os.path.exists(PATH + '\\resource\\captions.json'):
         #don't think these have moods currently but will implement this just in case
-        with open(PATH + '\\resource\\captions.json', 'r') as f:
-            l = json.loads(f.read())
-            i = 0
-            if 'prefix' in l: del l['prefix']
-            if 'subtext' in l: del l['subtext']
-            for x in l:
-                i += len(l[x])
-            captionStat = i
+        try:
+            with open(PATH + '\\resource\\captions.json', 'r') as f:
+                l = json.loads(f.read())
+                i = 0
+                if 'prefix' in l: del l['prefix']
+                if 'subtext' in l: del l['subtext']
+                for x in l:
+                    i += len(l[x])
+                captionStat = i
+        except Exception as e:
+            logging.warning(f'error in captions.json. Aborting preview load. {e}')
+            errors_list.append('Something is wrong with the currently loaded captions.json file!\n')
+            captionStat = 0
     else:
         captionStat = 0
 
@@ -1223,9 +1366,8 @@ def show_window():
     dropdownMenu = OptionMenu(advPanel, dropdownObj, *itemList, command=lambda a: updateText([textInput, expectedLabel], settings[a], a))
     dropdownMenu.configure(width=10)
     applyButton = Button(advPanel, text='Apply', command= lambda: assignJSON(dropdownObj.get(), textInput.get()))
-    Label(tabAdvanced).pack()
+    Label(tabAdvanced, text='Debug Config Edit', font='Default 13', relief=GROOVE).pack(pady=2)
     Label(tabAdvanced, text='Be careful messing with some of these; improper configuring can cause\nproblems when running, or potentially cause unintended damage to files.').pack()
-    Label(tabAdvanced).pack()
     Label(tabAdvanced).pack()
     advPanel.pack(fill='x', padx=2)
     dropdownMenu.pack(padx=2, side='left')
@@ -1238,16 +1380,40 @@ def show_window():
     troubleshootingFrame1 = Frame(troubleshootingHostFrame)
 
     toggleLanczos = Checkbutton(troubleshootingFrame1, text='Use Lanczos instead of Antialias', variable=antiOrLanczosVar, cursor='question_arrow')
+    toggleInternet = Checkbutton(troubleshootingFrame1, text='Disable Connection to Github', variable=toggleInternetVar, cursor='question_arrow')
+    toggleHibernateSkip = Checkbutton(troubleshootingFrame1, text='Toggle Tray Hibernate Skip', variable=toggleHibSkipVar, cursor='question_arrow')
 
     troubleshootingHostFrame.pack(fill='x')
     troubleshootingFrame1.pack(fill='both', side='left', expand=1)
-    toggleLanczos.pack(fill='x')
+    toggleLanczos.pack(fill='x', side='top')
+    toggleInternet.pack(fill='x', side='top')
+    toggleHibernateSkip.pack(fill='x', side='top')
 
     lanczosttp = CreateToolTip(toggleLanczos, 'Are popups and the startup image inexplicably not showing up for you? Try this setting.\n\n'
                                 'I am not entirely sure why, but the Lanczos image resizing algorithm sometimes works for people when the antialiasing one does not.\n\n'
                                 'This is not something changed in EdgeWare++, so if normal EdgeWare also didn\'t work for you, this might fix it?\n\n'
                                 'Enabled by default as i\'ve encountered way more people where antialiasing doesn\'t work than people who have it work fine.')
+    internetttp = CreateToolTip(toggleInternet, 'In some cases, having a slow internet connection can cause the config window to delay opening for a long time.\n\n'
+                                    'EdgeWare connects to Github just to check if there\'s a new update, but sometimes even this can take a while.\n\n'
+                                    'If you have noticed this, try enabling this setting- it will disable all connections to Github on future launches.')
+    internetttp = CreateToolTip(toggleHibernateSkip, 'Want to test out how hibernate mode works with your current settings, and hate waiting for the minimum time? Me too!\n\n'
+                                    'This adds a feature in the tray that allows you to skip to the start of hibernate.')
 
+    Label(tabAdvanced, text='Errors', font='Default 13', relief=GROOVE).pack(pady=2)
+    errorsFrame = Frame(tabAdvanced, borderwidth=5, relief=GROOVE)
+    errorsFrame.pack(fill='x')
+    Label(errorsFrame, text='These errors have been found while starting up EdgeWare Config, but might also affect running '
+            'EdgeWare itself.\n Likewise, there might be bugs that don\'t show up here but prevent EdgeWare itself from running '
+            'properly.\n Check the logs subfolder for more details.').pack()
+    if errors_list:
+        errorsText = Text(errorsFrame, height=10, fg='red')
+        errorsText.pack(pady=2, padx=2, fill='x')
+        for i in errors_list:
+            errorsText.insert(END, i)
+    else:
+        errorsText = Text(errorsFrame, height=10, fg='green')
+        errorsText.pack(pady=2, padx=2, fill='x')
+        errorsText.insert(END, 'No errors detected! (´◡`)')
 
     tabMaster.add(tabInfo, text='About')
     #==========={IN HERE IS ABOUT TAB ITEM INITS}===========#
@@ -1262,6 +1428,8 @@ def show_window():
     Label(tab_launch, text=STARTUP_TEXT, anchor='nw', wraplength=460).pack()
     tabInfoExpound.add(tab_hibernate, text='Hibernate')
     Label(tab_hibernate, text=HIBERNATE_TEXT, anchor='nw', wraplength=460).pack()
+    tabInfoExpound.add(tab_hibernateType, text='Hibernate Types')
+    Label(tab_hibernateType, text=HIBERNATE_TYPE_TEXT, anchor='nw', wraplength=460).pack()
     tabInfoExpound.add(tab_advanced, text='Advanced')
     Label(tab_advanced, text=ADVANCED_TEXT, anchor='nw', wraplength=460).pack()
     tabInfoExpound.add(tab_thanksAndAbout, text='Thanks & About')
@@ -1274,7 +1442,6 @@ def show_window():
 
     toggleAssociateSettings(fillVar.get(), fill_group)
     toggleAssociateSettings(replaceVar.get(), replace_group)
-    toggleAssociateSettings(hibernateVar.get(), hibernate_group)
     toggleAssociateSettings(rotateWallpaperVar.get(), wallpaper_group)
     toggleAssociateSettings(timeoutPopupsVar.get(), timeout_group)
     toggleAssociateSettings(mitosisVar.get(), mitosis_cGroup)
@@ -1286,6 +1453,7 @@ def show_window():
     toggleAssociateSettings(maxAToggleVar.get(), maxAudio_group)
     toggleAssociateSettings(maxVToggleVar.get(), maxVideo_group)
     toggleAssociateSettings(popupSublim.get(), subliminals_group)
+    hibernateHelper(hibernateTypeVar.get())
 
     tabMaster.pack(expand=1, fill='both')
     tabInfoExpound.pack(expand=1, fill='both')
@@ -1315,7 +1483,7 @@ def show_window():
     #version alert, if core web version (0.0.0) is different from the github configdefault, alerts user that update is available
     #   if user is a bugfix patch behind, the _X at the end of the 0.0.0, they will not be alerted
     #   the version will still be red to draw attention to it
-    if local_version.split('_')[0] != webv.split('_')[0] and not local_version.endswith('DEV'):
+    if local_version.split('_')[0] != webv.split('_')[0] and not (local_version.endswith('DEV') or settings['toggleInternet']):
         messagebox.showwarning('Update Available', 'Main local version and web version are not the same.\nPlease visit the Github and download the newer files.')
     root.mainloop()
 
@@ -1492,13 +1660,16 @@ def safeCheck(varList:list[StringVar | IntVar | BooleanVar], nameList:list[str])
             dangersList.append('\n•Launch on Startup is enabled! This will run EdgeWare when you start your computer!')
         if int(varList[nameList.index('fill')].get()) == 1:
             numDangers += 1
-            dangersList.append('\n•Fill Drive is enabled! Edgeware will replace files on your computer! Even if you want this, make sure the protected directories are right!')
-    if int(varList[nameList.index('timerMode')].get()) == 1 or int(varList[nameList.index('showDiscord')].get()) == 1:
+            dangersList.append('\n•Fill Drive is enabled! Edgeware will place images all over your computer! Even if you want this, make sure the protected directories are right!')
+    if int(varList[nameList.index('timerMode')].get()) == 1 or int(varList[nameList.index('showDiscord')].get()) == 1 or (int(varList[nameList.index('hibernateMode')].get()) == 1 and (int(varList[nameList.index('hibernateMin')].get()) < 30 or int(varList[nameList.index('hibernateMax')].get()) < 30)):
         logging.info('medium dangers found.')
         dangersList.append('\n\nMedium:')
         if int(varList[nameList.index('timerMode')].get()) == 1:
             numDangers += 1
             dangersList.append('\n•Timer mode is enabled! Panic cannot be used until a specific time! Make sure you know your Safeword!')
+        if int(varList[nameList.index('hibernateMode')].get()) == 1 and (int(varList[nameList.index('hibernateMin')].get()) < 30 or int(varList[nameList.index('hibernateMax')].get()) < 30):
+            numDangers += 1
+            dangersList.append('\n•You are running hibernate mode with a short cooldown! You might experience lag if a bunch of hibernate modes overlap!')
         if int(varList[nameList.index('showDiscord')].get()) == 1:
             numDangers += 1
             dangersList.append('\n•Show on Discord is enabled! This could lead to potential embarassment if you\'re on your main account!')
@@ -1523,13 +1694,17 @@ def validateBooru(name:str) -> bool:
     return requests.get(BOORU_URL.replace(BOORU_FLAG, name)).status_code == 200
 
 def getLiveVersion(url:str, id:int) -> str:
-    try:
-        logging.info('fetching github version')
-        with open(urllib.request.urlretrieve(url)[0], 'r') as liveDCfg:
-            return(liveDCfg.read().split('\n')[1].split(',')[id])
-    except Exception as e:
-        logging.warning('failed to fetch github version.\n\tReason: {e}')
-        return 'Could not check version.'
+    if not settings['toggleInternet']:
+        try:
+            logging.info('fetching github version')
+            with open(urllib.request.urlretrieve(url)[0], 'r') as liveDCfg:
+                return(liveDCfg.read().split('\n')[1].split(',')[id])
+        except Exception as e:
+            logging.warning('failed to fetch github version.\n\tReason: {e}')
+            return 'Could not check version.'
+    else:
+        logging.info('user has connection to github disabled. Version will not be checked.')
+        return 'Version check disabled!'
 
 def addList(tkListObj:Listbox, key:str, title:str, text:str):
     name = simpledialog.askstring(title, text)

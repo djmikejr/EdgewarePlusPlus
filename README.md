@@ -31,17 +31,23 @@ Previous config files might not work at all with this version, if you are planni
 
 •*Brand shiny new "Pack Info" tab that gives stats and information on the currently loaded pack*
 
+•*Simplified error console in the advanced tab, which could potentially help bugfix some things*
+
+•*Packs now support an "info.json" file which gives people basic information about the pack in the config window*
+
+•*Overhaul to hibernate mode which allows you to choose between multiple different types, and have your wallpaper go back to normal after you close all the popups*
+
 ## Planned Additions:
 
 •*Dark Mode*
 
 •*Giving mitosis a percentage activation slider*
 
-•*Giving hibernate new modes, offering alternatives like "slowly ramping up over time"*
-
 •*Giving a use to prompt/caption "moods", initial inspiration was giving people the ability to make "one handed" prompt modes, for those who are too "preoccupied" to type multiple full sentences*
 
 •*Rewriting all the old config presets ~~to work with the new version~~, and a few new ones as well!* (turns out the old configs work fine (at least for me), but they could do with a little updating for new settings)
+
+•*Allowing users to write config preset descriptions in the config window*
 
 •*Allowing pack creators to somehow make Edgeware "change over time", for example, getting more depraved or having the themes change the longer it runs. Would likely use the mood system.*
 
@@ -65,6 +71,44 @@ Suggestions I got from people who used the software and I thought would be inter
 •+0.5-0.25 to version number: new feature, but a smaller one or something not as essential, or lots of bugfixes
 
 •+0.2-0.1 to version number: very small update, usually just a bugfix, accessibility options, UI tweaks
+
+**Version 6**
+
+**THE FUTURE OF EDGEWARE++**
+
+You normally see this header when something is being deprecated, sunset, or no longer being worked on. Luckily I want to say right out the gate, that this is not the case. I do want to approach this subject though, as the next few updates might be a bit different than those previous.
+
+I am nearing the end of my planned features for EdgeWare++, most of which are things that I went "man, it should have this as an option" when I first used the original program. Pretty much everything left is getting exponentially larger to tackle, which is partially why i've procrastinated on adding them. There's a bigger issue in the back of my mind though, and that's the pack editor. The more features I add to EdgeWare++ that let people do fun stuff with packs, the more the pack creator needs to know how to manually add in, since the pack editor is still configured to the base version and has no new features. Additionally, the pack editor is feature-light in general.
+
+Because of this, I am planning to have version 7 or 8 be the *last version of EdgeWare++ for a while*. This is only because I want to focus instead on the pack editor, and I think it will only take 1-2 more versions to add the major features to packs that I want to add. After that, I might come back to EdgeWare++, I might take a break, I might be satisfied enough and move on, i'm unsure (mostly depends on how hellish it is switching to a new project). The last major features I want to add before then is mood blocking and "mood corruption", both of which I will go into more detail as they come out.
+
+Of course, I could always get distracted and work on other stuff here first. This is not set in stone as I know full well that I get easily satisfied adding lots of small, easy features instead of huge ones that can take weeks to work on. Just wanted to lay out the groundwork and let people know what i'm thinking about moving forward.
+
+•*Added troubleshooting option to disable connections to github for users with slow internet*
+
+•*Added errors section to troubleshooting with some non-fatal errors able to print user-facing logs there (there are still more detailed logs in the subfolder, though!)*
+
+•*Fixed some error checking \*ahem\* not existing, config should no longer crash if (most) non-essential files have errors in them*
+
+•*Added official support for info.json in pack files.*
+``{"name":"", "creator":"", "version":"", "description":""}``
+>Anything left blank will be set to a default value. File does not have to be included at all, and all it does is give the user more information on your pack in the pack info tab. Max suggested characters for name/creator/version is 20, and any description longer than 400 characters will be cut off with [...]. I plan to put all of this in the pack editor soon with these values included.
+
+•*Changed preset description to be handled by TextWrapper instead of the tkinter wraplength modifier*
+>In short, things might look different than before but will wrap lines a lot cleaner
+
+•*Added short hibernate mode timers to dangerous settings list*
+
+•*Added feature in troubleshooting to skip directly to hibernate starting*
+
+•*HIBERNATE OVERHAUL: added "hibernate types", which change how hibernate works. Also added a feature to change wallpaper back to your panic wallpaper once hibernate is done.*
+>full documentation on the different hibernate types and how each one works is available in the "about" tab.
+
+KNOWN ISSUES:
+
+-Pump-Scare is not eligible for chaos, mostly because it taps into the popup itself directly and I want to get this update out sooner than later
+
+-Hibernate modes might randomly drop popups, thus having less than expected range. This (shouldn't) affect the wallpaper fix setting, and upon testing an old version of edgeware this also happened with the original mode, so it might not be something worth fixing
 
 **Version 5.2**
 
