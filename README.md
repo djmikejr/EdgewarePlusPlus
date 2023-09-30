@@ -5,7 +5,7 @@ My goal with this extension of Edgeware is to add or modify features that I felt
 
 I have prior programming experience, but have never touched python before this project- so it's mostly going to be trial and error. Half of this is a learning experience made easier by horny motivation.
 
-Previous config files might not work at all with this version, if you are planning on switching over, make sure you write down your settings! (or go into your config file and manually update it, if you're so inclined)
+The EdgeWare++ Pack Editor is now live [here](https://github.com/araten10/EdgewareEditor-PlusPlus).
 
 ## New Features In Edgeware++:
 
