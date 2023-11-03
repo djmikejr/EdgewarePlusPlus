@@ -46,13 +46,15 @@ The EdgeWare++ Pack Editor is now live [here](https://github.com/araten10/Edgewa
 
 •*Overhaul to hibernate mode which allows you to choose between multiple different types, and have your wallpaper go back to normal after you close all the popups*
 
+•*File tab that allows you to do basic file management functions*
+
+•*Adding functionality to moods, allowing you to toggle them off/on*
+
 ## Planned Additions:
 
 •*Dark Mode*
 
 •*Giving mitosis a percentage activation slider*
-
-•*Giving a use to prompt/caption "moods", initial inspiration was giving people the ability to make "one handed" prompt modes, for those who are too "preoccupied" to type multiple full sentences*
 
 •*Rewriting all the old config presets ~~to work with the new version~~, and a few new ones as well!* (turns out the old configs work fine (at least for me), but they could do with a little updating for new settings)
 
@@ -60,7 +62,9 @@ The EdgeWare++ Pack Editor is now live [here](https://github.com/araten10/Edgewa
 
 •*Allowing pack creators to somehow make Edgeware "change over time", for example, getting more depraved or having the themes change the longer it runs. Would likely use the mood system.*
 
-•*Adding more in depth info to the pack info tab, but to do so I would like to make it so there's a "reveal spoilers" button*
+•*Making a demo video/images so people can get an idea of what they're downloading ~~but this might take a while since it requires me to clean my desktop~~*
+
+•*Making some new demo packs showcasing added features, allows me to not only show off my work but also be a horny bastard and browse porn*
 
 I'm also wanting to add features to the pack editor, will probably do that when this is in a state where I feel mostly done with what I wanted to accomplish.
 
@@ -72,6 +76,8 @@ Suggestions I got from people who used the software and I thought would be inter
 
 •*Randomized settings button. Might implement when i'm mostly done adding new config vars, but also gave me the idea for pack creators to be able to make "recommended settings" that you can switch to in the pack info tab*
 
+•*Support for confining edgeware to a single monitor, which actually sounds like a really good idea but i'd want to test it on a few monitor setups and it sounds fairly technical*
+
 ## EdgeWare++ Patch Notes
 **If you see that there's a new update and are somebody (like me) who is lazy and doesn't like installing every single update if unnecessary, here is how I do versioning:**
 
@@ -80,6 +86,33 @@ Suggestions I got from people who used the software and I thought would be inter
 •+0.5-0.25 to version number: new feature, but a smaller one or something not as essential, or lots of bugfixes
 
 •+0.2-0.1 to version number: very small update, usually just a bugfix, accessibility options, UI tweaks
+
+**Version 7**
+
+Gee howdy, it's been a long time, huh! Life stuff happened, then I got sucked into another project, then halloween happened... busy month.
+
+I really wanted to fit everything left I had planned before starting work on the pack editor in one huge mega-update, but unfortunately I found other bugs in the program, heard some more feedback, also was busy with other things... I felt like it was better to release it into smaller chunks. In 7.0 there are a couple bugfixes, a couple new features, and a couple features that are added to the config window but currently aren't implemented. Hopefully the last thing is more an exciting preview of things to come and less something that confuses everyone who uses this version~
+
+•*Fixed a minor bug in the troubleshooting tab that led to the wrong tooltip displaying*
+
+•*Fixed an actually nasty bug that disabled internet connection to github every time you didn't have a config file loaded*
+
+•*Made the disabled features a slightly lighter shade of grey, for both readability and also just easier on the eyes*
+
+•*Un-expanded certain sections in the config window which might have caused the "Save & Exit" button to be wiped from existence for some users. If this problem persists, I also added these buttons to a more safe space in the...*
+
+•*...Brand new "File" tab, which is the place for all your file management needs.*
+>Options for saving & loading, opening certain folders, and deleting logs (because I hated doing it myself). I also moved the "Config Presets" section here to make space for new features in the general tab. (I still want to do themes someday!!)
+
+•*Pack Info now contains a "moods" section, where you can view/toggle moods, and look at the pack's Corruption Path.*
+>HUGE asterisk: toggling moods on and off currently does nothing. That being said, you can still see the list of moods and number of items relating to each mood. You can also toggle these on and off pre-emptively (which will save properly) for when I release the next update which will (hopefully) add proper mood toggling. What's Corruption Path? Well...
+
+•*Added various settings and framework for a new "Corruption" mechanic, but... it's currently not implemented!*
+>I wish I could say "Happy Halloween" and release a spooky update involving a feature designed to slowly rot your brain with more degenerate fetishes, but I guess I missed the boat on that one. Feel free to toggle or mess around with any of the settings, they don't do anything at all currently.
+
+KNOWN ISSUES:
+
+The original demo packs for regular EdgeWare sometimes use the "default" mood as a completely separate mood, while other packs use it as the ONLY mood... For now I have made it so you cannot disable "default" so mood editing plays nice, but in the future I might change it to be toggled.
 
 **Version 6.0001**
 
