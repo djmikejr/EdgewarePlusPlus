@@ -2470,7 +2470,7 @@ def updateMoods(type:str, id:str, check:bool):
                             if id in mood_dict["prompts"]:
                                 mood_dict["prompts"].remove(id)
                 with open(f'{PATH}\\moods\\unnamed\\{UNIQUE_ID}.json', 'w') as mood:
-                    logging.info(mood_dict)
+                    #logging.info(mood_dict)
                     mood.write(json.dumps(mood_dict))
     except Exception as e:
         logging.warning(f'error updating mood files. {e}')
