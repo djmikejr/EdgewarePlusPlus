@@ -78,6 +78,8 @@ Suggestions I got from people who used the software and I thought would be inter
 
 •*Support for confining edgeware to a single monitor, which actually sounds like a really good idea but i'd want to test it on a few monitor setups and it sounds fairly technical*
 
+•*More "classic virus"-y popup options, like [moving popups](https://www.youtube.com/watch?v=LSgk7ctw1HY)*
+
 ## EdgeWare++ Patch Notes
 **If you see that there's a new update and are somebody (like me) who is lazy and doesn't like installing every single update if unnecessary, here is how I do versioning:**
 
@@ -91,7 +93,7 @@ Suggestions I got from people who used the software and I thought would be inter
 
 Once again dealing with "way too many projects at once and games to play", pardon the delay...
 
-Small one to get back into the swing of things. Still planning the next update to be finishing mood implementation. I was seriously tempted to work on it and try to cram a bunch in a larger update, but I regained control of myself and pushed out a smaller update now rather than delaying the whole thing to fit more in. 
+Small one to get back into the swing of things. Still planning the next update to be finishing mood implementation. I was seriously tempted to work on it and try to cram a bunch in a larger update, but I regained control of myself and pushed out a smaller update now rather than delaying the whole thing to fit more in.
 
 •*Fixed a bug that caused the startup splash to display every time the "Pump-Scare" hibernate mode activated*
 >Another bug I didn't discover until now. Was a really easy fix, sorry if you've been bothered by it for a while!
