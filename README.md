@@ -87,6 +87,25 @@ Suggestions I got from people who used the software and I thought would be inter
 
 •+0.2-0.1 to version number: very small update, usually just a bugfix, accessibility options, UI tweaks
 
+**Version 7.2**
+
+Once again dealing with "way too many projects at once and games to play", pardon the delay...
+
+Small one to get back into the swing of things. Still planning the next update to be finishing mood implementation. I was seriously tempted to work on it and try to cram a bunch in a larger update, but I regained control of myself and pushed out a smaller update now rather than delaying the whole thing to fit more in. 
+
+•*Fixed a bug that caused the startup splash to display every time the "Pump-Scare" hibernate mode activated*
+>Another bug I didn't discover until now. Was a really easy fix, sorry if you've been bothered by it for a while!
+
+•*Fixed a bug that might have blocked pump-scare from working for packs without audio*
+
+•*Added "Pump-Scare" to Chaos Mode, finally*
+>I kept putting this off because I wanted to figure out an elegant solution to add it without embarrassingly bad code, then I remembered that my whole ethos with this project is "just don't worry too hard, as long as it works". I think I could remove a few .dat files i've created over time by learning and properly implementing system args on file execution, but maybe another time.
+
+•*Added a feature to the troubleshooting tab allowing Pump-Scare offset*
+>I have debated for a while what I should do regarding this. I have known since the beginning that pump-scare's audio won't play when it should for any reasonably sized sound. I tested with various file sizes, and anything over 5MB will start to add delay (at least on my computer). It's obviously not reasonable for pack creators to compress their sounds this much, and I think anything that small would be so short it would only work for pump-scare and nothing else.
+
+>To put it shortly, the audio playing module "playaudio" is very feature bare. It doesn't support pretty much anything other than just playing an audio file, and that includes multithreading. I did a workaround with multiprocessing but at the end of the day there's no way to wait for the audio to load before playing it. The problem is that being barebones is kind of the point of the module- sure, I could import pyglet or pygame and have full audio controls, but then i'd feel bad getting users to download an entire game development module just for reasonable audio playback. This is a temporary measure to keep things "as they were" for now, but maybe someday i'll come back and update it to a new system.
+
 **Version 7**
 
 Gee howdy, it's been a long time, huh! Life stuff happened, then I got sucked into another project, then halloween happened... busy month.

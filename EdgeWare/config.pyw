@@ -417,6 +417,8 @@ def show_window():
             corruptionModeVar         = BooleanVar(root, value=(int(settings['corruptionMode'])==1))
             corruptionTimeVar         = IntVar(root, value=int(settings['corruptionTime']))
 
+            pumpScareOffsetVar        = IntVar(root, value=int(settings['pumpScareOffset']))
+
             #grouping for sanity's sake later
             in_var_group = [delayVar, popupVar, webVar, audioVar, promptVar, fillVar,
                             fillDelayVar, replaceVar, replaceThreshVar, startLoginVar,
@@ -432,7 +434,7 @@ def show_window():
                             maxVideoVar, subliminalsChanceVar, maxSubliminalsVar, safeModeVar,
                             antiOrLanczosVar, toggleInternetVar, buttonlessVar, hibernateTypeVar,
                             hibernateLengthVar, fixWallpaperVar, toggleHibSkipVar, toggleMoodSetVar,
-                            corruptionModeVar, corruptionTimeVar]
+                            corruptionModeVar, corruptionTimeVar, pumpScareOffsetVar]
 
             in_var_names = ['delay', 'popupMod', 'webMod', 'audioMod', 'promptMod', 'fill',
                             'fill_delay', 'replace', 'replaceThresh', 'start_on_logon',
@@ -447,7 +449,7 @@ def show_window():
                             'booruMinScore', 'desktopIcons', 'maxAudioBool', 'maxAudio', 'maxVideoBool',
                             'maxVideos', 'subliminalsChance', 'maxSubliminals', 'safeMode', 'antiOrLanczos',
                             'toggleInternet', 'buttonless', 'hibernateType', 'hibernateLength', 'fixWallpaper',
-                            'toggleHibSkip', 'toggleMoodSet', 'corruptionMode', 'corruptionTime']
+                            'toggleHibSkip', 'toggleMoodSet', 'corruptionMode', 'corruptionTime', 'pumpScareOffset']
             break
         except Exception as e:
             messagebox.showwarning(
@@ -1861,7 +1863,6 @@ def show_window():
     applyButton = Button(advPanel, text='Apply', command= lambda: assignJSON(dropdownObj.get(), textInput.get()))
     Label(tabAdvanced, text='Debug Config Edit', font='Default 13', relief=GROOVE).pack(pady=2)
     Label(tabAdvanced, text='Be careful messing with some of these; improper configuring can cause\nproblems when running, or potentially cause unintended damage to files.').pack()
-    Label(tabAdvanced).pack()
     advPanel.pack(fill='x', padx=2)
     dropdownMenu.pack(padx=2, side='left')
     textInput.pack(padx=2, fill='x', expand=1, side='left')
@@ -1871,18 +1872,31 @@ def show_window():
     Label(tabAdvanced, text='Troubleshooting', font='Default 13', relief=GROOVE).pack(pady=2)
     troubleshootingHostFrame = Frame(tabAdvanced, borderwidth=5, relief=RAISED)
     troubleshootingFrame1 = Frame(troubleshootingHostFrame)
+    troubleshootingFrame2 = Frame(troubleshootingHostFrame)
 
     toggleLanczos = Checkbutton(troubleshootingFrame1, text='Use Lanczos instead of Antialias', variable=antiOrLanczosVar, cursor='question_arrow')
-    toggleInternetSetting = Checkbutton(troubleshootingFrame1, text='Disable Connection to Github', variable=toggleInternetVar, cursor='question_arrow')
+    toggleInternetSetting = Checkbutton(troubleshootingFrame2, text='Disable Connection to Github', variable=toggleInternetVar, cursor='question_arrow')
     toggleHibernateSkip = Checkbutton(troubleshootingFrame1, text='Toggle Tray Hibernate Skip', variable=toggleHibSkipVar, cursor='question_arrow')
-    toggleMoodSettings = Checkbutton(troubleshootingFrame1, text='Toggle Mood Settings', variable=toggleMoodSetVar, cursor='question_arrow')
+    toggleMoodSettings = Checkbutton(troubleshootingFrame2, text='Toggle Mood Settings', variable=toggleMoodSetVar, cursor='question_arrow')
 
     troubleshootingHostFrame.pack(fill='x')
     troubleshootingFrame1.pack(fill='both', side='left', expand=1)
+    troubleshootingFrame2.pack(fill='both', side='left', expand=1)
     toggleLanczos.pack(fill='x', side='top')
     toggleInternetSetting.pack(fill='x', side='top')
     toggleHibernateSkip.pack(fill='x', side='top')
     toggleMoodSettings.pack(fill='x', side='top')
+
+    troubleshootingHostFrame2 = Frame(tabAdvanced, borderwidth=5, relief=RAISED)
+    troubleshootingFrame3 = Frame(troubleshootingHostFrame2)
+
+    offsetSlider = Scale(troubleshootingFrame3, label='Pump-Scare Offset', orient='horizontal', variable=pumpScareOffsetVar, to=50)
+    scareOffsetButton = Button(troubleshootingFrame3, text='Manual offset...', command=lambda: assign(pumpScareOffsetVar, simpledialog.askinteger('Offset for Pump-Scare Audio (seconds)', prompt='[0-50]: ')), cursor='question_arrow')
+
+    troubleshootingHostFrame2.pack(fill='x')
+    troubleshootingFrame3.pack(fill='both', side='left', expand=1)
+    offsetSlider.pack(fill='x', side='top', padx=2, pady=2)
+    scareOffsetButton.pack(fill='x', side='top', padx=2, pady=2)
 
     lanczosttp = CreateToolTip(toggleLanczos, 'Are popups and the startup image inexplicably not showing up for you? Try this setting.\n\n'
                                 'I am not entirely sure why, but the Lanczos image resizing algorithm sometimes works for people when the antialiasing one does not.\n\n'
@@ -1900,6 +1914,10 @@ def show_window():
                                     ' files in //moods//unnamed, all pointing to what is essentially the same pack. This will reset your mood settings every time, too.\n\n'
                                     'In situations like this, I recommend creating a info file with a pack name, but if you\'re unsure how to do that or just don\'t want to'
                                     ' deal with all this mood business, you can disable the mood saving feature here.')
+    psoffsetttp = CreateToolTip(scareOffsetButton, 'Pump-Scare is a hibernate mode type where an image \"jump-scares\" you by appearing suddenly then disappears seconds later. However, '
+                                    'sometimes audio files are large enough that the audio won\'t even have a chance to load in before the image disappears.\n\nThis setting allows you to let the audio '
+                                    'start playing earlier so it has time to load properly. Maybe you also have an audio file that builds up to a horny crecendo and want the image to appear at that point? '
+                                    'You could get creative with this!')
 
     Label(tabAdvanced, text='Errors', font='Default 13', relief=GROOVE).pack(pady=2)
     errorsFrame = Frame(tabAdvanced, borderwidth=5, relief=GROOVE)

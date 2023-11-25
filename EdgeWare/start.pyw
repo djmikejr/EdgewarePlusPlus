@@ -264,9 +264,12 @@ DRIVE_PATH = settings['drivePath']
 
 LANCZOS_MODE = int(settings['antiOrLanczos']) == 1
 
+PUMP_SCARE_OFFSET = int(settings['pumpScareOffset'])
+
 hiberWait = thread.Event()
 wallpaperWait = thread.Event()
 runningHibernate = thread.Event()
+pumpScareAudio = thread.Event()
 
 def shortcut_script(pth_str:str, keyword:str, script:str, title:str):
     #strings for batch script to write vbs script to create shortcut on desktop
@@ -385,6 +388,7 @@ except Exception as e:
 
 AUDIO = []
 try:
+    HAS_AUDIO = len(os.listdir(PATH + '\\resource\\aud\\')) > 0
     for aud in os.listdir(PATH + '\\resource\\aud\\'):
         AUDIO.append(PATH + '\\resource\\aud\\' + aud)
     logging.info('audio resources found')
@@ -412,7 +416,7 @@ if DESKTOP_ICONS:
     if not desktop_file_exists('Panic.lnk'):
         make_shortcut(shortcut_script(PATH, 'panic', 'panic.pyw', 'Panic'))
 
-if LOADING_FLAIR:
+if LOADING_FLAIR and (__name__ == "__main__"):
     logging.info('started loading flair')
     if os.path.exists(PATH + '\\resource\\loading_splash.png'):
         if LANCZOS_MODE:
@@ -577,15 +581,17 @@ def main():
             if HIBERNATE_TRUTH == 'Chaos':
                 try:
                     global HIBERNATE_TYPE
-                    #reminder for version 6.X to make 'Pump-Scare' eligible because I want to get this update out now and can't be bothered
                     HIBERNATE_TYPE = rand.choice(['Original', 'Spaced', 'Glitch', 'Ramp'])
+                    with open(PATH + '\\data\\chaos_type.dat', 'w') as f:
+                        f.write(HIBERNATE_TYPE)
                     logging.info(f'hibernate type is chaos, and has switched to {HIBERNATE_TYPE}')
                 except Exception as e:
                     logging.warning(f'failed to successfully run chaos hibernate.\n\tReason: {e}')
             hiberWait.wait(float(waitTime))
             runningHibernate.clear()
-            ctypes.windll.user32.SystemParametersInfoW(20, 0, PATH + '\\resource\\wallpaper.png', 0)
-            wallpaperWait.clear()
+            if HIBERNATE_TYPE != 'Pump-Scare':
+                ctypes.windll.user32.SystemParametersInfoW(20, 0, PATH + '\\resource\\wallpaper.png', 0)
+                wallpaperWait.clear()
             if HIBERNATE_TYPE == 'Original':
                 try:
                     logging.info(f'running original hibernate. number of popups estimated between {int(WAKEUP_ACTIVITY / 2)} and {WAKEUP_ACTIVITY}.')
@@ -668,7 +674,7 @@ def checkWallpaperStatus():
     with open(PATH + '\\data\\hibernate_handler.dat', 'r') as f:
         while True:
             runningHibernate.wait()
-            #logging.info('hibernate processing is over, waiting for popups to close')
+            logging.info('hibernate processing is over, waiting for popups to close')
             while True:
                 if not runningHibernate.is_set():
                     break
@@ -677,7 +683,7 @@ def checkWallpaperStatus():
                         i = int(f.readline())
                         if i < 1:
                             wallpaperWait.set()
-                            #logging.info('hibernate popups are all dead')
+                            logging.info('hibernate popups are all dead')
                             ctypes.windll.user32.SystemParametersInfoW(20, 0, PATH + '\\default_assets\\default_win10.jpg', 0)
                             break
 
@@ -835,24 +841,29 @@ def annoyance():
 def roll_for_initiative():
     if HIBERNATE_TYPE == 'Pump-Scare' and HIBERNATE_MODE:
         if HAS_IMAGES:
+            if HAS_AUDIO:
+                if AUDIO_CAP:
+                    if AUDIO_NUMBER < AUDIO_MAX:
+                        try:
+                            thread.Thread(target=play_audio).start()
+                            pumpScareAudio.wait()
+                        except:
+                            messagebox.showerror('Audio Error', 'Failed to play audio.\n[' + str(e) + ']')
+                            logging.critical(f'failed to play audio\n\tReason: {e}')
+                else:
+                    try:
+                        thread.Thread(target=play_audio).start()
+                        pumpScareAudio.wait()
+                    except:
+                        messagebox.showerror('Audio Error', 'Failed to play audio.\n[' + str(e) + ']')
+                        logging.critical(f'failed to play audio\n\tReason: {e}')
             try:
+                ctypes.windll.user32.SystemParametersInfoW(20, 0, PATH + '\\resource\\wallpaper.png', 0)
+                wallpaperWait.clear()
                 os.startfile('popup.pyw')
             except Exception as e:
                 messagebox.showerror('Popup Error', 'Failed to start popup.\n[' + str(e) + ']')
                 logging.critical(f'failed to start popup.pyw\n\tReason: {e}')
-            if AUDIO_CAP:
-                if AUDIO_NUMBER < AUDIO_MAX:
-                    try:
-                        thread.Thread(target=play_audio).start()
-                    except:
-                        messagebox.showerror('Audio Error', 'Failed to play audio.\n[' + str(e) + ']')
-                        logging.critical(f'failed to play audio\n\tReason: {e}')
-            else:
-                try:
-                    thread.Thread(target=play_audio).start()
-                except:
-                    messagebox.showerror('Audio Error', 'Failed to play audio.\n[' + str(e) + ']')
-                    logging.critical(f'failed to play audio\n\tReason: {e}')
     else:
         if do_roll(WEB_CHANCE) and HAS_WEB:
             try:
@@ -950,6 +961,7 @@ def do_timer():
 def audioHelper():
     ps.playsound(AUDIO[rand.randrange(len(AUDIO))])
 
+
 #if audio is not playing, selects and plays random audio file from /aud/ folder
 def play_audio():
     global PLAYING_AUDIO
@@ -963,7 +975,11 @@ def play_audio():
         if HIBERNATE_TYPE == 'Pump-Scare' and HIBERNATE_MODE:
             p = multiprocessing.Process(target=audioHelper)
             p.start()
-            time.sleep(3)
+            if PUMP_SCARE_OFFSET != 0:
+                time.sleep(PUMP_SCARE_OFFSET)
+            pumpScareAudio.set()
+            time.sleep(2.6)
+            pumpScareAudio.clear()
             p.terminate()
         else:
             ps.playsound(AUDIO[rand.randrange(len(AUDIO))])

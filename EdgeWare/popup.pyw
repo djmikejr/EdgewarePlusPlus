@@ -138,8 +138,18 @@ with open(PATH + '\\config.cfg', 'r') as cfg:
 
     BUTTONLESS = check_setting('buttonless')
 
-    HIBERNATE_TYPE = settings['hibernateType']
     HIBERNATE_MODE = check_setting('hibernateMode')
+
+    if HIBERNATE_MODE:
+        if settings['hibernateType'] == 'Chaos':
+            with open(PATH + '\\data\\chaos_type.dat', 'r') as ct:
+                HIBERNATE_TYPE = ct.read()
+        else:
+            HIBERNATE_TYPE = settings['hibernateType']
+
+    MOOD_MODE = check_setting('toggleMoodSet')
+
+
 
 #functions for script mode, unused for now
 if checkTag('timeout='):
