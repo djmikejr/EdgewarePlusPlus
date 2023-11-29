@@ -266,6 +266,17 @@ LANCZOS_MODE = int(settings['antiOrLanczos']) == 1
 
 PUMP_SCARE_OFFSET = int(settings['pumpScareOffset'])
 
+VLC_MODE = int(settings['vlcMode']) == 1
+
+#import VLC module if VLC mode is active. I do this rather than auto-importing to keep compatability up and confusion down.
+#if this messes something up put it back in the import block
+if VLC_MODE:
+    try:
+        import vlc
+    except:
+        pip_install('python-vlc')
+        import vlc
+
 hiberWait = thread.Event()
 wallpaperWait = thread.Event()
 runningHibernate = thread.Event()
@@ -865,55 +876,71 @@ def roll_for_initiative():
                 messagebox.showerror('Popup Error', 'Failed to start popup.\n[' + str(e) + ']')
                 logging.critical(f'failed to start popup.pyw\n\tReason: {e}')
     else:
-        if do_roll(WEB_CHANCE) and HAS_WEB:
+        #these variables make the experience "more consistent" by stopping further popup spawns if enough spawns are reached
+        currPopNum = 0
+        maxPopNum = 1 if HIBERNATE_MODE else 999
+        if do_roll(WEB_CHANCE) and HAS_WEB and currPopNum < maxPopNum:
             try:
                 url = url_select(rand.randrange(len(WEB_DICT['urls']))) if HAS_WEB else None
                 webbrowser.open_new(url)
+                currPopNum += 1
             except Exception as e:
                 messagebox.showerror('Web Error', 'Failed to open website.\n[' + str(e) + ']')
                 logging.critical(f'failed to open website {url}\n\tReason: {e}')
-        if do_roll(VIDEO_CHANCE) and VIDEOS:
+        if do_roll(VIDEO_CHANCE) and VIDEOS and currPopNum < maxPopNum:
             global VIDEO_NUMBER
             if VIDEO_CAP:
                 with open(PATH + '\\data\\max_videos.dat', 'r') as f:
                     VIDEO_NUMBER = int(f.readline())
                 if VIDEO_NUMBER < VIDEO_MAX:
                     try:
-                        thread.Thread(target=lambda: subprocess.call('pyw popup.pyw -video', shell=False)).start()
+                        if VLC_MODE:
+                            thread.Thread(target=lambda: subprocess.call('pyw popup.pyw -video -vlc', shell=False)).start()
+                        else:
+                            thread.Thread(target=lambda: subprocess.call('pyw popup.pyw -video', shell=False)).start()
                         with open(PATH + '\\data\\max_videos.dat', 'w') as f:
                             f.write(str(VIDEO_NUMBER+1))
+                        currPopNum += 1
                     except Exception as e:
                         messagebox.showerror('Popup Error', 'Failed to start popup.\n[' + str(e) + ']')
                         logging.critical(f'failed to start video popup.pyw\n\tReason: {e}')
             else:
                 try:
-                    thread.Thread(target=lambda: subprocess.call('pyw popup.pyw -video', shell=False)).start()
+                    if VLC_MODE:
+                        thread.Thread(target=lambda: subprocess.call('pyw popup.pyw -video -vlc', shell=False)).start()
+                    else:
+                        thread.Thread(target=lambda: subprocess.call('pyw popup.pyw -video', shell=False)).start()
+                    currPopNum += 1
                 except Exception as e:
                     messagebox.showerror('Popup Error', 'Failed to start popup.\n[' + str(e) + ']')
                     logging.critical(f'failed to start video popup.pyw\n\tReason: {e}')
-        if (not (MITOSIS_MODE or LOWKEY_MODE)) and do_roll(POPUP_CHANCE) and HAS_IMAGES:
+        if (not (MITOSIS_MODE or LOWKEY_MODE)) and do_roll(POPUP_CHANCE) and HAS_IMAGES and currPopNum < maxPopNum:
             try:
                 os.startfile('popup.pyw')
+                currPopNum += 1
             except Exception as e:
                 messagebox.showerror('Popup Error', 'Failed to start popup.\n[' + str(e) + ']')
                 logging.critical(f'failed to start popup.pyw\n\tReason: {e}')
-        if do_roll(AUDIO_CHANCE) and AUDIO:
+        if do_roll(AUDIO_CHANCE) and AUDIO and currPopNum < maxPopNum:
             if AUDIO_CAP:
                 if AUDIO_NUMBER < AUDIO_MAX:
                     try:
                         thread.Thread(target=play_audio).start()
+                        currPopNum += 1
                     except:
                         messagebox.showerror('Audio Error', 'Failed to play audio.\n[' + str(e) + ']')
                         logging.critical(f'failed to play audio\n\tReason: {e}')
             else:
                 try:
                     thread.Thread(target=play_audio).start()
+                    currPopNum += 1
                 except:
                     messagebox.showerror('Audio Error', 'Failed to play audio.\n[' + str(e) + ']')
                     logging.critical(f'failed to play audio\n\tReason: {e}')
-        if do_roll(PROMPT_CHANCE) and HAS_PROMPTS:
+        if do_roll(PROMPT_CHANCE) and HAS_PROMPTS and currPopNum < maxPopNum:
             try:
                 subprocess.call('pythonw prompt.pyw')
+                currPopNum += 1
             except:
                 messagebox.showerror('Prompt Error', 'Could not start prompt.\n[' + str(e) + ']')
                 logging.critical(f'failed to start prompt.pyw\n\tReason: {e}')

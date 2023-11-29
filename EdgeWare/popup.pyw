@@ -13,6 +13,7 @@ import logging
 from tkinter import messagebox, simpledialog, Tk, Frame, Label, Button, RAISED
 from itertools import count, cycle
 from PIL import Image, ImageTk, ImageFilter
+import vlc
 
 SYS_ARGS = sys.argv.copy()
 SYS_ARGS.pop(0)
@@ -225,6 +226,7 @@ class GifLabel(tk.Label):
             self.config(image=next(self.frames_))
             self.after(self.delay, self.next_frame)
 
+
 #video label class
 class VideoLabel(tk.Label):
     def load(self, path:str, resized_width:int, resized_height:int):
@@ -267,7 +269,6 @@ class VideoLabel(tk.Label):
                 self.time_offset_end = time.perf_counter()
                 time.sleep(max(0, self.delay - (self.time_offset_end - self.time_offset_start)))
 
-
 def run():
     #var things
     arr = os.listdir(f'{os.path.abspath(os.getcwd())}\\resource\\img\\')
@@ -294,13 +295,12 @@ def run():
         video_properties = get_video_properties(video_path)
         image = Image.new('RGB', (video_properties['width'], video_properties['height']))
 
-
     animated_gif = False
     # Check to see if the gif is animated or a normal gif file
     if item.split('.')[-1].lower() == 'gif':
         if image.n_frames > 1:
             animated_gif = True
-            
+
         else:
             image = image.convert('RGBA')
 
@@ -346,11 +346,22 @@ def run():
 
     #different handling for videos vs gifs vs normal images
     if video_mode:
-        #video mode
-        label = VideoLabel(root)
-        label.load(path = video_path, resized_width = resized_image.width, resized_height = resized_image.height)
-        label.pack()
-        thread.Thread(target=lambda: label.play(), daemon=True).start()
+        #quick and dirty hack, if this needs to get more complicated would likely be better suited as a class
+        if len(SYS_ARGS) >= 2 and SYS_ARGS[1] == '-vlc':
+            label = Label(root, width=resized_image.width, height=resized_image.height)
+            label.pack()
+            instance = vlc.Instance()
+            player = instance.media_player_new()
+            media = instance.media_new(video_path)
+            player.set_hwnd(label.winfo_id())
+            player.set_media(media)
+            player.play()
+        else:
+            #video mode
+            label = VideoLabel(root)
+            label.load(path = video_path, resized_width = resized_image.width, resized_height = resized_image.height)
+            label.pack()
+            thread.Thread(target=lambda: label.play(), daemon=True).start()
     elif animated_gif:
         #gif mode
         label = GifLabel(root)

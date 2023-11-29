@@ -416,8 +416,11 @@ def show_window():
 
             corruptionModeVar         = BooleanVar(root, value=(int(settings['corruptionMode'])==1))
             corruptionTimeVar         = IntVar(root, value=int(settings['corruptionTime']))
+            corruptionFadeTypeVar     = StringVar(root, value=(settings['corruptionFadeType'].strip()))
 
             pumpScareOffsetVar        = IntVar(root, value=int(settings['pumpScareOffset']))
+
+            vlcModeVar                = BooleanVar(root, value=(int(settings['vlcMode'])==1))
 
             #grouping for sanity's sake later
             in_var_group = [delayVar, popupVar, webVar, audioVar, promptVar, fillVar,
@@ -434,7 +437,8 @@ def show_window():
                             maxVideoVar, subliminalsChanceVar, maxSubliminalsVar, safeModeVar,
                             antiOrLanczosVar, toggleInternetVar, buttonlessVar, hibernateTypeVar,
                             hibernateLengthVar, fixWallpaperVar, toggleHibSkipVar, toggleMoodSetVar,
-                            corruptionModeVar, corruptionTimeVar, pumpScareOffsetVar]
+                            corruptionModeVar, corruptionTimeVar, pumpScareOffsetVar, corruptionFadeTypeVar,
+                            vlcModeVar]
 
             in_var_names = ['delay', 'popupMod', 'webMod', 'audioMod', 'promptMod', 'fill',
                             'fill_delay', 'replace', 'replaceThresh', 'start_on_logon',
@@ -449,7 +453,8 @@ def show_window():
                             'booruMinScore', 'desktopIcons', 'maxAudioBool', 'maxAudio', 'maxVideoBool',
                             'maxVideos', 'subliminalsChance', 'maxSubliminals', 'safeMode', 'antiOrLanczos',
                             'toggleInternet', 'buttonless', 'hibernateType', 'hibernateLength', 'fixWallpaper',
-                            'toggleHibSkip', 'toggleMoodSet', 'corruptionMode', 'corruptionTime', 'pumpScareOffset']
+                            'toggleHibSkip', 'toggleMoodSet', 'corruptionMode', 'corruptionTime', 'pumpScareOffset',
+                            'corruptionFadeType', 'vlcMode']
             break
         except Exception as e:
             messagebox.showwarning(
@@ -1887,16 +1892,27 @@ def show_window():
     toggleHibernateSkip.pack(fill='x', side='top')
     toggleMoodSettings.pack(fill='x', side='top')
 
+    Label(tabAdvanced, text='Playback Options', font='Default 13', relief=GROOVE).pack(pady=2)
+
     troubleshootingHostFrame2 = Frame(tabAdvanced, borderwidth=5, relief=RAISED)
     troubleshootingFrame3 = Frame(troubleshootingHostFrame2)
+    troubleshootingFrame4 = Frame(troubleshootingHostFrame2)
 
-    offsetSlider = Scale(troubleshootingFrame3, label='Pump-Scare Offset', orient='horizontal', variable=pumpScareOffsetVar, to=50)
+    offsetSlider = Scale(troubleshootingFrame3, label='Pump-Scare Offset', orient='horizontal', variable=pumpScareOffsetVar, to=50, width=10)
     scareOffsetButton = Button(troubleshootingFrame3, text='Manual offset...', command=lambda: assign(pumpScareOffsetVar, simpledialog.askinteger('Offset for Pump-Scare Audio (seconds)', prompt='[0-50]: ')), cursor='question_arrow')
+
+    toggleVLC = Checkbutton(troubleshootingFrame4, text='Use VLC to play videos', variable=vlcModeVar, cursor='question_arrow')
+    VLCNotice = Label(troubleshootingFrame4, text='NOTE: Installing VLC is required for this option!', width=10)
+    installVLCButton = Button(troubleshootingFrame4, text='Go to VLC\'s website', command=lambda: webbrowser.open('https://www.videolan.org/vlc/'))
 
     troubleshootingHostFrame2.pack(fill='x')
     troubleshootingFrame3.pack(fill='both', side='left', expand=1)
-    offsetSlider.pack(fill='x', side='top', padx=2, pady=2)
-    scareOffsetButton.pack(fill='x', side='top', padx=2, pady=2)
+    offsetSlider.pack(fill='x', side='top', padx=2)
+    scareOffsetButton.pack(fill='x', side='top', padx=2)
+    troubleshootingFrame4.pack(fill='both', side='left', expand=1)
+    toggleVLC.pack(fill='both', side='top', expand=1, padx=2)
+    VLCNotice.pack(fill='both', side='top', expand=1, padx=2)
+    installVLCButton.pack(fill='both', side='top', padx=2)
 
     lanczosttp = CreateToolTip(toggleLanczos, 'Are popups and the startup image inexplicably not showing up for you? Try this setting.\n\n'
                                 'I am not entirely sure why, but the Lanczos image resizing algorithm sometimes works for people when the antialiasing one does not.\n\n'
@@ -1918,6 +1934,12 @@ def show_window():
                                     'sometimes audio files are large enough that the audio won\'t even have a chance to load in before the image disappears.\n\nThis setting allows you to let the audio '
                                     'start playing earlier so it has time to load properly. Maybe you also have an audio file that builds up to a horny crecendo and want the image to appear at that point? '
                                     'You could get creative with this!')
+    vlcttp = CreateToolTip(toggleVLC, 'Going to get a bit technical here:\n\nBy default, EdgeWare loads videos by taking the source file, turning every frame into an image, and then playing the images in '
+                                    'sequence at the specified framerate. The upside to this is it requires no additional dependencies, but it has multiple downsides. Firstly, it\'s very slow: you may have '
+                                    'noticed that videos take a while to load and also cause excessive memory usage. Secondly, there is a bug that can cause certain users to not have audio while playing videos.'
+                                    '\n\nSo here\'s an alternative: by installing VLC to your computer and using this option, you can make videos play much faster and use less memory by using libvlc. '
+                                    'If videos were silent for you this will hopefully fix that as well.\n\nPlease note that this feature has the potential to break in the future as VLC is a program independent '
+                                    'from EdgeWare. For posterity\'s sake, the current version of VLC as of writing this tooltip is 3.0.20.')
 
     Label(tabAdvanced, text='Errors', font='Default 13', relief=GROOVE).pack(pady=2)
     errorsFrame = Frame(tabAdvanced, borderwidth=5, relief=GROOVE)

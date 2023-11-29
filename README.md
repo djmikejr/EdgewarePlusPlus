@@ -20,6 +20,8 @@ The EdgeWare++ Pack Editor is now live [here](https://github.com/araten10/Edgewa
 
 •*Toggle that switches from antialiasing to lanczos, if Edgeware wasn't displaying popups for you this will fix that! (probably)*
 
+•*Toggle that allows you to play videos with VLC, which not only loads faster but also should fix audio issues*
+
 •*Toggle to enable/disable desktop icon generation*
 
 •*Ability to cap audio/video popups if so desired, audio was previously limited to 1 and videos were uncapped*
@@ -88,6 +90,18 @@ Suggestions I got from people who used the software and I thought would be inter
 •+0.5-0.25 to version number: new feature, but a smaller one or something not as essential, or lots of bugfixes
 
 •+0.2-0.1 to version number: very small update, usually just a bugfix, accessibility options, UI tweaks
+
+**Version 7.5**
+
+Was given a potential solution for fixing video issues that people have been having since the original EdgeWare, and decided to take it. Releasing a short-but-hopefully-sweet update to patch it.
+
+•*Added a new mode for video playback: using VLC to play videos. Toggle it on/off in the troubleshooting tab.*
+>You must have VLC installed for this. This should help people who were having audio issues with videos and it's also a lot faster to load.
+
+•*Trialing a new "more consistent popup experience" by making it so popups can only "roll" once per spawn. This mostly affects having videos or audio at very high percentage values- before the change they would also be accompanied by a regular popup. Currently only enabled for hibernate mode*
+>I kind of like the randomized-ish experience of having potentially more popups than expected, but also for things like hibernate mode you probably want something more consistent. I'll keep it on hibernate only for now while I consider what I want to do with this.
+
+•*Worth bringing up even though it was added slightly before: merged a pull request from a fine contributor that allows for non-animated gifs to be used properly!*
 
 **Version 7.2**
 
