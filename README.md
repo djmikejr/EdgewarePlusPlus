@@ -52,6 +52,8 @@ The EdgeWare++ Pack Editor is now live [here](https://github.com/araten10/Edgewa
 
 •*Adding functionality to moods, allowing you to toggle them off/on*
 
+•*"Single Mode", allowing only one popup to spawn per popup roll, making for a more consistent experience if desired*
+
 ## Planned Additions:
 
 •*Dark Mode*
@@ -82,6 +84,12 @@ Suggestions I got from people who used the software and I thought would be inter
 
 •*More "classic virus"-y popup options, like [moving popups](https://www.youtube.com/watch?v=LSgk7ctw1HY)*
 
+## Packs
+
+[**EdgeWare++ Test Pack**](https://mega.nz/file/0acUQarB#QNyaZPkGYOGQgOi_W-up6n14rv_w8NSP-hN16qczC44)
+**Version: 1**
+A test pack featuring a sampler of all (finished) features found in EdgeWare++, and the pack i've been using to test functionality in. Some features are not complete and will be patched in as time goes on.
+
 ## EdgeWare++ Patch Notes
 **If you see that there's a new update and are somebody (like me) who is lazy and doesn't like installing every single update if unnecessary, here is how I do versioning:**
 
@@ -90,6 +98,59 @@ Suggestions I got from people who used the software and I thought would be inter
 •+0.5-0.25 to version number: new feature, but a smaller one or something not as essential, or lots of bugfixes
 
 •+0.2-0.1 to version number: very small update, usually just a bugfix, accessibility options, UI tweaks
+
+**Version 8b**
+
+Uwaaaaaaaaa! Mood blocking is here finally~!
+
+I am putting "b" for "beta" at the end of this version, because admittedly I am rushing this update out. I changed a lot and added a lot, but won't be able to test this as much as i'd like- I am leaving the house for holidays, and I know coming back I will not be in the same mindset. So I wanted to get this update out before I go, even if it's potentially buggy with some issues. Do not hesitate to download an older version or keep your previous version of edgeware as a backup, just in case.
+
+I originally planned for this to be a small update, but things kept getting added and I got closer and closer to implementing moods. While I am away I will not be able to work on EdgeWare, but any bug reports or issues I hear about I will do my best to fix ASAP as soon as I get back. I want to do a cleanup update next to try and fix some things.
+
+•*Custom loading splashes now support .gif (won't animate, sorry), .bmp, and .jpg/jpeg*
+>I tried to make animated gifs work, but couldn't figure out how to bugfix infinite iteration errors- I commented out the code but kept it in, in case I come back to fix it later (or somebody else does).
+
+•*Added web moods. No pack will currently support it, but the functionality is there for future packs. It is* **HIGHLY** *recommended you delete all previous mood files to let the newer versions populate with web features.*
+>Admittedly only reason I didn't add it before now is because I never use web links and totally forgot...
+
+•*Added "id" to info.json- apologies to the two people who have already made edgeware++ packs. Use it for hooking into moods similar to how the name of the pack used to do. No spaces or special characters, or else it won't work!*
+>Decided to nip this in the bud and add it in- if people put spaces in their pack name (incredibly common) or other non-accepted characters, it would mess up a lot of things down the line. Instead of forcing people to do certain naming conventions, the better option would be to split the mood ID and the name into two separate values.
+
+•*Added info.json and media.json template files to "example assets", if you want to make packs with them before the pack editor update. Also updated older example files.*
+>corruption.json will come in future updates when I finish implementing it fully
+
+•*Prompts, captions, and media (if set up) can now be blocked by mood.*
+>The only thing that can't currently be blocked by mood is weblinks, but that's fine because it's a new feature that won't be supported by any pack. I wanted to get it fixed before this update came out, but ran out of time unfortunately. Will be patched in to a later update.
+
+•*Added "Single Mode" in the annoyance tab, a toggleable option to only allow one popup to spawn per popup roll. Removed single mode being auto-enabled during hibernate mode.*
+>See version 7.5 patch notes for more information on what this entails
+
+•*Made the config window much taller, and changed some things to have the "Save and Exit"/"Resources" buttons more reliably show up.*
+>I can't imagine using all this space, but I wanted to increase it as things were getting pretty claustrophobic and I didn't want to have to compromise features to fit it all in there.
+>I know that some users might be running EdgeWare on lower res displays and don't want the config screen so big- you can still freely resize the config window to fit it back to it's older resolution. For those who are running EdgeWare on your 320x240 arcade cabinet displays (god bless you), I have purposefully made these the first settings on the "File" tab so you can access them there. If I get around to programming themes into EdgeWare I will consider an ultra-compact theme for this...!
+
+•*Renamed the "Advanced/Troubleshooting" tab to just "Troubleshooting", mainly to save space on the tab bar*
+>I plan to at least add one more tab (expanding corruption to it's own menu), so I want to keep people with smaller monitors in mind.
+
+•*Added the Corruption tab, for the next major update, coming soon...*
+
+•*Fixed video volume not working on VLC mode*
+
+•*Fixed VLC videos not looping*
+
+•*Edited the web.json file in "example assets" to correlate with this change.*
+
+•*Some backend changes and cleaning, shouldn't affect anything for the end user (hopefully)*
+
+•*Fixed a bug that made it so EdgeWare++ packs wouldn't have their moods properly set*
+
+•*A few more tooltips here and there, you know how it is*
+
+•*Added version 1.0 of Edgeware++ Test Pack.*
+
+KNOWN ISSUES:
+
+•*VLC can potentially not work if the PATH is not set to VLC. Currently not sure how to fix this issue, but will look into it. You can manually set the PATH yourself to the vlc directory.*
 
 **Version 7.55**
 

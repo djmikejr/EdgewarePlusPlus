@@ -108,6 +108,11 @@ DENIAL_CHANCE = 0
 SUBLIMINAL_MODE = False
 SUBLIMINAL_CHANCE = 100
 MAX_SUBLIMINALS = 200
+LANCZOS_MODE = True
+BUTTONLESS = False
+HIBERNATE_MODE = False
+MOOD_OFF = True
+MOOD_FILENAME = True
 
 with open(PATH + '\\config.cfg', 'r') as cfg:
     settings = json.loads(cfg.read())
@@ -139,6 +144,7 @@ with open(PATH + '\\config.cfg', 'r') as cfg:
 
     BUTTONLESS = check_setting('buttonless')
 
+
     HIBERNATE_MODE = check_setting('hibernateMode')
 
     if HIBERNATE_MODE:
@@ -147,9 +153,24 @@ with open(PATH + '\\config.cfg', 'r') as cfg:
                 HIBERNATE_TYPE = ct.read()
         else:
             HIBERNATE_TYPE = settings['hibernateType']
+    if SYS_ARGS:
+        MOOD_OFF = check_setting('toggleMoodSet')
 
-    MOOD_MODE = check_setting('toggleMoodSet')
+    MOOD_FILENAME = check_setting('captionFilename')
 
+#take out first arg and make it into the mood ID
+MOOD_ID = '0'
+if not MOOD_OFF:
+    MOOD_ID = SYS_ARGS[0].strip('-')
+    SYS_ARGS.pop(0)
+
+if MOOD_ID != '0':
+    if os.path.exists(PATH + f'\\moods\\{MOOD_ID}.json'):
+        with open(PATH + f'\\moods\\{MOOD_ID}.json', 'r') as f:
+            moodData = json.loads(f.read())
+    elif os.path.exists(PATH + f'\\moods\\unnamed\\{MOOD_ID}.json'):
+        with open(PATH + f'\\moods\\unnamed\\{MOOD_ID}.json', 'r') as f:
+            moodData = json.loads(f.read())
 
 
 #functions for script mode, unused for now
@@ -183,7 +204,19 @@ if WEB_OPEN:
     if os.path.exists(PATH + '\\resource\\web.json'):
         with open(PATH + '\\resource\\web.json', 'r') as web_file:
             web_dict = json.loads(web_file.read())
+            #web_mood_dict = web_dict
 
+        #if not MOOD_OFF:
+            #try:
+                #for i, mood in enumerate(web_dict['moods']):
+                    #if mood not in moodData['web']:
+                        #web_mood_dict['urls'].pop(i)
+                        #web_mood_dict['args'].pop(i)
+                        #web_mood_dict['moods'].pop(i)
+                #messagebox.showinfo('test', f'{web_mood_dict}, {type(web_mood_dict)}')
+            #except Exception as e:
+                #messagebox.showinfo('test', f'{e}')
+                #print('error loading web moods, or web moods not supported in pack.')
 try:
     with open(PATH + '\\resource\\CAPTIONS.json', 'r') as caption_file:
         CAPTIONS = json.loads(caption_file.read())
@@ -271,14 +304,28 @@ class VideoLabel(tk.Label):
 
 def run():
     #var things
-    arr = os.listdir(f'{os.path.abspath(os.getcwd())}\\resource\\img\\')
-    item = arr[rand.randrange(len(arr))]
-    video_mode = False
+    if MOOD_ID != '0' and os.path.exists(os.path.join(PATH, 'resource', 'media.json')):
+        try:
+            arr = []
+            with open(PATH + f'\\data\\media_images.dat', 'r') as f:
+                arr = json.loads(f.read())
+            #arr = os.listdir(f'{os.path.abspath(os.getcwd())}\\resource\\img\\')
+            item = arr[rand.randrange(len(arr))]
+        except:
+            print(f'failed to run mood check, reason:\n\t{e}')
+    else:
+        arr = os.listdir(f'{os.path.abspath(os.getcwd())}\\resource\\img\\')
+        item = arr[rand.randrange(len(arr))]
 
+    video_mode = False
     while item.split('.')[-1].lower() == 'ini':
         item = arr[rand.randrange(len(arr))]
     if len(SYS_ARGS) >= 1 and SYS_ARGS[0] != '%RAND%':
-        item = rand.choice(os.listdir(os.path.join(PATH, 'resource', 'vid')))
+        if MOOD_ID != '0' and os.path.exists(os.path.join(PATH, 'resource', 'media.json')):
+            with open(PATH + '\\data\\media_video.dat', 'r') as f:
+                item = rand.choice(json.loads(f.read()))
+        else:
+            item = rand.choice(os.listdir(os.path.join(PATH, 'resource', 'vid')))
     if len(SYS_ARGS) >= 1 and SYS_ARGS[0] == '-video':
         video_mode = True
 
@@ -346,16 +393,11 @@ def run():
 
     #different handling for videos vs gifs vs normal images
     if video_mode:
-        #quick and dirty hack, if this needs to get more complicated would likely be better suited as a class
         if len(SYS_ARGS) >= 2 and SYS_ARGS[1] == '-vlc':
+            #vlc mode
             label = Label(root, width=resized_image.width, height=resized_image.height)
             label.pack()
-            instance = vlc.Instance()
-            player = instance.media_player_new()
-            media = instance.media_new(video_path)
-            player.set_hwnd(label.winfo_id())
-            player.set_media(media)
-            player.play()
+            startVLC(video_path, label)
         else:
             #video mode
             label = VideoLabel(root)
@@ -452,6 +494,18 @@ def run():
     root.attributes('-alpha', OPACITY / 100)
     root.mainloop()
 
+def startVLC(vid, label):
+    #word of advice: if you go messing around with python-vlc there's almost no documentation for it
+    #this is a hack that will repeat the video 999,999 times, because I tried to find something less terrible for hours but couldn't
+    instance = vlc.Instance('--input-repeat=999999')
+    media_player = instance.media_player_new()
+    media_player.set_hwnd(label.winfo_id())
+    media_player.audio_set_volume(int(VIDEO_VOLUME*100))
+
+    media = instance.media_new(vid)
+    media_player.set_media(media)
+    media_player.play()
+
 def check_deny() -> bool:
     return DENIAL_MODE and rand.randint(1, 100) <= DENIAL_CHANCE
 
@@ -497,13 +551,17 @@ def do_roll(mod:int):
     return mod > rand.randint(0, 100)
 
 def select_url(arg:str):
+    #if MOOD_OFF:
     return web_dict['urls'][arg] + web_dict['args'][arg].split(',')[rand.randrange(len(web_dict['args'][arg].split(',')))]
+    #else:
+        #return web_mood_dict['urls'][arg] + web_mood_dict['args'][arg].split(',')[rand.randrange(len(web_mood_dict['args'][arg].split(',')))]
 
 def buttonless_die(event):
     die()
 
 def die():
     if WEB_OPEN and web_dict and do_roll((100-WEB_PROB) / 2) and not LOWKEY_MODE:
+        messagebox.showinfo('test', f'{web_mood_dict}')
         urlPath = select_url(rand.randrange(len(web_dict['urls'])))
         webbrowser.open_new(urlPath)
     if MITOSIS_MODE or LOWKEY_MODE:
@@ -534,10 +592,23 @@ def die():
 
 def select_caption(filename:str) -> str:
     for obj in CAPTIONS['prefix']:
-        if filename.startswith(obj):
-            ls = CAPTIONS[obj]
-            ls.extend(CAPTIONS['default'])
-            return ls[rand.randrange(0, len(CAPTIONS[obj]))]
+        if MOOD_FILENAME:
+            if MOOD_ID != '0':
+                if filename.startswith(obj) and obj in moodData['captions']:
+                    ls = CAPTIONS[obj]
+                    ls.extend(CAPTIONS['default'])
+                    return ls[rand.randrange(0, len(CAPTIONS[obj]))]
+            else:
+                if filename.startswith(obj):
+                    ls = CAPTIONS[obj]
+                    ls.extend(CAPTIONS['default'])
+                    return ls[rand.randrange(0, len(CAPTIONS[obj]))]
+        else:
+            if MOOD_ID != '0':
+                if obj in moodData['captions']:
+                    ls = CAPTIONS[obj]
+                    ls.extend(CAPTIONS['default'])
+                    return ls[rand.randrange(0, len(CAPTIONS[obj]))]
     return CAPTIONS['default'][rand.randrange(0, len(CAPTIONS['default']))] if (len(CAPTIONS['default']) > 0) else None
 
 def panic(key):

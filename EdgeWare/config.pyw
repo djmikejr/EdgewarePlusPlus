@@ -103,10 +103,10 @@ WALLPAPER_TEXT          = 'The Wallpaper section allows you to set up rotating w
 HIBERNATE_TEXT          = 'The Hibernate feature is an entirely different mode for Edgeware to operate in.\nInstead of constantly shoving popups, lewd websites, audio, and prompts in your face, hibernate starts quiet and waits for a random amount of time between its provided min and max before exploding with a rapid assortment of your chosen payloads. Once it finishes its barrage, it settles back down again for another random amount of time, ready to strike again when the time is right.\n\n\nThis feature is intend to be a much "calmer" way to use Edgeware; instead of explicitly using it to edge yourself or get off, it\'s supposed to lie in wait for you and perform bursts of self-sabotage to keep drawing you back to porn.\n\n In EdgeWare++, the hibernate function has been expanded with two key features: fix wallpaper and hibernate types. Fix wallpaper is fairly straightforward, it changes your wallpaper back to your panic wallpaper after hibernate is finished. Hibernate types are a bit more complicated, as each one changes the the way hibernate handles payloads. There is a short-form description next to the dropdown menu for quick reference, but you can check the about tab labelled \"Hibernate Types\" for a more detailed description of each type. Also, if you wish to trial out any of these types and don\'t want to wait, you can enable the \"Toggle Tray Hibernate Skip\" option in the troubleshooting tab to immediately skip to hibernate starting, on command.'
 HIBERNATE_TYPE_TEXT     = 'Check the \"Hibernate\" about tab for more information on what this is and how it works.\n\nOriginal: The original hibernate type that came with base EdgeWare. Spawns a barrage of popups instantly, the max possible amount is based on your awaken activity.\n\nSpaced: Essentially runs EdgeWare normally, but over a brief period of time before ceasing generation of new popups. Because of this awaken activity isn\'t used, instead popup delay is looked at for frequency of popups.\n\nGlitch: Creates popups at random-ish intervals over a period of time. The total amount of popups spawned is based on the awaken activity. Perfect for those who want a \'virus-like\' experience, or just something different every time.\n\nRamp: Similar to spaced, only the popup frequency gets faster and faster over the hibernate length. After reaching the max duration, it will spawn a number of popups equal to the awaken activity at a speed slightly faster than your popup delay. Best used with long hibernate length values and fairly short popup delay. (keep in mind that if the popup delay is too short though, popups can potentially not appear or lag behind)\n\nPump-Scare: Do you like haunted houses or scary movies? Don\'t you wish that instead of screamers and jumpscares, they had porn pop out at you instead? This is kind of like that. When hibernate is triggered a popup with audio will appear for around a second or two, then immediately disappear. This works best on packs with short, immediate audio files: old EdgeWare packs that contain half-hour long hypno files will likely not reach meaningful audio in time. Large audio files can also hamper effectiveness of the audio and lead to desync with the popup.\n\nChaos: Every time hibernate activates, it randomly selects any of the other hibernate modes.'
 CORRUPTION_TEXT         = 'This is a feature not currently implemented in the release version of EdgeWare. But it will be soon! Feel free to slide the sliders around and press some buttons. It currently won\'t do anything but sometimes just feels good to do.'
-ADVANCED_TEXT           = 'The Advanced section is also something previously only accessible by directly editing the config.cfg file. It offers full and complete customization of all setting values without any limitations outside of variable typing.\n\n\nPlease use this feature with discretion, as any erroneous values will result in a complete deletion and regeneration of the config file from the default, and certain value ranges are likely to result in crashes or unexpected glitches in the program.'
+ADVANCED_TEXT           = 'The "Debug Config Edit" section is also something previously only accessible by directly editing the config.cfg file. It offers full and complete customization of all setting values without any limitations outside of variable typing.\n\n\nPlease use this feature with discretion, as any erroneous values will result in a complete deletion and regeneration of the config file from the default, and certain value ranges are likely to result in crashes or unexpected glitches in the program.\n\nOtherwise, the Troubleshooting tab is fairly self explanatory. All features here will hopefully help issues you might have while running EdgeWare. If you didn\'t already know, you can hover over any option that gives your cursor a "question mark sign" to get a more detailed description of what it does.'
 THANK_AND_ABOUT_TEXT    = '[NOTE: this is the thanks page from the original EdgeWare. I didn\'t want to replace/remove it and erase credit to the original creator! Sorry if this caused confusion!]\n\nThank you so much to all the fantastic artists who create and freely distribute the art that allows programs like this to exist, to all the people who helped me work through the various installation problems as we set the software up (especially early on), and honestly thank you to ALL of the people who are happily using Edgeware. \n\nIt truly makes me happy to know that my work is actually being put to good use by people who enjoy it. After all, at the end of the day that\'s really all I\'ve ever really wanted, but figured was beyond reach of a stupid degreeless neet.\nI love you all <3\n\n\n\nIf you like my work, please feel free to help support my neet lifestyle by donating to $PetitTournesol on Cashapp; by no means are you obligated or expected to, but any and all donations are greatly appreciated!'
 
-PLUSPLUS_TEXT           = 'Thanks for taking the time to check out this extension on EdgeWare! However you found it, I appreciate that it interested you enough to give it a download.\n\nI am not an expert programmer by any means, so apologies if there are any bugs or errors in this version. My goal is to not do anything crazy ambitious like rewrite the entire program or fix up the backend, but rather just add on functionality that I thought could improve the base version. Because of this, i\'m hoping that compatability between those who use normal EdgeWare and those who use this version stays relatively stable.\n\nCurrent changes:\n\n•Added a option under "misc" to enable/disable desktop icon generation.\n•Added options to cap the number of audio popups and video popups.\n•Added a chance slider for subliminals, and a max subliminals slider.\n•Added feature to change Startup Graphic and Icon per pack. (name the file(s) \"loading_splash.png\" and/or \"icon.ico\" in the resource folder)\n•Added feature to enable warnings for \"Dangerous Settings\".\n•Added hover tooltips on some things to make the program easier to understand.\n•Added troubleshooting tab under \"advanced\" with some settings to fix things for certain users.\n•Added feature to click anywhere on popup to close.\n•Made the EdgewareSetup.bat more clear with easier to read text. Hopefully if you\'re seeing this it all worked out!\n•Moved the import/export resources button to be visible on every page, because honestly they\'re pretty important\n•Added the \"Pack Info\" tab with lots of fun goodies and stats so you know what you\'re getting into with each pack.\n•Added a simplified error console in the \"advanced\" tab.\n•Overhauled Hibernate with a bunch of new modes and features\n•Added file tab with multiple file management settings\n•Added feature to enable or disable moods (feature in regular edgeware that went unused afaik)\n•Added corruption. What is it? Dont worry about it.'
+PLUSPLUS_TEXT           = 'Thanks for taking the time to check out this extension on EdgeWare! However you found it, I appreciate that it interested you enough to give it a download.\n\nI am not an expert programmer by any means, so apologies if there are any bugs or errors in this version. My goal is to not do anything crazy ambitious like rewrite the entire program or fix up the backend, but rather just add on functionality that I thought could improve the base version. Because of this, i\'m hoping that compatability between those who use normal EdgeWare and those who use this version stays relatively stable.\n\nCurrent changes:\n\n•Added a option under "misc" to enable/disable desktop icon generation.\n•Added options to cap the number of audio popups and video popups.\n•Added a chance slider for subliminals, and a max subliminals slider.\n•Added feature to change Startup Graphic and Icon per pack. (name the file(s) \"loading_splash\" and/or \"icon.ico\" in the resource folder)\n•Added feature to enable warnings for \"Dangerous Settings\".\n•Added hover tooltips on some things to make the program easier to understand.\n•Added troubleshooting tab under \"advanced\" with some settings to fix things for certain users.\n•Added feature to click anywhere on popup to close.\n•Made the EdgewareSetup.bat more clear with easier to read text. Hopefully if you\'re seeing this it all worked out!\n•Moved the import/export resources button to be visible on every page, because honestly they\'re pretty important\n•Added the \"Pack Info\" tab with lots of fun goodies and stats so you know what you\'re getting into with each pack.\n•Added a simplified error console in the \"advanced\" tab.\n•Overhauled Hibernate with a bunch of new modes and features\n•Added file tab with multiple file management settings\n•Added feature to enable or disable moods (feature in regular edgeware that went unused afaik)\n•Added corruption. What is it? Dont worry about it.\n•Added support to playing videos in VLC, enabling faster loading.\n'
 PACKINFO_TEXT          = 'The pack info section contains an overview for whatever pack is currently loaded.\n\nThe \"Stats\" tab allows you to see what features are included in the current pack (or if a pack is even loaded at all), but keep in mind all of these features have default fallbacks if they aren\'t included. It also lets you see a lot of fun stats relating to the pack, including almost everything you\'ll encounter while using EdgeWare. Keep in mind that certain things having \"0\" as a stat doesn\'t mean you can\'t use it, for example, having 0 subliminals uses the default spiral and having 0 images displays a very un-sexy circle.\n\nThe \"Information\" tab gets info on the pack from //resource//info.json, which is a new addition to EdgeWare++. This feature was added to allow pack creators to give the pack a formal name and description without having to worry about details being lost if transferred from person to person. Think of it like a readme. Also included in this section is the discord status info, which gives what your discord status will be set to if that setting is turned on, along with the image. As of time of writing (or if I forget to update this later), the image cannot be previewed as it is \"hard coded\" into EdgeWare\'s discord application and accessed through the API. As I am not the original creator of EdgeWare, and am not sure how to contact them, the best I could do is low-res screenshots or the name of each image. I chose the latter. Because of this hard-coding, the only person i\'ve run into so far who use these images is PetitTournesol themselves, but it should be noted that anyone can use them as long as they know what to add to the discord.dat file. This is partially the reason I left this information in.\n\nThe \"Moods\" tab is where you can access mood settings and previews for the current pack. The left table shows information for media (linking moods to images, videos, etc), captions, and prompts, while the \"Corruption Path\" area shows how these moods correlate to corruption levels.'
 FILE_TEXT              = 'The file tab is for all your file management needs, whether it be saving things, loading things, deleting things, or looking around in config folders. The Preset window has also been moved here to make more room for general options.\n\nThere are only two things that aren\'t very self explanatory: deleting logs and unique IDs.\n\nWhile deleting logs is fairly straightforward, it should be noted that it will not delete the log currently being written during the session, so the \"total logs in folder\" stat will always display as \"1\".\n\nUnique IDs are a feature to help assist with saving moods. In short, they are a generated identifier that is used when saving to a \"moods json file\", which is tapped into when selecting what moods you want to see in the \"Pack Info\" tab. Unique IDs are only used if the pack does not have a \'info.json\' file, otherwise the pack name is just used instead. If you are rapidly editing a pack without info.json and want EdgeWare++ to stop generating new mood files, there is an option to disable it in the troubleshooting tab.\n\n When manually editing mood config jsons, you don\'t need to worry about how the unique ID is generated- the file tab will tell you what to look for. If you are curious though, here is the exact formula:\n\nnum_images + num_audio + num_video + wallpaper(y/n) + loading_splash(y/n) + discord_status(y/n) + icon(y/n) + corruption(y/n)\n\nFor example:\nA pack with 268 images, 7 audio, 6 videos, has a wallpaper, doesn\'t have a custom loading splash, has a discord status, doesn\'t have a custom icon, and doesn\'t have a corruption file, would generate \"26876wxdxx.json\" in //moods//unnamed (mood files go in unnamed when using unique IDs)'
 
@@ -135,6 +135,11 @@ if os.path.isfile(PATH + '\\resource\\info.json'):
         info_description = info_dict['description'] if info_dict['description'] else 'No description set.'
         info_creator = info_dict['creator'] if info_dict['creator'] else 'Anonymous'
         info_version = info_dict['version'] if info_dict['version'] else '1.0'
+        #id was added in later version, want to keep it backwards compatible without crashing and burning
+        if 'id' in info_dict:
+            info_id = info_dict['id'] if info_dict['id'] else '0'
+        else:
+            info_id = '0'
     except Exception as e:
         logging.warning(f'error copying info.json data to pack info page. {e}')
         errors_list.append('Could not use the info.json file for pack info!\n')
@@ -142,24 +147,43 @@ if os.path.isfile(PATH + '\\resource\\info.json'):
         info_description = INFO_DESCRIPTION_DEFAULT
         info_creator = INFO_CREATOR_DEFAULT
         info_version = INFO_VERSION_DEFAULT
+        info_id = '0'
 else:
     info_name = INFO_NAME_DEFAULT
     info_description = INFO_DESCRIPTION_DEFAULT
     info_creator = INFO_CREATOR_DEFAULT
     info_version = INFO_VERSION_DEFAULT
+    info_id = '0'
+
+#get loading splash
+try:
+    if os.path.isfile(PATH + '\\resource\\loading_splash.png'):
+        LOADING_PATH = '\\resource\\loading_splash.png'
+    elif os.path.isfile(PATH + '\\resource\\loading_splash.gif'):
+        LOADING_PATH = '\\resource\\loading_splash.gif'
+    elif os.path.isfile(PATH + '\\resource\\loading_splash.jpg'):
+        LOADING_PATH = '\\resource\\loading_splash.jpg'
+    elif os.path.isfile(PATH + '\\resource\\loading_splash.jpeg'):
+        LOADING_PATH = '\\resource\\loading_splash.jpeg'
+    elif os.path.isfile(PATH + '\\resource\\loading_splash.bmp'):
+        LOADING_PATH = '\\resource\\loading_splash.bmp'
+    else:
+        LOADING_PATH = '\\default_assets\\loading_splash.png'
+except:
+    LOADING_PATH = '\\default_assets\\loading_splash.png'
 
 UNIQUE_ID = '0'
 
 #creating a semi-parseable unique ID for the pack to make mood saving work, if the pack doesn't have an info.json file.
 #probably could have made it so the user manually has to save/load and not worried about this, but here we are
-if (info_name == INFO_NAME_DEFAULT) and os.path.exists(PATH + '\\resource\\'):
+if info_id == '0' and os.path.exists(PATH + '\\resource\\'):
     try:
         #already done the brunt of the work for getting these values in the pack info page, so i'm just using those again here. If this needs to be replaced, look there too
         im = str(len(os.listdir(PATH + '\\resource\\img\\'))) if os.path.exists(PATH + '\\resource\\img\\') else '0'
         au = str(len(os.listdir(PATH + '\\resource\\aud\\'))) if os.path.exists(PATH + '\\resource\\aud\\') else '0'
         vi = str(len(os.listdir(PATH + '\\resource\\vid\\'))) if os.path.exists(PATH + '\\resource\\vid\\') else '0'
         wa = 'w' if os.path.isfile(PATH + '\\resource\\wallpaper.png') else 'x'
-        sp = 's' if os.path.isfile(PATH + '\\resource\\loading_splash.png') else 'x'
+        sp = 's' if LOADING_PATH != '\\default_assets\\loading_splash.png' else 'x'
         di = 'd' if os.path.isfile(PATH + '\\resource\\discord.dat') else 'x'
         ic = 'i' if os.path.isfile(PATH + '\\resource\\icon.ico') else 'x'
         co = 'c' if os.path.isfile(PATH + '\\resource\\corruption.json') else 'x'
@@ -249,53 +273,31 @@ except Exception as e:
 
 pass_ = ''
 
-#creating the mood file if it doesn't exist
+
+MOOD_PATH = '0'
 if settings['toggleMoodSet'] != True:
     if UNIQUE_ID != '0' and os.path.exists(PATH + '\\resource\\'):
-        if not os.path.isfile(PATH + '\\moods\\unnamed\\' + UNIQUE_ID + '.json'):
-            logging.info(f'moods file does not exist, creating one using unique id {UNIQUE_ID}')
-            try:
-                with open(f'{PATH}\\moods\\unnamed\\{UNIQUE_ID}.json', 'w+') as mood:
-                    mood_dict = {"media": [], "captions": [], "prompts": []}
-
-                    if os.path.isfile(PATH + '\\resource\\media.json'):
-                        media_dict = ''
-                        with open(f'{PATH}\\resource\\media.json') as media:
-                            media_dict = json.loads(media.read())
-                            mood_dict["media"] += media_dict
-
-                    if os.path.isfile(PATH + '\\resource\\captions.json'):
-                        captions_dict = ''
-                        with open(f'{PATH}\\resource\\captions.json') as captions:
-                            captions_dict = json.loads(captions.read())
-                            if 'prefix' in captions_dict: del captions_dict['prefix']
-                            if 'subtext' in captions_dict: del captions_dict['subtext']
-                            mood_dict["captions"] += captions_dict
-
-                    if os.path.isfile(PATH + '\\resource\\prompt.json'):
-                        prompt_dict = ''
-                        with open(f'{PATH}\\resource\\prompt.json') as prompt:
-                            prompt_dict = json.loads(prompt.read())
-                            mood_dict["prompts"] += prompt_dict["moods"]
-
-                    content = json.dumps(mood_dict)
-                    mood.write(content)
-            except Exception as e:
-                logging.warning(f'error creating/populating mood json. {e}')
-                errors_list.append('Could not create the mood json file!\n')
+        MOOD_PATH = f'{PATH}\\moods\\unnamed\\{UNIQUE_ID}.json'
     elif UNIQUE_ID == '0' and os.path.exists(PATH + '\\resource\\'):
-        if not os.path.isfile(PATH + '\\moods\\' + info_name + '.json'):
-            logging.info(f'moods file does not exist, creating one using infoname id {info_name}')
-            try:
-                with open(f'{PATH}\\moods\\{info_name}.json', 'w+') as mood:
-                    mood_dict = {"media": [], "captions": [], "prompts": []}
+        MOOD_PATH = f'{PATH}\\moods\\{info_id}.json'
 
+    #creating the mood file if it doesn't exist
+    if MOOD_PATH != '0' and not os.path.isfile(MOOD_PATH):
+        logging.info(f'moods file does not exist, creating one using unique id {UNIQUE_ID}')
+        try:
+            with open(MOOD_PATH, 'w+') as mood:
+                mood_dict = {"media": [], "captions": [], "prompts": [], "web": []}
+
+                try:
                     if os.path.isfile(PATH + '\\resource\\media.json'):
                         media_dict = ''
                         with open(f'{PATH}\\resource\\media.json') as media:
                             media_dict = json.loads(media.read())
                             mood_dict["media"] += media_dict
+                except:
+                    logging.warning(f'media mood extraction failed.')
 
+                try:
                     if os.path.isfile(PATH + '\\resource\\captions.json'):
                         captions_dict = ''
                         with open(f'{PATH}\\resource\\captions.json') as captions:
@@ -303,17 +305,33 @@ if settings['toggleMoodSet'] != True:
                             if 'prefix' in captions_dict: del captions_dict['prefix']
                             if 'subtext' in captions_dict: del captions_dict['subtext']
                             mood_dict["captions"] += captions_dict
+                except:
+                    logging.warning(f'captions mood extraction failed.')
 
+                try:
                     if os.path.isfile(PATH + '\\resource\\prompt.json'):
                         prompt_dict = ''
                         with open(f'{PATH}\\resource\\prompt.json') as prompt:
                             prompt_dict = json.loads(prompt.read())
                             mood_dict["prompts"] += prompt_dict["moods"]
+                except:
+                    logging.warning(f'prompt mood extraction failed.')
 
-                    mood.write(json.dumps(mood_dict))
-            except Exception as e:
-                logging.warning(f'error creating/populating mood json. {e}')
-                errors_list.append('Could not create the mood json file!\n')
+                try:
+                    if os.path.isfile(PATH + '\\resource\\web.json'):
+                        web_dict = ''
+                        with open(f'{PATH}\\resource\\web.json') as web:
+                            web_dict = json.loads(web.read())
+                            for n in web_dict["moods"]:
+                                if n not in mood_dict["web"]:
+                                    mood_dict["web"].append(n)
+                except:
+                    logging.warning(f'web mood extraction failed.')
+
+                mood.write(json.dumps(mood_dict))
+        except Exception as e:
+            logging.warning(f'error creating/populating mood json. {e}')
+            errors_list.append('Could not create the mood json file!\n')
 
 def show_window():
     global settings, defaultSettings
@@ -322,7 +340,7 @@ def show_window():
     #window things
     root = Tk()
     root.title('Edgeware++ Config')
-    root.geometry('740x680')
+    root.geometry('740x800')
     try:
         root.iconbitmap(f'{PATH}default_assets\\config_icon.ico')
         logging.info('set iconbitmap.')
@@ -413,6 +431,8 @@ def show_window():
             toggleMoodSetVar    = BooleanVar(root, value=(int(settings['toggleMoodSet'])==1))
 
             buttonlessVar       = BooleanVar(root, value=(int(settings['buttonless'])==1))
+            captionFilenameVar  = BooleanVar(root, value=(int(settings['captionFilename'])==1))
+            singleModeVar       = BooleanVar(root, value=(int(settings['singleMode'])==1))
 
             corruptionModeVar         = BooleanVar(root, value=(int(settings['corruptionMode'])==1))
             corruptionTimeVar         = IntVar(root, value=int(settings['corruptionTime']))
@@ -421,6 +441,7 @@ def show_window():
             pumpScareOffsetVar        = IntVar(root, value=int(settings['pumpScareOffset']))
 
             vlcModeVar                = BooleanVar(root, value=(int(settings['vlcMode'])==1))
+
 
             #grouping for sanity's sake later
             in_var_group = [delayVar, popupVar, webVar, audioVar, promptVar, fillVar,
@@ -438,7 +459,7 @@ def show_window():
                             antiOrLanczosVar, toggleInternetVar, buttonlessVar, hibernateTypeVar,
                             hibernateLengthVar, fixWallpaperVar, toggleHibSkipVar, toggleMoodSetVar,
                             corruptionModeVar, corruptionTimeVar, pumpScareOffsetVar, corruptionFadeTypeVar,
-                            vlcModeVar]
+                            vlcModeVar, captionFilenameVar, singleModeVar]
 
             in_var_names = ['delay', 'popupMod', 'webMod', 'audioMod', 'promptMod', 'fill',
                             'fill_delay', 'replace', 'replaceThresh', 'start_on_logon',
@@ -454,7 +475,7 @@ def show_window():
                             'maxVideos', 'subliminalsChance', 'maxSubliminals', 'safeMode', 'antiOrLanczos',
                             'toggleInternet', 'buttonless', 'hibernateType', 'hibernateLength', 'fixWallpaper',
                             'toggleHibSkip', 'toggleMoodSet', 'corruptionMode', 'corruptionTime', 'pumpScareOffset',
-                            'corruptionFadeType', 'vlcMode']
+                            'corruptionFadeType', 'vlcMode', 'captionFilename', 'singleMode']
             break
         except Exception as e:
             messagebox.showwarning(
@@ -507,6 +528,7 @@ def show_window():
     tabGeneral   = ttk.Frame(None)          #general tab, will have current settings
     tabWallpaper = ttk.Frame(None)          #tab for wallpaper rotation settings
     tabAnnoyance = ttk.Frame(None)          #tab for popup settings
+    tabCorruption = ttk.Frame(None)          #tab for popup settings
     tabDrive     = ttk.Frame(None)          #tab for drive settings
     tabJSON      = ttk.Frame(None)          #tab for JSON editor (unused)
     tabAdvanced  = ttk.Frame(None)          #advanced tab, will have settings pertaining to startup, hibernation mode settings
@@ -740,7 +762,7 @@ def show_window():
     resourceFrame = Frame(root)
     exportResourcesButton = Button(resourceFrame, text='Export Resource Pack', command=exportResource)
     importResourcesButton = Button(resourceFrame, text='Import Resource Pack', command=lambda: importResource(root))
-    saveExitButton = Button(root, height=5, text='Save & Exit', command=lambda: write_save(in_var_group, in_var_names, safewordVar, True))
+    saveExitButton = Button(root, text='Save & Exit', command=lambda: write_save(in_var_group, in_var_names, safewordVar, True))
 
     #force reload button for debugging, only appears on DEV versions
     if local_version.endswith('DEV'):
@@ -824,13 +846,6 @@ def show_window():
                         '•Keep the config window open and press \"Perform Panic\"\n'
                         '•Use the panic desktop icon (if you kept those enabled)')
 
-    popupWebToggle= Checkbutton(popupHostFrame, text='Popup close opens web page', variable=popupWebVar)
-    toggleCaptionsButton = Checkbutton(popupHostFrame, text='Popup Captions', variable=captionVar)
-    toggleEasierButton = Checkbutton(popupHostFrame, text='Buttonless Closing Popups', variable=buttonlessVar, cursor='question_arrow')
-
-    buttonlessttp = CreateToolTip(toggleEasierButton, 'Disables the \"close button\" on popups and allows you to click anywhere on the popup to close it.\n\n'
-                                    'IMPORTANT: The panic keyboard hotkey will only work in this mode if you use it while *holding down* the mouse button over a popup!')
-
     timeoutToggle = Checkbutton(timeoutFrame, text='Popup Timeout', variable=timeoutPopupsVar, command=lambda: toggleAssociateSettings(timeoutPopupsVar.get(), timeout_group))
     timeoutSlider = Scale(timeoutFrame, label='Time (sec)', from_=1, to=120, orient='horizontal', variable=popupTimeoutVar)
 
@@ -859,11 +874,46 @@ def show_window():
     setPanicButtonButton.pack(fill='x')
     doPanicButton.pack(fill='x')
     panicDisableButton.pack(fill='x')
-    popupWebToggle.pack(fill='x')
-    toggleCaptionsButton.pack(fill='x')
-    toggleEasierButton.pack(fill='x')
     #popup frame handle end
 
+    #additional popup options, mostly edgeware++ stuff
+    popupOptionsFrame = Frame(tabAnnoyance, borderwidth=5, relief=RAISED)
+    popupOptionsSubFrame1 = Frame(popupOptionsFrame)
+    popupOptionsSubFrame2 = Frame(popupOptionsFrame)
+    popupOptionsSubFrame3 = Frame(popupOptionsFrame)
+
+    toggleCaptionsButton = Checkbutton(popupOptionsSubFrame1, text='Popup Captions', variable=captionVar, cursor='question_arrow')
+    popupWebToggle= Checkbutton(popupOptionsSubFrame1, text='Popup close opens web page', variable=popupWebVar)
+    toggleFilenameButton = Checkbutton(popupOptionsSubFrame2, text='Use filename for caption moods', variable=captionFilenameVar, cursor='question_arrow')
+    toggleEasierButton = Checkbutton(popupOptionsSubFrame2, text='Buttonless Closing Popups', variable=buttonlessVar, cursor='question_arrow')
+    toggleSingleButton = Checkbutton(popupOptionsSubFrame3, text='Single Popup Mode', variable=singleModeVar, cursor='question_arrow')
+
+    captionttp =  CreateToolTip(toggleCaptionsButton, 'Enables captions on popups. These are short segments of text written by the pack creator that adorn the top of each popup.')
+    captionfilenamettp =  CreateToolTip(toggleFilenameButton, 'When enabled, captions will try and match the filename of the image they attach to.\n\n'
+                                    'This is done using the start of the filename. For example, a mood named \"goon\" would match captions of that mood to popups '
+                                    'of images named things like \"goon300242\", \"goon-love\", \"goon_ytur8843\", etc.\n\n'
+                                    'This is how EdgeWare processed captions before moods were implemented fully in EdgeWare++. The reason you\'d turn this off, however, '
+                                    'is that if the mood doesn\'t match the filename, it won\'t display at all.\n\n For example, if you had a mood named \"succubus\", but '
+                                    'no files started with \"succubus\", the captions of that mood would never show up. Thus it is recommended to only turn this on if '
+                                    'the pack supports it.')
+    buttonlessttp = CreateToolTip(toggleEasierButton, 'Disables the \"close button\" on popups and allows you to click anywhere on the popup to close it.\n\n'
+                                    'IMPORTANT: The panic keyboard hotkey will only work in this mode if you use it while *holding down* the mouse button over a popup!')
+    singlettp = CreateToolTip(toggleSingleButton, 'The randomization in EdgeWare does not check to see if a previous \"roll\" succeeded or not when a popup is spawned.\n\n'
+                                    'For example, if you have audio, videos, and prompts all turned on, there\'s a very real chance you will get all of them popping up at the same '
+                                    'time if the percentage for each is high enough.\n\nThis mode ensures that only one of these types will spawn whenever a popup is created. It '
+                                    'delivers a more consistent experience and less double (or triple) popups.\n\nADVANCED DETAILS: The roll order for popups are as follows:\n'
+                                    'Web -> Video -> Audio -> Prompt -> Image\nTherefore, if every type of popup is at the same rate of appearing (and single mode is turned on), '
+                                    'web links will be slightly more common than videos, and videos slightly more common than audio, etc...')
+
+    popupOptionsFrame.pack(fill='x')
+    popupOptionsSubFrame1.pack(fill='y', side='left', expand=1)
+    popupOptionsSubFrame2.pack(fill='y', side='left', expand=1)
+    popupOptionsSubFrame3.pack(fill='y', side='left', expand=1)
+    toggleCaptionsButton.pack(fill='x')
+    popupWebToggle.pack(fill='x')
+    toggleFilenameButton.pack(fill='x')
+    toggleEasierButton.pack(fill='x')
+    toggleSingleButton.pack(fill='x')
     #other start
     otherHostFrame = Frame(tabAnnoyance, borderwidth=5, relief=RAISED)
 
@@ -983,8 +1033,10 @@ def show_window():
     maxSubliminalsScale.pack(fill='x', padx=1, expand=1)
     maxSubliminalsManual.pack(fill='x')
 
-    #corruption start
-    corruptionFrame = Frame(tabAnnoyance, borderwidth=5, relief=RAISED)
+    #===================={CORRUPTION}==============================#
+    tabMaster.add(tabCorruption, text='Corruption')
+
+    corruptionFrame = Frame(tabCorruption, borderwidth=5, relief=RAISED)
 
     corruptionSettingsFrame = Frame(corruptionFrame)
     corruptionTypeFrame = Frame(corruptionFrame)
@@ -1223,7 +1275,7 @@ def show_window():
         statusPack = True
         statusAbout = True if os.path.isfile(PATH + '\\resource\\info.json') else False
         statusWallpaper = True if os.path.isfile(PATH + '\\resource\\wallpaper.png') else False
-        statusStartup = True if os.path.isfile(PATH + '\\resource\\loading_splash.png') else False
+        statusStartup = True if LOADING_PATH != '\\default_assets\\loading_splash.png' else False
         statusDiscord = True if os.path.isfile(PATH + '\\resource\\discord.dat') else False
         statusIcon = True if os.path.isfile(PATH + '\\resource\\icon.ico') else False
         statusCorruption = True if os.path.isfile(PATH + '\\resource\\corruption.json') else False
@@ -1268,7 +1320,7 @@ def show_window():
     statusCorruptionFrameVarLabel.pack(padx=2, pady=2, side='top')
 
     statusStartupttp = CreateToolTip(statusStartupFrameVarLabel, 'If you are looking to add this to packs made before EdgeWare++,'
-                                        ' put the desired file in /resource/ and name it \"loading_splash.png\".')
+                                        ' put the desired file in /resource/ and name it \"loading_splash.png\" (also supports .gif, .bmp and .jpg/jpeg).')
     statusIconttp = CreateToolTip(statusIconFrameVarLabel, 'If you are looking to add this to packs made before EdgeWare++,'
                                         ' put the desired file in /resource/ and name it \"icon.ico\". (the file must be'
                                         ' a .ico file! make sure you convert properly!)')
@@ -1486,6 +1538,7 @@ def show_window():
     moodsMediaFrame = Frame(tabMoodsMaster)
     moodsCaptionsFrame = Frame(tabMoodsMaster)
     moodsPromptsFrame = Frame(tabMoodsMaster)
+    moodsWebFrame = Frame(tabMoodsMaster)
 
     moodsFrame.pack(fill='x')
     moodsListFrame.grid(row=0, column=0, sticky="nsew")
@@ -1493,13 +1546,15 @@ def show_window():
     moodsMediaFrame.pack(fill='both')
     moodsCaptionsFrame.pack(fill='both')
     moodsPromptsFrame.pack(fill='both')
+    moodsWebFrame.pack(fill='both')
 
     tabMoodsMaster.add(moodsMediaFrame, text='Media')
     tabMoodsMaster.add(moodsCaptionsFrame, text='Captions')
     tabMoodsMaster.add(moodsPromptsFrame, text='Prompts')
+    tabMoodsMaster.add(moodsWebFrame, text='Web')
 
         #Media frame
-    mediaTree = CheckboxTreeview(moodsMediaFrame, height=7, show='tree', name='captionsTree')
+    mediaTree = CheckboxTreeview(moodsMediaFrame, height=7, show='tree', name='mediaTree')
     mediaScrollbar = ttk.Scrollbar(moodsMediaFrame, orient=VERTICAL, command=mediaTree.yview)
     mediaTree.configure(yscroll=mediaScrollbar.set)
 
@@ -1517,7 +1572,7 @@ def show_window():
         except Exception as e:
             logging.warning(f'error in media.json. Aborting treeview load. {e}')
             errors_list.append('The media.json treeview couldn\'t load properly!\n')
-            mediaTree.insert('', 'end', id='NAer', text='Pack doesn\'t support media moods, or they\'re improperly configured!')
+            mediaTree.insert('', 'end', id='NAer', text='Pack doesn\'t support media moods, \nor they\'re improperly configured!')
             mediaTree.change_state('NAer', 'disabled')
     if len(mediaTree.get_children()) == 0:
         mediaTree.insert('', '0', iid='NAmi', text='No media moods found in pack!')
@@ -1525,9 +1580,9 @@ def show_window():
 
     if settings['toggleMoodSet'] != True:
         if len(mediaTree.get_children()) != 0:
-            if UNIQUE_ID != '0' and os.path.exists(PATH + '\\resource\\'):
+            if MOOD_PATH != '0' and os.path.exists(PATH + '\\resource\\'):
                 try:
-                    with open(f'{PATH}\\moods\\unnamed\\{UNIQUE_ID}.json', 'r') as mood:
+                    with open(MOOD_PATH, 'r') as mood:
                         mood_dict = json.loads(mood.read())
                         for c in mediaTree.get_children():
                             value = mediaTree.item(c, 'values')
@@ -1562,7 +1617,7 @@ def show_window():
         except Exception as e:
             logging.warning(f'error in captions.json. Aborting treeview load. {e}')
             errors_list.append('The captions.json treeview couldn\'t load properly!\n')
-            captionsTree.insert('', 'end', iid='NAer', text='Pack doesn\'t support caption moods, or they\'re improperly configured!')
+            captionsTree.insert('', 'end', iid='NAer', text='Pack doesn\'t support caption moods, \nor they\'re improperly configured!')
             captionsTree.change_state('NAer', 'disabled')
     if len(captionsTree.get_children()) == 0:
         captionsTree.insert('', '0', iid='NAmi', text='No caption moods found in pack!')
@@ -1570,9 +1625,9 @@ def show_window():
 
     if settings['toggleMoodSet'] != True:
         if len(captionsTree.get_children()) != 0:
-            if UNIQUE_ID != '0' and os.path.exists(PATH + '\\resource\\'):
+            if MOOD_PATH != '0' and os.path.exists(PATH + '\\resource\\'):
                 try:
-                    with open(f'{PATH}\\moods\\unnamed\\{UNIQUE_ID}.json', 'r') as mood:
+                    with open(MOOD_PATH, 'r') as mood:
                         mood_dict = json.loads(mood.read())
                         for c in captionsTree.get_children():
                             value = captionsTree.item(c, 'values')
@@ -1604,7 +1659,7 @@ def show_window():
         except Exception as e:
             logging.warning(f'error in prompt.json. Aborting treeview load. {e}')
             errors_list.append('The prompt.json treeview couldn\'t load properly!\n')
-            promptsTree.insert('', 'end', iid='NAer', text='Pack doesn\'t support prompt moods, or they\'re improperly configured!')
+            promptsTree.insert('', 'end', iid='NAer', text='Pack doesn\'t support prompt moods, \nor they\'re improperly configured!')
             promptsTree.change_state('NAer', 'disabled')
 
     if len(promptsTree.get_children()) == 0:
@@ -1613,9 +1668,9 @@ def show_window():
 
     if settings['toggleMoodSet'] != True:
         if len(promptsTree.get_children()) != 0:
-            if UNIQUE_ID != '0' and os.path.exists(PATH + '\\resource\\'):
+            if MOOD_PATH != '0' and os.path.exists(PATH + '\\resource\\'):
                 try:
-                    with open(f'{PATH}\\moods\\unnamed\\{UNIQUE_ID}.json', 'r') as mood:
+                    with open(MOOD_PATH, 'r') as mood:
                         mood_dict = json.loads(mood.read())
                         for c in promptsTree.get_children():
                             value = promptsTree.item(c, 'values')
@@ -1628,7 +1683,53 @@ def show_window():
 
     promptsTree.pack(side='left', fill='both', expand=1)
     promptsScrollbar.pack(side='left', fill='y')
+        #Web frame
+    webTree = CheckboxTreeview(moodsWebFrame, height=7, show='tree', name='webTree')
+    webScrollbar = ttk.Scrollbar(moodsWebFrame, orient=VERTICAL, command=webTree.yview)
+    webTree.configure(yscroll=webScrollbar.set)
 
+    if os.path.exists(PATH + '\\resource\\web.json'):
+        try:
+            with open(PATH + '\\resource\\web.json', 'r') as f:
+                l = json.loads(f.read())
+                webMoodList = ['default']
+                for m in l['moods']:
+                    if m == 'default':
+                        continue
+                    if m not in webMoodList:
+                        parent = webTree.insert('', 'end', iid=str(m), values=str(m), text=str(m))
+                        mCount = l['moods'].count(m)
+                        webTree.insert(parent, 'end', iid=(f'{m}desc'), text=(f'{mCount} web links related to this mood.'))
+                        webTree.change_state((f'{m}desc'), 'disabled')
+                        webMoodList.append(m)
+
+        except Exception as e:
+            logging.warning(f'error in web.json. Aborting treeview load. {e}')
+            errors_list.append('The web.json treeview couldn\'t load properly!\n')
+            webTree.insert('', 'end', iid='NAer', text='Pack doesn\'t support web moods, \nor they\'re improperly configured!')
+            webTree.change_state('NAer', 'disabled')
+
+    if len(webTree.get_children()) == 0:
+        webTree.insert('', '0', iid='NAmi', text='No web moods found in pack!')
+        webTree.change_state('NAmi', 'disabled')
+
+    if settings['toggleMoodSet'] != True:
+        if len(webTree.get_children()) != 0:
+            if MOOD_PATH != '0' and os.path.exists(PATH + '\\resource\\'):
+                try:
+                    with open(MOOD_PATH, 'r') as mood:
+                        mood_dict = json.loads(mood.read())
+                        for c in webTree.get_children():
+                            value = webTree.item(c, 'values')
+                            if value[0] in mood_dict["web"]:
+                                webTree.change_state(value[0], 'checked')
+                except Exception as e:
+                    logging.warning(f'error checking web treeview nodes. {e}')
+                    errors_list.append('The web treeview nodes couldn\'t finish their checking setup!\n')
+
+
+    webTree.pack(side='left', fill='both', expand=1)
+    webScrollbar.pack(side='left', fill='y')
 
     #corruption
 
@@ -1685,14 +1786,16 @@ def show_window():
 
     pathInnerFrame = Frame(moodsPathFrame)
     pathTree = ttk.Treeview(pathInnerFrame, height=6, show='headings', columns=('level', 'moods'))
-    pathScrollbar = ttk.Scrollbar(pathInnerFrame, orient=VERTICAL, command=pathTree.yview)
-    pathTree.configure(yscroll=pathScrollbar.set)
+    pathScrollbarY = ttk.Scrollbar(pathInnerFrame, orient='vertical', command=pathTree.yview)
+    pathScrollbarX = ttk.Scrollbar(pathInnerFrame, orient='horizontal', command=pathTree.xview)
+    pathTree.configure(yscroll=pathScrollbarY.set, xscroll=pathScrollbarX.set)
 
     pathTree.heading('level', text='LEVEL')
     pathTree.column('level', width=40, stretch=False, anchor='center')
-    pathTree.heading('moods', text='MOODS')
+    pathTree.heading('moods', text='MOODS', anchor='w')
 
     corruptionList = []
+    lineWidth = 0
     if statusCorruption:
         try:
             with open((PATH + '\\resource\\corruption.json'), 'r') as f:
@@ -1705,15 +1808,22 @@ def show_window():
             errors_list.append('Something is wrong with the currently loaded corruption.json file!\n')
         try:
             for level in corruptionList:
+                if sum(len(i) for i in level) > lineWidth:
+                    lineWidth = sum(len(i) for i in level)
                 pathTree.insert('', 'end', values=level)
         except Exception as e:
             logging.warning(f'error in loading corruption treeview. {e}')
             errors_list.append('The corruption treeview could not load properly!\n')
 
+    #just doing a magic number, long story short treeview is butts for horizontal scrolling
+    pathTree.column('moods', anchor='w', stretch=True, minwidth=int(lineWidth*5.5))
+
     moodsPathLabel.pack(pady=1, fill='x', side='top')
     pathInnerFrame.pack(fill='both', side='top')
+    pathScrollbarX.pack(side='bottom', fill='x')
     pathTree.pack(side='left', fill='both', expand=1)
-    pathScrollbar.pack(side='left', fill='y')
+    pathScrollbarY.pack(side='left', fill='y')
+
 
     moodsFrame.grid_columnconfigure(0, weight=1, uniform='group1')
     moodsFrame.grid_columnconfigure(1, weight=1, uniform='group1')
@@ -1774,8 +1884,8 @@ def show_window():
     moodsFileFrame = Frame(tabFile, borderwidth=5, relief=RAISED)
     mfSubFrame1 = Frame(moodsFileFrame)
     mfSubFrame2 = Frame(moodsFileFrame)
-    uniqueIDCheck = Label(mfSubFrame1, text=('Using Unique ID?: ' + ('✓' if (info_name == INFO_NAME_DEFAULT) else '✗')), fg=('green' if (info_name == INFO_NAME_DEFAULT) else 'red'))
-    uniqueIDLabel = Label(mfSubFrame1, text=('Your Unique ID is: ' + (UNIQUE_ID if (info_name == INFO_NAME_DEFAULT) else info_name)))
+    uniqueIDCheck = Label(mfSubFrame1, text=('Using Unique ID?: ' + ('✓' if (info_id == '0') else '✗')), fg=('green' if (info_id == '0') else 'red'))
+    uniqueIDLabel = Label(mfSubFrame1, text=('Your Unique ID is: ' + (UNIQUE_ID if (info_id == '0') else info_id)))
     openMoodsButton = Button(mfSubFrame2, height=2, text='Open Moods Folder', command=lambda: explorerView(os.path.join(PATH, 'moods')), cursor='question_arrow')
 
     openmoodsttp = CreateToolTip(openMoodsButton, 'If your currently loaded pack has a \"info.json\" file, it can be found under the pack name in this folder.\n\n'
@@ -1853,7 +1963,7 @@ def show_window():
     presetFrame.pack(fill='both', pady=2)
 
     #==========={IN HERE IS ADVANCED TAB ITEM INITS}===========#
-    tabMaster.add(tabAdvanced, text='Advanced/Troubleshooting')
+    tabMaster.add(tabAdvanced, text='Troubleshooting')
     itemList = []
     for settingName in settings:
         itemList.append(settingName)
@@ -1972,9 +2082,7 @@ def show_window():
     Label(tab_hibernate, text=HIBERNATE_TEXT, anchor='nw', wraplength=460).pack()
     tabInfoExpound.add(tab_hibernateType, text='Hibernate Types')
     Label(tab_hibernateType, text=HIBERNATE_TYPE_TEXT, anchor='nw', wraplength=460).pack()
-    tabInfoExpound.add(tab_corruption, text='Corruption')
-    Label(tab_corruption, text=CORRUPTION_TEXT, anchor='nw', wraplength=460).pack()
-    tabInfoExpound.add(tab_advanced, text='Advanced')
+    tabInfoExpound.add(tab_advanced, text='Troubleshooting')
     Label(tab_advanced, text=ADVANCED_TEXT, anchor='nw', wraplength=460).pack()
     tabInfoExpound.add(tab_thanksAndAbout, text='Thanks & About')
     Label(tab_thanksAndAbout, text=THANK_AND_ABOUT_TEXT, anchor='nw', wraplength=460).pack()
@@ -1984,6 +2092,8 @@ def show_window():
     Label(tab_packInfo, text=PACKINFO_TEXT, anchor='nw', wraplength=460).pack()
     tabInfoExpound.add(tab_file, text='File')
     Label(tab_file, text=FILE_TEXT, anchor='nw', wraplength=460).pack()
+    tabInfoExpound.add(tab_corruption, text='Corruption')
+    Label(tab_corruption, text=CORRUPTION_TEXT, anchor='nw', wraplength=460).pack()
     #==========={HERE ENDS  ABOUT TAB ITEM INITS}===========#
 
     toggleAssociateSettings(fillVar.get(), fill_group)
@@ -2006,7 +2116,7 @@ def show_window():
     resourceFrame.pack(fill='x')
     importResourcesButton.pack(fill='x', side='left', expand=1)
     exportResourcesButton.pack(fill='x', side='left', expand=1)
-    saveExitButton.pack(fill='both',expand=1)
+    saveExitButton.pack(fill='x')
 
 
     timeObjPath = os.path.join(PATH, 'hid_time.dat')
@@ -2481,37 +2591,48 @@ def updateMoods(type:str, id:str, check:bool):
     try:
         if settings['toggleMoodSet'] != True:
             if UNIQUE_ID != '0' and os.path.exists(PATH + '\\resource\\'):
-                with open(f'{PATH}\\moods\\unnamed\\{UNIQUE_ID}.json', 'r') as mood:
-                    mood_dict = json.loads(mood.read())
-                    if check:
-                        if type == 'mediaTree':
-                            #logging.info('mediaTree')
-                            if id not in mood_dict["media"]:
-                                mood_dict["media"].append(id)
-                        if type == 'captionsTree':
-                            #logging.info('captionsTree')
-                            if id not in mood_dict["captions"]:
-                                mood_dict["captions"].append(id)
-                        if type == 'promptsTree':
-                            #logging.info('promptsTree')
-                            if id not in mood_dict["prompts"]:
-                                mood_dict["prompts"].append(id)
-                    else:
-                        if type == 'mediaTree':
-                            #logging.info('mediaTree uncheck')
-                            if id in mood_dict["media"]:
-                                mood_dict["media"].remove(id)
-                        if type == 'captionsTree':
-                            #logging.info('captionsTree uncheck')
-                            if id in mood_dict["captions"]:
-                                mood_dict["captions"].remove(id)
-                        if type == 'promptsTree':
-                            #logging.info('promptsTree uncheck')
-                            if id in mood_dict["prompts"]:
-                                mood_dict["prompts"].remove(id)
-                with open(f'{PATH}\\moods\\unnamed\\{UNIQUE_ID}.json', 'w') as mood:
-                    #logging.info(mood_dict)
-                    mood.write(json.dumps(mood_dict))
+                moodUpdatePath = f'{PATH}\\moods\\unnamed\\{UNIQUE_ID}.json'
+            elif UNIQUE_ID == '0' and os.path.exists(PATH + '\\resource\\'):
+                moodUpdatePath = f'{PATH}\\moods\\{info_id}.json'
+            with open(moodUpdatePath, 'r') as mood:
+                mood_dict = json.loads(mood.read())
+                if check:
+                    if type == 'mediaTree':
+                        logging.info('mediaTree')
+                        if id not in mood_dict["media"]:
+                            mood_dict["media"].append(id)
+                    if type == 'captionsTree':
+                        #logging.info('captionsTree')
+                        if id not in mood_dict["captions"]:
+                            mood_dict["captions"].append(id)
+                    if type == 'promptsTree':
+                        #logging.info('promptsTree')
+                        if id not in mood_dict["prompts"]:
+                            mood_dict["prompts"].append(id)
+                    if type == 'webTree':
+                        #logging.info('promptsTree')
+                        if id not in mood_dict["web"]:
+                            mood_dict["web"].append(id)
+                else:
+                    if type == 'mediaTree':
+                        logging.info('mediaTree uncheck')
+                        if id in mood_dict["media"]:
+                            mood_dict["media"].remove(id)
+                    if type == 'captionsTree':
+                        #logging.info('captionsTree uncheck')
+                        if id in mood_dict["captions"]:
+                            mood_dict["captions"].remove(id)
+                    if type == 'promptsTree':
+                        #logging.info('promptsTree uncheck')
+                        if id in mood_dict["prompts"]:
+                            mood_dict["prompts"].remove(id)
+                    if type == 'webTree':
+                        #logging.info('webTree uncheck')
+                        if id in mood_dict["web"]:
+                            mood_dict["web"].remove(id)
+            with open(moodUpdatePath, 'w') as mood:
+                #logging.info(mood_dict)
+                mood.write(json.dumps(mood_dict))
     except Exception as e:
         logging.warning(f'error updating mood files. {e}')
 

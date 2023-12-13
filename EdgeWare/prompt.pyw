@@ -1,4 +1,5 @@
 import os
+import sys
 import pathlib
 import json
 import random as rand
@@ -6,16 +7,34 @@ import tkinter as tk
 from tkinter import messagebox
 from tkinter import *
 
+SYS_ARGS = sys.argv.copy()
+SYS_ARGS.pop(0)
+
+
 hasData = False
 textData = {}
 maxMistakes = 3
 submission_text = 'I Submit <3'
 command_text    = 'Type for me, slut~'
+moodData = {}
 PATH = str(pathlib.Path(__file__).parent.absolute())
 os.chdir(PATH)
 
+
 with open(PATH + '\\config.cfg') as settings:
     maxMistakes = int(json.loads(settings.read())['promptMistakes'])
+
+MOOD_ID = '0'
+if len(SYS_ARGS) >= 1 and SYS_ARGS[0] != '0':
+    MOOD_ID = SYS_ARGS[0].strip('-')
+
+if MOOD_ID != '0':
+    if os.path.exists(PATH + f'\\moods\\{MOOD_ID}.json'):
+        with open(PATH + f'\\moods\\{MOOD_ID}.json', 'r') as f:
+            moodData = json.loads(f.read())
+    elif os.path.exists(PATH + f'\\moods\\unnamed\\{MOOD_ID}.json'):
+        with open(PATH + f'\\moods\\unnamed\\{MOOD_ID}.json', 'r') as f:
+            moodData = json.loads(f.read())
 
 if os.path.exists(PATH + '\\resource\\prompt.json'):
     hasData = True
@@ -39,7 +58,7 @@ def unborderedWindow():
     root = Tk()
     label = tk.Label(root, text='\n' + command_text + '\n')
     label.pack()
-    
+
     txt = buildText()
 
     wid = root.winfo_screenwidth() / 4
@@ -65,11 +84,17 @@ def unborderedWindow():
 def buildText():
     moodList = textData['moods']
     freqList = textData['freqList']
+    if MOOD_ID != '0':
+        for i, mood in enumerate(moodList):
+            if mood not in moodData['prompts']:
+                del moodList[i-1]
+                del freqList[i-1]
     outputPhraseCount = rand.randint(int(textData['minLen']), int(textData['maxLen']))
     strVar = ''
     selection = rand.choices(moodList, freqList, k=1)
     for i in range(outputPhraseCount):
         strVar += textData[selection[0]][rand.randrange(0, len(textData[selection[0]]))] + ' '
+    #strVar += MOOD_ID
     return strVar.strip()
 
 def checkTotal(root, a, b):
