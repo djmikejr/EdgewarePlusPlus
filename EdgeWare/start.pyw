@@ -595,6 +595,8 @@ def main():
         thread.Thread(target=do_timer).start()
 
     #max value handling creation/cleaning
+    if not os.path.exists(PATH + '\\data\\'):
+        os.mkdir(PATH + '\\data\\')
     try:
         with open(PATH + '\\data\\max_videos.dat', 'w') as f:
             f.write('0')
@@ -754,8 +756,14 @@ def checkWallpaperStatus():
                             break
 
 #just checking %chance of doing annoyance options
-def do_roll(mod:int) -> bool:
-    return mod > rand.randint(0, 100)
+def do_roll(mod:float) -> bool:
+    if mod >= 100:
+        return True
+
+    if mod <= 0:
+        return False
+
+    return mod > (rand.random() * 100)
 
 #booru handling class
 class BooruDownloader:
@@ -1067,10 +1075,10 @@ def play_audio():
             pumpScareAudio.clear()
             p.terminate()
         else:
-            if MOOD_OFF:
-                ps.playsound(AUDIO[rand.randrange(len(AUDIO))])
-            else:
+            if not MOOD_OFF and os.path.exists(PATH + '\\resource\\media.json'):
                 ps.playsound(MOOD_AUDIO[rand.randrange(len(MOOD_AUDIO))])
+            else:
+                ps.playsound(AUDIO[rand.randrange(len(AUDIO))])
     except Exception as e:
         logging.warning(f'Could not play sound. {e}')
     #winsound.PlaySound(AUDIO[rand.randrange(len(AUDIO))], winsound.SND_)

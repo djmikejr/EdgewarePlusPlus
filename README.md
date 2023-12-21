@@ -99,6 +99,26 @@ A test pack featuring a sampler of all (finished) features found in EdgeWare++, 
 
 •+0.2-0.1 to version number: very small update, usually just a bugfix, accessibility options, UI tweaks
 
+**Version 8.2**
+
+Likely the last time I work on EdgeWare before the new year if I had to guess- you know, holiday stuff! Version 8 was more stable than I expected, having only one person report a bug that caused nothing to work. I fixed that, and also got around to adding another pull request in from TheoWinters that fixes some minor errors and adds new functionality to captions.
+
+•*Fixed a bug that made it so not having a "media.json" file threw errors unless you turned moods off.*
+
+•*Forgot to take out an error testing messagebox for people who used the "on popup close open weblink" option, it's gone now*
+
+•*Added some more error checking around importing VLC, in an attempt to make it less catastrophic if something goes wrong*
+
+•*Fixed VLC mode not letting you close popups if you were also using buttonless mode*
+
+•*Expanded captions.json to include several new features for pack creators. More information on this can be found [here](https://github.com/araten10/EdgewarePlusPlus/pull/3). Updated captions.json example in example assets as well.*
+>Note to self/other people who are trying to get these to work: if you leave the comments in, when you pu
+
+•*Likewise, added a feature in config that allows for multi-click popups*
+
+•*Testing out finally using a .gitignore file, so now I can actually work in the folder i'm using for github...*
+>I genuinely had zero experience with github before doing this project, I made this account purely for EdgeWare, so it was to be expected I also don't really understand how to have a sane and reasonable workflow with it. This won't affect anything on the frontend unless something slips through and I accidentally end up uploading porn
+
 **Version 8b**
 
 Uwaaaaaaaaa! Mood blocking is here finally~!
