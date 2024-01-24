@@ -14,7 +14,7 @@ import logging
 import time
 import textwrap
 import random as rand
-from tkinter import Tk, ttk, simpledialog, messagebox, filedialog, IntVar, BooleanVar, StringVar, Frame, Checkbutton, Button, Scale, Label, Toplevel, Entry, OptionMenu, Listbox, SINGLE, DISABLED, GROOVE, RAISED, Text, END, Scrollbar, VERTICAL
+from tkinter import Tk, ttk, simpledialog, messagebox, filedialog, IntVar, BooleanVar, StringVar, Frame, Checkbutton, Button, Scale, Label, Toplevel, Entry, OptionMenu, Listbox, SINGLE, DISABLED, GROOVE, RAISED, Text, END, Scrollbar, VERTICAL, font
 from tk_ToolTip_class101 import CreateToolTip
 
 PATH = f'{str(pathlib.Path(__file__).parent.absolute())}\\'
@@ -54,7 +54,8 @@ try:
     import ttkwidgets as tw
 except:
     pip_install('ttkwidgets')
-    import ttkwidgets as ttkw
+    import ttkwidgets as tw
+
 
 #if you are working on this i'm just letting you know there's like almost no documentation for ttkwidgets
 #source code is here https://github.com/TkinterEP/ttkwidgets/blob/master/ttkwidgets/checkboxtreeview.py
@@ -106,7 +107,7 @@ CORRUPTION_TEXT         = 'This is a feature not currently implemented in the re
 ADVANCED_TEXT           = 'The "Debug Config Edit" section is also something previously only accessible by directly editing the config.cfg file. It offers full and complete customization of all setting values without any limitations outside of variable typing.\n\n\nPlease use this feature with discretion, as any erroneous values will result in a complete deletion and regeneration of the config file from the default, and certain value ranges are likely to result in crashes or unexpected glitches in the program.\n\nOtherwise, the Troubleshooting tab is fairly self explanatory. All features here will hopefully help issues you might have while running EdgeWare. If you didn\'t already know, you can hover over any option that gives your cursor a "question mark sign" to get a more detailed description of what it does.'
 THANK_AND_ABOUT_TEXT    = '[NOTE: this is the thanks page from the original EdgeWare. I didn\'t want to replace/remove it and erase credit to the original creator! Sorry if this caused confusion!]\n\nThank you so much to all the fantastic artists who create and freely distribute the art that allows programs like this to exist, to all the people who helped me work through the various installation problems as we set the software up (especially early on), and honestly thank you to ALL of the people who are happily using Edgeware. \n\nIt truly makes me happy to know that my work is actually being put to good use by people who enjoy it. After all, at the end of the day that\'s really all I\'ve ever really wanted, but figured was beyond reach of a stupid degreeless neet.\nI love you all <3\n\n\n\nIf you like my work, please feel free to help support my neet lifestyle by donating to $PetitTournesol on Cashapp; by no means are you obligated or expected to, but any and all donations are greatly appreciated!'
 
-PLUSPLUS_TEXT           = 'Thanks for taking the time to check out this extension on EdgeWare! However you found it, I appreciate that it interested you enough to give it a download.\n\nI am not an expert programmer by any means, so apologies if there are any bugs or errors in this version. My goal is to not do anything crazy ambitious like rewrite the entire program or fix up the backend, but rather just add on functionality that I thought could improve the base version. Because of this, i\'m hoping that compatability between those who use normal EdgeWare and those who use this version stays relatively stable.\n\nCurrent changes:\n\n•Added a option under "misc" to enable/disable desktop icon generation.\n•Added options to cap the number of audio popups and video popups.\n•Added a chance slider for subliminals, and a max subliminals slider.\n•Added feature to change Startup Graphic and Icon per pack. (name the file(s) \"loading_splash\" and/or \"icon.ico\" in the resource folder)\n•Added feature to enable warnings for \"Dangerous Settings\".\n•Added hover tooltips on some things to make the program easier to understand.\n•Added troubleshooting tab under \"advanced\" with some settings to fix things for certain users.\n•Added feature to click anywhere on popup to close.\n•Made the EdgewareSetup.bat more clear with easier to read text. Hopefully if you\'re seeing this it all worked out!\n•Moved the import/export resources button to be visible on every page, because honestly they\'re pretty important\n•Added the \"Pack Info\" tab with lots of fun goodies and stats so you know what you\'re getting into with each pack.\n•Added a simplified error console in the \"advanced\" tab.\n•Overhauled Hibernate with a bunch of new modes and features\n•Added file tab with multiple file management settings\n•Added feature to enable or disable moods (feature in regular edgeware that went unused afaik)\n•Added corruption. What is it? Dont worry about it.\n•Added support to playing videos in VLC, enabling faster loading.\n•Added advanced caption settings to captions.json.\n'
+PLUSPLUS_TEXT           = 'Thanks for taking the time to check out this extension on EdgeWare! However you found it, I appreciate that it interested you enough to give it a download.\n\nI am not an expert programmer by any means, so apologies if there are any bugs or errors in this version. My goal is to not do anything crazy ambitious like rewrite the entire program or fix up the backend, but rather just add on functionality that I thought could improve the base version. Because of this, i\'m hoping that compatability between those who use normal EdgeWare and those who use this version stays relatively stable. If you were given this version directly without a download link and are curious about development updates, you can find updates and links to the github @ twitter @ara10ten.\n\n Current changes:\n\n•Added a option under "misc" to enable/disable desktop icon generation.\n•Added options to cap the number of audio popups and video popups.\n•Added a chance slider for subliminals, and a max subliminals slider.\n•Added feature to change Startup Graphic and Icon per pack. (name the file(s) \"loading_splash\" and/or \"icon.ico\" in the resource folder)\n•Added feature to enable warnings for \"Dangerous Settings\".\n•Added hover tooltips on some things to make the program easier to understand.\n•Added troubleshooting tab under \"advanced\" with some settings to fix things for certain users.\n•Added feature to click anywhere on popup to close.\n•Made the EdgewareSetup.bat more clear with easier to read text. Hopefully if you\'re seeing this it all worked out!\n•Moved the import/export resources button to be visible on every page, because honestly they\'re pretty important\n•Added the \"Pack Info\" tab with lots of fun goodies and stats so you know what you\'re getting into with each pack.\n•Added a simplified error console in the \"advanced\" tab.\n•Overhauled Hibernate with a bunch of new modes and features\n•Added file tab with multiple file management settings\n•Added feature to enable or disable moods (feature in regular edgeware that went unused afaik)\n•Added corruption. What is it? Dont worry about it.\n•Added support to playing videos in VLC, enabling faster loading.\n•Added advanced caption settings to captions.json.\n•Added theme support with multiple themes to switch between.'
 PACKINFO_TEXT          = 'The pack info section contains an overview for whatever pack is currently loaded.\n\nThe \"Stats\" tab allows you to see what features are included in the current pack (or if a pack is even loaded at all), but keep in mind all of these features have default fallbacks if they aren\'t included. It also lets you see a lot of fun stats relating to the pack, including almost everything you\'ll encounter while using EdgeWare. Keep in mind that certain things having \"0\" as a stat doesn\'t mean you can\'t use it, for example, having 0 subliminals uses the default spiral and having 0 images displays a very un-sexy circle.\n\nThe \"Information\" tab gets info on the pack from //resource//info.json, which is a new addition to EdgeWare++. This feature was added to allow pack creators to give the pack a formal name and description without having to worry about details being lost if transferred from person to person. Think of it like a readme. Also included in this section is the discord status info, which gives what your discord status will be set to if that setting is turned on, along with the image. As of time of writing (or if I forget to update this later), the image cannot be previewed as it is \"hard coded\" into EdgeWare\'s discord application and accessed through the API. As I am not the original creator of EdgeWare, and am not sure how to contact them, the best I could do is low-res screenshots or the name of each image. I chose the latter. Because of this hard-coding, the only person i\'ve run into so far who use these images is PetitTournesol themselves, but it should be noted that anyone can use them as long as they know what to add to the discord.dat file. This is partially the reason I left this information in.\n\nThe \"Moods\" tab is where you can access mood settings and previews for the current pack. The left table shows information for media (linking moods to images, videos, etc), captions, and prompts, while the \"Corruption Path\" area shows how these moods correlate to corruption levels.'
 FILE_TEXT              = 'The file tab is for all your file management needs, whether it be saving things, loading things, deleting things, or looking around in config folders. The Preset window has also been moved here to make more room for general options.\n\nThere are only two things that aren\'t very self explanatory: deleting logs and unique IDs.\n\nWhile deleting logs is fairly straightforward, it should be noted that it will not delete the log currently being written during the session, so the \"total logs in folder\" stat will always display as \"1\".\n\nUnique IDs are a feature to help assist with saving moods. In short, they are a generated identifier that is used when saving to a \"moods json file\", which is tapped into when selecting what moods you want to see in the \"Pack Info\" tab. Unique IDs are only used if the pack does not have a \'info.json\' file, otherwise the pack name is just used instead. If you are rapidly editing a pack without info.json and want EdgeWare++ to stop generating new mood files, there is an option to disable it in the troubleshooting tab.\n\n When manually editing mood config jsons, you don\'t need to worry about how the unique ID is generated- the file tab will tell you what to look for. If you are curious though, here is the exact formula:\n\nnum_images + num_audio + num_video + wallpaper(y/n) + loading_splash(y/n) + discord_status(y/n) + icon(y/n) + corruption(y/n)\n\nFor example:\nA pack with 268 images, 7 audio, 6 videos, has a wallpaper, doesn\'t have a custom loading splash, has a discord status, doesn\'t have a custom icon, and doesn\'t have a corruption file, would generate \"26876wxdxx.json\" in //moods//unnamed (mood files go in unnamed when using unique IDs)'
 
@@ -348,6 +349,10 @@ def show_window():
         logging.warning('failed to set iconbitmap.')
     fail_loop = 0
 
+    windowFont = font.nametofont('TkDefaultFont')
+    titleFont = font.Font(font='Default')
+    titleFont.configure(size=13)
+
     #painful control variables ._.
     while(fail_loop < 2):
         try:
@@ -443,6 +448,9 @@ def show_window():
             vlcModeVar                = BooleanVar(root, value=(int(settings['vlcMode'])==1))
             multiClickVar             = BooleanVar(root, value=(int(settings['multiClick'])==1))
 
+            themeTypeVar              = StringVar(root, value=(settings['themeType'].strip()))
+            themeNoConfigVar          = BooleanVar(root, value=(int(settings['themeNoConfig'])==1))
+
 
             #grouping for sanity's sake later
             in_var_group = [delayVar, popupVar, webVar, audioVar, promptVar, fillVar,
@@ -460,7 +468,8 @@ def show_window():
                             antiOrLanczosVar, toggleInternetVar, buttonlessVar, hibernateTypeVar,
                             hibernateLengthVar, fixWallpaperVar, toggleHibSkipVar, toggleMoodSetVar,
                             corruptionModeVar, corruptionTimeVar, pumpScareOffsetVar, corruptionFadeTypeVar,
-                            vlcModeVar, captionFilenameVar, singleModeVar, multiClickVar]
+                            vlcModeVar, captionFilenameVar, singleModeVar, multiClickVar, themeTypeVar,
+                            themeNoConfigVar]
 
             in_var_names = ['delay', 'popupMod', 'webMod', 'audioMod', 'promptMod', 'fill',
                             'fill_delay', 'replace', 'replaceThresh', 'start_on_logon',
@@ -476,7 +485,8 @@ def show_window():
                             'maxVideos', 'subliminalsChance', 'maxSubliminals', 'safeMode', 'antiOrLanczos',
                             'toggleInternet', 'buttonless', 'hibernateType', 'hibernateLength', 'fixWallpaper',
                             'toggleHibSkip', 'toggleMoodSet', 'corruptionMode', 'corruptionTime', 'pumpScareOffset',
-                            'corruptionFadeType', 'vlcMode', 'captionFilename', 'singleMode', 'multiClick']
+                            'corruptionFadeType', 'vlcMode', 'captionFilename', 'singleMode', 'multiClick',
+                            'themeType', 'themeNoConfig']
             break
         except Exception as e:
             messagebox.showwarning(
@@ -520,6 +530,7 @@ def show_window():
     subliminals_group = []
     info_group     = []
     discord_group  = []
+    test_group = []
 
     webv = getLiveVersion(UPDCHECK_URL, 0)
     webvpp = getLiveVersion(UPDCHECK_PP_URL, 1)
@@ -538,6 +549,21 @@ def show_window():
     tabFile      = ttk.Frame(None)          #file management tab
 
     style = ttk.Style(root)                 #style setting for left aligned tabs
+
+    #going to vent here for a second: I have no idea why ttk doesn't use the default theme by default
+    #and I also don't know why switching to the default theme is the only way to remove ugly borders on notebook tabs
+    #apparently borderwidth, highlightthickness, and anything else just decides to not work...
+    style.theme_use("default")
+
+    style.layout("Tab",
+                    [('Notebook.tab', {'sticky': 'nswe', 'children':
+                        [('Notebook.padding', {'side': 'top', 'sticky': 'nswe', 'children':
+                            #[('Notebook.focus', {'side': 'top', 'sticky': 'nswe', 'children': (Removes ugly selection dots from tabs)
+                                [('Notebook.label', {'side': 'top', 'sticky': ''})],
+                            #})],
+                        })],
+                    })]
+                 )
     style.configure('lefttab.TNotebook', tabposition='wn')
     tabInfoExpound = ttk.Notebook(tabInfo, style='lefttab.TNotebook')  #additional subtabs for info on features
 
@@ -644,7 +670,7 @@ def show_window():
     hactivity_group.append(h_activityScale)
     hactivity_group.append(h_activityButton)
 
-    Label(tabGeneral, text='Hibernate Settings', font='Default 13', relief=GROOVE).pack(pady=2)
+    Label(tabGeneral, text='Hibernate Settings', font=titleFont, relief=GROOVE).pack(pady=2)
     hibernateHostFrame.pack(fill='x')
     hibernateFrame.pack(fill='y', side='left')
     hibernateTypeFrame.pack(fill='x', side='left')
@@ -667,7 +693,7 @@ def show_window():
     hibernateLengthFrame.pack(fill='x', side='left')
 
     #timer settings
-    Label(tabGeneral, text='Timer Settings', font='Default 13', relief=GROOVE).pack(pady=2)
+    Label(tabGeneral, text='Timer Settings', font=titleFont, relief=GROOVE).pack(pady=2)
     timerFrame = Frame(tabGeneral, borderwidth=5, relief=RAISED)
 
     timerToggle = Checkbutton(timerFrame, text='Timer Mode', variable=timerVar, command=lambda: toggleAssociateSettings(timerVar.get(), timer_group), cursor='question_arrow')
@@ -691,7 +717,7 @@ def show_window():
     timerFrame.pack(fill='x')
 
     #other
-    Label(tabGeneral, text='Other', font='Default 13', relief=GROOVE).pack(pady=2)
+    Label(tabGeneral, text='Other', font=titleFont, relief=GROOVE).pack(pady=2)
     otherHostFrame = Frame(tabGeneral, borderwidth=5, relief=RAISED)
     toggleFrame1 = Frame(otherHostFrame)
     toggleFrame2 = Frame(otherHostFrame)
@@ -728,7 +754,7 @@ def show_window():
                     'Minor (low risk but could lead to unwanted interactions):\n'
                     'Disable Panic Hotkey, Run on Save & Exit')
 
-    Label(tabGeneral, text='Information', font='Default 13', relief=GROOVE).pack(pady=2)
+    Label(tabGeneral, text='Information', font=titleFont, relief=GROOVE).pack(pady=2)
     infoHostFrame = Frame(tabGeneral, borderwidth=5, relief=RAISED)
     zipGitFrame = Frame(infoHostFrame)
     verFrame = Frame(infoHostFrame)
@@ -764,6 +790,248 @@ def show_window():
     exportResourcesButton = Button(resourceFrame, text='Export Resource Pack', command=exportResource)
     importResourcesButton = Button(resourceFrame, text='Import Resource Pack', command=lambda: importResource(root))
     saveExitButton = Button(root, text='Save & Exit', command=lambda: write_save(in_var_group, in_var_names, safewordVar, True))
+
+    theme_types = ['Original', 'Dark', 'The One', 'Ransom', 'Goth', 'Bimbo']
+
+    Label(tabGeneral, text='Theme', font=titleFont, relief=GROOVE).pack(pady=2)
+    themeFrame = Frame(tabGeneral, borderwidth=5, relief=RAISED)
+    subThemeFrame = Frame(themeFrame)
+    testThemeFrame = Frame(themeFrame)
+    testThemePopup = Frame(testThemeFrame)
+    testThemePrompt = Frame(testThemeFrame)
+    testThemeConfig = Frame(testThemeFrame)
+
+    themeDropdown = OptionMenu(subThemeFrame, themeTypeVar, *theme_types, command=lambda key: themeHelper(key))
+    themeDropdown.configure(width = 12)
+    ignoreConfigToggle = Checkbutton(subThemeFrame, text='Ignore Config', variable=themeNoConfigVar, cursor='question_arrow')
+
+    ignoreconfigttp = CreateToolTip(ignoreConfigToggle, 'When enabled, the selected theme does not apply to the config window.')
+
+    def themeHelper(theme):
+        skiplist = [testThemeFrame, testThemePopup, testThemePrompt, testThemeConfig, testPopupTitle, testPromptTitle, testConfigTitle]
+        if theme == 'Original':
+            for widget in all_children(testThemeFrame):
+                if widget in skiplist:
+                    continue
+                if isinstance(widget, Frame):
+                    widget.configure(bg = '#f0f0f0')
+                if isinstance(widget, Button):
+                    widget.configure(bg = '#f0f0f0', fg = 'black', font = 'TkDefaultFont',
+                        activebackground = '#f0f0f0', activeforeground = 'black')
+                    print(widget.cget('font'))
+                if isinstance(widget, Label):
+                    widget.configure(bg = '#f0f0f0', fg = 'black', font = 'TkDefaultFont')
+                if isinstance(widget, OptionMenu):
+                    widget.configure(bg = '#f0f0f0', fg = 'black', font = 'TkDefaultFont',
+                        activebackground = '#f0f0f0', activeforeground = 'black')
+                if isinstance(widget, Text):
+                    widget.configure(bg = 'white', fg = 'black')
+                if isinstance(widget, Scale):
+                    widget.configure(bg = '#f0f0f0', fg = 'black', font = 'TkDefaultFont',
+                        activebackground = '#f0f0f0', troughcolor = '#c8c8c8')
+                if isinstance(widget, Checkbutton):
+                    widget.configure(bg = '#f0f0f0', fg = 'black', font = 'TkDefaultFont',
+                        selectcolor = 'white', activebackground = '#f0f0f0', activeforeground = 'black')
+            testpopupttp.background = '#ffffff'
+            testpopupttp.foreground = '#000000'
+            testpopupttp.bordercolor = '#000000'
+        if theme == 'Dark':
+            for widget in all_children(testThemeFrame):
+                if widget in skiplist:
+                    continue
+                if isinstance(widget, Frame):
+                    widget.configure(bg = '#282c34')
+                if isinstance(widget, Button):
+                    widget.configure(bg = '#282c34', fg = 'ghost white', font = ('Segoe UI', 9),
+                        activebackground = '#282c34', activeforeground = 'ghost white')
+                if isinstance(widget, Label):
+                    widget.configure(bg = '#282c34', fg = 'ghost white', font = ('Segoe UI', 9))
+                if isinstance(widget, OptionMenu):
+                    widget.configure(bg = '#282c34', fg = 'ghost white', font = ('Segoe UI', 9),
+                        activebackground = '#282c34', activeforeground = 'ghost white')
+                if isinstance(widget, Text):
+                    widget.configure(bg = '#1b1d23', fg = 'ghost white')
+                if isinstance(widget, Scale):
+                    widget.configure(bg = '#282c34', fg = 'ghost white', font = ('Segoe UI', 9),
+                        activebackground = '#282c34', troughcolor = '#c8c8c8')
+                if isinstance(widget, Checkbutton):
+                    widget.configure(bg = '#282c34', fg = 'ghost white', font = ('Segoe UI', 9),
+                        selectcolor = '#1b1d23', activebackground = '#282c34', activeforeground = 'ghost white')
+            testpopupttp.background = '#1b1d23'
+            testpopupttp.foreground = '#ffffff'
+            testpopupttp.bordercolor = '#ffffff'
+        if theme == 'The One':
+            for widget in all_children(testThemeFrame):
+                if widget in skiplist:
+                    continue
+                if isinstance(widget, Frame):
+                    widget.configure(bg = '#282c34')
+                if isinstance(widget, Button):
+                    widget.configure(bg = '#282c34', fg = '#00ff41', font = ('Consolas', 8),
+                        activebackground = '#1b1d23', activeforeground = '#00ff41')
+                if isinstance(widget, Label):
+                    widget.configure(bg = '#282c34', fg = '#00ff41', font = ('Consolas', 8))
+                if isinstance(widget, OptionMenu):
+                    widget.configure(bg = '#282c34', fg = '#00ff41', font = ('Consolas', 8),
+                        activebackground = '#282c34', activeforeground = '#00ff41')
+                if isinstance(widget, Text):
+                    widget.configure(bg = '#1b1d23', fg = '#00ff41')
+                if isinstance(widget, Scale):
+                    widget.configure(bg = '#282c34', fg = '#00ff41', font = ('Consolas', 8),
+                        activebackground = '#282c34', troughcolor = '#009a22')
+                if isinstance(widget, Checkbutton):
+                    widget.configure(bg = '#282c34', fg = '#00ff41', font = ('Consolas', 8),
+                        selectcolor = '#1b1d23', activebackground = '#282c34', activeforeground = '#00ff41')
+            testpopupttp.background = '#1b1d23'
+            testpopupttp.foreground = '#00ff41'
+            testpopupttp.bordercolor = '#00ff41'
+        if theme == 'Ransom':
+            for widget in all_children(testThemeFrame):
+                if widget in skiplist:
+                    continue
+                if isinstance(widget, Frame):
+                    widget.configure(bg = '#841212')
+                if isinstance(widget, Button):
+                    widget.configure(bg = '#841212', fg = 'yellow', font = ('Arial', 9),
+                        activebackground = '#841212', activeforeground = 'yellow')
+                if isinstance(widget, Label):
+                    widget.configure(bg = '#841212', fg = 'white', font = ('Arial Bold', 9))
+                if isinstance(widget, OptionMenu):
+                    widget.configure(bg = '#841212', fg = 'white', font = ('Arial Bold', 9),
+                        activebackground = '#841212', activeforeground = 'white')
+                if isinstance(widget, Text):
+                    widget.configure(bg = 'white', fg = 'black')
+                if isinstance(widget, Scale):
+                    widget.configure(bg = '#841212', fg = 'white', font = ('Arial', 9),
+                        activebackground = '#841212', troughcolor = '#c8c8c8')
+                if isinstance(widget, Checkbutton):
+                    widget.configure(bg = '#841212', fg = 'white', font = ('Arial', 9),
+                        selectcolor = '#5c0d0d', activebackground = '#841212', activeforeground = 'white')
+            testpopupttp.background = '#ff2600'
+            testpopupttp.foreground = '#ffffff'
+            testpopupttp.bordercolor = '#000000'
+        if theme == 'Goth':
+            for widget in all_children(testThemeFrame):
+                if widget in skiplist:
+                    continue
+                if isinstance(widget, Frame):
+                    widget.configure(bg = '#282c34')
+                if isinstance(widget, Button):
+                    widget.configure(bg = '#282c34', fg = 'MediumPurple1', font = ('Constantia', 9),
+                        activebackground = '#282c34', activeforeground = 'MediumPurple1')
+                if isinstance(widget, Label):
+                    widget.configure(bg = '#282c34', fg = 'MediumPurple1', font = ('Constantia', 9))
+                if isinstance(widget, OptionMenu):
+                    widget.configure(bg = '#282c34', fg = 'MediumPurple1', font = ('Constantia', 9),
+                        activebackground = '#282c34', activeforeground = 'MediumPurple1')
+                if isinstance(widget, Text):
+                    widget.configure(bg = 'MediumOrchid2', fg = 'purple4')
+                if isinstance(widget, Scale):
+                    widget.configure(bg = '#282c34', fg = 'MediumPurple1', font = ('Constantia', 9),
+                        activebackground = '#282c34', troughcolor = 'MediumOrchid2')
+                if isinstance(widget, Checkbutton):
+                    widget.configure(bg = '#282c34', fg = 'MediumPurple1', font = ('Constantia', 9),
+                        selectcolor = '#1b1d23', activebackground = '#282c34', activeforeground = 'MediumPurple1')
+            testpopupttp.background = '#1b1d23'
+            testpopupttp.foreground = '#cc60ff'
+            testpopupttp.bordercolor = '#b999fe'
+        if theme == 'Bimbo':
+            for widget in all_children(testThemeFrame):
+                if widget in skiplist:
+                    continue
+                if isinstance(widget, Frame):
+                    widget.configure(bg = 'pink')
+                if isinstance(widget, Button):
+                    widget.configure(bg = 'pink', fg = 'deep pink', font = ('Constantia', 9),
+                        activebackground = 'hot pink', activeforeground = 'deep pink')
+                if isinstance(widget, Label):
+                    widget.configure(bg = 'pink', fg = 'deep pink', font = ('Constantia', 9))
+                if isinstance(widget, OptionMenu):
+                    widget.configure(bg = 'pink', fg = 'deep pink', font = ('Constantia', 9),
+                        activebackground = 'hot pink', activeforeground = 'deep pink')
+                if isinstance(widget, Text):
+                    widget.configure(bg = 'light pink', fg = 'magenta2')
+                if isinstance(widget, Scale):
+                    widget.configure(bg = 'pink', fg = 'deep pink', font = ('Constantia', 9),
+                        activebackground = 'pink', troughcolor = 'hot pink')
+                if isinstance(widget, Checkbutton):
+                    widget.configure(bg = 'pink', fg = 'deep pink', font = ('Constantia', 9),
+                        selectcolor = 'light pink', activebackground = 'pink', activeforeground = 'deep pink')
+            testpopupttp.background = '#ffc5cd'
+            testpopupttp.foreground = '#ff3aa3'
+            testpopupttp.bordercolor = '#ff84c1'
+        toggleAssociateSettings(False, test_group, theme)
+
+    testPopupTitle = Label(testThemePopup, text="Popup")
+    testPopupImage = ImageTk.PhotoImage(file=os.path.join(PATH, 'default_assets', 'theme_demo.png'))
+    testPopupLabel = Label(testThemePopup, image=testPopupImage, width=150, height=75, borderwidth=2, relief=GROOVE, cursor='question_arrow')
+    testPopupButton = Button(testPopupLabel, text="Test~")
+    testPopupCaption = Label(testPopupLabel, text="Lewd Caption Here!")
+
+    testpopupttp = CreateToolTip(testPopupLabel, 'NOTE: the test image is very small, buttons and captions will appear proportionally larger here!\n\n'
+                    'Also, look! The tooltip changed too!')
+
+    testPromptBody = Frame(testThemePrompt, borderwidth=2, relief=GROOVE, width=150, height=75)
+    testPromptTitle = Label(testThemePrompt, text="Prompt")
+    testPromptInput = Text(testPromptBody, width=18, height=1)
+    testPromptButton = Button(testPromptBody, text="Sure!")
+
+    testConfigBody = Frame(testThemeConfig, borderwidth=2, relief=GROOVE)
+    testConfigTitle = Label(testThemeConfig, text="Config")
+    testCColumn1 = Frame(testConfigBody)
+    testToggle = Checkbutton(testConfigBody, text="Check")
+    testOptionsMenuVar = StringVar(root, 'Option')
+    test_types = ['Option','Menu']
+    testConfigMenu = OptionMenu(testConfigBody, testOptionsMenuVar,*test_types)
+    testConfigMenu.config(highlightthickness=0)
+
+    testCColumn2 = Frame(testConfigBody)
+    testScaleActivated = Scale(testCColumn2, orient='horizontal', from_=1, to=100, highlightthickness=0)
+    testButtonActivated = Button(testCColumn2, text="Activated")
+
+    testCColumn3 = Frame(testConfigBody)
+    testScaleDeactivated = Scale(testCColumn3, orient='horizontal', from_=1, to=100, highlightthickness=0)
+    testButtonDeactivated = Button(testCColumn3, text="Deactivated")
+
+    test_group.append(testScaleDeactivated)
+    test_group.append(testButtonDeactivated)
+    toggleAssociateSettings(False, test_group)
+
+    themeFrame.pack(fill='x')
+    subThemeFrame.pack(fill='both', side='left')
+    themeDropdown.pack(fill='both', side='top')
+    ignoreConfigToggle.pack(fill='both', side='top')
+    testThemeFrame.pack(fill='both', side='left', expand=1)
+
+    testThemePopup.pack(fill='both', side='left', padx=1)
+    testPopupTitle.pack(side='top')
+    #why ipadx and ipady don't support tuples but padx and pady do is beyond me... i'm a perfectionist and hate bottom and right being one pixel smaller but
+    #its a small enough issue im not going to bother doing some hacks to make it look right
+    testPopupLabel.pack(side='top', ipadx=1, ipady=1)
+    testPopupButton.place(x=140 - testPopupButton.winfo_reqwidth(), y=70 - testPopupButton.winfo_reqheight())
+    testPopupCaption.place(x=5, y=5)
+
+    testThemePrompt.pack(fill='both', side='left', padx=1)
+    testPromptTitle.pack()
+    testPromptBody.pack(fill='both', expand=1)
+    Label(testPromptBody, text="Do as I say~").pack(fill='both', expand=1)
+    testPromptInput.pack(fill='both')
+    testPromptButton.pack(expand=1)
+
+    testThemeConfig.pack(fill='both', side='left', padx=1)
+    testConfigTitle.pack(side='top')
+    testConfigBody.pack(fill='both', expand=1)
+    testCColumn1.pack(side='left', fill='both', expand=1)
+    testCColumn2.pack(side='left', fill='both', expand=1)
+    testCColumn3.pack(side='left', fill='both', expand=1)
+    testToggle.pack(fill='y')
+    testConfigMenu.pack(fill='y')
+    testButtonActivated.pack(fill='y')
+    testScaleActivated.pack(fill='y', expand=1)
+    testButtonDeactivated.pack(fill='y')
+    testScaleDeactivated.pack(fill='y', expand=1)
+
+    themeHelper(themeTypeVar.get())
 
     #force reload button for debugging, only appears on DEV versions
     if local_version.endswith('DEV'):
@@ -1266,7 +1534,7 @@ def show_window():
     tabMaster.add(tabPackInfo, text='Pack Info')
 
     #Stats
-    Label(tabPackInfo, text='Stats', font='Default 13', relief=GROOVE).pack(pady=2)
+    Label(tabPackInfo, text='Stats', font=titleFont, relief=GROOVE).pack(pady=2)
     infoStatusFrame = Frame(tabPackInfo, borderwidth=5, relief=RAISED)
     statusPackFrame = Frame(infoStatusFrame)
     statusAboutFrame = Frame(infoStatusFrame)
@@ -1434,7 +1702,7 @@ def show_window():
     Label(subliminalsStatsFrame, text=f'{subliminalStat}').pack(pady=2, side='top')
 
     #Information
-    Label(tabPackInfo, text='Information', font='Default 13', relief=GROOVE).pack(pady=2)
+    Label(tabPackInfo, text='Information', font=titleFont, relief=GROOVE).pack(pady=2)
     infoDescFrame = Frame(tabPackInfo, borderwidth=5, relief=RAISED)
     subInfoFrame = Frame(infoDescFrame, borderwidth=2, relief=GROOVE)
     descriptionFrame = Frame(infoDescFrame, borderwidth=2, relief=GROOVE)
@@ -1535,7 +1803,7 @@ def show_window():
                                     'Nevertheless, I have decided to put this here not only for those packs, but also for other '
                                     'packs that tap in to the same image IDs.')
     #Moods
-    Label(tabPackInfo, text='Moods', font='Default 13', relief=GROOVE).pack(pady=2)
+    Label(tabPackInfo, text='Moods', font=titleFont, relief=GROOVE).pack(pady=2)
 
     moodsFrame = Frame(tabPackInfo, borderwidth=5, relief=RAISED)
     moodsListFrame = Frame(moodsFrame)
@@ -1838,7 +2106,7 @@ def show_window():
     tabMaster.add(tabFile, text='File')
 
     #save/load
-    Label(tabFile, text='Save/Load', font='Default 13', relief=GROOVE).pack(pady=2)
+    Label(tabFile, text='Save/Load', font=titleFont, relief=GROOVE).pack(pady=2)
     importExportFrame = Frame(tabFile, borderwidth=5, relief=RAISED)
     fileTabImportButton = Button(importExportFrame, height=2, text='Import Resource Pack', command=lambda: importResource(root))
     fileTabExportButton = Button(importExportFrame, height=2, text='Export Resource Pack', command=exportResource)
@@ -1850,7 +2118,7 @@ def show_window():
     fileTabExportButton.pack(padx=5, pady=5, fill='x', side='left', expand=1)
 
     #directories
-    Label(tabFile, text='Directories', font='Default 13', relief=GROOVE).pack(pady=2)
+    Label(tabFile, text='Directories', font=titleFont, relief=GROOVE).pack(pady=2)
 
     logNum = len(os.listdir(PATH + '\\logs\\')) if os.path.exists(PATH + '\\logs\\') else 0
     logsFrame = Frame(tabFile, borderwidth=5, relief=RAISED)
@@ -1908,7 +2176,7 @@ def show_window():
     openResourcesButton.pack(fill='x', pady=2)
 
     #mode presets
-    Label(tabFile, text='Mode Presets', font='Default 13', relief=GROOVE).pack(pady=2)
+    Label(tabFile, text='Mode Presets', font=titleFont, relief=GROOVE).pack(pady=2)
     presetFrame = Frame(tabFile, borderwidth=5, relief=RAISED)
     dropdownSelectFrame = Frame(presetFrame)
 
@@ -1981,7 +2249,7 @@ def show_window():
     dropdownMenu = OptionMenu(advPanel, dropdownObj, *itemList, command=lambda a: updateText([textInput, expectedLabel], settings[a], a))
     dropdownMenu.configure(width=10)
     applyButton = Button(advPanel, text='Apply', command= lambda: assignJSON(dropdownObj.get(), textInput.get()))
-    Label(tabAdvanced, text='Debug Config Edit', font='Default 13', relief=GROOVE).pack(pady=2)
+    Label(tabAdvanced, text='Debug Config Edit', font=titleFont, relief=GROOVE).pack(pady=2)
     Label(tabAdvanced, text='Be careful messing with some of these; improper configuring can cause\nproblems when running, or potentially cause unintended damage to files.').pack()
     advPanel.pack(fill='x', padx=2)
     dropdownMenu.pack(padx=2, side='left')
@@ -1989,7 +2257,7 @@ def show_window():
     applyButton.pack(padx=2, fill='x', side='right')
     expectedLabel.pack()
     #==========={HERE ENDS  ADVANCED TAB ITEM INITS}===========#
-    Label(tabAdvanced, text='Troubleshooting', font='Default 13', relief=GROOVE).pack(pady=2)
+    Label(tabAdvanced, text='Troubleshooting', font=titleFont, relief=GROOVE).pack(pady=2)
     troubleshootingHostFrame = Frame(tabAdvanced, borderwidth=5, relief=RAISED)
     troubleshootingFrame1 = Frame(troubleshootingHostFrame)
     troubleshootingFrame2 = Frame(troubleshootingHostFrame)
@@ -2007,7 +2275,7 @@ def show_window():
     toggleHibernateSkip.pack(fill='x', side='top')
     toggleMoodSettings.pack(fill='x', side='top')
 
-    Label(tabAdvanced, text='Playback Options', font='Default 13', relief=GROOVE).pack(pady=2)
+    Label(tabAdvanced, text='Playback Options', font=titleFont, relief=GROOVE).pack(pady=2)
 
     troubleshootingHostFrame2 = Frame(tabAdvanced, borderwidth=5, relief=RAISED)
     troubleshootingFrame3 = Frame(troubleshootingHostFrame2)
@@ -2056,12 +2324,13 @@ def show_window():
                                     'If videos were silent for you this will hopefully fix that as well.\n\nPlease note that this feature has the potential to break in the future as VLC is a program independent '
                                     'from EdgeWare. For posterity\'s sake, the current version of VLC as of writing this tooltip is 3.0.20.')
 
-    Label(tabAdvanced, text='Errors', font='Default 13', relief=GROOVE).pack(pady=2)
+    Label(tabAdvanced, text='Errors', font=titleFont, relief=GROOVE).pack(pady=2)
     errorsFrame = Frame(tabAdvanced, borderwidth=5, relief=GROOVE)
     errorsFrame.pack(fill='x')
-    Label(errorsFrame, text='These errors have been found while starting up EdgeWare Config, but might also affect running '
-            'EdgeWare itself.\n Likewise, there might be bugs that don\'t show up here but prevent EdgeWare itself from running '
-            'properly.\n Check the logs subfolder for more details.').pack()
+    Label(errorsFrame, text='These errors have been found while starting up EdgeWare Config. While they are usually caused by older packs not\n having EdgeWare++ features '
+            'and can be ignored, there is still a chance they might affect the main program.\n'
+            'Likewise, there might be bugs that don\'t show up here but prevent EdgeWare itself from running '
+            'properly.\nTry running EdgeWare regardless if errors show up here, and check the logs subfolder for more details if things don\'t work.').pack()
     if errors_list:
         errorsText = Text(errorsFrame, height=10, fg='red')
         errorsText.pack(pady=2, padx=2, fill='x')
@@ -2100,6 +2369,8 @@ def show_window():
     tabInfoExpound.add(tab_corruption, text='Corruption')
     Label(tab_corruption, text=CORRUPTION_TEXT, anchor='nw', wraplength=460).pack()
     #==========={HERE ENDS  ABOUT TAB ITEM INITS}===========#
+
+    themeChange(settings['themeType'].strip(), root, style, windowFont, titleFont)
 
     toggleAssociateSettings(fillVar.get(), fill_group)
     toggleAssociateSettings(replaceVar.get(), replace_group)
@@ -2144,7 +2415,7 @@ def show_window():
     #version alert, if core web version (0.0.0) is different from the github configdefault, alerts user that update is available
     #   if user is a bugfix patch behind, the _X at the end of the 0.0.0, they will not be alerted
     #   the version will still be red to draw attention to it
-    if local_version.split('_')[0] != webv.split('_')[0] and not (local_version.endswith('DEV') or settings['toggleInternet']):
+    if local_pp_version.split('_')[0] != webvpp.split('_')[0] and not (local_pp_version.endswith('DEV') or settings['toggleInternet']):
         messagebox.showwarning('Update Available', 'Main local version and web version are not the same.\nPlease visit the Github and download the newer files.')
     root.after(10000, animateCorruption, corruptionLabel)
     root.mainloop()
@@ -2477,8 +2748,24 @@ def assignJSON(key:str, var:int or str):
     with open(f'{PATH}config.cfg', 'w') as f:
         f.write(json.dumps(settings))
 
-def toggleAssociateSettings(ownerState:bool, objList:list):
-    toggleAssociateSettings_manual(ownerState, objList, 'SystemButtonFace', 'gray35')
+def toggleAssociateSettings(ownerState:bool, objList:list, demo:str = False):
+    if demo:
+        th = demo
+    else:
+        th = settings['themeType'].strip()
+    if th == 'Original' or (settings['themeNoConfig'] == True and not demo):
+        toggleAssociateSettings_manual(ownerState, objList, 'SystemButtonFace', 'gray35')
+    else:
+        if th == 'Dark':
+            toggleAssociateSettings_manual(ownerState, objList, '#282c34', 'gray65')
+        if th == 'The One':
+            toggleAssociateSettings_manual(ownerState, objList, '#282c34', '#37573d')
+        if th == 'Ransom':
+            toggleAssociateSettings_manual(ownerState, objList, '#841212', '#573737')
+        if th == 'Goth':
+            toggleAssociateSettings_manual(ownerState, objList, '#282c34', '#4b3757')
+        if th == 'Bimbo':
+            toggleAssociateSettings_manual(ownerState, objList, '#ffc5cd', '#bc7abf')
 
 def toggleAssociateSettings_manual(ownerState:bool, objList:list, colorOn:int, colorOff:int):
     logging.info(f'toggling state of {objList} to {ownerState}')
@@ -2641,6 +2928,163 @@ def updateMoods(type:str, id:str, check:bool):
     except Exception as e:
         logging.warning(f'error updating mood files. {e}')
 
+def all_children(widget): return [widget] + [subchild for child in widget.winfo_children() for subchild in all_children(child)]
+
+def themeChange(theme:str, root, style, mfont, tfont):
+    if theme == 'Original' or settings['themeNoConfig'] == True:
+        style.configure('TFrame', background = '#f0f0f0')
+        style.configure('TNotebook', background = '#f0f0f0')
+        style.map("TNotebook.Tab", background =[("selected", '#f0f0f0')])
+        style.configure('TNotebook.Tab', background = '#d9d9d9')
+    else:
+        if theme == 'Dark':
+            for widget in all_children(root):
+                if isinstance(widget, Frame):
+                    widget.configure(bg = '#282c34')
+                if isinstance(widget, Button):
+                    widget.configure(bg = '#282c34', fg = 'ghost white',
+                        activebackground = '#282c34', activeforeground = 'ghost white')
+                if isinstance(widget, Label):
+                    widget.configure(bg = '#282c34', fg = 'ghost white')
+                if isinstance(widget, OptionMenu):
+                    widget.configure(bg = '#282c34', fg = 'ghost white', highlightthickness = 0,
+                        activebackground = '#282c34', activeforeground = 'ghost white')
+                if isinstance(widget, Text):
+                    widget.configure(bg = '#1b1d23', fg = 'ghost white')
+                if isinstance(widget, Scale):
+                    widget.configure(bg = '#282c34', fg = 'ghost white',
+                        activebackground = '#282c34', troughcolor = '#c8c8c8', highlightthickness = 0)
+                if isinstance(widget, Checkbutton):
+                    widget.configure(bg = '#282c34', fg = 'ghost white',
+                        selectcolor = '#1b1d23', activebackground = '#282c34', activeforeground = 'ghost white')
+            for widget in CreateToolTip.instances:
+                widget.background = '#1b1d23'
+                widget.foreground = '#ffffff'
+                widget.bordercolor = '#ffffff'
+            style.configure('TFrame', background = '#282c34')
+            style.configure('TNotebook', background = '#282c34')
+            style.map("TNotebook.Tab", background =[("selected", '#282c34')])
+            style.configure('TNotebook.Tab', background = '#1b1d23', foreground = '#f9faff')
+        if theme == 'The One':
+            for widget in all_children(root):
+                if isinstance(widget, Frame):
+                    widget.configure(bg = '#282c34')
+                if isinstance(widget, Button):
+                    widget.configure(bg = '#282c34', fg = '#00ff41',
+                        activebackground = '#1b1d23', activeforeground = '#00ff41')
+                if isinstance(widget, Label):
+                    widget.configure(bg = '#282c34', fg = '#00ff41')
+                if isinstance(widget, OptionMenu):
+                    widget.configure(bg = '#282c34', fg = '#00ff41', highlightthickness = 0,
+                        activebackground = '#282c34', activeforeground = '#00ff41')
+                if isinstance(widget, Text):
+                    widget.configure(bg = '#1b1d23', fg = '#00ff41')
+                if isinstance(widget, Scale):
+                    widget.configure(bg = '#282c34', fg = '#00ff41',
+                        activebackground = '#282c34', troughcolor = '#009a22', highlightthickness = 0)
+                if isinstance(widget, Checkbutton):
+                    widget.configure(bg = '#282c34', fg = '#00ff41',
+                        selectcolor = '#1b1d23', activebackground = '#282c34', activeforeground = '#00ff41')
+            for widget in CreateToolTip.instances:
+                widget.background = '#1b1d23'
+                widget.foreground = '#00ff41'
+                widget.bordercolor = '#00ff41'
+            style.configure('TFrame', background = '#282c34')
+            style.configure('TNotebook', background = '#282c34')
+            style.map("TNotebook.Tab", background =[("selected", '#282c34')])
+            style.configure('TNotebook.Tab', background = '#1b1d23', foreground = '#00ff41')
+            mfont.configure(family='Consolas', size=8)
+            tfont.configure(family='Consolas')
+        if theme == 'Ransom':
+            for widget in all_children(root):
+                if isinstance(widget, Frame):
+                    widget.configure(bg = '#841212')
+                if isinstance(widget, Button):
+                    widget.configure(bg = '#841212', fg = 'yellow',
+                        activebackground = '#841212', activeforeground = 'yellow')
+                if isinstance(widget, Label):
+                    widget.configure(bg = '#841212', fg = 'white')
+                if isinstance(widget, OptionMenu):
+                    widget.configure(bg = '#841212', fg = 'white', highlightthickness = 0,
+                        activebackground = '#841212', activeforeground = 'white')
+                if isinstance(widget, Text):
+                    widget.configure(bg = 'white', fg = 'black')
+                if isinstance(widget, Scale):
+                    widget.configure(bg = '#841212', fg = 'white',
+                        activebackground = '#841212', troughcolor = '#c8c8c8', highlightthickness = 0)
+                if isinstance(widget, Checkbutton):
+                    widget.configure(bg = '#841212', fg = 'white',
+                        selectcolor = '#5c0d0d', activebackground = '#841212', activeforeground = 'white')
+            for widget in CreateToolTip.instances:
+                widget.background = '#ff2600'
+                widget.foreground = '#ffffff'
+                widget.bordercolor = '#000000'
+            style.configure('TFrame', background = '#841212')
+            style.configure('TNotebook', background = '#841212')
+            style.map("TNotebook.Tab", background =[("selected", '#841212')])
+            style.configure('TNotebook.Tab', background = '#5c0d0d', foreground = '#ffffff')
+            mfont.configure(family='Arial')
+            tfont.configure(family='Arial Bold')
+        if theme == 'Goth':
+            for widget in all_children(root):
+                if isinstance(widget, Frame):
+                    widget.configure(bg = '#282c34')
+                if isinstance(widget, Button):
+                    widget.configure(bg = '#282c34', fg = 'MediumPurple1',
+                        activebackground = '#282c34', activeforeground = 'MediumPurple1')
+                if isinstance(widget, Label):
+                    widget.configure(bg = '#282c34', fg = 'MediumPurple1')
+                if isinstance(widget, OptionMenu):
+                    widget.configure(bg = '#282c34', fg = 'MediumPurple1', highlightthickness = 0,
+                        activebackground = '#282c34', activeforeground = 'MediumPurple1')
+                if isinstance(widget, Text):
+                    widget.configure(bg = 'MediumOrchid2', fg = 'purple4')
+                if isinstance(widget, Scale):
+                    widget.configure(bg = '#282c34', fg = 'MediumPurple1',
+                        activebackground = '#282c34', troughcolor = 'MediumOrchid2', highlightthickness = 0)
+                if isinstance(widget, Checkbutton):
+                    widget.configure(bg = '#282c34', fg = 'MediumPurple1',
+                        selectcolor = '#1b1d23', activebackground = '#282c34', activeforeground = 'MediumPurple1')
+            for widget in CreateToolTip.instances:
+                widget.background = '#1b1d23'
+                widget.foreground = '#cc60ff'
+                widget.bordercolor = '#b999fe'
+            style.configure('TFrame', background = '#282c34')
+            style.configure('TNotebook', background = '#282c34')
+            style.map("TNotebook.Tab", background =[("selected", '#282c34')])
+            style.configure('TNotebook.Tab', background = '#1b1d23', foreground = 'MediumPurple1')
+            mfont.configure(family='Constantia')
+            tfont.configure(family='Constantia')
+        if theme == 'Bimbo':
+            for widget in all_children(root):
+                if isinstance(widget, Frame):
+                    widget.configure(bg = 'pink')
+                if isinstance(widget, Button):
+                    widget.configure(bg = 'pink', fg = 'deep pink',
+                        activebackground = 'hot pink', activeforeground = 'deep pink')
+                if isinstance(widget, Label):
+                    widget.configure(bg = 'pink', fg = 'deep pink')
+                if isinstance(widget, OptionMenu):
+                    widget.configure(bg = 'pink', fg = 'deep pink', highlightthickness = 0,
+                        activebackground = 'hot pink', activeforeground = 'deep pink')
+                if isinstance(widget, Text):
+                    widget.configure(bg = 'light pink', fg = 'magenta2')
+                if isinstance(widget, Scale):
+                    widget.configure(bg = 'pink', fg = 'deep pink',
+                        activebackground = 'pink', troughcolor = 'hot pink', highlightthickness = 0)
+                if isinstance(widget, Checkbutton):
+                    widget.configure(bg = 'pink', fg = 'deep pink',
+                        selectcolor = 'light pink', activebackground = 'pink', activeforeground = 'deep pink')
+            for widget in CreateToolTip.instances:
+                widget.background = '#ffc5cd'
+                widget.foreground = '#ff3aa3'
+                widget.bordercolor = '#ff84c1'
+            style.configure('TFrame', background = 'pink')
+            style.configure('TNotebook', background = 'pink')
+            style.map("TNotebook.Tab", background =[("selected", 'pink')])
+            style.configure('TNotebook.Tab', background = 'lightpink', foreground = 'deep pink')
+            mfont.configure(family='Constantia')
+            tfont.configure(family='Constantia')
 
 if __name__ == '__main__':
     try:

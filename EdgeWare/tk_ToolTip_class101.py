@@ -17,7 +17,8 @@ class CreateToolTip(object):
     """
     create a tooltip for a given widget
     """
-    def __init__(self, widget, text='widget info'):
+    instances = []
+    def __init__(self, widget, text='widget info', bg = None, fg = None, bc = None):
         self.waittime = 1000     #miliseconds
         self.wraplength = 500   #pixels
         self.widget = widget
@@ -27,6 +28,19 @@ class CreateToolTip(object):
         self.widget.bind("<ButtonPress>", self.leave)
         self.id = None
         self.tw = None
+        if bg:
+            self.background = bg
+        else:
+            self.background = '#ffffff'
+        if fg:
+            self.foreground = fg
+        else:
+            self.foreground = '#000000'
+        if bc:
+            self.bordercolor = bc
+        else:
+            self.bordercolor = '#000000'
+        self.__class__.instances.append(self)
 
     def enter(self, event=None):
         self.schedule()
@@ -55,10 +69,12 @@ class CreateToolTip(object):
         # Leaves only the label and removes the app window
         self.tw.wm_overrideredirect(True)
         self.tw.wm_geometry("+%d+%d" % (x, y))
-        label = tk.Label(self.tw, text=self.text, justify='left',
-                       background="#ffffff", relief='solid', borderwidth=1,
-                       wraplength = self.wraplength)
-        label.pack(ipadx=1)
+        self.borderframe = tk.Frame(self.tw, background = self.bordercolor)
+        label = tk.Label(self.borderframe, text=self.text, justify='left',
+                       background= self.background, wraplength = self.wraplength,
+                       foreground= self.foreground)
+        self.borderframe.pack()
+        label.pack(padx=1, pady=1)
 
     def hidetip(self):
         tw = self.tw
@@ -83,4 +99,11 @@ if __name__ == '__main__':
     "First thing's first, I'm the realest. Drop this and let the whole world "
     "feel it. And I'm still in the Murda Bizness. I could hold you down, like "
     "I'm givin' lessons in  physics. You should want a bad Vic like this.")
+
+    btn2 = tk.Button(root, text="dark mode test")
+    btn2.pack(padx=10, pady=5)
+    button2_ttp = CreateToolTip(btn2, \
+    "First thing's first, I'm the realest. Drop this and let the whole world "
+    "feel it. And I'm still in the Murda Bizness. I could hold you down, like "
+    "I'm givin' lessons in  physics. You should want a bad Vic like this.", bg = '#282c34', fg = '#ffffff')
     root.mainloop()

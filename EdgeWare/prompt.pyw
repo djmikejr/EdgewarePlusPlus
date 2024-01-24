@@ -4,7 +4,7 @@ import pathlib
 import json
 import random as rand
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, font
 from tkinter import *
 
 SYS_ARGS = sys.argv.copy()
@@ -17,12 +17,15 @@ maxMistakes = 3
 submission_text = 'I Submit <3'
 command_text    = 'Type for me, slut~'
 moodData = {}
+THEME = 'Original'
 PATH = str(pathlib.Path(__file__).parent.absolute())
 os.chdir(PATH)
 
 
 with open(PATH + '\\config.cfg') as settings:
-    maxMistakes = int(json.loads(settings.read())['promptMistakes'])
+    jsondata = json.loads(settings.read())
+    maxMistakes = int(jsondata['promptMistakes'])
+    THEME = jsondata['themeType']
 
 MOOD_ID = '0'
 if len(SYS_ARGS) >= 1 and SYS_ARGS[0] != '0':
@@ -56,7 +59,45 @@ def unborderedWindow():
     if not hasData:
         exit()
     root = Tk()
-    label = tk.Label(root, text='\n' + command_text + '\n')
+
+    fore = '#000000'
+    back = '#f0f0f0'
+    textb = '#ffffff'
+    textf = '#000000'
+    mainfont = font.nametofont('TkDefaultFont')
+
+    if THEME == 'Dark':
+        fore = '#f9faff'
+        back = '#282c34'
+        textb = '#1b1d23'
+        textf = '#f9faff'
+    if THEME == 'The One':
+        fore = '#00ff41'
+        back = '#282c34'
+        textb = '#1b1d23'
+        textf = '#00ff41'
+        mainfont.configure(family='Consolas', size=8)
+    if THEME == 'Ransom':
+        fore = '#ffffff'
+        back = '#841212'
+        textb = '#ffffff'
+        textf = '#000000'
+        mainfont.configure(family='Arial Bold')
+    if THEME == 'Goth':
+        fore = '#ba9aff'
+        back = '#282c34'
+        textb = '#db7cf2'
+        textf = '#6a309d'
+        mainfont.configure(family='Constantia')
+    if THEME == 'Bimbo':
+        fore = '#ff3aa3'
+        back = '#ffc5cd'
+        textb = '#ffc5cd'
+        textf = '#f43df2'
+        mainfont.configure(family='Constantia')
+
+    root.configure(background=back)
+    label = tk.Label(root, text='\n' + command_text + '\n', bg=back, fg=fore)
     label.pack()
 
     txt = buildText()
@@ -64,20 +105,21 @@ def unborderedWindow():
     wid = root.winfo_screenwidth() / 4
     hgt = root.winfo_screenheight() / 2
 
-    textLabel = Label(root, text=txt, wraplength=wid)
+    textLabel = Label(root, text=txt, wraplength=wid, bg=back, fg=fore)
     textLabel.pack()
 
     root.geometry('%dx%d+%d+%d' % (wid, hgt, 2*wid - wid / 2, hgt - hgt / 2))
 
     root.overrideredirect(1)
-    root.frame = Frame(root, borderwidth=2, relief=RAISED)
+    root.frame = Frame(root, borderwidth=2, relief=RAISED, bg=back)
     root.frame.pack_propagate(True)
     root.wm_attributes('-topmost', 1)
 
-    inputBox = Text(root)
+    inputBox = Text(root, bg=textb, fg=textf)
     inputBox.pack()
 
-    subButton = Button(root, text=submission_text, command=lambda: checkTotal(root, txt, inputBox.get(1.0, "end-1c")))
+    subButton = Button(root, text=submission_text, command=lambda: checkTotal(root, txt, inputBox.get(1.0, "end-1c")), bg=back, fg=fore,
+                        activebackground=back, activeforeground=fore)
     subButton.place(x=wid - 5 - subButton.winfo_reqwidth(), y=hgt - 5 - subButton.winfo_reqheight())
     root.mainloop()
 

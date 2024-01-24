@@ -10,7 +10,7 @@ import webbrowser
 import ctypes
 import threading as thread
 import logging
-from tkinter import messagebox, simpledialog, Tk, Frame, Label, Button, RAISED, StringVar
+from tkinter import messagebox, simpledialog, Tk, Frame, Label, Button, RAISED, StringVar, font
 from itertools import count, cycle
 from PIL import Image, ImageTk, ImageFilter
 try:
@@ -142,6 +142,7 @@ HIBERNATE_MODE = False
 MOOD_OFF = True
 MOOD_FILENAME = True
 MULTI_CLICK = False
+THEME = 'Original'
 
 with open(PATH + '\\config.cfg', 'r') as cfg:
     settings = json.loads(cfg.read())
@@ -176,6 +177,8 @@ with open(PATH + '\\config.cfg', 'r') as cfg:
     MULTI_CLICK = check_setting('multiClick')
 
     HIBERNATE_MODE = check_setting('hibernateMode')
+
+    THEME = settings['themeType']
 
     if HIBERNATE_MODE:
         if settings['hibernateType'] == 'Chaos':
@@ -427,6 +430,30 @@ def pick_resource(basepath, vidYes:bool):
 
 root = Tk()
 
+fore = '#000000'
+back = '#f0f0f0'
+mainfont = font.nametofont('TkDefaultFont')
+
+if THEME == 'Dark':
+    fore = '#f9faff'
+    back = '#282c34'
+if THEME == 'The One':
+    fore = '#00ff41'
+    back = '#282c34'
+    mainfont.configure(family='Consolas', size=8)
+if THEME == 'Ransom':
+    fore = '#ffffff'
+    back = '#841212'
+    mainfont.configure(family='Arial Bold')
+if THEME == 'Goth':
+    fore = '#ba9aff'
+    back = '#282c34'
+    mainfont.configure(family='Constantia')
+if THEME == 'Bimbo':
+    fore = '#ff3aa3'
+    back = '#ffc5cd'
+    mainfont.configure(family='Constantia')
+
 def run():
     #var things
     video_mode = False
@@ -514,7 +541,7 @@ def run():
     elif animated_gif:
         #gif mode
         label = GifLabel(root)
-        label.load(path=os.path.abspath(f'{os.getcwd()}\\resource\\img\\{item}'), resized_width = resized_image.width, resized_height = resized_image.height)
+        label.load(path=os.path.abspath(f'{item}'), resized_width = resized_image.width, resized_height = resized_image.height)
         label.pack()
     else:
         #standard image mode
@@ -586,7 +613,7 @@ def run():
     if caption_text:
         root.caption_string = StringVar()
         root.caption_string.set(root.caption_text)
-        captionLabel = Label(root, textvariable=root.caption_string, wraplength=resized_image.width - border_wid_const)
+        captionLabel = Label(root, textvariable=root.caption_string, wraplength=resized_image.width - border_wid_const, bg=back, fg=fore)
         captionLabel.place(x=5, y=5)
 
     if BUTTONLESS:
@@ -595,7 +622,7 @@ def run():
         root.button_string = StringVar()
         root.button_text = SUBMISSION_TEXT
         root.button_string.set(root.button_text)
-        submit_button = Button(root, textvariable=root.button_string, command=click)
+        submit_button = Button(root, textvariable=root.button_string, command=click, bg=back, fg=fore, activebackground=back, activeforeground=fore)
         submit_button.place(x=resized_image.width - 25 - submit_button.winfo_reqwidth(), y=resized_image.height - 5 - submit_button.winfo_reqheight())
 
     if HIBERNATE_MODE and check_setting('fixWallpaper'):

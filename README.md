@@ -90,6 +90,12 @@ Suggestions I got from people who used the software and I thought would be inter
 **Version: 1**
 A test pack featuring a sampler of all (finished) features found in EdgeWare++, and the pack i've been using to test functionality in. Some features are not complete and will be patched in as time goes on.
 
+## Contact/More Info
+
+I understand i'm pretty elusive and don't talk much, so I apologize if it's difficult to contact me. If you are looking to report a bug, I don't fully know how to use github but I do know a bug report feature works, so we can figure it out together... I also recently made a [twitter account](https://twitter.com/ara10ten) (finally) and post both random ramblings and frequent development updates/screenshots there.
+
+I made a reddit account but was promptly immediately auto-banned for posting a link to EdgeWare++ on the appropriate subreddit as my first post, which is really cool. The part that's *really* awesome is I didn't even know this for a month or so, because reddit's automod bans are like strange shadowbans that don't actually give you this information upfront. So I spent a solid month just replying to posts trying to offer tech support when in reality nobody could see them or access my account. If you're here from reddit, know that I see you guys and your bug reports have been invaluable- for now head on over to my twitter and if reddit ever decides to be not shit and unban me i'll come back over and help people out.
+
 ## EdgeWare++ Patch Notes
 **If you see that there's a new update and are somebody (like me) who is lazy and doesn't like installing every single update if unnecessary, here is how I do versioning:**
 
@@ -98,6 +104,35 @@ A test pack featuring a sampler of all (finished) features found in EdgeWare++, 
 •+0.5-0.25 to version number: new feature, but a smaller one or something not as essential, or lots of bugfixes
 
 •+0.2-0.1 to version number: very small update, usually just a bugfix, accessibility options, UI tweaks
+
+**Version 9**
+
+Probably not what you were expecting, or when you were expecting it! In short, I fell victim to the "post-holiday haze" and proceeded to not really work on anything for half a month after new years. Then I finally decided to light a fire under my ass after hearing multiple reports for pretty serious bugs that I wasn't even aware existed... but after being absent for a month, my brainworms also told me that I probably should release an actual feature alongside it. So I decided to work on something "less convoluted" than corruption, and implemented themes instead. (turns out this was harder to implement than I thought)
+
+Work on corruption will proceed apace next update (unless I get distracted again)
+
+•*Added checking for mood toggle on web treeview load, so config doesn't throw errors even if moods are toggled off*
+
+•*Made the in-config error log more descriptive and less scary sounding*
+
+•*Fixed a bug that made animated gifs no longer work on the newest version- apologies for the delay on getting to this!*
+
+•*Fixed a bug with importing ttkwidgets that could cause errors the first time you launch the program*
+
+•*Changed the messagebox popup for version mismatch (which I forgot existed until now) to check for ++ version instead of base version*
+
+•*Added support for themes, including 6 themes to choose from. Original and Dark for something more standard, and four alternate "fun" themes to pick from!*
+>Some things might look different even if you stay on original, I had to change a few values to make themes compatible- please let me know if this breaks anything on your end!
+
+•*Added a link in this readme to my twitter. Follow me there for development updates!*
+
+KNOWN ISSUES:
+
+•*Switching between themes sometimes breaks the label in the preview window, making it disappear.*
+>I was worried this would also happen when you actually apply the theme, but I have not seen it happen yet on my end. Not sure what the bug is or how to fix it, so will keep it as it is unless I hear it's happening to things outside of the theme preview.
+
+•*Some coloured text displays mono-coloured when using a non default theme*
+>It's not a huge deal and would be a pain to go through and implement this right now, but just know that some things previously highlighted red and green will now be whatever text colour the theme switches to instead.
 
 **Version 8.2**
 
