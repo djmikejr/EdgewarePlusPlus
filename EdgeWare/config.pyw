@@ -14,7 +14,7 @@ import logging
 import time
 import textwrap
 import random as rand
-from tkinter import Tk, ttk, simpledialog, messagebox, filedialog, IntVar, BooleanVar, StringVar, Frame, Checkbutton, Button, Scale, Label, Toplevel, Entry, OptionMenu, Listbox, SINGLE, DISABLED, GROOVE, RAISED, Text, END, Scrollbar, VERTICAL, font
+from tkinter import Tk, ttk, simpledialog, messagebox, filedialog, IntVar, BooleanVar, StringVar, Frame, Checkbutton, Button, Scale, Label, Toplevel, Entry, OptionMenu, Listbox, SINGLE, DISABLED, GROOVE, RAISED, Text, END, Scrollbar, VERTICAL, font, CENTER
 from tk_ToolTip_class101 import CreateToolTip
 
 PATH = f'{str(pathlib.Path(__file__).parent.absolute())}\\'
@@ -107,7 +107,7 @@ CORRUPTION_TEXT         = 'This is a feature not currently implemented in the re
 ADVANCED_TEXT           = 'The "Debug Config Edit" section is also something previously only accessible by directly editing the config.cfg file. It offers full and complete customization of all setting values without any limitations outside of variable typing.\n\n\nPlease use this feature with discretion, as any erroneous values will result in a complete deletion and regeneration of the config file from the default, and certain value ranges are likely to result in crashes or unexpected glitches in the program.\n\nOtherwise, the Troubleshooting tab is fairly self explanatory. All features here will hopefully help issues you might have while running EdgeWare. If you didn\'t already know, you can hover over any option that gives your cursor a "question mark sign" to get a more detailed description of what it does.'
 THANK_AND_ABOUT_TEXT    = '[NOTE: this is the thanks page from the original EdgeWare. I didn\'t want to replace/remove it and erase credit to the original creator! Sorry if this caused confusion!]\n\nThank you so much to all the fantastic artists who create and freely distribute the art that allows programs like this to exist, to all the people who helped me work through the various installation problems as we set the software up (especially early on), and honestly thank you to ALL of the people who are happily using Edgeware. \n\nIt truly makes me happy to know that my work is actually being put to good use by people who enjoy it. After all, at the end of the day that\'s really all I\'ve ever really wanted, but figured was beyond reach of a stupid degreeless neet.\nI love you all <3\n\n\n\nIf you like my work, please feel free to help support my neet lifestyle by donating to $PetitTournesol on Cashapp; by no means are you obligated or expected to, but any and all donations are greatly appreciated!'
 
-PLUSPLUS_TEXT           = 'Thanks for taking the time to check out this extension on EdgeWare! However you found it, I appreciate that it interested you enough to give it a download.\n\nI am not an expert programmer by any means, so apologies if there are any bugs or errors in this version. My goal is to not do anything crazy ambitious like rewrite the entire program or fix up the backend, but rather just add on functionality that I thought could improve the base version. Because of this, i\'m hoping that compatability between those who use normal EdgeWare and those who use this version stays relatively stable. If you were given this version directly without a download link and are curious about development updates, you can find updates and links to the github @ twitter @ara10ten.\n\n Current changes:\n\n•Added a option under "misc" to enable/disable desktop icon generation.\n•Added options to cap the number of audio popups and video popups.\n•Added a chance slider for subliminals, and a max subliminals slider.\n•Added feature to change Startup Graphic and Icon per pack. (name the file(s) \"loading_splash\" and/or \"icon.ico\" in the resource folder)\n•Added feature to enable warnings for \"Dangerous Settings\".\n•Added hover tooltips on some things to make the program easier to understand.\n•Added troubleshooting tab under \"advanced\" with some settings to fix things for certain users.\n•Added feature to click anywhere on popup to close.\n•Made the EdgewareSetup.bat more clear with easier to read text. Hopefully if you\'re seeing this it all worked out!\n•Moved the import/export resources button to be visible on every page, because honestly they\'re pretty important\n•Added the \"Pack Info\" tab with lots of fun goodies and stats so you know what you\'re getting into with each pack.\n•Added a simplified error console in the \"advanced\" tab.\n•Overhauled Hibernate with a bunch of new modes and features\n•Added file tab with multiple file management settings\n•Added feature to enable or disable moods (feature in regular edgeware that went unused afaik)\n•Added corruption. What is it? Dont worry about it.\n•Added support to playing videos in VLC, enabling faster loading.\n•Added advanced caption settings to captions.json.\n•Added theme support with multiple themes to switch between.'
+PLUSPLUS_TEXT           = 'Thanks for taking the time to check out this extension on EdgeWare! However you found it, I appreciate that it interested you enough to give it a download.\n\nI am not an expert programmer by any means, so apologies if there are any bugs or errors in this version. My goal is to not do anything crazy ambitious like rewrite the entire program or fix up the backend, but rather just add on functionality that I thought could improve the base version. Because of this, i\'m hoping that compatability between those who use normal EdgeWare and those who use this version stays relatively stable. If you were given this version directly without a download link and are curious about development updates, you can find updates and links to the github @ twitter @ara10ten.\n\n Current changes:\n\n•Added a option under "misc" to enable/disable desktop icon generation.\n•Added options to cap the number of audio popups and video popups.\n•Added a chance slider for subliminals, and a max subliminals slider.\n•Added feature to change Startup Graphic and Icon per pack. (name the file(s) \"loading_splash\" and/or \"icon.ico\" in the resource folder)\n•Added feature to enable warnings for \"Dangerous Settings\".\n•Added hover tooltips on some things to make the program easier to understand.\n•Added troubleshooting tab under \"advanced\" with some settings to fix things for certain users.\n•Added feature to click anywhere on popup to close.\n•Made the EdgewareSetup.bat more clear with easier to read text. Hopefully if you\'re seeing this it all worked out!\n•Moved the import/export resources button to be visible on every page, because honestly they\'re pretty important\n•Added the \"Pack Info\" tab with lots of fun goodies and stats so you know what you\'re getting into with each pack.\n•Added a simplified error console in the \"advanced\" tab.\n•Overhauled Hibernate with a bunch of new modes and features\n•Added file tab with multiple file management settings\n•Added feature to enable or disable moods (feature in regular edgeware that went unused afaik)\n•Added corruption. What is it? Dont worry about it.\n•Added support to playing videos in VLC, enabling faster loading.\n•Added advanced caption settings to captions.json.\n•Added theme support with multiple themes to switch between.\n•Pack creators can now create a config preset for their pack.'
 PACKINFO_TEXT          = 'The pack info section contains an overview for whatever pack is currently loaded.\n\nThe \"Stats\" tab allows you to see what features are included in the current pack (or if a pack is even loaded at all), but keep in mind all of these features have default fallbacks if they aren\'t included. It also lets you see a lot of fun stats relating to the pack, including almost everything you\'ll encounter while using EdgeWare. Keep in mind that certain things having \"0\" as a stat doesn\'t mean you can\'t use it, for example, having 0 subliminals uses the default spiral and having 0 images displays a very un-sexy circle.\n\nThe \"Information\" tab gets info on the pack from //resource//info.json, which is a new addition to EdgeWare++. This feature was added to allow pack creators to give the pack a formal name and description without having to worry about details being lost if transferred from person to person. Think of it like a readme. Also included in this section is the discord status info, which gives what your discord status will be set to if that setting is turned on, along with the image. As of time of writing (or if I forget to update this later), the image cannot be previewed as it is \"hard coded\" into EdgeWare\'s discord application and accessed through the API. As I am not the original creator of EdgeWare, and am not sure how to contact them, the best I could do is low-res screenshots or the name of each image. I chose the latter. Because of this hard-coding, the only person i\'ve run into so far who use these images is PetitTournesol themselves, but it should be noted that anyone can use them as long as they know what to add to the discord.dat file. This is partially the reason I left this information in.\n\nThe \"Moods\" tab is where you can access mood settings and previews for the current pack. The left table shows information for media (linking moods to images, videos, etc), captions, and prompts, while the \"Corruption Path\" area shows how these moods correlate to corruption levels.'
 FILE_TEXT              = 'The file tab is for all your file management needs, whether it be saving things, loading things, deleting things, or looking around in config folders. The Preset window has also been moved here to make more room for general options.\n\nThere are only two things that aren\'t very self explanatory: deleting logs and unique IDs.\n\nWhile deleting logs is fairly straightforward, it should be noted that it will not delete the log currently being written during the session, so the \"total logs in folder\" stat will always display as \"1\".\n\nUnique IDs are a feature to help assist with saving moods. In short, they are a generated identifier that is used when saving to a \"moods json file\", which is tapped into when selecting what moods you want to see in the \"Pack Info\" tab. Unique IDs are only used if the pack does not have a \'info.json\' file, otherwise the pack name is just used instead. If you are rapidly editing a pack without info.json and want EdgeWare++ to stop generating new mood files, there is an option to disable it in the troubleshooting tab.\n\n When manually editing mood config jsons, you don\'t need to worry about how the unique ID is generated- the file tab will tell you what to look for. If you are curious though, here is the exact formula:\n\nnum_images + num_audio + num_video + wallpaper(y/n) + loading_splash(y/n) + discord_status(y/n) + icon(y/n) + corruption(y/n)\n\nFor example:\nA pack with 268 images, 7 audio, 6 videos, has a wallpaper, doesn\'t have a custom loading splash, has a discord status, doesn\'t have a custom icon, and doesn\'t have a corruption file, would generate \"26876wxdxx.json\" in //moods//unnamed (mood files go in unnamed when using unique IDs)'
 
@@ -451,6 +451,8 @@ def show_window():
             themeTypeVar              = StringVar(root, value=(settings['themeType'].strip()))
             themeNoConfigVar          = BooleanVar(root, value=(int(settings['themeNoConfig'])==1))
 
+            presetsDangerVar          = BooleanVar(root, value=(int(settings['presetsDanger'])==1))
+
 
             #grouping for sanity's sake later
             in_var_group = [delayVar, popupVar, webVar, audioVar, promptVar, fillVar,
@@ -469,7 +471,7 @@ def show_window():
                             hibernateLengthVar, fixWallpaperVar, toggleHibSkipVar, toggleMoodSetVar,
                             corruptionModeVar, corruptionTimeVar, pumpScareOffsetVar, corruptionFadeTypeVar,
                             vlcModeVar, captionFilenameVar, singleModeVar, multiClickVar, themeTypeVar,
-                            themeNoConfigVar]
+                            themeNoConfigVar, presetsDangerVar]
 
             in_var_names = ['delay', 'popupMod', 'webMod', 'audioMod', 'promptMod', 'fill',
                             'fill_delay', 'replace', 'replaceThresh', 'start_on_logon',
@@ -486,7 +488,7 @@ def show_window():
                             'toggleInternet', 'buttonless', 'hibernateType', 'hibernateLength', 'fixWallpaper',
                             'toggleHibSkip', 'toggleMoodSet', 'corruptionMode', 'corruptionTime', 'pumpScareOffset',
                             'corruptionFadeType', 'vlcMode', 'captionFilename', 'singleMode', 'multiClick',
-                            'themeType', 'themeNoConfig']
+                            'themeType', 'themeNoConfig', 'presetsDanger']
             break
         except Exception as e:
             messagebox.showwarning(
@@ -818,7 +820,6 @@ def show_window():
                 if isinstance(widget, Button):
                     widget.configure(bg = '#f0f0f0', fg = 'black', font = 'TkDefaultFont',
                         activebackground = '#f0f0f0', activeforeground = 'black')
-                    print(widget.cget('font'))
                 if isinstance(widget, Label):
                     widget.configure(bg = '#f0f0f0', fg = 'black', font = 'TkDefaultFont')
                 if isinstance(widget, OptionMenu):
@@ -1316,7 +1317,7 @@ def show_window():
     corruptionTimeFrame = Frame(corruptionFrame)
 
     corruptionToggle = Checkbutton(corruptionSettingsFrame, text='Turn on Corruption', variable=corruptionModeVar, cursor='question_arrow')
-    corruptionRecommendedToggle = Button(corruptionSettingsFrame, text='Recommended Settings', cursor='question_arrow')
+    corruptionRecommendedToggle = Button(corruptionSettingsFrame, text='Recommended Settings', cursor='question_arrow', command=lambda: packPreset(in_var_group, in_var_names, 'corruption', presetsDangerVar.get()))
 
     corruptionFrame.pack(fill='x')
 
@@ -1333,13 +1334,85 @@ def show_window():
                                         ' folder. Over time moods will \"unlock\", leading to new things you haven\'t seen before the longer you use'
                                         ' EdgeWare.\n\nFor more information, check out the \"About\" tab. \n\nNOTE: currently not implemented! Holy god I hope I remember to remove this notice later!')
     corruptionsettingsttp = CreateToolTip(corruptionRecommendedToggle, 'Pack creators can set \"default corruption settings\" for their pack, to give'
-                                        ' users a more designed and consistent experience. This setting turns those on (if they exist).')
+                                        ' users a more designed and consistent experience. This setting turns those on (if they exist).'
+                                        '\n\nSidenote: this will load configurations similarly to the option in the \"Pack Info\" tab, however this one will only load corruption-specific settings.')
 
     corruptionTimerButton = Button(corruptionTimeFrame, text='Manual time...', command=lambda: assign(corruptionTimeVar, simpledialog.askinteger('Manual Level Time (sec)', prompt='[5-1800]: ')))
     corruptionTimerScale = Scale(corruptionTimeFrame, label='Level Time', variable=corruptionTimeVar, orient='horizontal', from_=5, to=1800)
 
     corruptionTimerScale.pack(fill='y')
     corruptionTimerButton.pack(fill='y')
+
+    corruptionFadeFrame = Frame(tabCorruption, borderwidth=5, relief=RAISED)
+    fadeInfoFrame = Frame(corruptionFadeFrame)
+    fadeImageFrame = Frame(corruptionFadeFrame)
+
+    fade_types = ['Normal', 'Abrupt', 'Noise']
+    fadeDropdown = OptionMenu(fadeInfoFrame, corruptionFadeTypeVar, *fade_types, command=lambda key: fadeHelper(key))
+    fadeDescription = Label(fadeInfoFrame, text='Error loading fade description!', borderwidth=2, relief=GROOVE, wraplength=175)
+    fadeImageNormal = ImageTk.PhotoImage(file=os.path.join(PATH, 'default_assets', 'corruption_defaultfade.png'))
+    fadeImageContainer = Label(fadeImageFrame, image=fadeImageNormal, borderwidth=2, relief=GROOVE)
+
+    def fadeHelper(key):
+        if key == 'Normal':
+            fadeDescription.configure(text='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do')
+            fadeImageContainer.configure(image=fadeImageNormal)
+
+    corruptionFadeFrame.pack(fill='x')
+    fadeInfoFrame.pack(side='left', fill='both')
+    fadeDropdown.pack(side='left')
+    fadeDescription.pack(side='left', fill='y', padx=3, ipadx=2, ipady=2)
+    fadeImageFrame.pack(fill='both', expand=1)
+    fadeImageContainer.place(relx=.5, rely=.5, anchor=CENTER)
+
+    fadeHelper(corruptionFadeTypeVar.get())
+
+
+    corruptionPathFrame = Frame(tabCorruption, borderwidth=5, relief=RAISED)
+
+    corruptionLabel = '--CORRUPTION PATH--'
+    corruptionPathLabel = Label(corruptionPathFrame, text=corruptionLabel)
+
+    pathInnerFrame = Frame(corruptionPathFrame)
+    pathTree = ttk.Treeview(pathInnerFrame, height=6, show='headings', columns=('level', 'moods'))
+    pathScrollbarY = ttk.Scrollbar(corruptionPathFrame, orient='vertical', command=pathTree.yview)
+    pathScrollbarX = ttk.Scrollbar(pathInnerFrame, orient='horizontal', command=pathTree.xview)
+    pathTree.configure(yscroll=pathScrollbarY.set, xscroll=pathScrollbarX.set)
+
+    pathTree.heading('level', text='LEVEL')
+    pathTree.column('level', width=40, stretch=False, anchor='center')
+    pathTree.heading('moods', text='MOODS', anchor='w')
+
+    corruptionList = []
+    lineWidth = 0
+    if os.path.isfile(PATH + '\\resource\\corruption.json'):
+        try:
+            with open((PATH + '\\resource\\corruption.json'), 'r') as f:
+                l = json.loads(f.read())
+                for key in l:
+                    corruptionList.append((f'{key}', str(l[key]).strip('[]')))
+
+        except Exception as e:
+            logging.warning(f'error in corruption.json. Aborting preview load. {e}')
+            errors_list.append('Something is wrong with the currently loaded corruption.json file!\n')
+        try:
+            for level in corruptionList:
+                if sum(len(i) for i in level) > lineWidth:
+                    lineWidth = sum(len(i) for i in level)
+                pathTree.insert('', 'end', values=level)
+        except Exception as e:
+            logging.warning(f'error in loading corruption treeview. {e}')
+            errors_list.append('The corruption treeview could not load properly!\n')
+
+    #just doing a magic number, long story short treeview is butts for horizontal scrolling
+    pathTree.column('moods', anchor='w', stretch=True, minwidth=int(lineWidth*5.5))
+
+    corruptionPathFrame.pack(fill='x')
+    corruptionPathLabel.pack(pady=1, fill='x', side='top')
+    pathInnerFrame.pack(fill='both', side='left', expand=1)
+    pathScrollbarX.pack(side='bottom', fill='x')
+    pathTree.pack(side='left', fill='both', expand=1)
+    pathScrollbarY.pack(side='left', fill='y')
     #===================={DRIVE}==============================#
     tabMaster.add(tabDrive, text='Drive')
 
@@ -1668,7 +1741,7 @@ def show_window():
 
     subliminalStat = len(os.listdir(PATH + '\\resource\\subliminals\\')) if os.path.exists(PATH + '\\resource\\subliminals\\') else 0
 
-    statsFrame.pack(fill='x', padx=3, pady=1)
+    statsFrame.pack(fill='x', pady=1)
     statsFrame1.pack(fill='x', side='top')
     imageStatsFrame.pack(fill='x', side='left', expand=1)
     Label(imageStatsFrame, text='Images', font='Default 10').pack(pady=2, side='top')
@@ -1720,7 +1793,7 @@ def show_window():
     infoDescriptionWrap = textwrap.TextWrapper(width=80, max_lines=5)
     descriptionVarLabel = Label(descriptionFrame, text=infoDescriptionWrap.fill(text=f'{info_description}'))
 
-    infoDescFrame.pack(fill='x', padx=3)
+    infoDescFrame.pack(fill='x', pady=2)
     subInfoFrame.pack(fill='x', side='left', expand=1)
 
     nameFrame.pack(fill='x')
@@ -1781,7 +1854,7 @@ def show_window():
     discordStatusVarLabel = Label(discordStatusFrame, text=f'{info_discord[0]}')
     discordStatusImageVarLabel = Label(discordStatusFrame, text=f'{info_discord[1]}', cursor='question_arrow')
 
-    discordStatusFrame.pack(fill='x', padx=3)
+    discordStatusFrame.pack(fill='x', pady=2)
     discordStatusLabel.pack(padx=2, pady=2, side='left')
     ttk.Separator(discordStatusFrame, orient='vertical').pack(fill='y', side='left')
     discordStatusVarLabel.pack(padx=2, pady=2, side='left', expand=1)
@@ -1802,6 +1875,44 @@ def show_window():
                                     'Because of this, only packs created by the original EdgeWare creator, PetitTournesol, have custom status images.\n\n'
                                     'Nevertheless, I have decided to put this here not only for those packs, but also for other '
                                     'packs that tap in to the same image IDs.')
+    if os.path.exists(PATH + '\\resource\\config.json'):
+        with open(PATH + '\\resource\\config.json') as f:
+            try:
+                l = json.loads(f.read())
+                if 'version' in l: del l['version']
+                if 'versionplusplus' in l: del l['versionplusplus']
+                configNum = len(l)
+            except Exception as e:
+                logging.warning(f'could not load pack suggested settings. Reason: {e}')
+                configNum = "N/A"
+                toggleAssociateSettings(False, configPresetsButton)
+    else:
+        configNum = "N/A"
+        toggleAssociateSettings(False, configPresetsButton)
+    packConfigPresets = Frame(tabPackInfo, borderwidth=5, relief=RAISED)
+    configPresetsSub1 = Frame(packConfigPresets)
+    configPresetsSub2 = Frame(packConfigPresets)
+    configPresetsLabel = Label(configPresetsSub1, text=f'Number of suggested config settings: {configNum}')
+    presetsDangerToggle = Checkbutton(configPresetsSub1, text='Toggle on warning failsafes', variable=presetsDangerVar, cursor='question_arrow')
+    configPresetsButton = Button(configPresetsSub2, text='Load Pack Configuration', cursor='question_arrow', command=lambda: packPreset(in_var_group, in_var_names, 'full', presetsDangerVar.get()))
+
+    presetdangerttp = CreateToolTip(presetsDangerToggle, 'Toggles on the \"Warn if \"Dangerous\" Settings Active\" setting after loading the '
+                        'pack configuration file, regardless if it was toggled on or off in those settings.\n\nWhile downloading and loading '
+                        'something that could be potentially malicious is a fetish in itself, this provides some peace of mind for those of you '
+                        'who are more cautious with unknown files. More information on what these failsafe warnings entail is listed on the relevant '
+                        'setting tooltip in the \"General\" tab.')
+    configpresetttp = CreateToolTip(configPresetsButton, 'In EdgeWare++, the functionality was added for pack creators to add a config file to their pack, '
+                        'allowing for quick loading of setting presets tailored to their intended pack experience. It is highly recommended you save your '
+                        'personal preset beforehand, as this will overwrite all your current settings.\n\nIt should also be noted that this can potentially '
+                        'enable settings that can change or delete files on your computer, if the pack creator set them up in the config! Be careful out there!')
+
+    packConfigPresets.pack(fill='x', pady=2)
+    configPresetsSub1.pack(fill='both', side='left', expand=1)
+    configPresetsSub2.pack(fill='both', side='left', expand=1)
+    configPresetsLabel.pack(fill='both', side='top')
+    presetsDangerToggle.pack(fill='both', side='top')
+    configPresetsButton.pack(fill='both', expand=1)
+
     #Moods
     Label(tabPackInfo, text='Moods', font=titleFont, relief=GROOVE).pack(pady=2)
 
@@ -2003,100 +2114,6 @@ def show_window():
 
     webTree.pack(side='left', fill='both', expand=1)
     webScrollbar.pack(side='left', fill='y')
-
-    #corruption
-
-    moodsPathFrame = Frame(moodsFrame)
-
-    moodsPathFrame.grid(row=0, column=1, sticky="nsew")
-
-    corruptionLabel = '--CORRUPTION PATH--'
-    moodsPathLabel = Label(moodsPathFrame, text=corruptionLabel)
-
-    #putting too much work into a really minor display feature when the rest of the app is more functional than fancy... thats a classic
-    def animateCorruption(text):
-        trueLabel = '--CORRUPTION PATH--'
-        try:
-            err = 0
-            n = 0
-            for i in range(len(text)):
-                if trueLabel[i] is not text[i]:
-                    err += 1
-                    #logging.info(f'err {err}')
-            if err >= 1:
-                for i in range(len(text)):
-                    if trueLabel[i] is not text[i]:
-                        n += i
-                        break
-            else:
-                n += rand.randint(0, len(text)-1)
-                #logging.info(f'n {n}')
-            finaltext = ''
-            if trueLabel[n] == text[n]:
-                for i, txt in enumerate(text):
-                    if i == n:
-                        finaltext = finaltext + rand.choice(['!','@','#','%','^','&','*','x','X','-','_'])
-                    else:
-                        finaltext = finaltext + txt
-                if rand.randint(1,5) == 5:
-                    moodsPathLabel.configure(fg='red')
-                corruptionLabel = finaltext
-                moodsPathLabel.after(500, animateCorruption, corruptionLabel)
-            else:
-                for i, txt in enumerate(text):
-                    if i == n:
-                        finaltext = finaltext + trueLabel[n]
-                    else:
-                        finaltext = finaltext + txt
-                if moodsPathLabel.cget('fg') == 'red':
-                    moodsPathLabel.configure(fg='black')
-                corruptionLabel = finaltext
-                moodsPathLabel.after(rand.randint(5000, 10000), animateCorruption, corruptionLabel)
-            moodsPathLabel.configure(text=corruptionLabel)
-        except Exception as e:
-            logging.warning(f'Error in the corruption text animation. Not doing the animation, since it\'s not necessary! {e}')
-            errors_list.append('Something went wrong with the corruption text animation! But don\'t worry, it\'s not necessary at all... I just tried to be fancy and really fucked up!!!\n')
-
-    pathInnerFrame = Frame(moodsPathFrame)
-    pathTree = ttk.Treeview(pathInnerFrame, height=6, show='headings', columns=('level', 'moods'))
-    pathScrollbarY = ttk.Scrollbar(pathInnerFrame, orient='vertical', command=pathTree.yview)
-    pathScrollbarX = ttk.Scrollbar(pathInnerFrame, orient='horizontal', command=pathTree.xview)
-    pathTree.configure(yscroll=pathScrollbarY.set, xscroll=pathScrollbarX.set)
-
-    pathTree.heading('level', text='LEVEL')
-    pathTree.column('level', width=40, stretch=False, anchor='center')
-    pathTree.heading('moods', text='MOODS', anchor='w')
-
-    corruptionList = []
-    lineWidth = 0
-    if statusCorruption:
-        try:
-            with open((PATH + '\\resource\\corruption.json'), 'r') as f:
-                l = json.loads(f.read())
-                for key in l:
-                    corruptionList.append((f'{key}', str(l[key]).strip('[]')))
-
-        except Exception as e:
-            logging.warning(f'error in corruption.json. Aborting preview load. {e}')
-            errors_list.append('Something is wrong with the currently loaded corruption.json file!\n')
-        try:
-            for level in corruptionList:
-                if sum(len(i) for i in level) > lineWidth:
-                    lineWidth = sum(len(i) for i in level)
-                pathTree.insert('', 'end', values=level)
-        except Exception as e:
-            logging.warning(f'error in loading corruption treeview. {e}')
-            errors_list.append('The corruption treeview could not load properly!\n')
-
-    #just doing a magic number, long story short treeview is butts for horizontal scrolling
-    pathTree.column('moods', anchor='w', stretch=True, minwidth=int(lineWidth*5.5))
-
-    moodsPathLabel.pack(pady=1, fill='x', side='top')
-    pathInnerFrame.pack(fill='both', side='top')
-    pathScrollbarX.pack(side='bottom', fill='x')
-    pathTree.pack(side='left', fill='both', expand=1)
-    pathScrollbarY.pack(side='left', fill='y')
-
 
     moodsFrame.grid_columnconfigure(0, weight=1, uniform='group1')
     moodsFrame.grid_columnconfigure(1, weight=1, uniform='group1')
@@ -2417,7 +2434,6 @@ def show_window():
     #   the version will still be red to draw attention to it
     if local_pp_version.split('_')[0] != webvpp.split('_')[0] and not (local_pp_version.endswith('DEV') or settings['toggleInternet']):
         messagebox.showwarning('Update Available', 'Main local version and web version are not the same.\nPlease visit the Github and download the newer files.')
-    root.after(10000, animateCorruption, corruptionLabel)
     root.mainloop()
 
 def explorerView(url):
@@ -3085,6 +3101,45 @@ def themeChange(theme:str, root, style, mfont, tfont):
             style.configure('TNotebook.Tab', background = 'lightpink', foreground = 'deep pink')
             mfont.configure(family='Constantia')
             tfont.configure(family='Constantia')
+
+#applyPreset already exists, but there's a reason i'm not using it. I want the per-pack preset to not include every setting unless specified to do so, and
+#I also want the settings to not automatically be saved in case the user does not like what the pack sets.
+def packPreset(varList:list[StringVar | IntVar | BooleanVar], nameList:list[str], presetType:str, danger):
+    with open(PATH + '\\resource\\config.json') as f:
+        try:
+            l = json.loads(f.read())
+            print(l)
+            if 'version' in l: del l['version']
+            if 'versionplusplus' in l: del l['versionplusplus']
+            filter = []
+            num = 0
+            if presetType == 'full':
+                filter = nameList
+            if presetType == 'corruption':
+                filter = ['corruptionMode', 'corruptionTime', 'corruptionFadeType']
+            for c in l:
+                if c in filter:
+                    num += 1
+                    print(f'{c} matches. Looking for list number...')
+                    loc = nameList.index(c)
+                    print(f'{c}\'s location in in_var_names is {loc}. Changing value of var {loc} in in_var_group...')
+                    if isinstance(varList[loc], IntVar):
+                        varList[loc].set(int(l[c]))
+                    if isinstance(varList[loc], BooleanVar):
+                        varList[loc].set(l[c]==1)
+                    if isinstance(varList[loc], StringVar):
+                        varList[loc].set(l[c].strip())
+            messagebox.showinfo('Load Completed', f'Pack config settings have been loaded successfully. There were {num} settings loaded.'
+                '\n\nChanges have not been automatically saved. You may choose to look over the new settings before either saving or exiting the program.')
+            if danger:
+                for c in nameList:
+                    if c == 'safeMode':
+                        safeloc = nameList.index(c)
+                        break
+                varList[safeloc].set(True)
+        except Exception as e:
+            logging.warning(f'could not load pack suggested settings. Reason: {e}')
+            messagebox.showwarning('Error Loading File', f'There was an issue loading the pack config file. {e}')
 
 if __name__ == '__main__':
     try:

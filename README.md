@@ -54,9 +54,11 @@ The EdgeWare++ Pack Editor is now live [here](https://github.com/araten10/Edgewa
 
 •*"Single Mode", allowing only one popup to spawn per popup roll, making for a more consistent experience if desired*
 
-## Planned Additions:
+•*Different graphical themes, including dark mode (and a few other fun ones!)*
 
-•*Dark Mode*
+•*Allowing creation of a per-pack config setup, to help pack creators show off their "intended" settings*
+
+## Planned Additions:
 
 •*Giving mitosis a percentage activation slider*
 
@@ -78,12 +80,19 @@ Suggestions I got from people who used the software and I thought would be inter
 
 •*New type of popup: full screen text, taken from caption file. Like subliminals but briefly flashing on full screen.*
 
-•*Randomized settings button. Might implement when i'm mostly done adding new config vars, but also gave me the idea for pack creators to be able to make "recommended settings" that you can switch to in the pack info tab*
+•*Randomized settings button*
 
 •*Support for confining edgeware to a single monitor, which actually sounds like a really good idea but i'd want to test it on a few monitor setups and it sounds fairly technical*
 
 •*More "classic virus"-y popup options, like [moving popups](https://www.youtube.com/watch?v=LSgk7ctw1HY)*
 
+•*Windows "stealing focus", forcing you to do things like enter prompts before you're allowed to do anything else*
+
+•*Different folder for long audio files or "BGM", to be able to separate short and longer sounds (or another solution to this if not a folder)*
+
+•*Themes being able to associate with moods*
+
+•*Popup opening/closing sounds, would also theoretically hook into moods as well*
 ## Packs
 
 [**EdgeWare++ Test Pack**](https://mega.nz/file/0acUQarB#QNyaZPkGYOGQgOi_W-up6n14rv_w8NSP-hN16qczC44)
@@ -92,9 +101,9 @@ A test pack featuring a sampler of all (finished) features found in EdgeWare++, 
 
 ## Contact/More Info
 
-I understand i'm pretty elusive and don't talk much, so I apologize if it's difficult to contact me. If you are looking to report a bug, I don't fully know how to use github but I do know a bug report feature works, so we can figure it out together... I also recently made a [twitter account](https://twitter.com/ara10ten) (finally) and post both random ramblings and frequent development updates/screenshots there.
+I understand i'm pretty elusive and don't talk much, so I apologize if it's difficult to contact me. If you are looking to report a bug, I don't fully know how to use github but I do know a bug report feature works, so we can figure it out together... I also recently made a [twitter account](https://twitter.com/ara10ten) (finally) and post both random ramblings and frequent development updates/screenshots there. I also have a reddit account I use to answer tech support questions and browse for new packs occasionally on /r/edgingware (of which I have no official affiliation with).
 
-I made a reddit account but was promptly immediately auto-banned for posting a link to EdgeWare++ on the appropriate subreddit as my first post, which is really cool. The part that's *really* awesome is I didn't even know this for a month or so, because reddit's automod bans are like strange shadowbans that don't actually give you this information upfront. So I spent a solid month just replying to posts trying to offer tech support when in reality nobody could see them or access my account. If you're here from reddit, know that I see you guys and your bug reports have been invaluable- for now head on over to my twitter and if reddit ever decides to be not shit and unban me i'll come back over and help people out.
+1/31/2024: I have been suspended from twitter due to a mass suspension for reasons that don't make sense and are likely a bug. I am not sure if I will get my account back. I am leaving the link up in case I do, otherwise I will find another way to talk with you guys...
 
 ## EdgeWare++ Patch Notes
 **If you see that there's a new update and are somebody (like me) who is lazy and doesn't like installing every single update if unnecessary, here is how I do versioning:**
@@ -104,6 +113,21 @@ I made a reddit account but was promptly immediately auto-banned for posting a l
 •+0.5-0.25 to version number: new feature, but a smaller one or something not as essential, or lots of bugfixes
 
 •+0.2-0.1 to version number: very small update, usually just a bugfix, accessibility options, UI tweaks
+
+**Version 9.3**
+
+Remember about how I was banned from reddit because automoderation deleted my account thinking I was a spambot? Now twitter banned me because it said I was "evading suspension" (despite not having any other twitter accounts)! Turns out this is happening to a ton of people, it seems to be some strange bug that is just mass banning people. In theory this should be fine and I should get my account back, but it's twitter, and considering how dismal the automated support I got in trying to appeal this has been so far, I don't have much hope. I kind of feel like the outcome will be acknowledging the bug but not reinstating my account.
+
+I'm kind of frustrated as this is the second account i've had suspended in a week by automoderation not working properly, so I think i'm going to just take a break for a short bit and cool off. Luckily, this update (should) be stable enough to launch as the last major feature I worked on I managed to finish before this happened. There will be a few new things that are unimplemented, but they're all related to the corruption tab so not a huge deal. Especially for this update since i'm pushing it out, if you see any fatal bugs let me know so I can fix them!
+
+•*Moved the corruption path to the corruption tab*
+
+•*Also axed the corruption path "fancy text", since it didn't play well with most themes, and was overly code heavy for what it was*
+
+•*Added a "Pack Config Preset" setting in the "Pack Info" tab, which allows for pack creators to make settings presets for their packs. These are not automatically saved, and the user can view the changes before deciding to save themselves or simply exit the program.*
+>To make one of these for your pack, create a "config.json" file in your pack resource zip. This follows the exact same formatting as a regular config file, but doesn't need all of the arguments to run properly. For example, if you just wanted to change popup delay to 5 seconds, you could just create a config.json file with the contents {"delay": 1000}. Alternatively, you could also just save your config.cfg, and copy it over to this json file, whatever is easier.
+
+*Added a few more backend things to the corruption tab, progressing it's status from "unimplemented" to "still unimplemented, but closer to completion".*
 
 **Version 9**
 
