@@ -1885,10 +1885,10 @@ def show_window():
             except Exception as e:
                 logging.warning(f'could not load pack suggested settings. Reason: {e}')
                 configNum = "N/A"
-                toggleAssociateSettings(False, configPresetsButton)
+                #toggleAssociateSettings(False, configPresetsButton)
     else:
         configNum = "N/A"
-        toggleAssociateSettings(False, configPresetsButton)
+        #toggleAssociateSettings(False, configPresetsButton)
     packConfigPresets = Frame(tabPackInfo, borderwidth=5, relief=RAISED)
     configPresetsSub1 = Frame(packConfigPresets)
     configPresetsSub2 = Frame(packConfigPresets)
