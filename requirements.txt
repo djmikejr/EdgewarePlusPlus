@@ -1,0 +1,13 @@
+bs4
+get-video-properties
+imageio
+moviepy
+pillow
+playsound==1.2.2
+pygobject
+pypresence
+pystray
+python-vlc
+requests
+sounddevice
+ttkwidgets

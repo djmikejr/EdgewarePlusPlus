@@ -13,6 +13,8 @@ import logging
 from tkinter import messagebox, simpledialog, Tk, Frame, Label, Button, RAISED, StringVar, font
 from itertools import count, cycle
 from PIL import Image, ImageTk, ImageFilter
+from utils import utils
+import subprocess
 try:
     import vlc
 except:
@@ -23,7 +25,6 @@ SYS_ARGS.pop(0)
 
 #Start Imported Code
 #Code from: https://code.activestate.com/recipes/460509-get-the-actual-and-usable-sizes-of-all-the-monitor/
-user = ctypes.windll.user32
 
 class RECT(ctypes.Structure): #rect class for containing monitor info
     _fields_ = [
@@ -34,14 +35,6 @@ class RECT(ctypes.Structure): #rect class for containing monitor info
         ]
     def dump(self):
         return map(int, (self.left, self.top, self.right, self.bottom))
-
-class MONITORINFO(ctypes.Structure): #unneeded for this, but i don't want to rework the entire thing because i'm stupid
-    _fields_ = [
-        ('cbSize', ctypes.c_ulong),
-        ('rcMonitor', RECT),
-        ('rcWork', RECT),
-        ('dwFlags', ctypes.c_ulong)
-        ]
 
 class prefix_data:
     def __init__(self, name, captions = None, images = None, max = 1, chance = 100.0):
@@ -67,34 +60,6 @@ class prefix_data:
         self.chance = float(chance)
 
 prefixes = {}
-
-def get_monitors():
-    retval = []
-    CBFUNC = ctypes.WINFUNCTYPE(ctypes.c_int, ctypes.c_ulong, ctypes.c_ulong, ctypes.POINTER(RECT), ctypes.c_double)
-    def cb(hMonitor, hdcMonitor, lprcMonitor, dwData):
-        r = lprcMonitor.contents
-        data = [hMonitor]
-        data.append(r.dump())
-        retval.append(data)
-        return 1
-    cbfunc = CBFUNC(cb)
-    temp = user.EnumDisplayMonitors(0, 0, cbfunc, 0)
-    return retval
-
-def monitor_areas(): #all that matters from this is list(mapObj[monitor index][1])[k]; this is the list of monitor dimensions
-    retval = []
-    monitors = get_monitors()
-    for hMonitor, extents in monitors:
-        data = [hMonitor]
-        mi = MONITORINFO()
-        mi.cbSize = ctypes.sizeof(MONITORINFO)
-        mi.rcMonitor = RECT()
-        mi.rcWork = RECT()
-        res = user.GetMonitorInfoA(hMonitor, ctypes.byref(mi))
-        data.append(mi.rcMonitor.dump())
-        data.append(mi.rcWork.dump())
-        retval.append(data)
-    return retval
 #End Imported Code
 
 #used to check passed tags for script mode
@@ -143,8 +108,12 @@ MOOD_OFF = True
 MOOD_FILENAME = True
 MULTI_CLICK = False
 THEME = 'Original'
+MOVING_SPEED = 5
+MOVING_CHANCE = 0
+MOVING_STATUS = False
+MOVING_RANDOM = False
 
-with open(PATH + '\\config.cfg', 'r') as cfg:
+with open(os.path.join(PATH, 'config.cfg'), 'r') as cfg:
     settings = json.loads(cfg.read())
     SHOW_CAPTIONS = check_setting('showCaptions')
     PANIC_DISABLED = check_setting('panicDisabled')
@@ -182,7 +151,7 @@ with open(PATH + '\\config.cfg', 'r') as cfg:
 
     if HIBERNATE_MODE:
         if settings['hibernateType'] == 'Chaos':
-            with open(PATH + '\\data\\chaos_type.dat', 'r') as ct:
+            with open(os.path.join(PATH, 'data', 'chaos_type.dat'), 'r') as ct:
                 HIBERNATE_TYPE = ct.read()
         else:
             HIBERNATE_TYPE = settings['hibernateType']
@@ -191,6 +160,14 @@ with open(PATH + '\\config.cfg', 'r') as cfg:
 
     MOOD_FILENAME = check_setting('captionFilename')
 
+    MOVING_CHANCE = int(settings['movingChance'])
+    MOVING_SPEED = int(settings['movingSpeed'])
+    MOVING_RANDOM = check_setting('movingRandom')
+
+if MOVING_CHANCE >= rand.randint(1,100):
+    BUTTONLESS = True
+    MOVING_STATUS = True
+
 #take out first arg and make it into the mood ID
 MOOD_ID = '0'
 if not MOOD_OFF:
@@ -198,11 +175,11 @@ if not MOOD_OFF:
     SYS_ARGS.pop(0)
 
 if MOOD_ID != '0':
-    if os.path.exists(PATH + f'\\moods\\{MOOD_ID}.json'):
-        with open(PATH + f'\\moods\\{MOOD_ID}.json', 'r') as f:
+    if os.path.exists(os.path.join(PATH, 'moods', f'{MOOD_ID}.json')):
+        with open(os.path.join(PATH, 'moods', f'{MOOD_ID}.json'), 'r') as f:
             moodData = json.loads(f.read())
-    elif os.path.exists(PATH + f'\\moods\\unnamed\\{MOOD_ID}.json'):
-        with open(PATH + f'\\moods\\unnamed\\{MOOD_ID}.json', 'r') as f:
+    elif os.path.exists(os.path.join(PATH, 'moods', 'unnamed', f'{MOOD_ID}.json')):
+        with open(os.path.join(PATH, 'moods', 'unnamed', f'{MOOD_ID}.json'), 'r') as f:
             moodData = json.loads(f.read())
 
 
@@ -226,16 +203,18 @@ if checkTag('showCap'):
 if PANIC_REQUIRES_VALIDATION:
     hash_file_path = os.path.join(PATH, 'pass.hash')
     try:
+        utils.show_file(hash_file_path)
         with open(hash_file_path, 'r') as file:
             HASHED_PATH = file.readline()
+        utils.hide_file(hash_file_path)
     except:
         #no hash found
         HASHED_PATH = None
 
 if WEB_OPEN:
     web_dict = ''
-    if os.path.exists(PATH + '\\resource\\web.json'):
-        with open(PATH + '\\resource\\web.json', 'r') as web_file:
+    if os.path.exists(os.path.join(PATH, 'resource', 'web.json')):
+        with open(os.path.join(PATH, 'resource', 'web.json'), 'r') as web_file:
             web_dict = json.loads(web_file.read())
             #web_mood_dict = web_dict
 
@@ -251,7 +230,7 @@ if WEB_OPEN:
                 #messagebox.showinfo('test', f'{e}')
                 #print('error loading web moods, or web moods not supported in pack.')
 try:
-    with open(PATH + '\\resource\\CAPTIONS.json', 'r') as caption_file:
+    with open(os.path.join(PATH, 'resource', 'captions.json'), 'r') as caption_file:
         CAPTIONS = json.load(caption_file)
         try:
             SUBMISSION_TEXT = CAPTIONS['subtext']
@@ -286,7 +265,8 @@ try:
     if prefixes['default'].chance <= 10:
         prefixes['default'].chance = 10
 except:
-    print('no CAPTIONS.json')
+    prefixes['default'] = prefix_data('default', images='', max=1, chance=100.0)
+    print('no captions.json')
 
 #gif label class
 class GifLabel(tk.Label):
@@ -363,14 +343,53 @@ class VideoLabel(tk.Label):
                 self.time_offset_end = time.perf_counter()
                 time.sleep(max(0, self.delay - (self.time_offset_end - self.time_offset_start)))
 
+#moving window originally provided very generously by u/basicmo!
+mspd = rand.randint(-MOVING_SPEED,MOVING_SPEED)
+while mspd == 0:
+    mspd = rand.randint(-MOVING_SPEED,MOVING_SPEED)
+
+def move_window(master, resized_height:int, resized_width:int, xlocation:int, ylocation:int):
+    width = resized_width
+    height = resized_height
+    if MOVING_RANDOM:
+        move_speedX = rand.randint(-MOVING_SPEED,MOVING_SPEED)
+        move_speedY = rand.randint(-MOVING_SPEED,MOVING_SPEED)
+        while (move_speedX == 0) and (move_speedY == 0):
+            move_speedX = rand.randint(-MOVING_SPEED,MOVING_SPEED)
+            move_speedY = rand.randint(-MOVING_SPEED,MOVING_SPEED)
+    else:
+        move_speedX = mspd
+        move_speedY = mspd
+
+    dx = move_speedX
+    dy = move_speedY
+
+    x, y = xlocation, ylocation  # Initial position
+    while True:
+        x += dx
+        y += dy
+
+        if x + width >= master.winfo_screenwidth():
+            dx = -abs(move_speedX)
+        elif x <= 0:
+            dx = abs(move_speedX)
+        if y + height >= master.winfo_screenheight():
+            dy = -abs(move_speedY)
+        elif y <= 0:
+            dy = abs(move_speedY)
+
+        master.geometry(f"{width}x{height}+{x}+{y}")
+        master.update()
+        master.after(10)
+
 def pick_resource(basepath, vidYes:bool):
     if MOOD_ID != '0' and os.path.exists(os.path.join(PATH, 'resource', 'media.json')):
         try:
             if vidYes:
-                with open(PATH + '\\data\\media_video.dat', 'r') as f:
+                with open(os.path.join(PATH, 'data', 'media_video.dat'), 'r') as f:
                     items = json.loads(f.read())
             else:
-                with open(PATH + f'\\data\\media_images.dat', 'r') as f:
+                with open(os.path.join(PATH, 'data', 'media_images.dat'), 'r') as f:
                     items = json.loads(f.read())
         except Exception as e:
             print(f'failed to run mood check, reason:\n\t{e}')
@@ -457,10 +476,10 @@ if THEME == 'Bimbo':
 def run():
     #var things
     video_mode = False
-    resource_path = f'{os.path.abspath(os.getcwd())}\\resource\\img\\'
+    resource_path = os.path.join(os.path.abspath(os.getcwd()), 'resource', 'img')
     if len(SYS_ARGS) >= 1 and SYS_ARGS[0] == '-video':
         video_mode = True
-        resource_path = f'{os.path.abspath(os.getcwd())}\\resource\\vid\\'
+        resource_path = os.path.join(os.path.abspath(os.getcwd()), 'resource', 'vid')
 
     item, caption_text, root.click_count = pick_resource(resource_path, video_mode)
 
@@ -487,22 +506,19 @@ def run():
             image = image.convert('RGBA')
 
     border_wid_const = 5
-    monitor_data = monitor_areas()
-
-    data_list = list(monitor_data[rand.randrange(0, len(monitor_data))][2])
-    screen_width = data_list[2] - data_list[0]
-    screen_height = data_list[3] - data_list[1]
+    monitor_data = utils.monitor_areas()
+    area = rand.choice(monitor_data)
 
     #window start
     root.bind('<KeyPress>', lambda key: panic(key))
     root.configure(bg='black')
-    root.overrideredirect(1)
     root.frame = Frame(root)
-    root.wm_attributes('-topmost', 1)
+    root.wm_attributes('-topmost', -1)
+    utils.set_borderless(root)
 
     #many thanks to @MercyNudes for fixing my old braindead scaling method (https://twitter.com/MercyNudes)
     def resize(img:Image.Image) -> Image.Image:
-        size_source = max(img.width, img.height) / min(screen_width, screen_height)
+        size_source = max(img.width, img.height) / min(area.width, area.height)
         size_target = rand.randint(30, 70) / 100 if not LOWKEY_MODE else rand.randint(20, 50) / 100
         resize_factor = size_target / size_source
         if LANCZOS_MODE:
@@ -549,7 +565,7 @@ def run():
             label = Label(root, image=photoimage_image, bg='black')
             label.pack()
         else:
-            with open(PATH + '\\data\\max_subliminals.dat', 'r+') as f:
+            with open(os.path.join(PATH, 'data', 'max_subliminals.dat'), 'r+') as f:
                 i = int(f.readline())
                 label = GifLabel(root)
                 subliminal_path = os.path.join(PATH, 'default_assets', 'default_spiral.gif')
@@ -577,25 +593,25 @@ def run():
             denyLabel.place(x=int(resized_image.width / 2) - int(denyLabel.winfo_reqwidth() / 2),
                             y=int(resized_image.height / 2) - int(denyLabel.winfo_reqheight() / 2))
 
-    locX = rand.randint(data_list[0], data_list[2] - (resized_image.width))
-    locY = rand.randint(data_list[1], max(data_list[3] - (resized_image.height), 0))
+    locX = rand.randint(area.x, area.x + area.width - (resized_image.width))
+    locY = rand.randint(area.y, max(area.y + area.height - (resized_image.height), 0))
 
     if LOWKEY_MODE:
         global LOWKEY_CORNER
         if LOWKEY_CORNER == 4:
             LOWKEY_CORNER = rand.randrange(0, 3)
         if LOWKEY_CORNER == 0:
-            locX = data_list[2] - (resized_image.width)
-            locY = 0
+            locX = area.width - (resized_image.width)
+            locY = area.y
         elif LOWKEY_CORNER == 1:
-            locX = 0
-            locY = 0
+            locX = area.x
+            locY = area.y
         elif LOWKEY_CORNER == 2:
-            locX = 0
-            locY = data_list[3] - (resized_image.height)
+            locX = area.x
+            locY = area.height - (resized_image.height)
         elif LOWKEY_CORNER == 3:
-            locX = data_list[2] - (resized_image.width)
-            locY = data_list[3] - (resized_image.height)
+            locX = area.x + area.width - (resized_image.width)
+            locY = area.y + area.height - (resized_image.height)
 
     root.geometry(f'{resized_image.width + border_wid_const - 1}x{resized_image.height + border_wid_const - 1}+{locX}+{locY}')
 
@@ -626,13 +642,17 @@ def run():
         submit_button.place(x=resized_image.width - 25 - submit_button.winfo_reqwidth(), y=resized_image.height - 5 - submit_button.winfo_reqheight())
 
     if HIBERNATE_MODE and check_setting('fixWallpaper'):
-        with open(PATH + '\\data\\hibernate_handler.dat', 'r+') as f:
+        with open(os.path.join(PATH, 'data', 'hibernate_handler.dat'), 'r+') as f:
             i = int(f.readline())
             f.seek(0)
             f.write(str(i+1))
             f.truncate()
 
     root.attributes('-alpha', OPACITY / 100)
+
+    if MOVING_STATUS:
+        move_window(root,resized_image.height,resized_image.width,locX,locY)
+        
     root.mainloop()
 
 def startVLC(vid, label):
@@ -654,7 +674,7 @@ def check_deny() -> bool:
 
 def check_subliminal():
     global SUBLIMINAL_MODE
-    with open(PATH + '\\data\\max_subliminals.dat', 'r') as f:
+    with open(os.path.join(PATH, 'data', 'max_subliminals.dat'), 'r') as f:
         if int(f.readline()) >= MAX_SUBLIMINALS:
             SUBLIMINAL_MODE = False
         elif rand.randint(1, 100) > SUBLIMINAL_CHANCE:
@@ -668,23 +688,23 @@ def live_life(parent:tk, length:int):
         parent.attributes('-alpha', 1-i/100)
         time.sleep(FADE_OUT_TIME / 100)
     if LOWKEY_MODE:
-        os.startfile('popup.pyw')
+        subprocess.Popen([sys.executable, 'popup.pyw'])
     if HIBERNATE_MODE and check_setting('fixWallpaper'):
-        with open(PATH + '\\data\\hibernate_handler.dat', 'r+') as f:
+        with open(os.path.join(PATH, 'data', 'hibernate_handler.dat'), 'r+') as f:
             i = int(f.readline())
             if i > 0:
                 f.seek(0)
                 f.write(str(i-1))
                 f.truncate()
     if len(SYS_ARGS) >= 1 and SYS_ARGS[0] == '-video':
-        with open(PATH + '\\data\\max_videos.dat', 'r+') as f:
+        with open(os.path.join(PATH, 'data', 'max_videos.dat'), 'r+') as f:
             i = int(f.readline())
             if i > 0:
                 f.seek(0)
                 f.write(str(i-1))
                 f.truncate()
     if SUBLIMINAL_MODE:
-        with open(PATH + '\\data\\max_subliminals.dat', 'r+') as f:
+        with open(os.path.join(PATH, 'data', 'max_subliminals.dat'), 'r+') as f:
             i = int(f.readline())
             if i > 0:
                 f.seek(0)
@@ -744,23 +764,23 @@ def die():
         webbrowser.open_new(urlPath)
     if MITOSIS_MODE or LOWKEY_MODE:
         for i in (range(0, MITOSIS_STRENGTH) if not LOWKEY_MODE else [1]):
-            os.startfile('popup.pyw')
+            subprocess.Popen([sys.executable, 'popup.pyw'])
     if HIBERNATE_MODE and check_setting('fixWallpaper'):
-        with open(PATH + '\\data\\hibernate_handler.dat', 'r+') as f:
+        with open(os.path.join(PATH, 'data', 'hibernate_handler.dat'), 'r+') as f:
             i = int(f.readline())
             if i > 0:
                 f.seek(0)
                 f.write(str(i-1))
                 f.truncate()
     if len(SYS_ARGS) >= 1 and SYS_ARGS[0] == '-video':
-        with open(PATH + '\\data\\max_videos.dat', 'r+') as f:
+        with open(os.path.join(PATH, 'data', 'max_videos.dat'), 'r+') as f:
             i = int(f.readline())
             if i > 0:
                 f.seek(0)
                 f.write(str(i-1))
                 f.truncate()
     if SUBLIMINAL_MODE:
-        with open(PATH + '\\data\\max_subliminals.dat', 'r+') as f:
+        with open(os.path.join(PATH, 'data', 'max_subliminals.dat'), 'r+') as f:
             i = int(f.readline())
             if i > 0:
                 f.seek(0)
@@ -796,25 +816,27 @@ def panic(key):
             hash_file_path = os.path.join(PATH, 'pass.hash')
             time_file_path = os.path.join(PATH, 'hid_time.dat')
             pass_ = simpledialog.askstring('Panic', 'Enter Panic Password')
+            print('ASKING FOR PASS')
             t_hash = None if pass_ == None or pass_ == '' else hashlib.sha256(pass_.encode(encoding='ascii', errors='ignore')).hexdigest()
         except:
             #if some issue occurs with the hash or time files just emergency panic
-            os.startfile('panic.pyw')
+            subprocess.Popen([sys.executable, 'panic.pyw'])
+        print(t_hash)
+        print(HASHED_PATH)
         if t_hash == HASHED_PATH:
             #revealing hidden files
             try:
-                SHOWN_ATTR = 0x08
-                ctypes.windll.kernel32.SetFileAttributesW(hash_file_path, SHOWN_ATTR)
-                ctypes.windll.kernel32.SetFileAttributesW(time_file_path, SHOWN_ATTR)
+                utils.show_file(hash_file_path)
+                utils.show_file(time_file_path)
                 os.remove(hash_file_path)
                 os.remove(time_file_path)
-                os.startfile('panic.pyw')
+                subprocess.Popen([sys.executable, 'panic.pyw'])
             except:
                 #if some issue occurs with the hash or time files just emergency panic
-                os.startfile('panic.pyw')
+                subprocess.Popen([sys.executable, 'panic.pyw'])
     else:
         if not PANIC_DISABLED and key_condition:
-            os.startfile('panic.pyw')
+            subprocess.Popen([sys.executable, 'panic.pyw'])
 
 def pumpScare():
     if HIBERNATE_MODE and HIBERNATE_TYPE == 'Pump-Scare':
