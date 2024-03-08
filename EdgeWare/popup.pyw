@@ -652,7 +652,7 @@ def run():
 
     if MOVING_STATUS:
         move_window(root,resized_image.height,resized_image.width,locX,locY)
-        
+
     root.mainloop()
 
 def startVLC(vid, label):

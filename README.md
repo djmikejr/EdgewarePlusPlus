@@ -121,7 +121,23 @@ My twitter account seems to love getting shadowbanned for no reason other than t
 
 •+0.2-0.1 to version number: very small update, usually just a bugfix, accessibility options, UI tweaks
 
+**Version 10b**
+
+Quick and dirty bugfixes to a few problems that have popped up since version 10's release. I might have to go do *shudder* actual work for a week or so, so I wanted to get out critical bugfixes before I go anywhere.
+
+•*Fixed custom startup flairs not loading*
+
+•*Fixed start.pyw crashing on windows if create desktop icons is enabled*
+
+KNOWN ISSUES:
+
+•*I have narrowed down the old pack compatibility issues to the multi-click popup update causing very basic captions.json setups causing issues. I will look into fixing this as much as I can, at the very worst I can hack some sort of compatibility check in which i'm sure will make future contributors to these forks hate me*
+
+•*All other known issues from 10a still persist, as they were not critical to most edgeware operation*
+
+
 **Version 10a**
+
 Another month, another long story~! So I got roughly halfway through working on corruption, and was going to ship a small version, likely 9.5 or 9.6, then was sent a DM with some interesting new features. I decided heck, since they're already programmed and were things I wanted to do anyways, i'll add them in. Then when I was about done with them, I got sent another DM with fatal bugs that definitely should be fixed sooner than later. While looking into potential causes and ruminating it on twitter, I got sent another DM from somebody who submitted a pull request for Linux compatibility, saying they already potentially fixed the bug since they noticed some things that were wrong. So then I went and merged the linux pull request and did some bugfixes while talking with the person who submitted it to iron some things out. Eventually I just said "screw it", and decided this was large enough to be a full new version. Theoretically I could name it 9.9 to keep my promise of corruption being finished by version 10, however I think i'd rather stick to more consistent versioning rules (as consistent as I get with them, at least) than try and make a loophole for my own problems.
 
 Anyways, this is probably one of the largest updates EdgeWare++ has ever had. Because of that i'm cautiously appending an "alpha" label onto it, in case the weight of it causes more bugs than usual. As always, if this catastrophically doesn't work, I will try my best to fix it ASAP!

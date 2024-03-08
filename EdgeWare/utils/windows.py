@@ -95,7 +95,7 @@ def make_shortcut(
     success = False
     with tempfile.NamedTemporaryFile('w', suffix='.bat', delete=False, ) as bat:
         bat.writelines(
-            _create_shortcut_script(path, icon, script, title, startup_path)
+            _create_shortcut_script(str(path), icon, script, title)
         )  # write built shortcut script text to temporary batch file
 
     try:
@@ -127,3 +127,16 @@ def toggle_run_at_startup(path: Path, state:bool):
         errText = str(e).lower().replace(os.environ['USERPROFILE'].lower().replace('\\', '\\\\'), '[USERNAME_REDACTED]')
         logging.warning(f'failed to toggle startup bat.\n\tReason: {errText}')
         print('uwu')
+
+def _create_shortcut_script(pth_str:str, keyword:str, script:str, title:str):
+    return ['@echo off\n'
+            'set SCRIPT="%TEMP%\%RANDOM%-%RANDOM%-%RANDOM%-%RANDOM%.vbs"\n',
+            'echo Set oWS = WScript.CreateObject("WScript.Shell") >> %SCRIPT%\n',
+            'echo sLinkFile = "%USERPROFILE%\Desktop\\' + title + '.lnk" >> %SCRIPT%\n',
+            'echo Set oLink = oWS.CreateShortcut(sLinkFile) >> %SCRIPT%\n',
+            'echo oLink.WorkingDirectory = "' + pth_str + '\\" >> %SCRIPT%\n',
+            'echo oLink.IconLocation = "' + pth_str + '\\default_assets\\' + keyword + '_icon.ico" >> %SCRIPT%\n',
+            'echo oLink.TargetPath = "' + pth_str + '\\' + script + '" >> %SCRIPT%\n',
+            'echo oLink.Save >> %SCRIPT%\n',
+            'cscript /nologo %SCRIPT%\n',
+            'del %SCRIPT%']
