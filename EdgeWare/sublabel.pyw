@@ -7,6 +7,7 @@ import os
 import logging
 import time
 import random as rand
+from screeninfo import get_monitors
 from utils import utils
 
 SYS_ARGS = sys.argv.copy()
@@ -120,24 +121,23 @@ def display_subliminal_message():
     label = tk.Label(fg=fore, bg=back)
 
     # Choose a screen for the window
-    monitor_data = utils.monitor_areas()
-    area = rand.choice(monitor_data)
+    monitor = rand.choice(get_monitors())
 
     # Calculate the font size based on screen resolution
-    f_size = min(area.width, area.height) // 10  # Adjust the scaling factor as needed
+    f_size = min(monitor.width, monitor.height) // 10  # Adjust the scaling factor as needed
 
     # Configure the font
     font = (mainfont, f_size)
 
     # Configure the label with the calculated font size and wrap the text
-    label.config(font=font, wraplength=area.width // 1.5)
+    label.config(font=font, wraplength=monitor.width // 1.5)
 
     # Set the text to a random subliminal message
     label.config(text=get_random_subliminal())
 
     # Calculate the position to center the window
-    x = area.x + (area.width - label.winfo_reqwidth()) // 2
-    y = area.y + (area.height - label.winfo_reqheight()) // 2
+    x = monitor.x + (monitor.width - label.winfo_reqwidth()) // 2
+    y = monitor.y + (monitor.height - label.winfo_reqheight()) // 2
 
     # Configure the window
     label.master.overrideredirect(True)

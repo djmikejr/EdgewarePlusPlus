@@ -6,6 +6,7 @@ import random as rand
 import tkinter as tk
 from tkinter import messagebox, font
 from tkinter import *
+from screeninfo import get_monitors
 from utils import utils
 
 SYS_ARGS = sys.argv.copy()
@@ -103,15 +104,14 @@ def unborderedWindow():
 
     txt = buildText()
 
-    monitor_data = utils.monitor_areas()
-    area = rand.choice(monitor_data) # TODO: Only on primary monitor?
-    wid = area.width / 4
-    hgt = area.height / 2
+    monitor = rand.choice(get_monitors()) # TODO: Only on primary monitor?
+    wid = monitor.width / 4
+    hgt = monitor.height / 2
 
     textLabel = Label(root, text=txt, wraplength=wid, bg=back, fg=fore)
     textLabel.pack()
 
-    root.geometry('%dx%d+%d+%d' % (wid, hgt, area.x + 2*wid - wid / 2, area.y + hgt - hgt / 2))
+    root.geometry('%dx%d+%d+%d' % (wid, hgt, monitor.x + 2*wid - wid / 2, monitor.y + hgt - hgt / 2))
 
     root.frame = Frame(root, borderwidth=2, relief=RAISED, bg=back)
     root.frame.pack_propagate(True)

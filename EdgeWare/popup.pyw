@@ -13,6 +13,7 @@ import logging
 from tkinter import messagebox, simpledialog, Tk, Frame, Label, Button, RAISED, StringVar, font
 from itertools import count, cycle
 from PIL import Image, ImageTk, ImageFilter
+from screeninfo import get_monitors
 from utils import utils
 import subprocess
 try:
@@ -22,19 +23,6 @@ except:
 
 SYS_ARGS = sys.argv.copy()
 SYS_ARGS.pop(0)
-
-#Start Imported Code
-#Code from: https://code.activestate.com/recipes/460509-get-the-actual-and-usable-sizes-of-all-the-monitor/
-
-class RECT(ctypes.Structure): #rect class for containing monitor info
-    _fields_ = [
-        ('left', ctypes.c_long),
-        ('top', ctypes.c_long),
-        ('right', ctypes.c_long),
-        ('bottom', ctypes.c_long)
-        ]
-    def dump(self):
-        return map(int, (self.left, self.top, self.right, self.bottom))
 
 class prefix_data:
     def __init__(self, name, captions = None, images = None, max = 1, chance = 100.0):
@@ -506,8 +494,7 @@ def run():
             image = image.convert('RGBA')
 
     border_wid_const = 5
-    monitor_data = utils.monitor_areas()
-    area = rand.choice(monitor_data)
+    monitor = rand.choice(get_monitors())
 
     #window start
     root.bind('<KeyPress>', lambda key: panic(key))
@@ -518,7 +505,7 @@ def run():
 
     #many thanks to @MercyNudes for fixing my old braindead scaling method (https://twitter.com/MercyNudes)
     def resize(img:Image.Image) -> Image.Image:
-        size_source = max(img.width, img.height) / min(area.width, area.height)
+        size_source = max(img.width, img.height) / min(monitor.width, monitor.height)
         size_target = rand.randint(30, 70) / 100 if not LOWKEY_MODE else rand.randint(20, 50) / 100
         resize_factor = size_target / size_source
         if LANCZOS_MODE:
@@ -593,25 +580,25 @@ def run():
             denyLabel.place(x=int(resized_image.width / 2) - int(denyLabel.winfo_reqwidth() / 2),
                             y=int(resized_image.height / 2) - int(denyLabel.winfo_reqheight() / 2))
 
-    locX = rand.randint(area.x, area.x + area.width - (resized_image.width))
-    locY = rand.randint(area.y, max(area.y + area.height - (resized_image.height), 0))
+    locX = rand.randint(monitor.x, monitor.x + monitor.width - (resized_image.width))
+    locY = rand.randint(monitor.y, max(monitor.y + monitor.height - (resized_image.height), 0))
 
     if LOWKEY_MODE:
         global LOWKEY_CORNER
         if LOWKEY_CORNER == 4:
             LOWKEY_CORNER = rand.randrange(0, 3)
         if LOWKEY_CORNER == 0:
-            locX = area.width - (resized_image.width)
-            locY = area.y
+            locX = monitor.width - (resized_image.width)
+            locY = monitor.y
         elif LOWKEY_CORNER == 1:
-            locX = area.x
-            locY = area.y
+            locX = monitor.x
+            locY = monitor.y
         elif LOWKEY_CORNER == 2:
-            locX = area.x
-            locY = area.height - (resized_image.height)
+            locX = monitor.x
+            locY = monitor.height - (resized_image.height)
         elif LOWKEY_CORNER == 3:
-            locX = area.x + area.width - (resized_image.width)
-            locY = area.y + area.height - (resized_image.height)
+            locX = monitor.x + monitor.width - (resized_image.width)
+            locY = monitor.y + monitor.height - (resized_image.height)
 
     root.geometry(f'{resized_image.width + border_wid_const - 1}x{resized_image.height + border_wid_const - 1}+{locX}+{locY}')
 

@@ -8,7 +8,6 @@ import sys
 from tkinter import messagebox
 from Xlib.display import Display
 from Xlib.ext import randr
-from utils.area import Area
 import subprocess
 
 def panic_script():
@@ -16,37 +15,6 @@ def panic_script():
 
 def set_borderless(root):
     root.wm_attributes('-type', 'splash')
-
-def get_monitors():
-    display = Display()
-    info = display.screen(0)
-    window = info.root
-
-    monitors = []
-
-    res = randr.get_screen_resources(window)
-    for output in res.outputs:
-        params = display.xrandr_get_output_info(output, res.config_timestamp)
-        if not params.crtc:
-            continue
-        crtc = display.xrandr_get_crtc_info(params.crtc, res.config_timestamp)
-        monitors.append(crtc)
-
-    return monitors
-
-def monitor_areas():
-    areas: list[Area] = []
-    for monitor in get_monitors():
-        areas.append(
-            Area(
-                monitor.x,
-                monitor.y,
-                monitor.width,
-                monitor.height,
-            )
-        )
-
-    return areas
 
 def set_wallpaper(wallpaper_path: Path | str):
     global first_run

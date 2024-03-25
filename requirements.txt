@@ -9,5 +9,6 @@ pypresence
 pystray
 python-vlc
 requests
+screeninfo
 sounddevice
 ttkwidgets
