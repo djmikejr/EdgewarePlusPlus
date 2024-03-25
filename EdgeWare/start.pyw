@@ -16,10 +16,25 @@ import threading as thread
 import tkinter as tk
 import logging
 import sys
+import requests
+import PIL
+import pypresence
+import pystray
+import playsound as ps
+import videoprops
+import imageio
+import moviepy
+import sounddevice
+from PIL import Image
+from bs4 import BeautifulSoup
 from dataclasses import dataclass
 from tkinter import messagebox, simpledialog
 from pathlib import Path
 from utils import utils
+try:
+    import vlc
+except:
+    print('vlc failed to load.')
 
 PATH = Path(__file__).parent
 os.chdir(PATH)
@@ -120,103 +135,6 @@ if not settings['is_configed']==1:
     subprocess.run([sys.executable, 'config.pyw'])
     logging.info('reloading settings')
     load_settings()
-
-#check for pip_installed flag, if not installed run get-pip.pyw and then install pillow for popups
-if utils.is_windows() and not int(settings['pip_installed'])==1:
-    logging.warning('pip is not installed, running get-pip.pyw')
-    subprocess.call('python get-pip.pyw')
-    logging.warning('pip should be installed, but issues will occur if installation failed.')
-    settings['pip_installed'] = 1
-    with open(os.path.join(PATH, 'config.cfg'), 'w') as f:
-        f.write(json.dumps(settings))
-
-def pip_install(packageName:str):
-    if utils.is_windows():
-        try:
-            logging.info(f'attempting to install {packageName}')
-            subprocess.call(f'py -m pip install {packageName}')
-        except:
-            logging.warning(f'failed to install {packageName} using py -m pip, trying raw pip request')
-            subprocess.call(f'pip install {packageName}')
-            logging.warning(f'{packageName} should be installed, fatal errors will occur if install failed.')
-
-#i liked the emergency fix so much that i just made it import every non-standard lib like that c:
-try:
-    import requests
-except:
-    logging.warning('failed to import requests module')
-    pip_install('requests')
-    import requests
-
-try:
-    import PIL
-    from PIL import Image
-except:
-    logging.warning('failed to import pillow module')
-    pip_install('pillow')
-    from PIL import Image
-
-try:
-    import pypresence
-except:
-    logging.warning('failed to import pypresence module')
-    pip_install('pypresence')
-
-try:
-    import pystray
-except:
-    logging.warning('failed to import pystray module')
-    pip_install('pystray')
-
-try:
-    import playsound as ps
-except:
-    logging.warning('failed to import playsound module')
-    pip_install('playsound==1.2.2')
-    import playsound as ps
-
-try:
-    import videoprops
-except:
-    logging.warning('failed to import videoprops module')
-    pip_install('get-video-properties')
-
-try:
-    import imageio
-except:
-    logging.warning('failed to import imageio module')
-    pip_install('imageio')
-
-try:
-    import moviepy
-except:
-    logging.warning('failed to import moviepy module')
-    pip_install('moviepy')
-
-try:
-    import sounddevice
-except:
-    logging.warning('failed to import moviepy module')
-    pip_install('sounddevice')
-
-try:
-    from bs4 import BeautifulSoup
-except:
-    logging.warning('failed to import bs4 module')
-    pip_install('bs4')
-    from bs4 import BeautifulSoup
-
-try:
-    import vlc
-except:
-    logging.warning('failed to import vlc module')
-    try:
-        pip_install('python-vlc')
-        import vlc
-    except Exception as e:
-        logging.fatal(f'failed to install and import vlc. reason: {e}')
-
-#end non-standard imports
 
 AVOID_LIST = ['EdgeWare', 'AppData'] #default avoid list for fill/replace
 FILE_TYPES = ['png', 'jpg', 'jpeg'] #recognized file types for replace

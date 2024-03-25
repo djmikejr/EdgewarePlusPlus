@@ -15,9 +15,13 @@ import time
 import textwrap
 import random as rand
 import getpass
+import requests
+import PIL
+import ttkwidgets as tw
 from tkinter import Tk, ttk, simpledialog, messagebox, filedialog, IntVar, BooleanVar, StringVar, Frame, Checkbutton, Button, Scale, Label, Toplevel, Entry, OptionMenu, Listbox, SINGLE, DISABLED, GROOVE, RAISED, Text, END, Scrollbar, VERTICAL, font, CENTER
 from tk_ToolTip_class101 import CreateToolTip
 from pathlib import Path
+from PIL import Image, ImageTk
 from utils import utils
 
 PATH = Path(__file__).parent
@@ -29,37 +33,6 @@ if not os.path.exists(os.path.join(PATH, 'logs')):
 LOG_TIME = time.asctime().replace(' ', '_').replace(':', '-')
 logging.basicConfig(filename=os.path.join(PATH, 'logs', LOG_TIME + '-dbg.txt'), format='%(levelname)s:%(message)s', level=logging.DEBUG)
 logging.info('Started config logging successfully.')
-
-def pip_install(packageName:str):
-    if utils.is_windows():
-        try:
-            logging.info(f'attempting to install {packageName}')
-            subprocess.call(f'py -m pip install {packageName}')
-        except:
-            logging.warning(f'failed to install {packageName} using py -m pip, trying raw pip request')
-            subprocess.call(f'pip install {packageName}')
-            logging.warning(f'{packageName} should be installed, fatal errors will occur if install failed.')
-
-try:
-    import requests
-except:
-    pip_install('requests')
-    import requests
-
-try:
-    import PIL
-    from PIL import Image, ImageTk
-except:
-    logging.warning('failed to import pillow module')
-    pip_install('pillow')
-    from PIL import Image, ImageTk
-
-try:
-    import ttkwidgets as tw
-except:
-    pip_install('ttkwidgets')
-    import ttkwidgets as tw
-
 
 #if you are working on this i'm just letting you know there's like almost no documentation for ttkwidgets
 #source code is here https://github.com/TkinterEP/ttkwidgets/blob/master/ttkwidgets/checkboxtreeview.py
