@@ -31,6 +31,7 @@ from dataclasses import dataclass
 from tkinter import messagebox, simpledialog
 from pathlib import Path
 from utils import utils
+from utils.paths import Process, Resource
 try:
     import vlc
 except:
@@ -49,19 +50,6 @@ logging.info('Started start logging successfully.')
 SYS_ARGS = sys.argv.copy()
 SYS_ARGS.pop(0)
 logging.info(f'args: {SYS_ARGS}')
-
-#get loading splash
-try:
-    LOADING_PATH = None
-    for file_format in ['png', 'gif', 'jpg', 'jpeg', 'bmp']:
-        if os.path.isfile(os.path.join(PATH, 'resource', f'loading_splash.{file_format}')):
-            LOADING_PATH = os.path.join('resource', f'loading_splash.{file_format}')
-            break
-
-    if not LOADING_PATH:
-        LOADING_PATH = os.path.join('default_assets', 'loading_splash.png')
-except:
-    LOADING_PATH = os.path.join('default_assets', 'loading_splash.png')
 
 settings = {}
 #func for loading settings, really just grouping it
@@ -138,12 +126,6 @@ if not settings['is_configed']==1:
 
 AVOID_LIST = ['EdgeWare', 'AppData'] #default avoid list for fill/replace
 FILE_TYPES = ['png', 'jpg', 'jpeg'] #recognized file types for replace
-RESOURCE_PATHS = [
-    os.path.join('resource'),
-    os.path.join('resource', 'aud'),
-    os.path.join('resource', 'img'),
-    os.path.join('resource', 'vid')
-]
 
 LIVE_FILL_THREADS = 0 #count of live threads for hard drive filling
 PLAYING_AUDIO = False #audio thread flag
@@ -223,21 +205,21 @@ MOOD_OFF = int(settings['toggleMoodSet']) == 1
 MOOD_ID = '0'
 if not MOOD_OFF:
     try:
-        if os.path.isfile(os.path.join(PATH, 'resource', 'info.json')):
+        if os.path.isfile(Resource.INFO):
             info_dict = ''
-            with open(os.path.join(PATH, 'resource', 'info.json')) as r:
+            with open(Resource.INFO) as r:
                 info_dict = json.loads(r.read())
                 if 'id' in info_dict:
                     MOOD_ID = info_dict['id'] if info_dict['id'] else '0'
         if MOOD_ID == '0':
-            im = str(len(os.listdir(os.path.join(PATH, 'resource', 'img')))) if os.path.exists(os.path.join(PATH, 'resource', 'img')) else '0'
-            au = str(len(os.listdir(os.path.join(PATH, 'resource', 'aud')))) if os.path.exists(os.path.join(PATH, 'resource', 'aud')) else '0'
-            vi = str(len(os.listdir(os.path.join(PATH, 'resource', 'vid')))) if os.path.exists(os.path.join(PATH, 'resource', 'vid')) else '0'
-            wa = 'w' if os.path.isfile(os.path.join(PATH, 'resource', 'wallpaper.png')) else 'x'
-            sp = 's' if LOADING_PATH != os.path.join('default_assets', 'loading_splash.png') else 'x'
-            di = 'd' if os.path.isfile(os.path.join(PATH, 'resource', 'discord.dat')) else 'x'
-            ic = 'i' if os.path.isfile(os.path.join(PATH, 'resource', 'icon.ico')) else 'x'
-            co = 'c' if os.path.isfile(os.path.join(PATH, 'resource', 'corruption.json')) else 'x'
+            im = str(len(os.listdir(Resource.IMAGE))) if os.path.exists(Resource.IMAGE) else '0'
+            au = str(len(os.listdir(Resource.AUDIO))) if os.path.exists(Resource.AUDIO) else '0'
+            vi = str(len(os.listdir(Resource.VIDEO))) if os.path.exists(Resource.VIDEO) else '0'
+            wa = 'w' if os.path.isfile(Resource.WALLPAPER) else 'x'
+            sp = 's' if Resource.SPLASH else 'x'
+            di = 'd' if os.path.isfile(Resource.DISCORD) else 'x'
+            ic = 'i' if os.path.isfile(Resource.ICON) else 'x'
+            co = 'c' if os.path.isfile(Resource.CORRUPTION) else 'x'
             MOOD_ID = im + au + vi + wa + sp + di + ic + co
     except Exception as e:
         messagebox.showerror('Launch Error', 'Could not launch Edgeware due to setting mood ID issues.\n[' + str(e) + ']')
@@ -250,13 +232,9 @@ wallpaperWait = thread.Event()
 runningHibernate = thread.Event()
 pumpScareAudio = thread.Event()
 
-#for checking directories/files
-def file_exists(dir:str) -> bool:
-    return os.path.exists(os.path.join(PATH, dir))
-
 #start init portion, check resources, config, etc.
 try:
-    if not file_exists('resource'):
+    if not os.path.exists(Resource.ROOT):
         logging.warning('no resource folder found')
         pth = 'pth-default_ignore'
         #selecting first zip found in script folder
@@ -272,31 +250,30 @@ try:
         if not pth == 'pth-default_ignore':
            with zipfile.ZipFile(pth, 'r') as obj:
                 logging.info('extracting resources from zip')
-                obj.extractall(os.path.join(PATH, 'resource'))
+                obj.extractall(Resource.ROOT)
         else:
             #if no zip found, use default resources
             logging.warning('no zip file found, generating resource folder from default assets.')
-            for obj in RESOURCE_PATHS:
-                os.mkdir(os.path.join(PATH, obj))
+            for obj in [Resource.ROOT, Resource.AUDIO, Resource.IMAGE, Resource.VIDEO]:
+                os.mkdir(obj)
             default_path = os.path.join(PATH, 'default_assets')
-            output_path = os.path.join(PATH, 'resource')
             shutil.copyfile(
                 os.path.join(default_path, 'default_wallpaper.png'),
-                os.path.join(output_path, 'wallpaper.png')
+                Resource.WALLPAPER
             )
             shutil.copyfile(
                 os.path.join(default_path, 'default_image.png'),
-                os.path.join(output_path, 'img', 'img0.png'),
+                Resource.IMAGE / 'img0.png',
                 follow_symlinks=True
             )
-            if not os.path.exists(os.path.join(output_path, 'discord.dat')):
-                with open(os.path.join(output_path, 'discord.dat'), 'w') as f:
+            if not os.path.exists(Resource.DISCORD):
+                with open(Resource.DISCORD, 'w') as f:
                     f.write(DEFAULT_DISCORD)
-            if not os.path.exists(os.path.join(output_path, 'prompt.json')):
-                with open(os.path.join(output_path, 'prompt.json'), 'w') as f:
+            if not os.path.exists(Resource.PROMPT):
+                with open(Resource.PROMPT, 'w') as f:
                     f.write(DEFAULT_PROMPT)
-            if not os.path.exists(os.path.join(output_path, 'web.json')):
-                with open(os.path.join(output_path, 'web.json'), 'w') as f:
+            if not os.path.exists(Resource.WEB):
+                with open(Resource.WEB, 'w') as f:
                     f.write(DEFAULT_WEB)
 except Exception as e:
     messagebox.showerror('Launch Error', 'Could not launch Edgeware due to resource zip unpacking issues.\n[' + str(e) + ']')
@@ -305,16 +282,16 @@ except Exception as e:
 
 HAS_PROMPTS = False
 WEB_JSON_FOUND = False
-if os.path.exists(os.path.join(PATH, 'resource', 'prompt.json')):
+if os.path.exists(Resource.PROMPT):
     logging.info('found prompt.json')
     HAS_PROMPTS = True
-if os.path.exists(os.path.join(PATH, 'resource', 'web.json')):
+if os.path.exists(Resource.WEB):
     logging.info('found web.json')
     WEB_JSON_FOUND = True
 
 WEB_DICT = {}
-if os.path.exists(os.path.join(PATH, 'resource', 'web.json')):
-    with open(os.path.join(PATH, 'resource', 'web.json'), 'r') as webF:
+if os.path.exists(Resource.WEB):
+    with open(Resource.WEB, 'r') as webF:
         WEB_DICT = json.loads(webF.read())
 
 try:
@@ -324,7 +301,7 @@ except Exception as e:
 
 #checking presence of resources
 try:
-    HAS_IMAGES = len(os.listdir(os.path.join(PATH, 'resource', 'img'))) > 0
+    HAS_IMAGES = len(os.listdir(Resource.IMAGE)) > 0
     logging.info('image resources found')
 except Exception as e:
     logging.warning(f'no image resource folder found\n\tReason: {e}')
@@ -333,8 +310,8 @@ except Exception as e:
 
 VIDEOS = []
 try:
-    for vid in os.listdir(os.path.join(PATH, 'resource', 'vid')):
-        VIDEOS.append(os.path.join(PATH, 'resource', 'vid', vid))
+    for vid in os.listdir(Resource.VIDEO):
+        VIDEOS.append(Resource.VIDEO / vid)
     logging.info('video resources found')
 except Exception as e:
     logging.warning(f'no video resource folder found\n\tReason: {e}')
@@ -343,15 +320,15 @@ except Exception as e:
 AUDIO = []
 MOOD_AUDIO = []
 try:
-    HAS_AUDIO = len(os.path.join(PATH, 'resource', 'aud')) > 0
-    for aud in os.listdir(os.path.join(PATH, 'resource', 'aud')):
-        AUDIO.append(os.path.join(PATH, 'resource', 'aud', aud))
+    HAS_AUDIO = os.path.exists(Resource.AUDIO)
+    for aud in os.listdir(Resource.AUDIO):
+        AUDIO.append(Resource.AUDIO / aud)
     logging.info('audio resources found')
 except Exception as e:
     logging.warning(f'no audio resource folder found\n\tReason: {e}')
     print('no audio folder found')
 
-CAPTIONS = os.path.exists(os.path.join(PATH, 'resource', 'captions.json'))
+CAPTIONS = os.path.exists(Resource.CAPTIONS)
 
 HAS_WEB = WEB_JSON_FOUND and len(WEB_DICT['urls']) > 0
 #end of checking resource presence
@@ -359,7 +336,7 @@ HAS_WEB = WEB_JSON_FOUND and len(WEB_DICT['urls']) > 0
 #set discord status if enabled
 if SHOW_ON_DISCORD:
     try:
-        subprocess.Popen([sys.executable, 'disc_handler.pyw'])
+        subprocess.Popen([sys.executable, Process.DISCORD])
     except Exception as e:
         logging.warning(f'failed to start discord status background task\n\tReason: {e}')
         print('failed to start discord status')
@@ -375,23 +352,23 @@ if DESKTOP_ICONS:
 
 if LOADING_FLAIR and (__name__ == "__main__"):
     logging.info('started loading flair')
-    if LOADING_PATH != os.path.join('default_assets', 'loading_splash.png'):
+    if Resource.SPLASH:
         if LANCZOS_MODE:
             logging.info('using lanczos for loading flair')
-            subprocess.run([sys.executable, 'startup_flair.pyw', '-custom', '-lanczos'])
+            subprocess.run([sys.executable, Process.STARTUP, '-custom', '-lanczos'])
         else:
-            subprocess.run([sys.executable, 'startup_flair.pyw', '-custom'])
+            subprocess.run([sys.executable, Process.STARTUP, '-custom'])
     else:
         if LANCZOS_MODE:
             logging.info('using lanczos for loading flair')
-            subprocess.run([sys.executable, 'startup_flair.pyw', '-lanczos'])
+            subprocess.run([sys.executable, Process.STARTUP, '-lanczos'])
         else:
-            subprocess.run([sys.executable, 'startup_flair.pyw'])
+            subprocess.run([sys.executable, Process.STARTUP])
 
 #set wallpaper
 if not HIBERNATE_MODE:
     logging.info('set user wallpaper to default wallpaper.png')
-    utils.set_wallpaper(os.path.join(PATH, 'resource', 'wallpaper.png'))
+    utils.set_wallpaper(Resource.WALLPAPER)
 
 #selects url to be opened in new tab by web browser
 def url_select(arg:int):
@@ -409,9 +386,9 @@ class TrayHandler:
         if settings['toggleHibSkip']:
             self.option_list.append(pystray.MenuItem('Skip to Hibernate', self.hib_skip))
 
-        if os.path.isfile(os.path.join(PATH, 'resource', 'icon.ico')):
+        if os.path.isfile(Resource.ICON):
             self.tray_icon = pystray.Icon('Edgeware',
-                                        Image.open(os.path.join(PATH, 'resource', 'icon.ico')),
+                                        Image.open(Resource.ICON),
                                         'Edgeware',
                                         self.option_list)
         else:
@@ -553,7 +530,7 @@ def main():
             hiberWait.wait(float(waitTime))
             runningHibernate.clear()
             if HIBERNATE_TYPE != 'Pump-Scare':
-                utils.set_wallpaper(os.path.join(PATH, 'resource', 'wallpaper.png'))
+                utils.set_wallpaper(Resource.WALLPAPER)
                 wallpaperWait.clear()
             if HIBERNATE_TYPE == 'Original':
                 try:
@@ -741,7 +718,7 @@ class BooruDownloader:
     def direct_download(self, url:str) -> None:
         class LocalOpener(urllib.request.FancyURLopener):
             version = 'Mozilla/5.0'
-        with LocalOpener().open(url) as file, open(os.path.join(PATH, 'resource', 'img', url.split('/')[-1]), 'wb') as out:
+        with LocalOpener().open(url) as file, open(Resource.IMAGE / url.split('/')[-1] / 'wb') as out:
             logging.info(f'downloaded {url}')
             shutil.copyfileobj(file, out)
 
@@ -781,7 +758,7 @@ class BooruScheme:
 #downloads all images listed in webresource.json in resources
 def download_web_resources():
     try:
-        with open(os.path.join(PATH, 'resource', 'webResource.json')) as op:
+        with open(Resource.WEB_RESOURCE) as op:
             js = json.loads(op.read())
             ls = js['weblist']
             for link in ls:
@@ -800,7 +777,7 @@ def annoyance():
     while(True):
         roll_for_initiative()
         if not MITOSIS_LIVE and (MITOSIS_MODE or LOWKEY_MODE) and HAS_IMAGES:
-            subprocess.Popen([sys.executable, 'popup.pyw']) if MOOD_OFF else subprocess.Popen([sys.executable, 'popup.pyw', f'-{MOOD_ID}'])
+            subprocess.Popen([sys.executable, Process.POPUP]) if MOOD_OFF else subprocess.Popen([sys.executable, Process.POPUP, f'-{MOOD_ID}'])
             MITOSIS_LIVE = True
         if FILL_MODE and LIVE_FILL_THREADS < MAX_FILL_THREADS:
             thread.Thread(target=fill_drive).start()
@@ -829,9 +806,9 @@ def roll_for_initiative():
                         messagebox.showerror('Audio Error', 'Failed to play audio.\n[' + str(e) + ']')
                         logging.critical(f'failed to play audio\n\tReason: {e}')
             try:
-                utils.set_wallpaper(os.path.join(PATH, 'resource', 'wallpaper.png'))
+                utils.set_wallpaper(Resource.WALLPAPER)
                 wallpaperWait.clear()
-                subprocess.Popen([sys.executable, 'popup.pyw']) if MOOD_OFF else subprocess.Popen([sys.executable, 'popup.pyw', f'-{MOOD_ID}'])
+                subprocess.Popen([sys.executable, Process.POPUP]) if MOOD_OFF else subprocess.Popen([sys.executable, Process.POPUP, f'-{MOOD_ID}'])
             except Exception as e:
                 messagebox.showerror('Popup Error', 'Failed to start popup.\n[' + str(e) + ']')
                 logging.critical(f'failed to start popup.pyw\n\tReason: {e}')
@@ -855,9 +832,9 @@ def roll_for_initiative():
                 if VIDEO_NUMBER < VIDEO_MAX:
                     try:
                         if VLC_MODE:
-                            thread.Thread(target=lambda: subprocess.call([sys.executable, 'popup.pyw', '-video', '-vlc'], shell=False)).start() if MOOD_OFF else thread.Thread(target=lambda: subprocess.call([sys.executable, 'popup.pyw', f'-{MOOD_ID}', '-video', '-vlc'], shell=False)).start()
+                            thread.Thread(target=lambda: subprocess.call([sys.executable, Process.POPUP, '-video', '-vlc'], shell=False)).start() if MOOD_OFF else thread.Thread(target=lambda: subprocess.call([sys.executable, Process.POPUP, f'-{MOOD_ID}', '-video', '-vlc'], shell=False)).start()
                         else:
-                            thread.Thread(target=lambda: subprocess.call([sys.executable, 'popup.pyw', '-video'], shell=False)).start() if MOOD_OFF else thread.Thread(target=lambda: subprocess.call([sys.executable, 'popup.pyw', f'-{MOOD_ID}', '-video'], shell=False)).start()
+                            thread.Thread(target=lambda: subprocess.call([sys.executable, Process.POPUP, '-video'], shell=False)).start() if MOOD_OFF else thread.Thread(target=lambda: subprocess.call([sys.executable, Process.POPUP, f'-{MOOD_ID}', '-video'], shell=False)).start()
                         with open(os.path.join(PATH, 'data', 'max_videos.dat'), 'w') as f:
                             f.write(str(VIDEO_NUMBER+1))
                         currPopNum += 1
@@ -867,9 +844,9 @@ def roll_for_initiative():
             else:
                 try:
                     if VLC_MODE:
-                        thread.Thread(target=lambda: subprocess.call([sys.executable, 'popup.pyw', '-video', '-vlc'], shell=False)).start() if MOOD_OFF else thread.Thread(target=lambda: subprocess.call([sys.executable, 'popup.pyw', f'-{MOOD_ID}', '-video', '-vlc'], shell=False)).start()
+                        thread.Thread(target=lambda: subprocess.call([sys.executable, Process.POPUP, '-video', '-vlc'], shell=False)).start() if MOOD_OFF else thread.Thread(target=lambda: subprocess.call([sys.executable, Process.POPUP, f'-{MOOD_ID}', '-video', '-vlc'], shell=False)).start()
                     else:
-                        thread.Thread(target=lambda: subprocess.call([sys.executable, 'popup.pyw', '-video'], shell=False)).start() if MOOD_OFF else thread.Thread(target=lambda: subprocess.call([sys.executable, 'popup.pyw', f'-{MOOD_ID}', '-video'], shell=False)).start()
+                        thread.Thread(target=lambda: subprocess.call([sys.executable, Process.POPUP, '-video'], shell=False)).start() if MOOD_OFF else thread.Thread(target=lambda: subprocess.call([sys.executable, Process.POPUP, f'-{MOOD_ID}', '-video'], shell=False)).start()
                     currPopNum += 1
                 except Exception as e:
                     messagebox.showerror('Popup Error', 'Failed to start popup.\n[' + str(e) + ']')
@@ -892,7 +869,7 @@ def roll_for_initiative():
                     logging.critical(f'failed to play audio\n\tReason: {e}')
         if do_roll(CAP_POP_CHANCE) and CAPTIONS and currPopNum < maxPopNum:
             try:
-                subprocess.call([sys.executable, 'sublabel.pyw', f'-{MOOD_ID}']) if not MOOD_OFF else subprocess.call([sys.executable, 'sublabel.pyw'])
+                subprocess.call([sys.executable, Process.SUBLABEL, f'-{MOOD_ID}']) if not MOOD_OFF else subprocess.call([sys.executable, Process.SUBLABEL])
                 currPopNum += 1
             except Exception as e:
                 messagebox.showerror('Caption Popup Error', 'Could not start caption popup.\n[' + str(e) + ']')
@@ -900,14 +877,14 @@ def roll_for_initiative():
 
         if do_roll(PROMPT_CHANCE) and HAS_PROMPTS and currPopNum < maxPopNum:
             try:
-                subprocess.call([sys.executable, 'prompt.pyw', f'-{MOOD_ID}']) if not MOOD_OFF else subprocess.call([sys.executable, 'prompt.pyw'])
+                subprocess.call([sys.executable, Process.POPUP, f'-{MOOD_ID}']) if not MOOD_OFF else subprocess.call([sys.executable, Process.POPUP])
                 currPopNum += 1
             except Exception as e:
                 messagebox.showerror('Prompt Error', 'Could not start prompt.\n[' + str(e) + ']')
                 logging.critical(f'failed to start prompt.pyw\n\tReason: {e}')
         if (not (MITOSIS_MODE or LOWKEY_MODE)) and do_roll(POPUP_CHANCE) and HAS_IMAGES and currPopNum < maxPopNum:
             try:
-                subprocess.Popen([sys.executable, 'popup.pyw']) if MOOD_OFF else subprocess.Popen([sys.executable, 'popup.pyw', f'-{MOOD_ID}'])
+                subprocess.Popen([sys.executable, Process.POPUP]) if MOOD_OFF else subprocess.Popen([sys.executable, Process.POPUP, f'-{MOOD_ID}'])
                 currPopNum += 1
             except Exception as e:
                 messagebox.showerror('Popup Error', 'Failed to start popup.\n[' + str(e) + ']')
@@ -922,7 +899,7 @@ def rotate_wallpapers():
         selectedWallpaper = list(settings['wallpaperDat'].keys())[rand.randrange(0, len(settings['wallpaperDat'].keys()))]
         while(selectedWallpaper == prv):
             selectedWallpaper = list(settings['wallpaperDat'].keys())[rand.randrange(0, len(settings['wallpaperDat'].keys()))]
-        utils.set_wallpaper(os.path.join(PATH, 'resource', settings['wallpaperDat'][selectedWallpaper]))
+        utils.set_wallpaper(Resource.ROOT / settings['wallpaperDat'][selectedWallpaper])
         prv = selectedWallpaper
 
 def do_timer():
@@ -978,7 +955,7 @@ def play_audio():
             pumpScareAudio.clear()
             p.terminate()
         else:
-            if not MOOD_OFF and os.path.exists(os.path.join(PATH, 'resource', 'media.json')):
+            if not MOOD_OFF and os.path.exists(Resource.MEDIA):
                 ps.playsound(MOOD_AUDIO[rand.randrange(len(MOOD_AUDIO))])
             else:
                 ps.playsound(AUDIO[rand.randrange(len(AUDIO))])
@@ -998,7 +975,7 @@ def fill_drive():
     docPath = DRIVE_PATH
     images = []
     logging.info(f'starting drive fill to {docPath}')
-    for img in os.listdir(os.path.join(PATH, 'resource', 'img')):
+    for img in os.listdir(Resource.IMAGE):
         if not img.split('.')[-1] == 'ini':
             images.append(img)
     for root, dirs, files in os.walk(docPath):
@@ -1010,7 +987,7 @@ def fill_drive():
             index = rand.randint(0, len(images)-1)
             tObj = str(time.time() * rand.randint(10000, 69420)).encode(encoding='ascii',errors='ignore')
             pth = os.path.join(root, hashlib.md5(tObj).hexdigest() + '.' + str.split(images[index], '.')[len(str.split(images[index], '.')) - 1].lower())
-            shutil.copyfile(os.path.join(PATH, 'resource', 'img', images[index]), pth)
+            shutil.copyfile(Resource.IMAGE / images[index], pth)
         time.sleep(float(FILL_DELAY) / 100)
     LIVE_FILL_THREADS -= 1
 
@@ -1020,9 +997,9 @@ def replace_images():
     REPLACING_LIVE = True
     docPath = DRIVE_PATH
     imageNames = []
-    for img in os.listdir(os.path.join(PATH, 'resource', 'img')):
+    for img in os.listdir(Resource.IMAGE):
         if not img.split('.')[-1] == 'ini':
-            imageNames.append(os.path.join(PATH, 'resource', 'img', img))
+            imageNames.append(Resource.IMAGE / img)
     for root, dirs, files in os.walk(docPath):
         for obj in list(dirs):
             if obj in AVOID_LIST or obj[0] == '.':
@@ -1043,7 +1020,7 @@ def replace_images():
 
 def update_media():
     #handle media list, doing it here instead of popup to take the load off of popups
-    if os.path.exists(os.path.join(PATH, 'resource', 'media.json')) and not MOOD_OFF:
+    if os.path.exists(Resource.MEDIA) and not MOOD_OFF:
         if os.path.exists(os.path.join(PATH, 'moods', f'{MOOD_ID}.json')):
             with open(os.path.join(PATH, 'moods', f'{MOOD_ID}.json'), 'r') as f:
                 moodData = json.loads(f.read())
@@ -1052,7 +1029,7 @@ def update_media():
             with open(os.path.join(PATH, 'moods', 'unnamed', f'{MOOD_ID}.json'), 'r') as f:
                 moodData = json.loads(f.read())
                 #logging.info(f'moodData {moodData}')
-        with open(os.path.join(PATH, 'resource', 'media.json'), 'r') as f:
+        with open(Resource.MEDIA, 'r') as f:
             mediaData = json.loads(f.read())
             #print(f'mediaData {mediaData}')
         #if CORRUPTION_MODE:
@@ -1069,10 +1046,10 @@ def update_media():
             moodVideo = []
             for sub in rawList:
                 for i in sub:
-                    if i in os.listdir(os.path.join(PATH, 'resource', 'aud')):
-                        MOOD_AUDIO.append(os.path.join(PATH, 'resource', 'aud', i))
+                    if i in os.listdir(Resource.AUDIO):
+                        MOOD_AUDIO.append(Resource.AUDIO / i)
                         #logging.info(f'{i}')
-                    elif i in os.listdir(os.path.join(PATH, 'resource', 'vid')):
+                    elif i in os.listdir(Resource.VIDEO):
                         moodVideo.append(i)
                     else:
                         mergedList.append(i)

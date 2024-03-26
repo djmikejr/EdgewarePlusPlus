@@ -8,6 +8,7 @@ from tkinter import Tk, Frame, Label, RAISED, messagebox
 from PIL import Image, ImageTk, ImageFilter
 from itertools import cycle
 from pathlib import Path
+from utils.paths import Resource
 
 PATH = Path(__file__).parent
 os.chdir(PATH)
@@ -20,7 +21,7 @@ SYS_ARGS.pop(0)
 #keeping it in because it would be nice to fix at some point
 class GifLabel(tk.Label):
     def load(self, resized_width:int, resized_height:int, delay:int=75):
-        self.image = Image.open(os.path.join(PATH, 'resource', 'loading_splash.gif'))
+        self.image = Image.open(Resource.ROOT / 'loading_splash.gif')
         self.configure(background='black')
         self.frames:list[ImageTk.PhotoImage] = []
         if 'duration' in self.image.info:
@@ -55,18 +56,7 @@ def doAnimation():
 
     animated_gif = False
     if len(SYS_ARGS) >= 1 and SYS_ARGS[0] == '-custom':
-        if os.path.exists(os.path.join(PATH, 'resource', 'loading_splash.png')):
-            img_ = Image.open(os.path.join(PATH, 'resource', 'loading_splash.png'))
-        elif os.path.exists(os.path.join(PATH, 'resource', 'loading_splash.gif')):
-            img_ = Image.open(os.path.join(PATH, 'resource', 'loading_splash.gif'))
-            #if img_.n_frames > 1:
-                #animated_gif = True
-        elif os.path.exists(os.path.join(PATH, 'resource', 'loading_splash.jpg')):
-            img_ = Image.open(os.path.join(PATH, 'resource', 'loading_splash.jpg'))
-        elif os.path.exists(os.path.join(PATH, 'resource', 'loading_splash.jpeg')):
-            img_ = Image.open(os.path.join(PATH, 'resource', 'loading_splash.jpeg'))
-        elif os.path.exists(os.path.join(PATH, 'resource', 'loading_splash.bmp')):
-            img_ = Image.open(os.path.join(PATH, 'resource', 'loading_splash.bmp'))
+        img_ = Image.open(Resource.SPLASH)
     else:
         img_ = Image.open(os.path.join(PATH, 'default_assets', 'loading_splash.png'))
     if len(SYS_ARGS) >= 2 and SYS_ARGS[1] == '-lanczos' or len(SYS_ARGS) == 1 and SYS_ARGS[0] == '-lanczos':

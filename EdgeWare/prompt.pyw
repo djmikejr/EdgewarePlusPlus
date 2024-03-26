@@ -8,6 +8,7 @@ from tkinter import messagebox, font
 from tkinter import *
 from screeninfo import get_monitors
 from utils import utils
+from utils.paths import Resource
 
 SYS_ARGS = sys.argv.copy()
 SYS_ARGS.pop(0)
@@ -41,9 +42,9 @@ if MOOD_ID != '0':
         with open(os.path.join(PATH, 'moods', 'unnamed', f'{MOOD_ID}.json'), 'r') as f:
             moodData = json.loads(f.read())
 
-if os.path.exists(os.path.join(PATH, 'resource', 'prompt.json')):
+if os.path.exists(Resource.PROMPT):
     hasData = True
-    with open(os.path.join(PATH, 'resource', 'prompt.json'), 'r') as f:
+    with open(Resource.PROMPT, 'r') as f:
         textData = json.loads(f.read())
         try:
             submission_text = textData['subtext']

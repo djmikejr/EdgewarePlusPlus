@@ -9,6 +9,7 @@ import time
 import random as rand
 from screeninfo import get_monitors
 from utils import utils
+from utils.paths import Resource
 
 SYS_ARGS = sys.argv.copy()
 SYS_ARGS.pop(0)
@@ -87,7 +88,7 @@ def display_subliminal_message():
     # Load subliminal messages from captions.json
     def load_subliminal_messages():
         try:
-            with open(os.path.join(PATH, 'resource', 'captions.json'), "r") as file:
+            with open(Resource.CAPTIONS, "r") as file:
                 l = json.load(file)
                 if l.get("subliminal", []) and SUBLIMINAL_MOOD:
                     return l.get("subliminal", [])

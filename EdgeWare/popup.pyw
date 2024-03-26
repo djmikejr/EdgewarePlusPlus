@@ -15,6 +15,7 @@ from itertools import count, cycle
 from PIL import Image, ImageTk, ImageFilter
 from screeninfo import get_monitors
 from utils import utils
+from utils.paths import Process, Resource
 import subprocess
 try:
     import vlc
@@ -201,8 +202,8 @@ if PANIC_REQUIRES_VALIDATION:
 
 if WEB_OPEN:
     web_dict = ''
-    if os.path.exists(os.path.join(PATH, 'resource', 'web.json')):
-        with open(os.path.join(PATH, 'resource', 'web.json'), 'r') as web_file:
+    if os.path.exists(Resource.WEB):
+        with open(Resource.WEB, 'r') as web_file:
             web_dict = json.loads(web_file.read())
             #web_mood_dict = web_dict
 
@@ -218,7 +219,7 @@ if WEB_OPEN:
                 #messagebox.showinfo('test', f'{e}')
                 #print('error loading web moods, or web moods not supported in pack.')
 try:
-    with open(os.path.join(PATH, 'resource', 'captions.json'), 'r') as caption_file:
+    with open(Resource.CAPTIONS, 'r') as caption_file:
         CAPTIONS = json.load(caption_file)
         try:
             SUBMISSION_TEXT = CAPTIONS['subtext']
@@ -371,7 +372,7 @@ def move_window(master, resized_height:int, resized_width:int, xlocation:int, yl
         master.after(10)
 
 def pick_resource(basepath, vidYes:bool):
-    if MOOD_ID != '0' and os.path.exists(os.path.join(PATH, 'resource', 'media.json')):
+    if MOOD_ID != '0' and os.path.exists(Resource.MEDIA):
         try:
             if vidYes:
                 with open(os.path.join(PATH, 'data', 'media_video.dat'), 'r') as f:
@@ -464,10 +465,10 @@ if THEME == 'Bimbo':
 def run():
     #var things
     video_mode = False
-    resource_path = os.path.join(os.path.abspath(os.getcwd()), 'resource', 'img')
+    resource_path = Resource.IMAGE
     if len(SYS_ARGS) >= 1 and SYS_ARGS[0] == '-video':
         video_mode = True
-        resource_path = os.path.join(os.path.abspath(os.getcwd()), 'resource', 'vid')
+        resource_path = Resource.VIDEO
 
     item, caption_text, root.click_count = pick_resource(resource_path, video_mode)
 
@@ -480,7 +481,7 @@ def run():
                 item, caption_text, root.click_count = pick_resource(resource_path, video_mode)
     else:
         from videoprops import get_video_properties
-        video_path = os.path.join(PATH, 'resource', 'vid', item)
+        video_path = Resource.VIDEO / item
         video_properties = get_video_properties(video_path)
         image = Image.new('RGB', (video_properties['width'], video_properties['height']))
 
@@ -557,10 +558,10 @@ def run():
                 label = GifLabel(root)
                 subliminal_path = os.path.join(PATH, 'default_assets', 'default_spiral.gif')
 
-                if os.path.exists(os.path.join(PATH, 'resource', 'subliminals')):
-                    subliminal_options = [file for file in os.listdir(os.path.join(PATH, 'resource', 'subliminals')) if file.lower().endswith('.gif')]
+                if os.path.exists(Resource.SUBLIMINALS):
+                    subliminal_options = [file for file in os.listdir(Resource.SUBLIMINALS) if file.lower().endswith('.gif')]
                     if len(subliminal_options) > 0:
-                        subliminal_path = os.path.join(PATH, 'resource', 'subliminals', str(rand.choice(subliminal_options)))
+                        subliminal_path = Resource.SUBLIMINALS / str(rand.choice(subliminal_options))
 
                 label.load(subliminal_path, photoimage_image.width(), photoimage_image.height(), back_image=resized_image)
                 label.pack()
@@ -675,7 +676,7 @@ def live_life(parent:tk, length:int):
         parent.attributes('-alpha', 1-i/100)
         time.sleep(FADE_OUT_TIME / 100)
     if LOWKEY_MODE:
-        subprocess.Popen([sys.executable, 'popup.pyw'])
+        subprocess.Popen([sys.executable, Process.POPUP])
     if HIBERNATE_MODE and check_setting('fixWallpaper'):
         with open(os.path.join(PATH, 'data', 'hibernate_handler.dat'), 'r+') as f:
             i = int(f.readline())
@@ -751,7 +752,7 @@ def die():
         webbrowser.open_new(urlPath)
     if MITOSIS_MODE or LOWKEY_MODE:
         for i in (range(0, MITOSIS_STRENGTH) if not LOWKEY_MODE else [1]):
-            subprocess.Popen([sys.executable, 'popup.pyw'])
+            subprocess.Popen([sys.executable, Process.POPUP])
     if HIBERNATE_MODE and check_setting('fixWallpaper'):
         with open(os.path.join(PATH, 'data', 'hibernate_handler.dat'), 'r+') as f:
             i = int(f.readline())
