@@ -2,15 +2,15 @@
 :open
 color 0d
 echo +==============[ Welcome to Edgeware Setup~ ]==============+
-echo Python Version:
-py --version 
+echo Python version:
+py --version
 echo:
 echo NOTE: Python versions older than 3.10.2 might have compatability issues.
 echo If you are on one of these versions and experience issues with Edgeware, try uninstalling them
 echo and running this installer again. (or download it yourself if you know what you're doing!)
 echo:
 if NOT %errorlevel%==0 goto pyInstall
-goto run
+goto checkPip
 :pyInstall
 echo Could not find Python.
 echo Now downloading installer from python.org, please wait...
@@ -23,7 +23,24 @@ start %CD%\pyinstaller.exe
 pause
 :verifyInstallation
 py --version
-if NOT %errorlevel%==0 goto quit
+if NOT %errorlevel%==0 goto quitPy
+goto checkPip
+:checkPip
+echo pip version:
+py -m pip --version
+if NOT %errorlevel%==0 goto installPip
+goto requirements
+:installPip
+echo Could not find pip.
+echo Installing pip with ensurepip...
+py -m ensurepip --upgrade
+py -m pip --version
+if NOT %errorlevel%==0 goto quitPip
+goto requirements
+:requirements
+echo Installing requirements...
+py -m pip install -r requirements.txt
+if NOT %errorlevel%==0 goto quitRequirements
 goto run
 :run
 echo Edgeware is ready, and will now start the config file for you.
@@ -35,6 +52,12 @@ echo panic.pyw: kills Edgeware and all currently spawned popups
 pause
 start "Edgeware++ Config" "%CD%/EdgeWare/config.pyw"
 exit
-:quit
+:quitPy
 echo Python still could not be found.
+pause
+:quitPip
+echo pip still could not be found.
+pause
+:quitRequirements
+echo Failed to install requirements.
 pause
