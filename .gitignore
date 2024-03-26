@@ -163,7 +163,7 @@ cython_debug/
 .vs/
 
 # Ignore anything that could be considered a local file
-Edgeware/config.cfg
+EdgeWare/config.cfg
 EdgeWare/hid_time.dat
 EdgeWare/pass.hash
 EdgeWare/data/
