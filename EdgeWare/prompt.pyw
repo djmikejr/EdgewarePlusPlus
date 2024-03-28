@@ -8,7 +8,7 @@ from tkinter import messagebox, font
 from tkinter import *
 from screeninfo import get_monitors
 from utils import utils
-from utils.paths import Resource
+from utils.paths import Data, Resource
 
 SYS_ARGS = sys.argv.copy()
 SYS_ARGS.pop(0)
@@ -25,7 +25,7 @@ PATH = str(pathlib.Path(__file__).parent.absolute())
 os.chdir(PATH)
 
 
-with open(os.path.join(PATH, 'config.cfg')) as settings:
+with open(Data.CONFIG) as settings:
     jsondata = json.loads(settings.read())
     maxMistakes = int(jsondata['promptMistakes'])
     THEME = jsondata['themeType']
@@ -35,11 +35,11 @@ if len(SYS_ARGS) >= 1 and SYS_ARGS[0] != '0':
     MOOD_ID = SYS_ARGS[0].strip('-')
 
 if MOOD_ID != '0':
-    if os.path.exists(os.path.join(PATH, 'moods', f'{MOOD_ID}.json')):
-        with open(os.path.join(PATH, 'moods', f'{MOOD_ID}.json'), 'r') as f:
+    if os.path.exists(Data.MOODS / f'{MOOD_ID}.json'):
+        with open(Data.MOODS / f'{MOOD_ID}.json', 'r') as f:
             moodData = json.loads(f.read())
-    elif os.path.exists(os.path.join(PATH, 'moods', 'unnamed', f'{MOOD_ID}.json')):
-        with open(os.path.join(PATH, 'moods', 'unnamed', f'{MOOD_ID}.json'), 'r') as f:
+    elif os.path.exists(Data.UNNAMED_MOODS / f'{MOOD_ID}.json'):
+        with open(Data.UNNAMED_MOODS / f'{MOOD_ID}.json', 'r') as f:
             moodData = json.loads(f.read())
 
 if os.path.exists(Resource.PROMPT):

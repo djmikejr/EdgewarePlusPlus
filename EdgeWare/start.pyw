@@ -31,7 +31,7 @@ from dataclasses import dataclass
 from tkinter import messagebox, simpledialog
 from pathlib import Path
 from utils import utils
-from utils.paths import Process, Resource
+from utils.paths import Data, Defaults, Process, Resource
 try:
     import vlc
 except:
@@ -40,12 +40,7 @@ except:
 PATH = Path(__file__).parent
 os.chdir(PATH)
 
-#starting logging
-if not os.path.exists(os.path.join(PATH, 'logs')):
-    os.mkdir(os.path.join(PATH, 'logs'))
-if __name__ == '__main__':
-    logging.basicConfig(filename=os.path.join(PATH, 'logs', time.asctime().replace(' ', '_').replace(':', '-') + '-ew_start.txt'), format='%(levelname)s:%(message)s', level=logging.DEBUG)
-logging.info('Started start logging successfully.')
+utils.init_logging(logging, 'ew_start', 'start')
 
 SYS_ARGS = sys.argv.copy()
 SYS_ARGS.pop(0)
@@ -59,7 +54,7 @@ def load_settings():
     settings = {}
 
     #creating objects to check vs live config for version updates
-    with open(os.path.join(PATH, 'configDefault.dat')) as r:
+    with open(Defaults.CONFIG) as r:
         logging.info('reading in default config values')
         defaultLines = r.readlines()
         default_setting_keys = defaultLines[0].split(',')
@@ -70,13 +65,13 @@ def load_settings():
         settings[var] = default_setting_values[default_setting_keys.index(var)]
 
     #checking if config file exists and then writing the default config settings to a new file if it doesn't
-    if not os.path.exists(os.path.join(PATH, 'config.cfg')):
-        with open(os.path.join(PATH, 'config.cfg'), 'w') as f:
+    if not os.path.exists(Data.CONFIG):
+        with open(Data.CONFIG, 'w') as f:
             f.write(json.dumps(settings))
             logging.warning('could not find config.cfg, wrote new file.')
 
     #reading in config file
-    with open(os.path.join(PATH, 'config.cfg'), 'r') as f:
+    with open(Data.CONFIG, 'r') as f:
         settings = json.loads(f.readline())
         logging.info('read in settings from config.cfg')
 
@@ -94,7 +89,7 @@ def load_settings():
         regen_settings['version'] = default_setting_values[0]
         regen_settings = json.loads(str(regen_settings).replace('\'', '"'))
         settings = regen_settings
-        with open(os.path.join(PATH, 'config.cfg'), 'w') as f:
+        with open(Data.CONFIG, 'w') as f:
             f.write(str(regen_settings).replace('\'', '"'))
             logging.info('wrote updated config to config.cfg')
 
@@ -256,16 +251,8 @@ try:
             logging.warning('no zip file found, generating resource folder from default assets.')
             for obj in [Resource.ROOT, Resource.AUDIO, Resource.IMAGE, Resource.VIDEO]:
                 os.mkdir(obj)
-            default_path = os.path.join(PATH, 'default_assets')
-            shutil.copyfile(
-                os.path.join(default_path, 'default_wallpaper.png'),
-                Resource.WALLPAPER
-            )
-            shutil.copyfile(
-                os.path.join(default_path, 'default_image.png'),
-                Resource.IMAGE / 'img0.png',
-                follow_symlinks=True
-            )
+            shutil.copyfile(Defaults.WALLPAPER, Resource.WALLPAPER)
+            shutil.copyfile(Defaults.IMAGE, Resource.IMAGE / 'img0.png', follow_symlinks=True)
             if not os.path.exists(Resource.DISCORD):
                 with open(Resource.DISCORD, 'w') as f:
                     f.write(DEFAULT_DISCORD)
@@ -393,7 +380,7 @@ class TrayHandler:
                                         self.option_list)
         else:
             self.tray_icon = pystray.Icon('Edgeware',
-                                        Image.open(os.path.join(PATH, 'default_assets', 'default_icon.ico')),
+                                        Image.open(Defaults.ICON),
                                         'Edgeware',
                                         self.option_list)
 
@@ -410,12 +397,11 @@ class TrayHandler:
 
     def password_setup(self):
         if self.timer_mode:
-            hashObjPath = os.path.join(PATH, 'pass.hash')
             try:
-                utils.show_file(hashObjPath)
-                with open(hashObjPath, 'r') as file:
+                utils.show_file(Data.PASS_HASH)
+                with open(Data.PASS_HASH, 'r') as file:
                     self.hashedPass = file.readline()
-                utils.hide_file(hashObjPath)
+                utils.hide_file(Data.PASS_HASH)
             except:
                 #no hash found
                 self.hashedPass = None
@@ -424,26 +410,24 @@ class TrayHandler:
         logging.info('attempting tray panic')
         if not PANIC_DISABLED:
             if self.timer_mode:
-                hashObjPath = os.path.join(PATH, 'pass.hash')
-                timeObjPath = os.path.join(PATH, 'hid_time.dat')
                 pass_ = simpledialog.askstring('Panic', 'Enter Panic Password')
                 t_hash = None if pass_ is None or pass_ == '' else hashlib.sha256(pass_.encode(encoding='ascii', errors='ignore')).hexdigest()
                 if t_hash == self.hashedPass:
                     #revealing hidden files
                     try:
-                        utils.show_file(hashObjPath)
-                        utils.show_file(hashObjPath)
-                        os.remove(hashObjPath)
-                        os.remove(timeObjPath)
-                        subprocess.Popen([sys.executable, 'panic.pyw'])
+                        utils.show_file(Data.PASS_HASH)
+                        utils.show_file(Data.PASS_HASH)
+                        os.remove(Data.PASS_HASH)
+                        os.remove(Data.HID_TIME)
+                        subprocess.Popen([sys.executable, Process.PANIC])
                     except:
                         logging.critical('panic initiated due to failed pass/timer check')
                         self.tray_icon.stop()
-                        subprocess.Popen([sys.executable, 'panic.pyw'])
+                        subprocess.Popen([sys.executable, Process.PANIC])
             else:
                 logging.warning('panic initiated from tray command')
                 self.tray_icon.stop()
-                subprocess.Popen([sys.executable, 'panic.pyw'])
+                subprocess.Popen([sys.executable, Process.PANIC])
 
     def move_to_tray(self):
         self.tray_icon.run(tray_setup)
@@ -463,23 +447,23 @@ def main():
     thread.Thread(target=tray.move_to_tray, daemon=True).start()
 
     #timer handling, start if there's a time left file
-    if os.path.exists(os.path.join(PATH, 'hid_time.dat')):
+    if os.path.exists(Data.HID_TIME):
         thread.Thread(target=do_timer).start()
 
     #max value handling creation/cleaning
-    if not os.path.exists(os.path.join(PATH, 'data')):
-        os.mkdir(os.path.join(PATH, 'data'))
+    if not os.path.exists(Data.ROOT):
+        os.mkdir(Data.ROOT)
     try:
-        with open(os.path.join(PATH, 'data', 'max_videos.dat'), 'w') as f:
+        with open(Data.MAX_VIDEOS, 'w') as f:
             f.write('0')
-        with open(os.path.join(PATH, 'data', 'max_subliminals.dat'), 'w') as f:
+        with open(Data.MAX_SUBLIMINALS, 'w') as f:
             f.write('0')
-        with open(os.path.join(PATH, 'data', 'hibernate_handler.dat'), 'w') as f:
+        with open(Data.HIBERNATE, 'w') as f:
             f.write('0')
         if not MOOD_OFF:
-            with open(os.path.join(PATH, 'data', 'media_images.dat'), 'w') as f:
+            with open(Data.MEDIA_IMAGES, 'w') as f:
                 f.write('0')
-            with open(os.path.join(PATH, 'data', 'media_video.dat'), 'w') as f:
+            with open(Data.MEDIA_VIDEO, 'w') as f:
                 f.write('0')
     except Exception as e:
         logging.warning(f'failed to clean or create data files\n\tReason: {e}')
@@ -522,7 +506,7 @@ def main():
                 try:
                     global HIBERNATE_TYPE
                     HIBERNATE_TYPE = rand.choice(['Original', 'Spaced', 'Glitch', 'Ramp'])
-                    with open(os.path.join(PATH, 'data', 'chaos_type.dat'), 'w') as f:
+                    with open(Data.CHAOS_TYPE, 'w') as f:
                         f.write(HIBERNATE_TYPE)
                     logging.info(f'hibernate type is chaos, and has switched to {HIBERNATE_TYPE}')
                 except Exception as e:
@@ -613,7 +597,7 @@ def main():
 
 
 def checkWallpaperStatus():
-    with open(os.path.join(PATH, 'data', 'hibernate_handler.dat'), 'r') as f:
+    with open(Data.HIBERNATE, 'r') as f:
         while True:
             runningHibernate.wait()
             logging.info('hibernate processing is over, waiting for popups to close')
@@ -626,7 +610,7 @@ def checkWallpaperStatus():
                         if i < 1:
                             wallpaperWait.set()
                             logging.info('hibernate popups are all dead')
-                            utils.set_wallpaper(os.path.join(PATH, 'default_assets', 'default_win10.jpg'))
+                            utils.set_wallpaper(Defaults.PANIC_WALLPAPER)
                             break
 
 #just checking %chance of doing annoyance options
@@ -827,7 +811,7 @@ def roll_for_initiative():
         if do_roll(VIDEO_CHANCE) and VIDEOS and currPopNum < maxPopNum:
             global VIDEO_NUMBER
             if VIDEO_CAP:
-                with open(os.path.join(PATH, 'data', 'max_videos.dat'), 'r') as f:
+                with open(Data.MAX_VIDEOS, 'r') as f:
                     VIDEO_NUMBER = int(f.readline())
                 if VIDEO_NUMBER < VIDEO_MAX:
                     try:
@@ -835,7 +819,7 @@ def roll_for_initiative():
                             thread.Thread(target=lambda: subprocess.call([sys.executable, Process.POPUP, '-video', '-vlc'], shell=False)).start() if MOOD_OFF else thread.Thread(target=lambda: subprocess.call([sys.executable, Process.POPUP, f'-{MOOD_ID}', '-video', '-vlc'], shell=False)).start()
                         else:
                             thread.Thread(target=lambda: subprocess.call([sys.executable, Process.POPUP, '-video'], shell=False)).start() if MOOD_OFF else thread.Thread(target=lambda: subprocess.call([sys.executable, Process.POPUP, f'-{MOOD_ID}', '-video'], shell=False)).start()
-                        with open(os.path.join(PATH, 'data', 'max_videos.dat'), 'w') as f:
+                        with open(Data.MAX_VIDEOS, 'w') as f:
                             f.write(str(VIDEO_NUMBER+1))
                         currPopNum += 1
                     except Exception as e:
@@ -877,7 +861,7 @@ def roll_for_initiative():
 
         if do_roll(PROMPT_CHANCE) and HAS_PROMPTS and currPopNum < maxPopNum:
             try:
-                subprocess.call([sys.executable, Process.POPUP, f'-{MOOD_ID}']) if not MOOD_OFF else subprocess.call([sys.executable, Process.POPUP])
+                subprocess.call([sys.executable, Process.PROMPT, f'-{MOOD_ID}']) if not MOOD_OFF else subprocess.call([sys.executable, Process.PROMPT])
                 currPopNum += 1
             except Exception as e:
                 messagebox.showerror('Prompt Error', 'Could not start prompt.\n[' + str(e) + ']')
@@ -903,30 +887,27 @@ def rotate_wallpapers():
         prv = selectedWallpaper
 
 def do_timer():
-    hashObjPath = os.path.join(PATH, 'pass.hash')
-    timeObjPath = os.path.join(PATH, 'hid_time.dat')
-
-    utils.show_file(timeObjPath)
-    with open(timeObjPath, 'r') as file:
+    utils.show_file(Data.HID_TIME)
+    with open(Data.HID_TIME, 'r') as file:
         time_remaining = int(file.readline())
 
     while time_remaining > 0:
         print('time left: ', str(time_remaining), 'secs', sep='')
         time.sleep(1)
         time_remaining -= 1
-        utils.show_file(timeObjPath)
-        with open(timeObjPath, 'w') as file:
+        utils.show_file(Data.HID_TIME)
+        with open(Data.HID_TIME, 'w') as file:
             file.write(str(time_remaining))
-        utils.hide_file(timeObjPath)
+        utils.hide_file(Data.HID_TIME)
 
     try:
-        utils.show_file(hashObjPath)
-        utils.show_file(timeObjPath)
-        os.remove(hashObjPath)
-        os.remove(timeObjPath)
-        subprocess.Popen([sys.executable, 'panic.pyw'])
+        utils.show_file(Data.PASS_HASH)
+        utils.show_file(Data.HID_TIME)
+        os.remove(Data.PASS_HASH)
+        os.remove(Data.HID_TIME)
+        subprocess.Popen([sys.executable, Process.PANIC])
     except:
-        subprocess.Popen([sys.executable, 'panic.pyw'])
+        subprocess.Popen([sys.executable, Process.PANIC])
 
 def audioHelper():
     if MOOD_OFF:
@@ -1021,12 +1002,12 @@ def replace_images():
 def update_media():
     #handle media list, doing it here instead of popup to take the load off of popups
     if os.path.exists(Resource.MEDIA) and not MOOD_OFF:
-        if os.path.exists(os.path.join(PATH, 'moods', f'{MOOD_ID}.json')):
-            with open(os.path.join(PATH, 'moods', f'{MOOD_ID}.json'), 'r') as f:
+        if os.path.exists(Data.MOODS / f'{MOOD_ID}.json'):
+            with open(Data.MOODS / f'{MOOD_ID}.json', 'r') as f:
                 moodData = json.loads(f.read())
                 #logging.info(f'moodData {moodData}')
-        elif os.path.exists(os.path.join(PATH, 'moods', 'unnamed', f'{MOOD_ID}.json')):
-            with open(os.path.join(PATH, 'moods', 'unnamed', f'{MOOD_ID}.json'), 'r') as f:
+        elif os.path.exists(Data.UNNAMED_MOODS / f'{MOOD_ID}.json'):
+            with open(Data.UNNAMED_MOODS / f'{MOOD_ID}.json', 'r') as f:
                 moodData = json.loads(f.read())
                 #logging.info(f'moodData {moodData}')
         with open(Resource.MEDIA, 'r') as f:
@@ -1054,9 +1035,9 @@ def update_media():
                     else:
                         mergedList.append(i)
 
-            with open(os.path.join(PATH, 'data', 'media_images.dat'), 'w') as f:
+            with open(Data.MEDIA_IMAGES, 'w') as f:
                 f.write(json.dumps(mergedList))
-            with open(os.path.join(PATH, 'data', 'media_video.dat'), 'w') as f:
+            with open(Data.MEDIA_VIDEO, 'w') as f:
                 f.write(json.dumps(moodVideo))
         except Exception as e:
             logging.warning(f'failed to load mediaData properly.\n\tReason: {e}')

@@ -2,8 +2,8 @@ import time
 import os
 import pathlib
 from pypresence import presence
+from utils.paths import Resource
 
-status_path = os.path.join(str(pathlib.Path(__file__).parent.absolute()), 'resource', 'discord.dat')
 textObj = ['[No discord.dat resource]', 'default']
 
 IMGID_CONSTS = ['furcock_img', 'blacked_img', 'censored_img', 'goon_img', 'goon2_img', 'hypno_img', 'futa_img', 'healslut_img', 'gross_img']
@@ -12,7 +12,7 @@ txt = ''
 
 try:
     #grab discord status from discord.dat, mark as having file
-    with open(status_path, 'r') as f:
+    with open(Resource.DISCORD, 'r') as f:
         txt=f.read()
 except:
     print('failed text read')

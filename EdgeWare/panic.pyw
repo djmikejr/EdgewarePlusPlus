@@ -3,22 +3,17 @@ import os
 import pathlib
 from pathlib import Path
 from utils import utils
+from utils.paths import Data, Defaults
 
-PATH = Path(__file__).parent
-
-timeObjPath = os.path.join(PATH, 'hid_time.dat')
-
-#checking timer
+# Checking timer
 try:
-    utils.show_file(timeObjPath)
+    utils.show_file(Data.HID_TIME)
 except:
     ''
-if os.path.exists(os.path.join(PATH, 'hid_time.dat')):
-    utils.hide_file(timeObjPath)
-    #sudoku if timer after hiding file again
-    os.kill(os.getpid(), 9)
+if os.path.exists(Data.HID_TIME):
+    utils.hide_file(Data.HID_TIME)
+    # Do nothing if timer is present
 else:
-    #continue if no timer
-    utils.set_wallpaper(os.path.join(PATH, 'default_assets', 'default_win10.jpg'))
-
-utils.panic_script()
+    # Continue if no timer
+    utils.set_wallpaper(Defaults.PANIC_WALLPAPER)
+    utils.panic_script()

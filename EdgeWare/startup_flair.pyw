@@ -8,7 +8,7 @@ from tkinter import Tk, Frame, Label, RAISED, messagebox
 from PIL import Image, ImageTk, ImageFilter
 from itertools import cycle
 from pathlib import Path
-from utils.paths import Resource
+from utils.paths import Defaults, Resource
 
 PATH = Path(__file__).parent
 os.chdir(PATH)
@@ -58,7 +58,7 @@ def doAnimation():
     if len(SYS_ARGS) >= 1 and SYS_ARGS[0] == '-custom':
         img_ = Image.open(Resource.SPLASH)
     else:
-        img_ = Image.open(os.path.join(PATH, 'default_assets', 'loading_splash.png'))
+        img_ = Image.open(Defaults.SPLASH)
     if len(SYS_ARGS) >= 2 and SYS_ARGS[1] == '-lanczos' or len(SYS_ARGS) == 1 and SYS_ARGS[0] == '-lanczos':
         img = ImageTk.PhotoImage(img_.resize((int(img_.width * scalar), int(img_.height * scalar)), resample=Image.LANCZOS))
     else:

@@ -9,14 +9,14 @@ import time
 import random as rand
 from screeninfo import get_monitors
 from utils import utils
-from utils.paths import Resource
+from utils.paths import Data, Resource
 
 SYS_ARGS = sys.argv.copy()
 SYS_ARGS.pop(0)
 PATH = str(pathlib.Path(__file__).parent.absolute())
 os.chdir(PATH)
 
-logging.basicConfig(filename=os.path.join(PATH, 'logs', time.asctime().replace(' ', '_').replace(':', '-') + '-sublabel.txt'), format='%(levelname)s:%(message)s', level=logging.DEBUG)
+utils.init_logging(logging, 'sublabel')
 #This sublabel.pyw originally provided very generously by u/basicmo!
 
 def check_setting(name:str, default:bool=False) -> bool:
@@ -37,14 +37,14 @@ if len(SYS_ARGS) >= 1 and SYS_ARGS[0] != '0':
     MOOD_ID = SYS_ARGS[0].strip('-')
 
 if MOOD_ID != '0':
-    if os.path.exists(os.path.join(PATH, 'moods', f'{MOOD_ID}.json')):
-        with open(os.path.join(PATH, 'moods', f'{MOOD_ID}.json')) as f:
+    if os.path.exists(Data.MOODS / f'{MOOD_ID}.json'):
+        with open(Data.MOODS / f'{MOOD_ID}.json') as f:
             moodData = json.loads(f.read())
-    elif os.path.exists(os.path.join(PATH, 'moods', 'unnamed', f'{MOOD_ID}.json')):
-        with open(os.path.join(PATH, 'moods', 'unnamed', f'{MOOD_ID}.json')) as f:
+    elif os.path.exists(Data.UNNAMED_MOODS /  f'{MOOD_ID}.json'):
+        with open(Data.UNNAMED_MOODS / f'{MOOD_ID}.json') as f:
             moodData = json.loads(f.read())
 
-with open(os.path.join(PATH, 'config.cfg')) as cfg:
+with open(Data.CONFIG) as cfg:
     settings = json.loads(cfg.read())
     CAP_OPACITY = int(settings['capPopOpacity'])
     CAP_TIMER = int(settings['capPopTimer'])

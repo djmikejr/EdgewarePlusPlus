@@ -22,18 +22,13 @@ from tkinter import Tk, ttk, simpledialog, messagebox, filedialog, IntVar, Boole
 from pathlib import Path
 from PIL import Image, ImageTk
 from utils import utils
-from utils.paths import Resource
+from utils.paths import Defaults, Data, LOG_PATH, Resource
 from utils.tooltip import CreateToolTip
 
 PATH = Path(__file__).parent
 os.chdir(PATH)
 
-#starting logging
-if not os.path.exists(os.path.join(PATH, 'logs')):
-    os.mkdir(os.path.join(PATH, 'logs'))
-LOG_TIME = time.asctime().replace(' ', '_').replace(':', '-')
-logging.basicConfig(filename=os.path.join(PATH, 'logs', LOG_TIME + '-dbg.txt'), format='%(levelname)s:%(message)s', level=logging.DEBUG)
-logging.info('Started config logging successfully.')
+utils.init_logging(logging, 'dbg', 'config')
 
 #if you are working on this i'm just letting you know there's like almost no documentation for ttkwidgets
 #source code is here https://github.com/TkinterEP/ttkwidgets/blob/master/ttkwidgets/checkboxtreeview.py
@@ -169,7 +164,7 @@ UPDCHECK_PP_URL = 'http://raw.githubusercontent.com/araten10/EdgewarePlusPlus/ma
 local_pp_version = '0.0.0_NOCONNECT'
 
 logging.info('opening configDefault')
-with open(os.path.join(PATH, 'configDefault.dat')) as r:
+with open(Defaults.CONFIG) as r:
     defaultSettingLines = r.readlines()
     varNames = defaultSettingLines[0].split(',')
     varNames[-1] = varNames[-1].replace('\n', '')
@@ -185,13 +180,13 @@ for var in varNames:
 
 defaultSettings = settings.copy()
 
-if not os.path.exists(os.path.join(PATH, 'config.cfg')):
+if not os.path.exists(Data.CONFIG):
     logging.warning('no "config.cfg" file found, creating new "config.cfg".')
-    with open(os.path.join(PATH, 'config.cfg'), 'w') as f:
+    with open(Data.CONFIG, 'w') as f:
         f.write(json.dumps(settings))
     logging.info('created new config file.')
 
-with open(os.path.join(PATH, 'config.cfg'), 'r') as f:
+with open(Data.CONFIG, 'r') as f:
     logging.info('json loading settings')
     try:
         settings = json.loads(f.readline())
@@ -213,7 +208,7 @@ if settings['version'] != defaultVars[0] or len(settings) != len(defaultSettings
             logging.info(f'added missing key: {name}')
     tempSettingDict['version'] = defaultVars[0]
     settings = tempSettingDict.copy()
-    with open(os.path.join(PATH, 'config.cfg'), 'w') as f:
+    with open(Data.CONFIG, 'w') as f:
         #bugfix for the config crash issue
         tempSettingDict['wallpaperDat'] = str(tempSettingDict['wallpaperDat']).replace("'", '%^%')
         tempSettingString = str(tempSettingDict).replace("'", '"')
@@ -243,9 +238,9 @@ pass_ = ''
 MOOD_PATH = '0'
 if settings['toggleMoodSet'] != True:
     if UNIQUE_ID != '0' and os.path.exists(Resource.ROOT):
-        MOOD_PATH = os.path.join(PATH, 'moods', 'unnamed', f'{UNIQUE_ID}.json')
+        MOOD_PATH = Data.UNNAMED_MOODS / f'{UNIQUE_ID}.json'
     elif UNIQUE_ID == '0' and os.path.exists(Resource.ROOT):
-        MOOD_PATH = os.path.join(PATH, 'moods', f'{info_id}.json')
+        MOOD_PATH = Data.MOODS / f'{info_id}.json'
 
     #creating the mood file if it doesn't exist
     if MOOD_PATH != '0' and not os.path.isfile(MOOD_PATH):
@@ -310,7 +305,7 @@ def show_window():
     root.title('Edgeware++ Config')
     root.geometry('740x800')
     try:
-        root.iconbitmap(os.path.join(PATH, 'default_assets', 'config_icon.ico'))
+        root.iconbitmap(Defaults.CONFIG_ICON)
         logging.info('set iconbitmap.')
     except:
         logging.warning('failed to set iconbitmap.')
@@ -497,9 +492,9 @@ def show_window():
             emergencySettings = {}
             for var in varNames:
                 emergencySettings[var] = defaultVars[varNames.index(var)]
-            with open(os.path.join(PATH, 'config.cfg'), 'w') as f:
+            with open(Data.CONFIG, 'w') as f:
                 f.write(json.dumps(emergencySettings))
-            with open(os.path.join(PATH, 'config.cfg'), 'r') as f:
+            with open(Data.CONFIG, 'r') as f:
                 settings = json.loads(f.readline())
             fail_loop += 1
 
@@ -976,7 +971,7 @@ def show_window():
         toggleAssociateSettings(False, test_group, theme)
 
     testPopupTitle = Label(testThemePopup, text="Popup")
-    testPopupImage = ImageTk.PhotoImage(file=os.path.join(PATH, 'default_assets', 'theme_demo.png'))
+    testPopupImage = ImageTk.PhotoImage(file=Defaults.THEME_DEMO)
     testPopupLabel = Label(testThemePopup, image=testPopupImage, width=150, height=75, borderwidth=2, relief=GROOVE, cursor='question_arrow')
     testPopupButton = Button(testPopupLabel, text="Test~")
     testPopupCaption = Label(testPopupLabel, text="Lewd Caption Here!")
@@ -1120,7 +1115,7 @@ def show_window():
     mitosis_cGroup.append(mitosisStren)
 
     setPanicButtonButton = Button(panicFrame, text=f'Set Panic\nButton\n<{panicButtonVar.get()}>', command=lambda:getKeyboardInput(setPanicButtonButton, panicButtonVar), cursor='question_arrow')
-    doPanicButton = Button(panicFrame, text='Perform Panic', command=lambda: subprocess.Popen([sys.executable, 'panic.pyw']))
+    doPanicButton = Button(panicFrame, text='Perform Panic', command=lambda: subprocess.Popen([sys.executable, Process.PANIC]))
 
     setpanicttp = CreateToolTip(setPanicButtonButton, 'NOTE: To use this hotkey you must be \"focused\" on a EdgeWare popup. Click on a popup before using.')
 
@@ -1428,9 +1423,9 @@ def show_window():
     fadeDropdown.configure(width=9, highlightthickness = 0)
     fadeDescription = Label(fadeInfoFrame, text='Error loading fade description!', borderwidth=2, relief=GROOVE, wraplength=150)
     fadeDescription.configure(height=3, width=22)
-    fadeImageNormal = ImageTk.PhotoImage(file=os.path.join(PATH, 'default_assets', 'corruption_defaultfade.png'))
-    fadeImageAbrupt = ImageTk.PhotoImage(file=os.path.join(PATH, 'default_assets', 'corruption_abruptfade.png'))
-    fadeImageNoise = ImageTk.PhotoImage(file=os.path.join(PATH, 'default_assets', 'corruption_noisefade.png'))
+    fadeImageNormal = ImageTk.PhotoImage(file=Defaults.CORRUPTION_DEFAULT)
+    fadeImageAbrupt = ImageTk.PhotoImage(file=Defaults.CORRUPTION_ABRUPT)
+    fadeImageNoise = ImageTk.PhotoImage(file=Defaults.CORRUPTION_NOISE)
     fadeImageContainer = Label(fadeSubInfo, image=fadeImageNormal, borderwidth=2, relief=GROOVE)
     trigger_types = ['Timed', 'Popup', 'Launch']
     triggerDropdown = OptionMenu(triggerSubInfo, corruptionTriggerVar, *trigger_types, command=lambda key: triggerHelper(key, False))
@@ -1805,7 +1800,7 @@ def show_window():
     wpDelaySlider = Scale(tabWallpaper, orient='horizontal', label='Rotate Timer (sec)', from_=5, to=300,
                           variable=wallpaperDelayVar, command=lambda val: updateMax(varSlider, int(val)-1))
 
-    pHoldImageR = Image.open(os.path.join(PATH, 'default_assets', 'default_win10.jpg')).resize((int(root.winfo_screenwidth()*0.13), int(root.winfo_screenheight()*0.13)), Image.NEAREST)
+    pHoldImageR = Image.open(Defaults.PANIC_WALLPAPER).resize((int(root.winfo_screenwidth()*0.13), int(root.winfo_screenheight()*0.13)), Image.NEAREST)
 
     def updatePanicPaper():
         nonlocal pHoldImageR
@@ -1815,7 +1810,7 @@ def show_window():
         if not isinstance(selectedFile, type(None)):
             try:
                 img = Image.open(selectedFile.name).convert('RGB')
-                img.save(os.path.join(PATH, 'default_assets', 'default_win10.jpg'))
+                img.save(Defaults.PANIC_WALLPAPER)
                 pHoldImageR = ImageTk.PhotoImage(img.resize((int(root.winfo_screenwidth()*0.13), int(root.winfo_screenheight()*0.13)), Image.NEAREST))
                 panicWallpaperLabel.config(image=pHoldImageR)
                 panicWallpaperLabel.update_idletasks()
@@ -2394,11 +2389,11 @@ def show_window():
     #directories
     Label(tabFile, text='Directories', font=titleFont, relief=GROOVE).pack(pady=2)
 
-    logNum = len(os.listdir(os.path.join(PATH, 'logs'))) if os.path.exists(os.path.join(PATH, 'logs')) else 0
+    logNum = len(os.listdir(LOG_PATH)) if os.path.exists(LOG_PATH) else 0
     logsFrame = Frame(tabFile, borderwidth=5, relief=RAISED)
     lSubFrame1 = Frame(logsFrame)
     lSubFrame2 = Frame(logsFrame)
-    openLogsButton = Button(lSubFrame2, text='Open Logs Folder', command=lambda: explorerView(os.path.join(PATH, 'logs')))
+    openLogsButton = Button(lSubFrame2, text='Open Logs Folder', command=lambda: explorerView(LOG_PATH))
     clearLogsButton = Button(lSubFrame2, text='Delete All Logs', command=lambda: cleanLogs(), cursor='question_arrow')
     logStat = Label(lSubFrame1, text=f'Total Logs: {logNum}')
 
@@ -2406,17 +2401,17 @@ def show_window():
 
     def cleanLogs():
         try:
-            logNum = len(os.listdir(os.path.join(PATH, 'logs'))) if os.path.exists(os.path.join(PATH, 'logs')) else 0
+            logNum = len(os.listdir(LOG_PATH)) if os.path.exists(LOG_PATH) else 0
             if messagebox.askyesno('Confirm Delete', f'Are you sure you want to delete all logs? There are currently {logNum}.', icon='warning') == True:
-                    if os.path.exists(os.path.join(PATH, 'logs')) and os.listdir(os.path.join(PATH, 'logs')):
-                        logs = os.listdir(os.path.join(PATH, 'logs'))
+                    if os.path.exists(LOG_PATH) and os.listdir(LOG_PATH):
+                        logs = os.listdir(LOG_PATH)
                         for f in logs:
                             if os.path.splitext(f)[0] == os.path.join(LOG_TIME + '-dbg'):
                                 continue
                             e = os.path.splitext(f)[1].lower()
                             if e == '.txt':
-                                os.remove(os.path.join(PATH, 'logs') + f)
-                        logNum = len(os.listdir(os.path.join(PATH, 'logs'))) if os.path.exists(os.path.join(PATH, 'logs')) else 0
+                                os.remove(LOG_PATH + f)
+                        logNum = len(os.listdir(LOG_PATH)) if os.path.exists(LOG_PATH) else 0
                         logStat.configure(text=f'Total Logs: {logNum}')
         except Exception as e:
             logging.warning(f'could not clear logs. this might be an issue with attempting to delete the log currently in use. if so, ignore this prompt. {e}')
@@ -2433,7 +2428,7 @@ def show_window():
     mfSubFrame2 = Frame(moodsFileFrame)
     uniqueIDCheck = Label(mfSubFrame1, text=('Using Unique ID?: ' + ('✓' if (info_id == '0') else '✗')), fg=('green' if (info_id == '0') else 'red'))
     uniqueIDLabel = Label(mfSubFrame1, text=('Your Unique ID is: ' + (UNIQUE_ID if (info_id == '0') else info_id)))
-    openMoodsButton = Button(mfSubFrame2, height=2, text='Open Moods Folder', command=lambda: explorerView(os.path.join(PATH, 'moods')), cursor='question_arrow')
+    openMoodsButton = Button(mfSubFrame2, height=2, text='Open Moods Folder', command=lambda: explorerView(Data.MOODS), cursor='question_arrow')
 
     openmoodsttp = CreateToolTip(openMoodsButton, 'If your currently loaded pack has a \"info.json\" file, it can be found under the pack name in this folder.\n\n'
                                     'If it does not have this file however, EdgeWare++ will generate a Unique ID for it, so you can still save your mood settings '
@@ -2470,7 +2465,7 @@ def show_window():
 
     def doSave() -> bool:
         name_ = simpledialog.askstring('Save Preset', 'Preset name')
-        existed = os.path.exists(os.path.join(PATH, 'presets', f'{name_.lower()}.cfg'))
+        existed = os.path.exists(Data.PRESETS / f'{name_.lower()}.cfg')
         if name_ != None and name != '':
             write_save(in_var_group, in_var_names, safewordVar, False)
             if existed:
@@ -2675,16 +2670,15 @@ def show_window():
     saveExitButton.pack(fill='x')
 
 
-    timeObjPath = os.path.join(PATH, 'hid_time.dat')
-    utils.show_file(timeObjPath)
-    if os.path.exists(timeObjPath):
-        with open(timeObjPath, 'r') as file:
+    utils.show_file(Data.HID_TIME)
+    if os.path.exists(Data.HID_TIME):
+        with open(Data.HID_TIME, 'r') as file:
             time_ = int(file.readline()) / 60
             if not time_ == int(settings['timerSetupTime']):
                 timerToggle.configure(state=DISABLED)
                 for item in timer_group:
                     item.configure(state=DISABLED)
-    utils.hide_file(timeObjPath)
+    utils.hide_file(Data.HID_TIME)
 
 
     #first time alert popup
@@ -2798,35 +2792,32 @@ def write_save(varList:list[StringVar | IntVar | BooleanVar], nameList:list[str]
 
     utils.toggle_run_at_startup(PATH, varList[nameList.index('start_on_logon')].get())
 
-    hashObjPath = os.path.join(PATH, 'pass.hash')
-    timeObjPath = os.path.join(PATH, 'hid_time.dat')
-
     if int(varList[nameList.index('timerMode')].get()) == 1:
         #utils.toggle_run_at_startup(PATH, True)
 
         #revealing hidden files
-        utils.show_file(hashObjPath)
-        utils.show_file(timeObjPath)
+        utils.show_file(Data.PASS_HASH)
+        utils.show_file(Data.HID_TIME)
         logging.info('revealed hashed pass and time files')
 
-        with open(hashObjPath, 'w') as passFile, open(timeObjPath, 'w') as timeFile:
+        with open(Data.PASS_HASH, 'w') as passFile, open(Data.HID_TIME, 'w') as timeFile:
             logging.info('attempting file writes...')
             passFile.write(hashlib.sha256(passVar.get().encode(encoding='ascii',errors='ignore')).hexdigest())
             timeFile.write(str(varList[nameList.index('timerSetupTime')].get()*60))
             logging.info('wrote files.')
 
         #hiding hash file with saved password hash for panic and time data
-        utils.hide_file(hashObjPath)
-        utils.hide_file(timeObjPath)
+        utils.hide_file(Data.PASS_HASH)
+        utils.hide_file(Data.HID_TIME)
         logging.info('hid hashed pass and time files')
     else:
         try:
             if not varList[nameList.index('start_on_logon')].get():
                 utils.toggle_run_at_startup(PATH, False)
-            utils.show_file(hashObjPath)
-            utils.show_file(timeObjPath)
-            os.remove(hashObjPath)
-            os.remove(timeObjPath)
+            utils.show_file(Data.PASS_HASH)
+            utils.show_file(Data.HID_TIME)
+            os.remove(Data.PASS_HASH)
+            os.remove(Data.HID_TIME)
             logging.info('removed pass/time files.')
         except Exception as e:
             errText = str(e).replace(getpass.getuser(), '[USERNAME_REDACTED]')
@@ -2845,12 +2836,12 @@ def write_save(varList:list[StringVar | IntVar | BooleanVar], nameList:list[str]
             except:
                 temp[name] = settings[name]
 
-    with open(os.path.join(PATH, 'config.cfg'), 'w') as file:
+    with open(Data.CONFIG, 'w') as file:
         file.write(json.dumps(temp))
         logging.info(f'wrote config file: {json.dumps(temp)}')
 
     if int(varList[nameList.index('runOnSaveQuit')].get()) == 1 and exitAtEnd:
-        subprocess.Popen([sys.executable, 'start.pyw'])
+        subprocess.Popen([sys.executable, Process.START])
 
     if exitAtEnd:
         logging.info('exiting config')
@@ -3014,12 +3005,12 @@ def updateText(objList:Entry or Label, var:str, var_Label:str):
         print('idk what would cause this but just in case uwu')
 
 def refresh():
-    subprocess.Popen([sys.executable, 'config.pyw'])
+    subprocess.Popen([sys.executable, Process.CONFIG])
     os.kill(os.getpid(), 9)
 
 def assignJSON(key:str, var:int or str):
     settings[key] = var
-    with open(os.path.join(PATH, 'config.cfg'), 'w') as f:
+    with open(Data.CONFIG, 'w') as f:
         f.write(json.dumps(settings))
 
 def toggleAssociateSettings(ownerState:bool, objList:list, demo:str = False):
@@ -3073,15 +3064,14 @@ def assignKey(parent:Tk, button:Button, var:StringVar, key):
 
 
 def getPresets() -> list[str]:
-    presetFolderPath = os.path.join(PATH, 'presets')
-    if not os.path.exists(presetFolderPath):
-        os.mkdir(presetFolderPath)
-    return os.listdir(presetFolderPath) if len(os.listdir(presetFolderPath)) > 0 else None
+    if not os.path.exists(Data.PRESETS):
+        os.mkdir(Data.PRESETS)
+    return os.listdir(Data.PRESETS) if len(os.listdir(Data.PRESETS)) > 0 else None
 
 def applyPreset(name:str):
     try:
-        os.remove(os.path.join(PATH, 'config.cfg'))
-        shutil.copyfile(os.path.join(PATH, 'presets', f'{name}.cfg'), os.path.join(PATH, 'config.cfg'))
+        os.remove(Data.CONFIG)
+        shutil.copyfile(Data.PRESETS / f'{name}.cfg', Data.CONFIG)
         refresh()
     except Exception as e:
         messagebox.showerror('Error', 'Failed to load preset.\n\n{e}')
@@ -3089,8 +3079,8 @@ def applyPreset(name:str):
 def savePreset(name:str) -> bool:
     try:
         if name is not None and name != '':
-            shutil.copyfile(os.path.join(PATH, 'config.cfg'), os.path.join(PATH, 'presets', f'{name.lower()}.cfg'))
-            with open(os.path.join(PATH, 'presets', f'{name.lower()}.cfg'), 'rw') as file:
+            shutil.copyfile(Data.CONFIG, Data.PRESETS / f'{name.lower()}.cfg')
+            with open(Data.PRESETS / f'{name.lower()}.cfg', 'rw') as file:
                 file_json = json.loads(file.readline())
                 file_json['drivePath'] = 'C:/Users/'
                 file.write(json.dumps(file_json))
@@ -3101,7 +3091,7 @@ def savePreset(name:str) -> bool:
 
 def getDescriptText(name:str) -> str:
     try:
-        with open(os.path.join(PATH, 'presets', f'{name}.txt'), 'r') as file:
+        with open(Data.PRESETS / f'{name}.txt', 'r') as file:
             text = ''
             for line in file.readlines():
                 text += line
@@ -3113,9 +3103,9 @@ def updateMoods(type:str, id:str, check:bool):
     try:
         if settings['toggleMoodSet'] != True:
             if UNIQUE_ID != '0' and os.path.exists(Resource.ROOT):
-                moodUpdatePath = os.path.join(PATH, 'moods', 'unnamed', f'{UNIQUE_ID}.json')
+                moodUpdatePath = Data.UNNAMED_MOODS / f'{UNIQUE_ID}.json'
             elif UNIQUE_ID == '0' and os.path.exists(Resource.ROOT):
-                moodUpdatePath = os.path.join(PATH, 'moods', f'{info_id}.json')
+                moodUpdatePath = Data.MOODS / f'{info_id}.json'
             with open(moodUpdatePath, 'r') as mood:
                 mood_dict = json.loads(mood.read())
                 if check:

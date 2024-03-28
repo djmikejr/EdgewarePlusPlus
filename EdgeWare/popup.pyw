@@ -15,7 +15,7 @@ from itertools import count, cycle
 from PIL import Image, ImageTk, ImageFilter
 from screeninfo import get_monitors
 from utils import utils
-from utils.paths import Process, Resource
+from utils.paths import Data, Defaults, Process, Resource
 import subprocess
 try:
     import vlc
@@ -102,7 +102,7 @@ MOVING_CHANCE = 0
 MOVING_STATUS = False
 MOVING_RANDOM = False
 
-with open(os.path.join(PATH, 'config.cfg'), 'r') as cfg:
+with open(Data.CONFIG, 'r') as cfg:
     settings = json.loads(cfg.read())
     SHOW_CAPTIONS = check_setting('showCaptions')
     PANIC_DISABLED = check_setting('panicDisabled')
@@ -140,7 +140,7 @@ with open(os.path.join(PATH, 'config.cfg'), 'r') as cfg:
 
     if HIBERNATE_MODE:
         if settings['hibernateType'] == 'Chaos':
-            with open(os.path.join(PATH, 'data', 'chaos_type.dat'), 'r') as ct:
+            with open(Data.CHAOS_TYPE, 'r') as ct:
                 HIBERNATE_TYPE = ct.read()
         else:
             HIBERNATE_TYPE = settings['hibernateType']
@@ -164,11 +164,11 @@ if not MOOD_OFF:
     SYS_ARGS.pop(0)
 
 if MOOD_ID != '0':
-    if os.path.exists(os.path.join(PATH, 'moods', f'{MOOD_ID}.json')):
-        with open(os.path.join(PATH, 'moods', f'{MOOD_ID}.json'), 'r') as f:
+    if os.path.exists(Data.MOODS / f'{MOOD_ID}.json'):
+        with open(Data.MOODS / f'{MOOD_ID}.json', 'r') as f:
             moodData = json.loads(f.read())
-    elif os.path.exists(os.path.join(PATH, 'moods', 'unnamed', f'{MOOD_ID}.json')):
-        with open(os.path.join(PATH, 'moods', 'unnamed', f'{MOOD_ID}.json'), 'r') as f:
+    elif os.path.exists(Data.UNNAMED_MOODS / f'{MOOD_ID}.json'):
+        with open(Data.UNNAMED_MOODS / f'{MOOD_ID}.json', 'r') as f:
             moodData = json.loads(f.read())
 
 
@@ -190,12 +190,11 @@ if checkTag('showCap'):
 
 #used for timer mode, checks if password is required to panic
 if PANIC_REQUIRES_VALIDATION:
-    hash_file_path = os.path.join(PATH, 'pass.hash')
     try:
-        utils.show_file(hash_file_path)
-        with open(hash_file_path, 'r') as file:
+        utils.show_file(Data.PASS_HASH)
+        with open(Data.PASS_HASH, 'r') as file:
             HASHED_PATH = file.readline()
-        utils.hide_file(hash_file_path)
+        utils.hide_file(Data.PASS_HASH)
     except:
         #no hash found
         HASHED_PATH = None
@@ -375,10 +374,10 @@ def pick_resource(basepath, vidYes:bool):
     if MOOD_ID != '0' and os.path.exists(Resource.MEDIA):
         try:
             if vidYes:
-                with open(os.path.join(PATH, 'data', 'media_video.dat'), 'r') as f:
+                with open(Data.MEDIA_VIDEO, 'r') as f:
                     items = json.loads(f.read())
             else:
-                with open(os.path.join(PATH, 'data', 'media_images.dat'), 'r') as f:
+                with open(Data.MEDIA_IMAGES, 'r') as f:
                     items = json.loads(f.read())
         except Exception as e:
             print(f'failed to run mood check, reason:\n\t{e}')
@@ -481,7 +480,7 @@ def run():
                 item, caption_text, root.click_count = pick_resource(resource_path, video_mode)
     else:
         from videoprops import get_video_properties
-        video_path = Resource.VIDEO / item
+        video_path = str(Resource.VIDEO / item)
         video_properties = get_video_properties(video_path)
         image = Image.new('RGB', (video_properties['width'], video_properties['height']))
 
@@ -553,13 +552,13 @@ def run():
             label = Label(root, image=photoimage_image, bg='black')
             label.pack()
         else:
-            with open(os.path.join(PATH, 'data', 'max_subliminals.dat'), 'r+') as f:
+            with open(Data.MAX_SUBLIMINALS, 'r+') as f:
                 i = int(f.readline())
                 label = GifLabel(root)
-                subliminal_path = os.path.join(PATH, 'default_assets', 'default_spiral.gif')
+                subliminal_path = Defaults.SPIRAL
 
                 if os.path.exists(Resource.SUBLIMINALS):
-                    subliminal_options = [file for file in os.listdir(Resource.SUBLIMINALS) if file.lower().endswith('.gif')]
+                    subliminal_options = [file for file in os.listdir(Resource.SUBLIMINALS) if str(file).lower().endswith('.gif')]
                     if len(subliminal_options) > 0:
                         subliminal_path = Resource.SUBLIMINALS / str(rand.choice(subliminal_options))
 
@@ -630,7 +629,7 @@ def run():
         submit_button.place(x=resized_image.width - 25 - submit_button.winfo_reqwidth(), y=resized_image.height - 5 - submit_button.winfo_reqheight())
 
     if HIBERNATE_MODE and check_setting('fixWallpaper'):
-        with open(os.path.join(PATH, 'data', 'hibernate_handler.dat'), 'r+') as f:
+        with open(Data.HIBERNATE, 'r+') as f:
             i = int(f.readline())
             f.seek(0)
             f.write(str(i+1))
@@ -662,7 +661,7 @@ def check_deny() -> bool:
 
 def check_subliminal():
     global SUBLIMINAL_MODE
-    with open(os.path.join(PATH, 'data', 'max_subliminals.dat'), 'r') as f:
+    with open(Data.MAX_SUBLIMINALS, 'r') as f:
         if int(f.readline()) >= MAX_SUBLIMINALS:
             SUBLIMINAL_MODE = False
         elif rand.randint(1, 100) > SUBLIMINAL_CHANCE:
@@ -678,21 +677,21 @@ def live_life(parent:tk, length:int):
     if LOWKEY_MODE:
         subprocess.Popen([sys.executable, Process.POPUP])
     if HIBERNATE_MODE and check_setting('fixWallpaper'):
-        with open(os.path.join(PATH, 'data', 'hibernate_handler.dat'), 'r+') as f:
+        with open(Data.HIBERNATE, 'r+') as f:
             i = int(f.readline())
             if i > 0:
                 f.seek(0)
                 f.write(str(i-1))
                 f.truncate()
     if len(SYS_ARGS) >= 1 and SYS_ARGS[0] == '-video':
-        with open(os.path.join(PATH, 'data', 'max_videos.dat'), 'r+') as f:
+        with open(Data.MAX_VIDEOS, 'r+') as f:
             i = int(f.readline())
             if i > 0:
                 f.seek(0)
                 f.write(str(i-1))
                 f.truncate()
     if SUBLIMINAL_MODE:
-        with open(os.path.join(PATH, 'data', 'max_subliminals.dat'), 'r+') as f:
+        with open(Data.MAX_SUBLIMINALS, 'r+') as f:
             i = int(f.readline())
             if i > 0:
                 f.seek(0)
@@ -754,21 +753,21 @@ def die():
         for i in (range(0, MITOSIS_STRENGTH) if not LOWKEY_MODE else [1]):
             subprocess.Popen([sys.executable, Process.POPUP])
     if HIBERNATE_MODE and check_setting('fixWallpaper'):
-        with open(os.path.join(PATH, 'data', 'hibernate_handler.dat'), 'r+') as f:
+        with open(Data.HIBERNATE, 'r+') as f:
             i = int(f.readline())
             if i > 0:
                 f.seek(0)
                 f.write(str(i-1))
                 f.truncate()
     if len(SYS_ARGS) >= 1 and SYS_ARGS[0] == '-video':
-        with open(os.path.join(PATH, 'data', 'max_videos.dat'), 'r+') as f:
+        with open(Data.MAX_VIDEOS, 'r+') as f:
             i = int(f.readline())
             if i > 0:
                 f.seek(0)
                 f.write(str(i-1))
                 f.truncate()
     if SUBLIMINAL_MODE:
-        with open(os.path.join(PATH, 'data', 'max_subliminals.dat'), 'r+') as f:
+        with open(Data.MAX_SUBLIMINALS, 'r+') as f:
             i = int(f.readline())
             if i > 0:
                 f.seek(0)
@@ -801,30 +800,28 @@ def panic(key):
     key_condition = (key.keysym == PANIC_KEY or key.keycode == PANIC_KEY)
     if PANIC_REQUIRES_VALIDATION and key_condition:
         try:
-            hash_file_path = os.path.join(PATH, 'pass.hash')
-            time_file_path = os.path.join(PATH, 'hid_time.dat')
             pass_ = simpledialog.askstring('Panic', 'Enter Panic Password')
             print('ASKING FOR PASS')
             t_hash = None if pass_ == None or pass_ == '' else hashlib.sha256(pass_.encode(encoding='ascii', errors='ignore')).hexdigest()
         except:
             #if some issue occurs with the hash or time files just emergency panic
-            subprocess.Popen([sys.executable, 'panic.pyw'])
+            subprocess.Popen([sys.executable, Process.PANIC])
         print(t_hash)
         print(HASHED_PATH)
         if t_hash == HASHED_PATH:
             #revealing hidden files
             try:
-                utils.show_file(hash_file_path)
-                utils.show_file(time_file_path)
-                os.remove(hash_file_path)
-                os.remove(time_file_path)
-                subprocess.Popen([sys.executable, 'panic.pyw'])
+                utils.show_file(Data.PASS_HASH)
+                utils.show_file(Data.HID_TIME)
+                os.remove(Data.PASS_HASH)
+                os.remove(Data.HID_TIME)
+                subprocess.Popen([sys.executable, Process.PANIC])
             except:
                 #if some issue occurs with the hash or time files just emergency panic
-                subprocess.Popen([sys.executable, 'panic.pyw'])
+                subprocess.Popen([sys.executable, Process.PANIC])
     else:
         if not PANIC_DISABLED and key_condition:
-            subprocess.Popen([sys.executable, 'panic.pyw'])
+            subprocess.Popen([sys.executable, Process.PANIC])
 
 def pumpScare():
     if HIBERNATE_MODE and HIBERNATE_TYPE == 'Pump-Scare':
@@ -836,7 +833,5 @@ if __name__ == '__main__':
         thread.Thread(target=pumpScare).start()
         run()
     except Exception as e:
-        if not os.path.exists(os.path.join(PATH, 'logs')):
-            os.mkdir(os.path.join(PATH, 'logs'))
-        logging.basicConfig(filename=os.path.join(PATH, 'logs', time.asctime().replace(' ', '_').replace(':', '-') + '-popup.txt'), format='%(levelname)s:%(message)s', level=logging.DEBUG)
+        utils.init_logging(logging, 'popup')
         logging.fatal(f'failed to start popup\n{e}')
