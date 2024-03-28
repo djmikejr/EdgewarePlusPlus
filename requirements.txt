@@ -4,7 +4,7 @@ imageio
 moviepy
 pillow
 playsound==1.2.2
-pygobject
+pygobject; sys_platform == 'linux'
 pypresence
 pystray
 python-vlc
