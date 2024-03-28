@@ -911,9 +911,9 @@ def do_timer():
 
 def audioHelper():
     if MOOD_OFF:
-        ps.playsound(AUDIO[rand.randrange(len(AUDIO))])
+        ps.playsound(str(AUDIO[rand.randrange(len(AUDIO))]))
     else:
-        ps.playsound(MOOD_AUDIO[rand.randrange(len(MOOD_AUDIO))])
+        ps.playsound(str(MOOD_AUDIO[rand.randrange(len(MOOD_AUDIO))]))
 
 
 #if audio is not playing, selects and plays random audio file from /aud/ folder
@@ -937,9 +937,9 @@ def play_audio():
             p.terminate()
         else:
             if not MOOD_OFF and os.path.exists(Resource.MEDIA):
-                ps.playsound(MOOD_AUDIO[rand.randrange(len(MOOD_AUDIO))])
+                ps.playsound(str(MOOD_AUDIO[rand.randrange(len(MOOD_AUDIO))]))
             else:
-                ps.playsound(AUDIO[rand.randrange(len(AUDIO))])
+                ps.playsound(str(AUDIO[rand.randrange(len(AUDIO))]))
     except Exception as e:
         logging.warning(f'Could not play sound. {e}')
     #winsound.PlaySound(AUDIO[rand.randrange(len(AUDIO))], winsound.SND_)
