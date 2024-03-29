@@ -302,6 +302,20 @@ SINGLE_MODE = int(settings['singleMode']) == 1
 
 MOOD_OFF = int(settings['toggleMoodSet']) == 1
 
+CORRUPTION_MODE = int(settings['corruptionMode']) == 1
+CORRUPTION_FADE = settings['corruptionFadeType']
+CORRUPTION_TRIGGER = settings['corruptionTrigger']
+#adding all three as individual vars instead of checking for trigger type because of an idea: randomized corruption per-launch?
+CORRUPTION_TIME = settings['corruptionTime']
+CORRUPTION_POPUPS = settings['corruptionPopups']
+CORRUPTION_LAUNCHES = settings['corruptionLaunches']
+
+CORRUPTION_DEVMODE = int(settings['corruptionDevMode']) == 1
+CORRUPTION_WALLCYCLE = int(settings['corruptionWallpaperCycle']) == 1
+CORRUPTION_THEMECYCLE = int(settings['corruptionThemeCycle']) == 1
+CORRUPTION_PURITY = int(settings['corruptionPurityMode']) == 1
+CORRUPTION_FULL = int(settings['corruptionFullPerm']) == 1
+
 MOOD_ID = '0'
 if not MOOD_OFF:
     try:
@@ -384,6 +398,23 @@ except Exception as e:
     messagebox.showerror('Launch Error', 'Could not launch Edgeware due to resource zip unpacking issues.\n[' + str(e) + ']')
     logging.fatal(f'failed to unpack resource zip or read default resources.\n\tReason:{e}')
     os.kill(os.getpid(), 9)
+
+#writing corruption file if it doesn't exist/wiping it if the mode isn't on launch
+if CORRUPTION_MODE:
+    try:
+        if not os.path.exists(os.path.join(PATH, 'data')):
+            os.mkdir(os.path.join(PATH, 'data'))
+            #the launches will reset when the user specifies in the config, or a new pack is loaded
+            if not os.path.exists(os.path.join(PATH, 'data', 'corruption_launches.dat')):
+                with open(os.path.join(PATH, 'data', 'corruption_launches.dat'), 'w') as f:
+                    f.write('0')
+            with open(os.path.join(PATH, 'data', 'corruption_popups.dat'), 'w') as f:
+                f.write('0')
+            with open(os.path.join(PATH, 'data', 'corruption_level.dat'), 'w') as f:
+                f.write('0')
+    except Exception as e:
+        print(f'error loading corruption. {e}')
+        logging.warning(f'failed to initialize corruption properly.\n\tReason: {e}')
 
 HAS_PROMPTS = False
 WEB_JSON_FOUND = False

@@ -15,6 +15,7 @@ from itertools import count, cycle
 from PIL import Image, ImageTk, ImageFilter
 from utils import utils
 import subprocess
+#import traceback
 try:
     import vlc
 except:
@@ -62,9 +63,6 @@ class prefix_data:
 prefixes = {}
 #End Imported Code
 
-#used to check passed tags for script mode
-def checkTag(tag) -> bool:
-    return [c.startswith(tag) for c in SYS_ARGS].count(True) >= 1
 
 def check_setting(name:str, default:bool=False) -> bool:
     default = False if default is None else default
@@ -164,6 +162,8 @@ with open(os.path.join(PATH, 'config.cfg'), 'r') as cfg:
     MOVING_SPEED = int(settings['movingSpeed'])
     MOVING_RANDOM = check_setting('movingRandom')
 
+    CORRUPTION_DEVMODE = check_setting('corruptionDevMode')
+
 if MOVING_CHANCE >= rand.randint(1,100):
     BUTTONLESS = True
     MOVING_STATUS = True
@@ -182,22 +182,6 @@ if MOOD_ID != '0':
         with open(os.path.join(PATH, 'moods', 'unnamed', f'{MOOD_ID}.json'), 'r') as f:
             moodData = json.loads(f.read())
 
-
-#functions for script mode, unused for now
-if checkTag('timeout='):
-    HAS_LIFESPAN = True
-    LIFESPAN = int(SYS_ARGS[[c.startswith('timeout=') for c in SYS_ARGS].index(True)].split('=')[1])
-
-if checkTag('mitosis='):
-    MITOSIS_MODE = True
-    MITOSIS_STRENGTH = int(SYS_ARGS[[c.startswith('mitosis=') for c in SYS_ARGS].index(True)].split('=')[1])
-
-if checkTag('hideCap'):
-    SHOW_CAPTIONS = False
-
-if checkTag('showCap'):
-    SHOW_CAPTIONS = True
-#end script mode function tag checks
 
 #used for timer mode, checks if password is required to panic
 if PANIC_REQUIRES_VALIDATION:
@@ -632,6 +616,15 @@ def run():
         captionLabel = Label(root, textvariable=root.caption_string, wraplength=resized_image.width - border_wid_const, bg=back, fg=fore)
         captionLabel.place(x=5, y=5)
 
+    if CORRUPTION_DEVMODE:
+        devmodeLabel1 = Label(root, text=f'clev=', wraplength=resized_image.width - border_wid_const, bg=back, fg=fore)
+        devmodeLabel2 = Label(root, text=f'poplev=', wraplength=resized_image.width - border_wid_const, bg=back, fg=fore)
+        devmodeLabel3 = Label(root, text=f'filen={pathlib.Path(item).name}', wraplength=resized_image.width - border_wid_const, bg=back, fg=fore)
+        devmodeLabel1.place(x= 5, y= int(resized_image.height/2))
+        devmodeLabel2.place(x= 5, y= int(resized_image.height/2) + devmodeLabel2.winfo_reqheight() + 2)
+        devmodeLabel3.place(x= 5, y= int(resized_image.height/2) + devmodeLabel3.winfo_reqheight() + devmodeLabel2.winfo_reqheight() + 4)
+
+
     if BUTTONLESS:
         label.bind("<ButtonRelease-1>", buttonless_click)
     else:
@@ -852,3 +845,4 @@ if __name__ == '__main__':
             os.mkdir(os.path.join(PATH, 'logs'))
         logging.basicConfig(filename=os.path.join(PATH, 'logs', time.asctime().replace(' ', '_').replace(':', '-') + '-popup.txt'), format='%(levelname)s:%(message)s', level=logging.DEBUG)
         logging.fatal(f'failed to start popup\n{e}')
+        #traceback.print_exc() 

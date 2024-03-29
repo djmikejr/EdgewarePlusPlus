@@ -1511,6 +1511,8 @@ def show_window():
     cLaunchesFrame = Frame(corruptionTimeFrame)
     corruptionLaunchesButton = Button(cLaunchesFrame, text='Manual launches...', command=lambda: assign(corruptionLaunchesVar, simpledialog.askinteger('Manual Level Launches (per transition)', prompt='[2-31]: ')))
     corruptionLaunchesScale = Scale(cLaunchesFrame, label='Level Launches', variable=corruptionLaunchesVar, orient='horizontal', from_=2, to=31)
+    cOtherTimerFrame = Frame(corruptionTimeFrame)
+    clearLaunchesButton = Button(cOtherTimerFrame, text='Reset Launches', height=3, command=lambda: clearLaunches(True))
 
     ctutorialtransition_group.append(corruptionTimerButton)
     ctutorialtransition_group.append(corruptionTimerScale)
@@ -1528,6 +1530,8 @@ def show_window():
     cLaunchesFrame.pack(side='left', fill='x', padx=1, expand=1)
     corruptionLaunchesScale.pack(fill='y')
     corruptionLaunchesButton.pack(fill='y')
+    cOtherTimerFrame.pack(side='left', fill='x', padx=1, expand=1)
+    clearLaunchesButton.pack()
 
     ctime_group.append(corruptionTimerButton)
     ctime_group.append(corruptionTimerScale)
@@ -1637,7 +1641,8 @@ def show_window():
                                         'the theme you set in the \"General\" tab of the config window.')
     corrpurityttp = CreateToolTip(corruptionPurityToggle, 'Starts corruption mode at the highest corruption level, then works backwards to level 1. '
                                         'Retains all of your other settings for this mode, if applicable.')
-    corruptiondevttp = CreateToolTip(corruptionDevToggle, '')
+    corruptiondevttp = CreateToolTip(corruptionDevToggle, 'Enables captions on popups that show various info.\n\nclev: current corruption level when popup spawned\n'
+                                        'poplev: the corruption level of the popup\'s mood\n filen: the filename of the popup\'s image/video')
 
     #-Info-
 
@@ -1658,24 +1663,26 @@ def show_window():
 
     corruptionList = []
     lineWidth = 0
-    if os.path.isfile(os.path.join(PATH, 'resource', 'corruption.json')):
-        try:
-            with open(os.path.join(PATH, 'resource', 'corruption.json'), 'r') as f:
-                l = json.loads(f.read())
-                for key in l:
-                    corruptionList.append((f'{key}', str(l[key]).strip('[]')))
-
-        except Exception as e:
-            logging.warning(f'error in corruption.json. Aborting preview load. {e}')
-            errors_list.append('Something is wrong with the currently loaded corruption.json file!\n')
-        try:
-            for level in corruptionList:
-                if sum(len(i) for i in level) > lineWidth:
-                    lineWidth = sum(len(i) for i in level)
-                pathTree.insert('', 'end', values=level)
-        except Exception as e:
-            logging.warning(f'error in loading corruption treeview. {e}')
-            errors_list.append('The corruption treeview could not load properly!\n')
+    # if os.path.isfile(os.path.join(PATH, 'resource', 'corruption.json')):
+    #     try:
+    #         with open(os.path.join(PATH, 'resource', 'corruption.json'), 'r') as f:
+    #             l = json.loads(f.read())
+    #             for key in list(l):
+    #                 if key == "moods":
+    #                     for level, i in l[key]:
+    #                         corruptionList.append((f'{level}', str(level.keys()).strip('[]')))
+    #
+    #     except Exception as e:
+    #         logging.warning(f'error in corruption.json. Aborting preview load. {e}')
+    #         errors_list.append('Something is wrong with the currently loaded corruption.json file!\n')
+    #     try:
+    #         for level in corruptionList:
+    #             if sum(len(i) for i in level) > lineWidth:
+    #                 lineWidth = sum(len(i) for i in level)
+    #             pathTree.insert('', 'end', values=level)
+    #     except Exception as e:
+    #         logging.warning(f'error in loading corruption treeview. {e}')
+    #         errors_list.append('The corruption treeview could not load properly!\n')
 
     #just doing a magic number, long story short treeview is butts for horizontal scrolling
     pathTree.column('moods', anchor='w', stretch=True, minwidth=int(lineWidth*5.5))
@@ -3391,8 +3398,26 @@ def packPreset(varList:list[StringVar | IntVar | BooleanVar], nameList:list[str]
                         break
                 varList[safeloc].set(True)
         except Exception as e:
+            print(f'failed to load pack suggested settings. {e}')
             logging.warning(f'could not load pack suggested settings. Reason: {e}')
             messagebox.showwarning('Error Loading File', f'There was an issue loading the pack config file. {e}')
+
+def clearLaunches(confirmation:bool):
+    try:
+        if os.path.exists(os.path.join(PATH, 'data', 'corruption_launches.dat')):
+            os.remove(os.path.join(PATH, 'data', 'corruption_launches.dat'))
+            if confirmation:
+                messagebox.showinfo('Cleaning Completed', 'The file that manages corruption launches has been deleted,'
+                    ' and will be remade next time you start EdgeWare with corruption on!')
+        else:
+            if confirmation:
+                messagebox.showinfo('No launches file!', 'There is no launches file to delete!\n\nThe launches file is used'
+                    ' for the launch transition mode, and is automatically deleted when you load a new pack. To generate a new'
+                    ' one, simply start EdgeWare with the corruption setting on!')
+    except Exception as e:
+        print(f'failed to clear launches. {e}')
+        logging.warning(f'could not delete the corruption launches file. {e}')
+
 
 if __name__ == '__main__':
     try:
