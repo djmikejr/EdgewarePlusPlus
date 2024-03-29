@@ -284,15 +284,15 @@ except Exception as e:
 #writing corruption file if it doesn't exist/wiping it if the mode isn't on launch
 if CORRUPTION_MODE:
     try:
-        if not os.path.exists(os.path.join(PATH, 'data')):
-            os.mkdir(os.path.join(PATH, 'data'))
+        if not os.path.exists(Data.ROOT):
+            os.mkdir(Data.ROOT)
             #the launches will reset when the user specifies in the config, or a new pack is loaded
-            if not os.path.exists(os.path.join(PATH, 'data', 'corruption_launches.dat')):
-                with open(os.path.join(PATH, 'data', 'corruption_launches.dat'), 'w') as f:
+            if not os.path.exists(Data.CORRUPTION_LAUNCHES):
+                with open(Data.CORRUPTION_LAUNCHES, 'w') as f:
                     f.write('0')
-            with open(os.path.join(PATH, 'data', 'corruption_popups.dat'), 'w') as f:
+            with open(Data.CORRUPTION_POPUPS, 'w') as f:
                 f.write('0')
-            with open(os.path.join(PATH, 'data', 'corruption_level.dat'), 'w') as f:
+            with open(Data.CORRUPTION_LEVEL, 'w') as f:
                 f.write('0')
     except Exception as e:
         print(f'error loading corruption. {e}')

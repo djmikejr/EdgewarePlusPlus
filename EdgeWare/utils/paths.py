@@ -64,6 +64,9 @@ class Data:
     UNNAMED_MOODS = PATH / 'moods' / 'unnamed'
 
     CHAOS_TYPE = ROOT / 'chaos_type.dat'
+    CORRUPTION_LAUNCHES = ROOT / 'corruption_launches.dat'
+    CORRUPTION_LEVEL = ROOT / 'corruption_level.dat'
+    CORRUPTION_POPUPS = ROOT / 'corruption_popups.dat'
     HIBERNATE = ROOT / 'hibernate_handler.dat'
     MAX_SUBLIMINALS = ROOT / 'max_subliminals.dat'
     MAX_VIDEOS = ROOT / 'max_videos.dat'

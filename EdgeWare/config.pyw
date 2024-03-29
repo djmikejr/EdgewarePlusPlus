@@ -3355,8 +3355,8 @@ def packPreset(varList:list[StringVar | IntVar | BooleanVar], nameList:list[str]
 
 def clearLaunches(confirmation:bool):
     try:
-        if os.path.exists(os.path.join(PATH, 'data', 'corruption_launches.dat')):
-            os.remove(os.path.join(PATH, 'data', 'corruption_launches.dat'))
+        if os.path.exists(Data.CORRUPTION_LAUNCHES):
+            os.remove(Data.CORRUPTION_LAUNCHES)
             if confirmation:
                 messagebox.showinfo('Cleaning Completed', 'The file that manages corruption launches has been deleted,'
                     ' and will be remade next time you start EdgeWare with corruption on!')
