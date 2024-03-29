@@ -1,5 +1,5 @@
 # Edgeware++
-
+![Edgeware++ running on Windows 11](EdgeWare/default_assets/readme/demo2.png)
 ## What is EdgeWare?
 
 Going to say immediately: **EdgeWare is not a virus, nor does it install itself onto your computer**. All it installs onto your computer by default is python 3.10 and a few extra libraries, which is needed for it to run. EdgeWare **can** potentially modify files on your computer, including deleting or replacing things, but these are all *user set* settings that are not on by default. That being said, other people can download EdgeWare, modify it to be malicious, and upload it elsewhere, so exercise caution when downloading versions from other sites. This project is open source, so feel free to peruse the source code if you're unsure.
@@ -105,12 +105,31 @@ Suggestions I got from people who used the software and I thought would be inter
 [**EdgeWare++ Test Pack**](https://mega.nz/file/0acUQarB#QNyaZPkGYOGQgOi_W-up6n14rv_w8NSP-hN16qczC44)
 **Version: 1**
 A test pack featuring a sampler of all (finished) features found in EdgeWare++, and the pack i've been using to test functionality in. Some features are not complete and will be patched in as time goes on.
+## Frequently Asked Questions
 
-## Contact/More Info
+>Q: Where do I download more packs?
 
-I understand i'm pretty elusive and don't talk much, so I apologize if it's difficult to contact me. If you are looking to report a bug, I don't fully know how to use github but I do know a bug report feature works, so we can figure it out together... I also recently made a [twitter account](https://twitter.com/ara10ten) (finally) and post both random ramblings and frequent development updates/screenshots there. I also have a reddit account I use to answer tech support questions and browse for new packs occasionally on /r/edgingware (of which I have no official affiliation with).
+A: Unfortunately, packs are kind of scattered about... Since there is no specific place to congregate EdgeWare packs (to my knowledge), people usually end up posting them to their personal twitters or discord servers. Additionally, some people charge money for their own packs and/or bundle a complete copy of EdgeWare with their pack, making it even harder to give a definite answer to this question.
 
-My twitter account seems to love getting shadowbanned for no reason other than twitter automoderation thinks I'm a spambot, so if my account disappears for a day or replies don't send notifications, that's why. If it gets bad enough I might make a bluesky account, but for the time being it's tolerable enough I'll stay on the platform with more people.
+There are a few places you can start, however. PetitTournesol's original github page has multiple packs, although they don't support new ++ features. /r/edgingware on reddit is mostly focused to tech support, but there are multiple packs there, including a helpful reference pack. I believe hgoon.booru also has a thread for EdgeWare packs on the forum, but since it's a bit of an obscure booru and requires an account to post, i'm sure many still fall through the cracks.
+
+>Q: Can you give me more info on upcoming features?
+
+A: I personally like to reveal things once they're at the point where i'm not going to turn back or change my mind on them, as I think sometimes revealing things too early kills motivation and adds a lot of stress. I also get easily distracted and absentminded (don't we all...) so I can't guarantee that anything I announce early will actually happen anytime soon. Because of this I don't like to give out information on upcoming features to people, but I do post general updates/ideas on my [twitter account](https://twitter.com/ara10ten), which also serves as a point of contact/a place for me to ramble about horny things!
+
+>Q: Why are my videos silent/why do videos not work?
+
+A: You might be one of the many people affected by the **python video player bubonic plague**! Jokes aside, the default video player that EdgeWare used is really janky and mostly left in for ease of use and compatibility. In EdgeWare++ I have added support for libvlc, which has it's own plethora of problems i'm sure, but is generally more stable and fixes these issues. Head on over to [vlc's website](https://www.videolan.org/vlc/) and download **the correct VLC for your hardware** (extra emphasis on this, check if you're 64-bit!). Then go to the troubleshooting tab and enable VLC playback once you've installed it.
+
+>Q: I opened up the debug script after using VLC, and oh my god, there's a horrifying amount of errors being spit out into console!
+
+A: I guarantee this won't be a frequently asked question, but when else am I going to talk about it? I found a fix for this [here](https://stackoverflow.com/questions/68246840/how-to-avoid-main-libvlc-error-when-using-the-python-vlc-package), assuming it's the "stale plugins cache" error.
+
+>Q: Can we be friends/talk more/can I dom you?
+
+A: I am a creature by night, and keep to the shadows. (this is an edgy way of saying i'm quiet and autistic, I generally have a low social battery)
+
+But also feel free to follow me on twitter, interact with me there, and other such things! I don't bite!
 
 ## EdgeWare++ Patch Notes
 **If you see that there's a new update and are somebody (like me) who is lazy and doesn't like installing every single update if unnecessary, here is how I do versioning:**
@@ -120,6 +139,26 @@ My twitter account seems to love getting shadowbanned for no reason other than t
 •+0.5-0.25 to version number: new feature, but a smaller one or something not as essential, or lots of bugfixes
 
 •+0.2-0.1 to version number: very small update, usually just a bugfix, accessibility options, UI tweaks
+
+**Version 10.2**
+
+Continued work on corruption among other things. There might be big changes happening to this github page, as I am now working with a friend (@ecchigooner) and they are helping me actually understand github instead of pretending to understand github. This actually might be one of the last times Edgeware updates like this, as i'm hoping to get a grasp on releases and making things actually semi-official instead of whatever i'm doing right now...  
+
+•*Example image added to readme, along with some readme changes that will continue with future patches*
+
+•*Commented out the display tree on the corruption page for now, something like it will return but I want to focus on finishing corruption before having to debug it!*
+
+•*Backend work on corruption*
+>Startup now checks for a corruption data file, you can now
+
+•*Implemented "Dev Mode" in the corruption tab, which overlays information very unsexily on popups*
+>This currently includes filename and current corruption level, but might be expanded in the future. Let me know if there are any developer statistics you want to see!
+
+•*Edgeware Setup now downloads things from the requirements.txt file on first startup*
+>If you've already previously run edgeware and had it work fine, no need to do this
+
+•*Removed scripthandler.py and some unfinished "script mode" code*
+>We're trying to clean up edgeware a bit to make it easier to understand, and in doing so we're realizing that this script mode ended up going completely unfinished and was likely the last thing petit worked on before disappearing.
 
 **Version 10b**
 
