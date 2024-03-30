@@ -109,9 +109,13 @@ A test pack featuring a sampler of all (finished) features found in EdgeWare++, 
 
 >Q: Where do I download more packs?
 
-A: Unfortunately, packs are kind of scattered about... Since there is no specific place to congregate EdgeWare packs (to my knowledge), people usually end up posting them to their personal twitters or discord servers. Additionally, some people charge money for their own packs and/or bundle a complete copy of EdgeWare with their pack, making it even harder to give a definite answer to this question.
+A: Unfortunately, packs are kind of scattered about... Since there is no specific place to congregate EdgeWare packs (to my knowledge), people usually end up posting them to their personal twitters or discord servers. Additionally, some people charge money for their own packs and/or bundle a complete copy of EdgeWare with their pack, making it even harder to give a definite answer to this question
 
 There are a few places you can start, however. PetitTournesol's original github page has multiple packs, although they don't support new ++ features. /r/edgingware on reddit is mostly focused to tech support, but there are multiple packs there, including a helpful reference pack. I believe hgoon.booru also has a thread for EdgeWare packs on the forum, but since it's a bit of an obscure booru and requires an account to post, i'm sure many still fall through the cracks.
+
+>Q: Do you plan on making a discord for EdgeWare?
+
+A: No, I don't have any plans for this. On top of not particularly liking discord both as a program and a company, I also sadly don't have the energy to manage and moderate a discord. Even if I made one just for development updates with limited public posting, it would essentially be what my twitter is but on a platform I use less often.
 
 >Q: Can you give me more info on upcoming features?
 
@@ -130,5 +134,11 @@ A: I guarantee this won't be a frequently asked question, but when else am I goi
 A: I am a creature by night, and keep to the shadows. (this is an edgy way of saying i'm quiet and autistic, I generally have a low social battery)
 
 But also feel free to follow me on twitter, interact with me there, and other such things! I don't bite!
+
+>Q: Does EdgeWare work on android/mac/ios?
+
+A: I only have plans to develop EdgeWare for windows, and LewdDevelopment is currently only developing EdgeWare for Linux.
+
+##Changelog
 
 The changelog can be viewed [here](CHANGELOG.md).
