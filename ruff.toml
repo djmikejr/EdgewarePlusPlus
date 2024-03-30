@@ -1,0 +1,4 @@
+extend-include = ['*.pyw']
+
+[format]
+quote-style = 'single'
