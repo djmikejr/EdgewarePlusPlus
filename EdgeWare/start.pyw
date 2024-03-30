@@ -524,10 +524,10 @@ def main():
             if HIBERNATE_TRUTH == 'Chaos':
                 try:
                     global HIBERNATE_TYPE
-                    HIBERNATE_TYPE = rand.choice(['Original', 'Spaced', 'Glitch', 'Ramp'])
+                    HIBERNATE_TYPE = rand.choice(['Original', 'Spaced', 'Glitch', 'Ramp', 'Pump-Scare'])
                     with open(Data.CHAOS_TYPE, 'w') as f:
                         f.write(HIBERNATE_TYPE)
-                    logging.info(f'hibernate type is chaos, and has switched to {HIBERNATE_TYPE}')
+                    print(f'hibernate type is chaos, and has switched to {HIBERNATE_TYPE}')
                 except Exception as e:
                     logging.warning(f'failed to successfully run chaos hibernate.\n\tReason: {e}')
             hiberWait.wait(float(waitTime))
@@ -537,7 +537,7 @@ def main():
                 wallpaperWait.clear()
             if HIBERNATE_TYPE == 'Original':
                 try:
-                    logging.info(f'running original hibernate. number of popups estimated between {int(WAKEUP_ACTIVITY / 2)} and {WAKEUP_ACTIVITY}.')
+                    print(f'running original hibernate. number of popups estimated between {int(WAKEUP_ACTIVITY / 2)} and {WAKEUP_ACTIVITY}.')
                     for i in range(0, rand.randint(int(WAKEUP_ACTIVITY / 2), WAKEUP_ACTIVITY)):
                         roll_for_initiative()
                 except Exception as e:
@@ -545,7 +545,7 @@ def main():
             if HIBERNATE_TYPE == 'Spaced':
                 try:
                     endTime = time.monotonic() + float(HIBERNATE_LENGTH)
-                    logging.info(f'running spaced hibernate. current time is {time.monotonic()}, end time is {endTime}')
+                    print(f'running spaced hibernate. current time is {time.monotonic()}, end time is {endTime}')
                     while time.monotonic() < endTime:
                         roll_for_initiative()
                         time.sleep(float(DELAY) / 1000.0)
@@ -556,7 +556,7 @@ def main():
                     glitchSleep = HIBERNATE_LENGTH / WAKEUP_ACTIVITY
                     totalTime = time.monotonic()
                     endTime = time.monotonic() + float(HIBERNATE_LENGTH)
-                    logging.info(f'running glitch hibernate. the end time is {endTime} with {WAKEUP_ACTIVITY} popups, total time is {HIBERNATE_LENGTH} and glitchSleep median is {glitchSleep}')
+                    print(f'running glitch hibernate. the end time is {endTime} with {WAKEUP_ACTIVITY} popups, total time is {HIBERNATE_LENGTH} and glitchSleep median is {glitchSleep}')
                     for i in range(0, WAKEUP_ACTIVITY):
                         if endTime <= time.monotonic():
                             break
@@ -579,7 +579,7 @@ def main():
                     logging.warning(f'failed to successfully run {HIBERNATE_TYPE} hibernate.\n\tReason: {e}')
             if HIBERNATE_TYPE == 'Ramp':
                 try:
-                    logging.info(f'hibernate type is ramp. ramping up speed for {HIBERNATE_LENGTH}, max speed is {DELAY*0.9}, and popups at max speed is {WAKEUP_ACTIVITY}')
+                    print(f'hibernate type is ramp. ramping up speed for {HIBERNATE_LENGTH}, max speed is {DELAY*0.9}, and popups at max speed is {WAKEUP_ACTIVITY}')
                     endTime = time.monotonic() + float(HIBERNATE_LENGTH)
                     x = HIBERNATE_LENGTH / 4
                     accelerate = 1
@@ -602,7 +602,7 @@ def main():
                     logging.warning(f'failed to successfully run {HIBERNATE_TYPE} hibernate.\n\tReason: {e}')
             if HIBERNATE_TYPE == 'Pump-Scare':
                 try:
-                    logging.info('hibernate type is pump-scare.')
+                    print(f'hibernate type is pump-scare.')
                     roll_for_initiative()
                 except Exception as e:
                     logging.warning(f'failed to successfully run {HIBERNATE_TYPE} hibernate.\n\tReason: {e}')
@@ -619,7 +619,7 @@ def checkWallpaperStatus():
     with open(Data.HIBERNATE, 'r') as f:
         while True:
             runningHibernate.wait()
-            logging.info('hibernate processing is over, waiting for popups to close')
+            print('hibernate processing is over, waiting for popups to close')
             while True:
                 if not runningHibernate.is_set():
                     break
@@ -628,7 +628,7 @@ def checkWallpaperStatus():
                         i = int(f.readline())
                         if i < 1:
                             wallpaperWait.set()
-                            logging.info('hibernate popups are all dead')
+                            print('hibernate popups are all dead')
                             utils.set_wallpaper(Defaults.PANIC_WALLPAPER)
                             break
 
