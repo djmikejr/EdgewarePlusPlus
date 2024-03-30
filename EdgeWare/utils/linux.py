@@ -2,12 +2,8 @@ import codecs
 from configparser import ConfigParser
 import os
 from pathlib import Path
-import re
 import shlex
 import sys
-from tkinter import messagebox
-from Xlib.display import Display
-from Xlib.ext import randr
 import subprocess
 
 def panic_script():
@@ -290,7 +286,7 @@ def _get_desktop_environment():
         if os.environ.get('KDE_FULL_SESSION') == 'true':
             return 'kde'
         elif os.environ.get('GNOME_DESKTOP_SESSION_ID'):
-            if not 'deprecated' in os.environ.get('GNOME_DESKTOP_SESSION_ID'):  # type: ignore
+            if 'deprecated' not in os.environ.get('GNOME_DESKTOP_SESSION_ID'):  # type: ignore
                 return 'gnome2'
         # From http://ubuntuforums.org/showthread.php?t=652320
         elif _is_running('xfce-mcs-manage'):

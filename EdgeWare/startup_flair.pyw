@@ -1,11 +1,10 @@
 import time
 import os
 import threading as thread
-import pathlib
 import sys
 import tkinter as tk
 from tkinter import Tk, Frame, Label, RAISED, messagebox
-from PIL import Image, ImageTk, ImageFilter
+from PIL import Image, ImageTk
 from itertools import cycle
 from pathlib import Path
 from utils.paths import Defaults, Resource

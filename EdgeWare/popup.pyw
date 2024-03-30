@@ -7,11 +7,10 @@ import time
 import json
 import pathlib
 import webbrowser
-import ctypes
 import threading as thread
 import logging
-from tkinter import messagebox, simpledialog, Tk, Frame, Label, Button, RAISED, StringVar, font
-from itertools import count, cycle
+from tkinter import simpledialog, Tk, Frame, Label, Button, StringVar, font
+from itertools import cycle
 from PIL import Image, ImageTk, ImageFilter
 from screeninfo import get_monitors
 from utils import utils
@@ -604,8 +603,8 @@ def run():
         captionLabel.place(x=5, y=5)
 
     if CORRUPTION_DEVMODE:
-        devmodeLabel1 = Label(root, text=f'clev=', wraplength=resized_image.width - border_wid_const, bg=back, fg=fore)
-        devmodeLabel2 = Label(root, text=f'poplev=', wraplength=resized_image.width - border_wid_const, bg=back, fg=fore)
+        devmodeLabel1 = Label(root, text='clev=', wraplength=resized_image.width - border_wid_const, bg=back, fg=fore)
+        devmodeLabel2 = Label(root, text='poplev=', wraplength=resized_image.width - border_wid_const, bg=back, fg=fore)
         devmodeLabel3 = Label(root, text=f'filen={pathlib.Path(item).name}', wraplength=resized_image.width - border_wid_const, bg=back, fg=fore)
         devmodeLabel1.place(x= 5, y= int(resized_image.height/2))
         devmodeLabel2.place(x= 5, y= int(resized_image.height/2) + devmodeLabel2.winfo_reqheight() + 2)

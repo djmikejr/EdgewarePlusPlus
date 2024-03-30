@@ -4,21 +4,16 @@ import shutil
 import subprocess
 import webbrowser
 import zipfile
-import pathlib
 import ast
 import urllib.request
 import hashlib
-import ctypes
 import sys
 import logging
-import time
 import textwrap
-import random as rand
 import getpass
 import requests
-import PIL
 import ttkwidgets as tw
-from tkinter import Tk, ttk, simpledialog, messagebox, filedialog, IntVar, BooleanVar, StringVar, Frame, Checkbutton, Button, Scale, Label, Toplevel, Entry, OptionMenu, Listbox, SINGLE, DISABLED, GROOVE, RAISED, Text, END, Scrollbar, VERTICAL, font, CENTER
+from tkinter import Tk, ttk, simpledialog, messagebox, filedialog, IntVar, BooleanVar, StringVar, Frame, Checkbutton, Button, Scale, Label, Toplevel, Entry, OptionMenu, Listbox, SINGLE, DISABLED, GROOVE, RAISED, Text, END, VERTICAL, font
 from pathlib import Path
 from PIL import Image, ImageTk
 from utils import utils
@@ -256,7 +251,7 @@ if settings['toggleMoodSet'] != True:
                             media_dict = json.loads(media.read())
                             mood_dict["media"] += media_dict
                 except:
-                    logging.warning(f'media mood extraction failed.')
+                    logging.warning('media mood extraction failed.')
 
                 try:
                     if os.path.isfile(Resource.CAPTIONS):
@@ -269,7 +264,7 @@ if settings['toggleMoodSet'] != True:
                             if 'prefix_settings' in captions_dict: del captions_dict['prefix_settings']
                             mood_dict["captions"] += captions_dict
                 except:
-                    logging.warning(f'captions mood extraction failed.')
+                    logging.warning('captions mood extraction failed.')
 
                 try:
                     if os.path.isfile(Resource.PROMPT):
@@ -278,7 +273,7 @@ if settings['toggleMoodSet'] != True:
                             prompt_dict = json.loads(prompt.read())
                             mood_dict["prompts"] += prompt_dict["moods"]
                 except:
-                    logging.warning(f'prompt mood extraction failed.')
+                    logging.warning('prompt mood extraction failed.')
 
                 try:
                     if os.path.isfile(Resource.WEB):
@@ -289,7 +284,7 @@ if settings['toggleMoodSet'] != True:
                                 if n not in mood_dict["web"]:
                                     mood_dict["web"].append(n)
                 except:
-                    logging.warning(f'web mood extraction failed.')
+                    logging.warning('web mood extraction failed.')
 
                 mood.write(json.dumps(mood_dict))
         except Exception as e:
@@ -2495,7 +2490,7 @@ def show_window():
 
     descriptNameLabel = Label(presetDescriptFrame, text='Default Description', font='Default 15')
     presetDescriptionWrap = textwrap.TextWrapper(width=100, max_lines=5)
-    descriptLabel = Label(presetDescriptFrame, text=presetDescriptionWrap.fill(text=f'Default Text Here'), relief=GROOVE)
+    descriptLabel = Label(presetDescriptFrame, text=presetDescriptionWrap.fill(text='Default Text Here'), relief=GROOVE)
     changeDescriptText('Default')
 
     dropdownSelectFrame.pack(side='left', fill='x', padx=6)
@@ -2916,7 +2911,7 @@ def getLiveVersion(url:str, id:int) -> str:
             with open(urllib.request.urlretrieve(url)[0], 'r') as liveDCfg:
                 return(liveDCfg.read().split('\n')[1].split(',')[id])
         except Exception as e:
-            logging.warning('failed to fetch github version.\n\tReason: {e}')
+            logging.warning(f'failed to fetch github version.\n\tReason: {e}')
             return 'Could not check version.'
     else:
         logging.info(f'user has connection to github disabled. Version will not be checked. {test}')
@@ -3081,7 +3076,7 @@ def applyPreset(name:str):
         shutil.copyfile(Data.PRESETS / f'{name}.cfg', Data.CONFIG)
         refresh()
     except Exception as e:
-        messagebox.showerror('Error', 'Failed to load preset.\n\n{e}')
+        messagebox.showerror('Error', f'Failed to load preset.\n\n{e}')
 
 def savePreset(name:str) -> bool:
     try:

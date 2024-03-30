@@ -1,6 +1,4 @@
 import time
-import os
-import pathlib
 from pypresence import presence
 from utils.paths import Resource
 

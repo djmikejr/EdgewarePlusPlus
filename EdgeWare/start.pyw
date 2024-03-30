@@ -1,6 +1,4 @@
 import urllib
-import pathlib
-import ctypes
 import hashlib
 import os
 import subprocess
@@ -17,14 +15,8 @@ import tkinter as tk
 import logging
 import sys
 import requests
-import PIL
-import pypresence
 import pystray
 import playsound as ps
-import videoprops
-import imageio
-import moviepy
-import sounddevice
 from PIL import Image
 from bs4 import BeautifulSoup
 from dataclasses import dataclass
@@ -32,10 +24,6 @@ from tkinter import messagebox, simpledialog
 from pathlib import Path
 from utils import utils
 from utils.paths import Data, Defaults, Process, Resource
-try:
-    import vlc
-except:
-    print('vlc failed to load.')
 
 PATH = Path(__file__).parent
 os.chdir(PATH)
@@ -614,7 +602,7 @@ def main():
                     logging.warning(f'failed to successfully run {HIBERNATE_TYPE} hibernate.\n\tReason: {e}')
             if HIBERNATE_TYPE == 'Pump-Scare':
                 try:
-                    logging.info(f'hibernate type is pump-scare.')
+                    logging.info('hibernate type is pump-scare.')
                     roll_for_initiative()
                 except Exception as e:
                     logging.warning(f'failed to successfully run {HIBERNATE_TYPE} hibernate.\n\tReason: {e}')

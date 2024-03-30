@@ -5,7 +5,6 @@ import pathlib
 import sys
 import os
 import logging
-import time
 import random as rand
 from screeninfo import get_monitors
 from utils import utils
