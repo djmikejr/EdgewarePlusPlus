@@ -5,6 +5,7 @@ import pathlib
 import sys
 import os
 import logging
+import time
 import random as rand
 from screeninfo import get_monitors
 from utils import utils
@@ -16,16 +17,14 @@ PATH = str(pathlib.Path(__file__).parent.absolute())
 os.chdir(PATH)
 
 utils.init_logging(logging, 'sublabel')
-# This sublabel.pyw originally provided very generously by u/basicmo!
+#This sublabel.pyw originally provided very generously by u/basicmo!
 
-
-def check_setting(name: str, default: bool = False) -> bool:
+def check_setting(name:str, default:bool=False) -> bool:
     default = False if default is None else default
     try:
         return int(settings.get(name)) == 1
     except:
         return default
-
 
 CAP_OPACITY = 100
 CAP_TIMER = 300
@@ -41,7 +40,7 @@ if MOOD_ID != '0':
     if os.path.exists(Data.MOODS / f'{MOOD_ID}.json'):
         with open(Data.MOODS / f'{MOOD_ID}.json') as f:
             moodData = json.loads(f.read())
-    elif os.path.exists(Data.UNNAMED_MOODS / f'{MOOD_ID}.json'):
+    elif os.path.exists(Data.UNNAMED_MOODS /  f'{MOOD_ID}.json'):
         with open(Data.UNNAMED_MOODS / f'{MOOD_ID}.json') as f:
             moodData = json.loads(f.read())
 
@@ -53,7 +52,7 @@ with open(Data.CONFIG) as cfg:
     MOOD_OFF = check_setting('toggleMoodSet')
     THEME = settings['themeType']
 
-# background is one hex value off here, because it looks pretty ugly if they're different colours, so we keep them close so there is no visual difference
+#background is one hex value off here, because it looks pretty ugly if they're different colours, so we keep them close so there is no visual difference
 try:
     if THEME == 'Original':
         fore = '#000000'
@@ -85,22 +84,18 @@ except Exception as e:
     back = '#000001' if utils.is_windows() else '#f0f0f0'
     mainfont = 'Segoe UI'
 
-
 def display_subliminal_message():
     # Load subliminal messages from captions.json
     def load_subliminal_messages():
         try:
-            with open(Resource.CAPTIONS, 'r') as file:
+            with open(Resource.CAPTIONS, "r") as file:
                 l = json.load(file)
-                if l.get('subliminal', []) and SUBLIMINAL_MOOD:
-                    return l.get('subliminal', [])
+                if l.get("subliminal", []) and SUBLIMINAL_MOOD:
+                    return l.get("subliminal", [])
                 else:
-                    if 'prefix' in l:
-                        del l['prefix']
-                    if 'subtext' in l:
-                        del l['subtext']
-                    if 'prefix_settings' in l:
-                        del l['prefix_settings']
+                    if 'prefix' in l: del l['prefix']
+                    if 'subtext' in l: del l['subtext']
+                    if 'prefix_settings' in l: del l['prefix_settings']
                     if MOOD_ID != '0':
                         allsub = []
                         for key in l:
@@ -109,7 +104,7 @@ def display_subliminal_message():
                     else:
                         allsub = list(l.values())
                     flatlist = [i for sublist in allsub for i in sublist]
-                    # logging.info(flatlist)
+                    #logging.info(flatlist)
                     return flatlist
         except Exception as e:
             logging.fatal(f'failed to get sublabel prefixes. {e}')
@@ -121,7 +116,7 @@ def display_subliminal_message():
         if subliminal_messages:
             return random.choice(subliminal_messages)
         else:
-            return 'No subliminal messages found.'
+            return "No subliminal messages found."
 
     # Create the label
     label = tk.Label(fg=fore, bg=back)
@@ -130,9 +125,7 @@ def display_subliminal_message():
     monitor = rand.choice(get_monitors())
 
     # Calculate the font size based on screen resolution
-    f_size = (
-        min(monitor.width, monitor.height) // 10
-    )  # Adjust the scaling factor as needed
+    f_size = min(monitor.width, monitor.height) // 10  # Adjust the scaling factor as needed
 
     # Configure the font
     font = (mainfont, f_size)
@@ -155,7 +148,7 @@ def display_subliminal_message():
     if utils.is_windows():
         label.master.wm_attributes('-disabled', True)
         label.master.wm_attributes('-transparentcolor', back)
-    label.winfo_toplevel().attributes('-alpha', CAP_OPACITY / 100)
+    label.winfo_toplevel().attributes('-alpha',CAP_OPACITY/100)
     label.pack()
 
     # Update the label's size
@@ -167,7 +160,6 @@ def display_subliminal_message():
     # Start the Tkinter event loop
 
     label.mainloop()
-
 
 # Call the function to display the subliminal message
 display_subliminal_message()

@@ -2,21 +2,19 @@ import codecs
 from configparser import ConfigParser
 import os
 from pathlib import Path
+import re
 import shlex
 import sys
+from tkinter import messagebox
+from Xlib.display import Display
+from Xlib.ext import randr
 import subprocess
 
-
 def panic_script():
-    subprocess.run(
-        'for pid in $(ps -u $USER -ef | grep -E "python.* *+.pyw" | awk \'{print $2}\'); do echo $pid; kill -9 $pid; done',
-        shell=True,
-    )
-
+    subprocess.run('for pid in $(ps -u $USER -ef | grep -E "python.* *+.pyw" | awk \'{print $2}\'); do echo $pid; kill -9 $pid; done', shell=True)
 
 def set_borderless(root):
     root.wm_attributes('-type', 'splash')
-
 
 def set_wallpaper(wallpaper_path: Path | str):
     global first_run
@@ -30,7 +28,7 @@ def set_wallpaper(wallpaper_path: Path | str):
     desktop_env = _get_desktop_environment()
     try:
         if desktop_env in ['gnome', 'unity', 'cinnamon']:
-            uri = """file://%s""" % wallpaper_path
+            uri = '''file://%s''' % wallpaper_path
             args = [
                 'gsettings',
                 'set',
@@ -55,7 +53,7 @@ def set_wallpaper(wallpaper_path: Path | str):
                     'set',
                     'org.mate.background',
                     'picture-filename',
-                    """%s""" % wallpaper_path,
+                    '''%s''' % wallpaper_path,
                 ]
                 subprocess.Popen(args)
             except:  # MATE < 1.6
@@ -66,7 +64,7 @@ def set_wallpaper(wallpaper_path: Path | str):
                     'string',
                     '--set',
                     '/desktop/mate/background/picture_filename',
-                    """%s""" % wallpaper_path,
+                    '''%s''' % wallpaper_path,
                 ]
                 subprocess.Popen(args)
         elif desktop_env == 'gnome2':  # Not tested
@@ -77,7 +75,7 @@ def set_wallpaper(wallpaper_path: Path | str):
                 'string',
                 '--set',
                 '/desktop/gnome/background/picture_filename',
-                """%s""" % wallpaper_path,
+                '''%s''' % wallpaper_path,
             ]
             subprocess.Popen(args)
         ## KDE4 is difficult
@@ -222,7 +220,6 @@ def set_wallpaper(wallpaper_path: Path | str):
         sys.stderr.write('ERROR: Failed to set wallpaper. There might be a bug.\n')
         return False
 
-
 def hide_file(path: Path | str):
     if isinstance(path, str):
         path = Path(path)
@@ -237,7 +234,6 @@ def show_file(path: Path | str):
     hidden_path = path.parent / f'.{path.name}'
     if hidden_path.exists():
         hidden_path.rename(path)
-
 
 # Source(Martin Hansen, Serge Stroobandt): https://stackoverflow.com/a/21213358
 def _get_desktop_environment():
@@ -294,7 +290,7 @@ def _get_desktop_environment():
         if os.environ.get('KDE_FULL_SESSION') == 'true':
             return 'kde'
         elif os.environ.get('GNOME_DESKTOP_SESSION_ID'):
-            if 'deprecated' not in os.environ.get('GNOME_DESKTOP_SESSION_ID'):  # type: ignore
+            if not 'deprecated' in os.environ.get('GNOME_DESKTOP_SESSION_ID'):  # type: ignore
                 return 'gnome2'
         # From http://ubuntuforums.org/showthread.php?t=652320
         elif _is_running('xfce-mcs-manage'):
@@ -303,13 +299,11 @@ def _get_desktop_environment():
             return 'kde'
     return 'unknown'
 
-
 def does_desktop_shortcut_exist(name: str):
     file = Path(name)
     return Path(
         os.path.expanduser('~/Desktop') / file.with_name(f'{file.name}.desktop')
     ).exists()
-
 
 def make_shortcut(
     path: Path,
@@ -336,14 +330,14 @@ def make_shortcut(
         script_path = str((path / f'{script_or_command}').absolute())
         script_or_command = [sys.executable, script_path]
 
-    shortcut_content = f"""[Desktop Entry]
+    shortcut_content = f'''[Desktop Entry]
 Version=1.0
 Name={title}
 Exec={shlex.join(script_or_command)}
 Icon={str(icon.absolute())}
 Terminal=false
 Type=Application
-Categories=Application;"""
+Categories=Application;'''
 
     file_name = f'{file_name}.desktop'
     desktop_file = Path(os.path.expanduser('~/Desktop')) / file_name
@@ -363,18 +357,17 @@ Categories=Application;"""
         return False
     return True
 
-
 # FIXME: Shouldn't be started with profile as it is not made to launch GUI application.
 # Another problem is that VSCODE run .profile, and so run edgeware on start. Tempfix
 def toggle_run_at_startup(path: Path, state: bool):
     command = f'{sys.executable} {str((path / "start.pyw").absolute())}&'
 
-    edgeware_content = f"""############## EDGEWARE ##############
+    edgeware_content = f'''############## EDGEWARE ##############
 if [[ ! '${{GIO_LAUNCHED_DESKTOP_FILE}}' == '/usr/share/applications/code.desktop' ]] && [[ ! '${{TERM_PROGRAM}}' == 'vscode' ]]; then
     {command}
 fi
 ############## EDGEWARE ##############
-"""
+'''
 
     edgeware_profile = Path(os.path.expanduser('~/.profile'))
 
