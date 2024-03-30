@@ -1,4 +1,6 @@
 import urllib
+import pathlib
+import ctypes
 import hashlib
 import os
 import subprocess
@@ -15,8 +17,14 @@ import tkinter as tk
 import logging
 import sys
 import requests
+import PIL
+import pypresence
 import pystray
 import playsound as ps
+import videoprops
+import imageio
+import moviepy
+import sounddevice
 from PIL import Image
 from bs4 import BeautifulSoup
 from dataclasses import dataclass
@@ -24,6 +32,10 @@ from tkinter import messagebox, simpledialog
 from pathlib import Path
 from utils import utils
 from utils.paths import Data, Defaults, Process, Resource
+try:
+    import vlc
+except:
+    print('vlc failed to load.')
 
 PATH = Path(__file__).parent
 os.chdir(PATH)
@@ -35,15 +47,13 @@ SYS_ARGS.pop(0)
 logging.info(f'args: {SYS_ARGS}')
 
 settings = {}
-
-
-# func for loading settings, really just grouping it
+#func for loading settings, really just grouping it
 def load_settings():
     global settings
     logging.info('loading config settings...')
     settings = {}
 
-    # creating objects to check vs live config for version updates
+    #creating objects to check vs live config for version updates
     with open(Defaults.CONFIG) as r:
         logging.info('reading in default config values')
         defaultLines = r.readlines()
@@ -54,40 +64,36 @@ def load_settings():
     for var in default_setting_keys:
         settings[var] = default_setting_values[default_setting_keys.index(var)]
 
-    # checking if config file exists and then writing the default config settings to a new file if it doesn't
+    #checking if config file exists and then writing the default config settings to a new file if it doesn't
     if not os.path.exists(Data.CONFIG):
         with open(Data.CONFIG, 'w') as f:
             f.write(json.dumps(settings))
             logging.warning('could not find config.cfg, wrote new file.')
 
-    # reading in config file
+    #reading in config file
     with open(Data.CONFIG, 'r') as f:
         settings = json.loads(f.readline())
         logging.info('read in settings from config.cfg')
 
-    # if the config version and the version listed in the configdefault version are different to try to update with
-    # new setting tags if any are missing.
+    #if the config version and the version listed in the configdefault version are different to try to update with
+    #new setting tags if any are missing.
     if settings['version'] != default_setting_values[0]:
-        logging.warning(
-            f'local version {settings["version"]} does not match default version, config will be updated'
-        )
+        logging.warning(f'local version {settings["version"]} does not match default version, config will be updated')
         regen_settings = {}
         for obj in default_setting_keys:
             try:
                 regen_settings[obj] = settings[obj]
             except:
                 logging.info(f'added missing key: {obj}')
-                regen_settings[obj] = default_setting_values[
-                    default_setting_keys.index(obj)
-                ]
+                regen_settings[obj] = default_setting_values[default_setting_keys.index(obj)]
         regen_settings['version'] = default_setting_values[0]
-        regen_settings = json.loads(str(regen_settings).replace("'", '"'))
+        regen_settings = json.loads(str(regen_settings).replace('\'', '"'))
         settings = regen_settings
         with open(Data.CONFIG, 'w') as f:
-            f.write(str(regen_settings).replace("'", '"'))
+            f.write(str(regen_settings).replace('\'', '"'))
             logging.info('wrote updated config to config.cfg')
 
-    # handling proper initialization of wallpapers
+    #handling proper initialization of wallpapers
     default_wallpaper_dict = {'default': 'wallpaper.png'}
     logging.info('converting wallpaper string to dict')
     try:
@@ -99,41 +105,36 @@ def load_settings():
                 logging.info('wallpaperdat already dict')
                 print('passed')
             else:
-                settings['wallpaperDat'] = ast.literal_eval(
-                    settings['wallpaperDat'].replace('\\', '/')
-                )
+                settings['wallpaperDat'] = ast.literal_eval(settings['wallpaperDat'].replace('\\', '/'))
                 logging.info('parsed wallpaper dict from string')
     except Exception as e:
         settings['wallpaperDat'] = default_wallpaper_dict
-        logging.warning(
-            f'failed to parse wallpaper from string, using default value instead\n\tReason: {e}'
-        )
+        logging.warning(f'failed to parse wallpaper from string, using default value instead\n\tReason: {e}')
 
-
-# load settings, if first run open options, then reload options from file
+#load settings, if first run open options, then reload options from file
 load_settings()
-if not settings['is_configed'] == 1:
+if not settings['is_configed']==1:
     logging.info('running config for first setup, is_configed flag is false.')
     subprocess.run([sys.executable, 'config.pyw'])
     logging.info('reloading settings')
     load_settings()
 
-AVOID_LIST = ['EdgeWare', 'AppData']  # default avoid list for fill/replace
-FILE_TYPES = ['png', 'jpg', 'jpeg']  # recognized file types for replace
+AVOID_LIST = ['EdgeWare', 'AppData'] #default avoid list for fill/replace
+FILE_TYPES = ['png', 'jpg', 'jpeg'] #recognized file types for replace
 
-LIVE_FILL_THREADS = 0  # count of live threads for hard drive filling
-PLAYING_AUDIO = False  # audio thread flag
-REPLACING_LIVE = False  # replace thread flag
-HAS_PROMPTS = False  # can use prompts flag
-MITOSIS_LIVE = False  # flag for if the mitosis mode popup has been spawned
+LIVE_FILL_THREADS = 0 #count of live threads for hard drive filling
+PLAYING_AUDIO = False #audio thread flag
+REPLACING_LIVE = False #replace thread flag
+HAS_PROMPTS = False #can use prompts flag
+MITOSIS_LIVE = False #flag for if the mitosis mode popup has been spawned
 
-# default data for generating working default asset resource folder
+#default data for generating working default asset resource folder
 DEFAULT_WEB = '{"urls":["https://duckduckgo.com/"], "args":["?q=why+are+you+gay"]}'
 DEFAULT_PROMPT = '{"moods":["no moods"], "freqList":[100], "minLen":1, "maxLen":1, "no moods":["no prompts"]}'
 DEFAULT_DISCORD = 'Playing with myself~'
 
-# naming each used variable from config for ease of use later
-# annoyance vars
+#naming each used variable from config for ease of use later
+#annoyance vars
 DELAY = int(settings['delay'])
 POPUP_CHANCE = int(settings['popupMod'])
 AUDIO_CHANCE = int(settings['audioMod'])
@@ -153,7 +154,7 @@ VIDEO_MAX = int(settings['maxVideos'])
 AUDIO_NUMBER = 0
 VIDEO_NUMBER = 0
 
-# mode vars
+#mode vars
 SHOW_ON_DISCORD = int(settings['showDiscord']) == 1
 LOADING_FLAIR = int(settings['showLoadingFlair']) == 1
 DESKTOP_ICONS = int(settings['desktopIcons']) == 1
@@ -199,7 +200,7 @@ MOOD_OFF = int(settings['toggleMoodSet']) == 1
 CORRUPTION_MODE = int(settings['corruptionMode']) == 1
 CORRUPTION_FADE = settings['corruptionFadeType']
 CORRUPTION_TRIGGER = settings['corruptionTrigger']
-# adding all three as individual vars instead of checking for trigger type because of an idea: randomized corruption per-launch?
+#adding all three as individual vars instead of checking for trigger type because of an idea: randomized corruption per-launch?
 CORRUPTION_TIME = settings['corruptionTime']
 CORRUPTION_POPUPS = settings['corruptionPopups']
 CORRUPTION_LAUNCHES = settings['corruptionLaunches']
@@ -220,21 +221,9 @@ if not MOOD_OFF:
                 if 'id' in info_dict:
                     MOOD_ID = info_dict['id'] if info_dict['id'] else '0'
         if MOOD_ID == '0':
-            im = (
-                str(len(os.listdir(Resource.IMAGE)))
-                if os.path.exists(Resource.IMAGE)
-                else '0'
-            )
-            au = (
-                str(len(os.listdir(Resource.AUDIO)))
-                if os.path.exists(Resource.AUDIO)
-                else '0'
-            )
-            vi = (
-                str(len(os.listdir(Resource.VIDEO)))
-                if os.path.exists(Resource.VIDEO)
-                else '0'
-            )
+            im = str(len(os.listdir(Resource.IMAGE))) if os.path.exists(Resource.IMAGE) else '0'
+            au = str(len(os.listdir(Resource.AUDIO))) if os.path.exists(Resource.AUDIO) else '0'
+            vi = str(len(os.listdir(Resource.VIDEO))) if os.path.exists(Resource.VIDEO) else '0'
             wa = 'w' if os.path.isfile(Resource.WALLPAPER) else 'x'
             sp = 's' if Resource.SPLASH else 'x'
             di = 'd' if os.path.isfile(Resource.DISCORD) else 'x'
@@ -242,12 +231,7 @@ if not MOOD_OFF:
             co = 'c' if os.path.isfile(Resource.CORRUPTION) else 'x'
             MOOD_ID = im + au + vi + wa + sp + di + ic + co
     except Exception as e:
-        messagebox.showerror(
-            'Launch Error',
-            'Could not launch Edgeware due to setting mood ID issues.\n['
-            + str(e)
-            + ']',
-        )
+        messagebox.showerror('Launch Error', 'Could not launch Edgeware due to setting mood ID issues.\n[' + str(e) + ']')
         logging.fatal(f'failed to set mood id.\n\tReason:{e}')
         os.kill(os.getpid(), 9)
     logging.info(f'mood id: {MOOD_ID}')
@@ -257,12 +241,12 @@ wallpaperWait = thread.Event()
 runningHibernate = thread.Event()
 pumpScareAudio = thread.Event()
 
-# start init portion, check resources, config, etc.
+#start init portion, check resources, config, etc.
 try:
     if not os.path.exists(Resource.ROOT):
         logging.warning('no resource folder found')
         pth = 'pth-default_ignore'
-        # selecting first zip found in script folder
+        #selecting first zip found in script folder
         for obj in os.listdir(PATH):
             try:
                 if obj.split('.')[-1].lower() == 'zip':
@@ -271,22 +255,18 @@ try:
                     break
             except:
                 print(f'{obj} is not a zip file.')
-        # if found zip unpack
+        #if found zip unpack
         if not pth == 'pth-default_ignore':
-            with zipfile.ZipFile(pth, 'r') as obj:
+           with zipfile.ZipFile(pth, 'r') as obj:
                 logging.info('extracting resources from zip')
                 obj.extractall(Resource.ROOT)
         else:
-            # if no zip found, use default resources
-            logging.warning(
-                'no zip file found, generating resource folder from default assets.'
-            )
+            #if no zip found, use default resources
+            logging.warning('no zip file found, generating resource folder from default assets.')
             for obj in [Resource.ROOT, Resource.AUDIO, Resource.IMAGE, Resource.VIDEO]:
                 os.mkdir(obj)
             shutil.copyfile(Defaults.WALLPAPER, Resource.WALLPAPER)
-            shutil.copyfile(
-                Defaults.IMAGE, Resource.IMAGE / 'img0.png', follow_symlinks=True
-            )
+            shutil.copyfile(Defaults.IMAGE, Resource.IMAGE / 'img0.png', follow_symlinks=True)
             if not os.path.exists(Resource.DISCORD):
                 with open(Resource.DISCORD, 'w') as f:
                     f.write(DEFAULT_DISCORD)
@@ -297,23 +277,16 @@ try:
                 with open(Resource.WEB, 'w') as f:
                     f.write(DEFAULT_WEB)
 except Exception as e:
-    messagebox.showerror(
-        'Launch Error',
-        'Could not launch Edgeware due to resource zip unpacking issues.\n['
-        + str(e)
-        + ']',
-    )
-    logging.fatal(
-        f'failed to unpack resource zip or read default resources.\n\tReason:{e}'
-    )
+    messagebox.showerror('Launch Error', 'Could not launch Edgeware due to resource zip unpacking issues.\n[' + str(e) + ']')
+    logging.fatal(f'failed to unpack resource zip or read default resources.\n\tReason:{e}')
     os.kill(os.getpid(), 9)
 
-# writing corruption file if it doesn't exist/wiping it if the mode isn't on launch
+#writing corruption file if it doesn't exist/wiping it if the mode isn't on launch
 if CORRUPTION_MODE:
     try:
         if not os.path.exists(Data.ROOT):
             os.mkdir(Data.ROOT)
-            # the launches will reset when the user specifies in the config, or a new pack is loaded
+            #the launches will reset when the user specifies in the config, or a new pack is loaded
             if not os.path.exists(Data.CORRUPTION_LAUNCHES):
                 with open(Data.CORRUPTION_LAUNCHES, 'w') as f:
                     f.write('0')
@@ -344,7 +317,7 @@ try:
 except Exception as e:
     logging.warning(f'failed to set avoid list\n\tReason: {e}')
 
-# checking presence of resources
+#checking presence of resources
 try:
     HAS_IMAGES = len(os.listdir(Resource.IMAGE)) > 0
     logging.info('image resources found')
@@ -376,19 +349,17 @@ except Exception as e:
 CAPTIONS = os.path.exists(Resource.CAPTIONS)
 
 HAS_WEB = WEB_JSON_FOUND and len(WEB_DICT['urls']) > 0
-# end of checking resource presence
+#end of checking resource presence
 
-# set discord status if enabled
+#set discord status if enabled
 if SHOW_ON_DISCORD:
     try:
         subprocess.Popen([sys.executable, Process.DISCORD])
     except Exception as e:
-        logging.warning(
-            f'failed to start discord status background task\n\tReason: {e}'
-        )
+        logging.warning(f'failed to start discord status background task\n\tReason: {e}')
         print('failed to start discord status')
 
-# making missing desktop shortcuts
+#making missing desktop shortcuts
 if DESKTOP_ICONS:
     if not utils.does_desktop_shortcut_exist('Edgeware'):
         utils.make_shortcut(PATH, 'default', 'start.pyw', 'Edgeware')
@@ -397,7 +368,7 @@ if DESKTOP_ICONS:
     if not utils.does_desktop_shortcut_exist('Panic'):
         utils.make_shortcut(PATH, 'panic', 'panic.pyw', 'Panic')
 
-if LOADING_FLAIR and (__name__ == '__main__'):
+if LOADING_FLAIR and (__name__ == "__main__"):
     logging.info('started loading flair')
     if Resource.SPLASH:
         if LANCZOS_MODE:
@@ -412,47 +383,37 @@ if LOADING_FLAIR and (__name__ == '__main__'):
         else:
             subprocess.run([sys.executable, Process.STARTUP])
 
-# set wallpaper
+#set wallpaper
 if not HIBERNATE_MODE:
     logging.info('set user wallpaper to default wallpaper.png')
     utils.set_wallpaper(Resource.WALLPAPER)
 
-
-# selects url to be opened in new tab by web browser
-def url_select(arg: int):
+#selects url to be opened in new tab by web browser
+def url_select(arg:int):
     logging.info(f'selected url {arg}')
-    return (
-        WEB_DICT['urls'][arg]
-        + WEB_DICT['args'][arg].split(',')[
-            rand.randrange(len(WEB_DICT['args'][arg].split(',')))
-        ]
-    )
+    return WEB_DICT['urls'][arg] + WEB_DICT['args'][arg].split(',')[rand.randrange(len(WEB_DICT['args'][arg].split(',')))]
 
-
-# class to handle window for tray icon
+#class to handle window for tray icon
 class TrayHandler:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title('Edgeware')
         self.timer_mode = settings['timerMode'] == 1
 
-        self.option_list = [
-            pystray.MenuItem('Edgeware Menu', print),
-            pystray.MenuItem('Panic', self.try_panic),
-        ]
+        self.option_list = [pystray.MenuItem('Edgeware Menu', print), pystray.MenuItem('Panic', self.try_panic)]
         if settings['toggleHibSkip']:
-            self.option_list.append(
-                pystray.MenuItem('Skip to Hibernate', self.hib_skip)
-            )
+            self.option_list.append(pystray.MenuItem('Skip to Hibernate', self.hib_skip))
 
         if os.path.isfile(Resource.ICON):
-            self.tray_icon = pystray.Icon(
-                'Edgeware', Image.open(Resource.ICON), 'Edgeware', self.option_list
-            )
+            self.tray_icon = pystray.Icon('Edgeware',
+                                        Image.open(Resource.ICON),
+                                        'Edgeware',
+                                        self.option_list)
         else:
-            self.tray_icon = pystray.Icon(
-                'Edgeware', Image.open(Defaults.ICON), 'Edgeware', self.option_list
-            )
+            self.tray_icon = pystray.Icon('Edgeware',
+                                        Image.open(Defaults.ICON),
+                                        'Edgeware',
+                                        self.option_list)
 
         self.root.withdraw()
 
@@ -473,7 +434,7 @@ class TrayHandler:
                     self.hashedPass = file.readline()
                 utils.hide_file(Data.PASS_HASH)
             except:
-                # no hash found
+                #no hash found
                 self.hashedPass = None
 
     def try_panic(self):
@@ -481,15 +442,9 @@ class TrayHandler:
         if not PANIC_DISABLED:
             if self.timer_mode:
                 pass_ = simpledialog.askstring('Panic', 'Enter Panic Password')
-                t_hash = (
-                    None
-                    if pass_ is None or pass_ == ''
-                    else hashlib.sha256(
-                        pass_.encode(encoding='ascii', errors='ignore')
-                    ).hexdigest()
-                )
+                t_hash = None if pass_ is None or pass_ == '' else hashlib.sha256(pass_.encode(encoding='ascii', errors='ignore')).hexdigest()
                 if t_hash == self.hashedPass:
-                    # revealing hidden files
+                    #revealing hidden files
                     try:
                         utils.show_file(Data.PASS_HASH)
                         utils.show_file(Data.PASS_HASH)
@@ -497,9 +452,7 @@ class TrayHandler:
                         os.remove(Data.HID_TIME)
                         subprocess.Popen([sys.executable, Process.PANIC])
                     except:
-                        logging.critical(
-                            'panic initiated due to failed pass/timer check'
-                        )
+                        logging.critical('panic initiated due to failed pass/timer check')
                         self.tray_icon.stop()
                         subprocess.Popen([sys.executable, Process.PANIC])
             else:
@@ -511,26 +464,24 @@ class TrayHandler:
         self.tray_icon.run(tray_setup)
         logging.info('tray handler thread running')
 
-
 def tray_setup(icon):
     icon.visible = True
 
-
-# main function, probably can do more with this but oh well i'm an idiot so
+#main function, probably can do more with this but oh well i'm an idiot so
 def main():
     logging.info('entered main function')
-    # set up tray icon
+    #set up tray icon
     tray = TrayHandler()
 
-    # if tray icon breaks again this is why
-    # idk why it works 50% of the time when it works and sometimes just stops working
+    #if tray icon breaks again this is why
+    #idk why it works 50% of the time when it works and sometimes just stops working
     thread.Thread(target=tray.move_to_tray, daemon=True).start()
 
-    # timer handling, start if there's a time left file
+    #timer handling, start if there's a time left file
     if os.path.exists(Data.HID_TIME):
         thread.Thread(target=do_timer).start()
 
-    # max value handling creation/cleaning
+    #max value handling creation/cleaning
     if not os.path.exists(Data.ROOT):
         os.mkdir(Data.ROOT)
     try:
@@ -551,46 +502,29 @@ def main():
 
     update_media()
 
-    # do downloading for booru stuff
+    #do downloading for booru stuff
     if settings.get('downloadEnabled') == 1:
-        booru_downloader: BooruDownloader = BooruDownloader(
-            settings.get('booruName'), settings.get('tagList').split('>')
-        )
+        booru_downloader:BooruDownloader = BooruDownloader(settings.get('booruName'), settings.get('tagList').split('>'))
 
         logging.info('start booru_method thread')
         if settings.get('downloadMode') == 'First Page':
-            thread.Thread(
-                target=lambda: booru_downloader.download(
-                    min_score=int(settings.get('booruMinScore'))
-                ),
-                daemon=True,
-            ).start()
+            thread.Thread(target=lambda: booru_downloader.download(min_score=int(settings.get('booruMinScore'))), daemon=True).start()
         elif settings.get('downloadMode') == 'Random Page':
-            thread.Thread(
-                target=lambda: booru_downloader.download_random(
-                    min_score=int(settings.get('booruMinScore'))
-                ),
-                daemon=True,
-            ).start()
+            thread.Thread(target=lambda: booru_downloader.download_random(min_score=int(settings.get('booruMinScore'))), daemon=True).start()
         else:
-            thread.Thread(
-                target=lambda: booru_downloader.download_all(
-                    min_score=int(settings.get('booruMinScore'))
-                ),
-                daemon=True,
-            ).start()
+            thread.Thread(target=lambda: booru_downloader.download_all(min_score=int(settings.get('booruMinScore'))), daemon=True).start()
 
-    # do downloading from web resource folder
+    #do downloading from web resource folder
     if USE_WEB_RESOURCE:
         logging.info('start download_web_resources thread')
         thread.Thread(target=download_web_resources).start()
 
-    # start thread for wallpaper timer
+    #start thread for wallpaper timer
     if ROTATE_WALLPAPER:
         logging.info('start rotate_wallpapers thread')
         thread.Thread(target=rotate_wallpapers).start()
 
-    # run annoyance thread or do hibernate mode
+    #run annoyance thread or do hibernate mode
     if HIBERNATE_MODE:
         logging.info('starting in hibernate mode')
         triggerThread = thread.Thread(target=checkWallpaperStatus)
@@ -602,18 +536,12 @@ def main():
             if HIBERNATE_TRUTH == 'Chaos':
                 try:
                     global HIBERNATE_TYPE
-                    HIBERNATE_TYPE = rand.choice(
-                        ['Original', 'Spaced', 'Glitch', 'Ramp']
-                    )
+                    HIBERNATE_TYPE = rand.choice(['Original', 'Spaced', 'Glitch', 'Ramp'])
                     with open(Data.CHAOS_TYPE, 'w') as f:
                         f.write(HIBERNATE_TYPE)
-                    logging.info(
-                        f'hibernate type is chaos, and has switched to {HIBERNATE_TYPE}'
-                    )
+                    logging.info(f'hibernate type is chaos, and has switched to {HIBERNATE_TYPE}')
                 except Exception as e:
-                    logging.warning(
-                        f'failed to successfully run chaos hibernate.\n\tReason: {e}'
-                    )
+                    logging.warning(f'failed to successfully run chaos hibernate.\n\tReason: {e}')
             hiberWait.wait(float(waitTime))
             runningHibernate.clear()
             if HIBERNATE_TYPE != 'Pump-Scare':
@@ -621,43 +549,31 @@ def main():
                 wallpaperWait.clear()
             if HIBERNATE_TYPE == 'Original':
                 try:
-                    logging.info(
-                        f'running original hibernate. number of popups estimated between {int(WAKEUP_ACTIVITY / 2)} and {WAKEUP_ACTIVITY}.'
-                    )
-                    for i in range(
-                        0, rand.randint(int(WAKEUP_ACTIVITY / 2), WAKEUP_ACTIVITY)
-                    ):
+                    logging.info(f'running original hibernate. number of popups estimated between {int(WAKEUP_ACTIVITY / 2)} and {WAKEUP_ACTIVITY}.')
+                    for i in range(0, rand.randint(int(WAKEUP_ACTIVITY / 2), WAKEUP_ACTIVITY)):
                         roll_for_initiative()
                 except Exception as e:
-                    logging.warning(
-                        f'failed to successfully run {HIBERNATE_TYPE} hibernate.\n\tReason: {e}'
-                    )
+                    logging.warning(f'failed to successfully run {HIBERNATE_TYPE} hibernate.\n\tReason: {e}')
             if HIBERNATE_TYPE == 'Spaced':
                 try:
                     endTime = time.monotonic() + float(HIBERNATE_LENGTH)
-                    logging.info(
-                        f'running spaced hibernate. current time is {time.monotonic()}, end time is {endTime}'
-                    )
+                    logging.info(f'running spaced hibernate. current time is {time.monotonic()}, end time is {endTime}')
                     while time.monotonic() < endTime:
                         roll_for_initiative()
                         time.sleep(float(DELAY) / 1000.0)
                 except Exception as e:
-                    logging.warning(
-                        f'failed to successfully run {HIBERNATE_TYPE} hibernate.\n\tReason: {e}'
-                    )
+                    logging.warning(f'failed to successfully run {HIBERNATE_TYPE} hibernate.\n\tReason: {e}')
             if HIBERNATE_TYPE == 'Glitch':
                 try:
                     glitchSleep = HIBERNATE_LENGTH / WAKEUP_ACTIVITY
                     totalTime = time.monotonic()
                     endTime = time.monotonic() + float(HIBERNATE_LENGTH)
-                    logging.info(
-                        f'running glitch hibernate. the end time is {endTime} with {WAKEUP_ACTIVITY} popups, total time is {HIBERNATE_LENGTH} and glitchSleep median is {glitchSleep}'
-                    )
+                    logging.info(f'running glitch hibernate. the end time is {endTime} with {WAKEUP_ACTIVITY} popups, total time is {HIBERNATE_LENGTH} and glitchSleep median is {glitchSleep}')
                     for i in range(0, WAKEUP_ACTIVITY):
                         if endTime <= time.monotonic():
                             break
-                        rgl = rand.randint(1, 4)
-                        rt = rand.randint(2, 4)
+                        rgl = rand.randint(1,4)
+                        rt = rand.randint(2,4)
                         if rgl == 1 and (endTime - totalTime) > glitchSleep:
                             time.sleep(float(glitchSleep))
                             totalTime = totalTime + glitchSleep
@@ -669,25 +585,18 @@ def main():
                             totalTime = totalTime + (glitchSleep * rt)
                         logging.info(f'time {endTime - totalTime}, rgl {rgl}, rt {rt}')
                         roll_for_initiative()
-                    if endTime > time.monotonic():
-                        time.sleep(float(endTime - time.monotonic()))
+                    if endTime > time.monotonic(): time.sleep(float(endTime - time.monotonic()))
                     roll_for_initiative()
                 except Exception as e:
-                    logging.warning(
-                        f'failed to successfully run {HIBERNATE_TYPE} hibernate.\n\tReason: {e}'
-                    )
+                    logging.warning(f'failed to successfully run {HIBERNATE_TYPE} hibernate.\n\tReason: {e}')
             if HIBERNATE_TYPE == 'Ramp':
                 try:
-                    logging.info(
-                        f'hibernate type is ramp. ramping up speed for {HIBERNATE_LENGTH}, max speed is {DELAY*0.9}, and popups at max speed is {WAKEUP_ACTIVITY}'
-                    )
+                    logging.info(f'hibernate type is ramp. ramping up speed for {HIBERNATE_LENGTH}, max speed is {DELAY*0.9}, and popups at max speed is {WAKEUP_ACTIVITY}')
                     endTime = time.monotonic() + float(HIBERNATE_LENGTH)
                     x = HIBERNATE_LENGTH / 4
                     accelerate = 1
                     while True:
-                        if (time.monotonic() > endTime) and (
-                            (DELAY / 1000) + 0.1 > rampSleep
-                        ):
+                        if (time.monotonic() > endTime) and ((DELAY/1000) + 0.1 > rampSleep):
                             break
                         if ((endTime - time.monotonic()) / HIBERNATE_LENGTH) > 0.5:
                             accelerate = accelerate * 1.10
@@ -695,30 +604,27 @@ def main():
                             accelerate = accelerate * 1.05
                         x = x / accelerate
                         rampSleep = (DELAY / 1000) + x
-                        # logging.info(f'rampsleep {rampSleep} accelerate {accelerate}, {((endTime - time.monotonic()) / HIBERNATE_LENGTH)} time left {endTime - time.monotonic()}')
+                        #logging.info(f'rampsleep {rampSleep} accelerate {accelerate}, {((endTime - time.monotonic()) / HIBERNATE_LENGTH)} time left {endTime - time.monotonic()}')
                         roll_for_initiative()
                         time.sleep(float(rampSleep))
                     for i in range(0, WAKEUP_ACTIVITY):
                         roll_for_initiative()
-                        time.sleep(float(DELAY * 0.9) / 1000.0)
+                        time.sleep(float(DELAY*0.9) / 1000.0)
                 except Exception as e:
-                    logging.warning(
-                        f'failed to successfully run {HIBERNATE_TYPE} hibernate.\n\tReason: {e}'
-                    )
+                    logging.warning(f'failed to successfully run {HIBERNATE_TYPE} hibernate.\n\tReason: {e}')
             if HIBERNATE_TYPE == 'Pump-Scare':
                 try:
-                    logging.info('hibernate type is pump-scare.')
+                    logging.info(f'hibernate type is pump-scare.')
                     roll_for_initiative()
                 except Exception as e:
-                    logging.warning(
-                        f'failed to successfully run {HIBERNATE_TYPE} hibernate.\n\tReason: {e}'
-                    )
+                    logging.warning(f'failed to successfully run {HIBERNATE_TYPE} hibernate.\n\tReason: {e}')
             time.sleep(0.5)
             runningHibernate.set()
 
     else:
         logging.info('starting annoyance loop')
         annoyance()
+
 
 
 def checkWallpaperStatus():
@@ -730,17 +636,16 @@ def checkWallpaperStatus():
                 if not runningHibernate.is_set():
                     break
                 if not wallpaperWait.is_set():
-                    f.seek(0)
-                    i = int(f.readline())
-                    if i < 1:
-                        wallpaperWait.set()
-                        logging.info('hibernate popups are all dead')
-                        utils.set_wallpaper(Defaults.PANIC_WALLPAPER)
-                        break
+                        f.seek(0)
+                        i = int(f.readline())
+                        if i < 1:
+                            wallpaperWait.set()
+                            logging.info('hibernate popups are all dead')
+                            utils.set_wallpaper(Defaults.PANIC_WALLPAPER)
+                            break
 
-
-# just checking %chance of doing annoyance options
-def do_roll(mod: float) -> bool:
+#just checking %chance of doing annoyance options
+def do_roll(mod:float) -> bool:
     if mod >= 100:
         return True
 
@@ -749,48 +654,36 @@ def do_roll(mod: float) -> bool:
 
     return mod > (rand.random() * 100)
 
-
-# booru handling class
+#booru handling class
 class BooruDownloader:
-    def __init__(self, booru: str, tags: list[str] = None):
-        self.extension_list: list[str] = ['jpg', 'jpeg', 'png', 'gif']
+    def __init__(self, booru:str, tags:list[str]=None):
 
-        self.exception_list: dict[str, BooruScheme] = {
-            'rule34': BooruScheme(
-                'rule34',
-                'https://www.rule34.xxx/index.php?page=post&s=list&tags=',
-                '/thumbnails/',
-                '/',
-                'thumbnail_',
-                '.',
-                'score:',
-                ' ',
-                'https://us.rule34.xxx//images/{code_actual}/',
-            )
+        self.extension_list:list[str] = ['jpg', 'jpeg', 'png', 'gif']
+
+        self.exception_list:dict[str, BooruScheme] = {
+            'rule34':BooruScheme('rule34',
+                                 'https://www.rule34.xxx/index.php?page=post&s=list&tags=',
+                                 '/thumbnails/',
+                                 '/',
+                                 'thumbnail_',
+                                 '.',
+                                 'score:',
+                                 ' ',
+                                 'https://us.rule34.xxx//images/{code_actual}/')
         }
 
-        self.booru = booru
-        self.tags = '+'.join(tags) if tags is not None else 'all'
+        self.booru          = booru
+        self.tags           = '+'.join(tags) if tags is not None else 'all'
         logging.info(f'tags={self.tags}')
-        self.post_per_page = 0
-        self.page_count = 0
-        self.booru_scheme = (
-            BooruScheme(self.booru)
-            if self.booru not in self.exception_list.keys()
-            else self.exception_list.get(self.booru)
-        )
-        self.max_page = int(self.get_page_count())
+        self.post_per_page  = 0
+        self.page_count     = 0
+        self.booru_scheme   = BooruScheme(self.booru) if self.booru not in self.exception_list.keys() else self.exception_list.get(self.booru)
+        self.max_page       = int(self.get_page_count())
 
-    def download(
-        self, page_start: int = 0, page_end: int = 1, min_score: int = None
-    ) -> None:
+    def download(self, page_start:int = 0, page_end:int = 1, min_score:int = None) -> None:
         self._page_start = max(page_start, 0)
         self._page_start = min(self._page_start, self.page_count)
-        self._page_end = (
-            min(page_end, self.max_page + 1)
-            if page_end >= self._page_start
-            else self._page_start + 1
-        )
+        self._page_end   = min(page_end, self.max_page+1) if page_end >= self._page_start else self._page_start + 1
 
         for page_index in range(self._page_start, self._page_end):
             self._page_url = f'{self.booru_scheme.booru_search_url.format(booru_name=self.booru)}{self.tags}&pid={page_index*self.post_per_page}'
@@ -800,29 +693,18 @@ class BooruDownloader:
 
             for image in self._soup.find_all('img'):
                 try:
-                    self._src: str = image.get('src')
-                    self._code_actual = int(
-                        self.pick_value(
-                            self._src,
-                            f'{self.booru_scheme.preview_thumb_id_start}',
-                            f'{self.booru_scheme.preview_thumb_id_end}',
-                        )
-                    )
-                    self._file_name = self.pick_value(
-                        self._src,
-                        f'{self.booru_scheme.preview_thumb_name_start}',
-                        f'{self.booru_scheme.preview_thumb_name_end}',
-                    )
+                    self._src:str     = image.get('src')
+                    self._code_actual = int(self.pick_value(self._src,
+                                                       f'{self.booru_scheme.preview_thumb_id_start}',
+                                                       f'{self.booru_scheme.preview_thumb_id_end}'))
+                    self._file_name   = self.pick_value(self._src,
+                                                   f'{self.booru_scheme.preview_thumb_name_start}',
+                                                   f'{self.booru_scheme.preview_thumb_name_end}')
 
-                    self._title: str = image.get('title')
-                    self._start = int(
-                        self._title.index(f'{self.booru_scheme.score_start}')
-                        + len(self.booru_scheme.score_start)
-                    )
-                    self._end = self._title.index(
-                        f'{self.booru_scheme.score_end}', self._start
-                    )
-                    self._score = int(self._title[self._start : self._end])
+                    self._title:str = image.get('title')
+                    self._start     = int(self._title.index(f'{self.booru_scheme.score_start}') + len(self.booru_scheme.score_start))
+                    self._end       = self._title.index(f'{self.booru_scheme.score_end}', self._start)
+                    self._score     = int(self._title[self._start:self._end])
 
                     if min_score is not None and self._score < min_score:
                         print(f'(score {self._score} too low) skipped {self._src}')
@@ -840,30 +722,25 @@ class BooruDownloader:
                     except:
                         continue
 
-    def download_random(self, min_score: int = None) -> None:
+    def download_random(self, min_score:int=None) -> None:
         self._selected_page = rand.randint(0, self.max_page)
         self.download(self._selected_page, min_score=min_score)
 
-    def download_all(self, min_score: int = None) -> None:
+    def download_all(self, min_score:int=None) -> None:
         for page in range(0, self.max_page):
             self.download(page, min_score=min_score)
 
-    def direct_download(self, url: str) -> None:
+    def direct_download(self, url:str) -> None:
         class LocalOpener(urllib.request.FancyURLopener):
             version = 'Mozilla/5.0'
-
-        with LocalOpener().open(url) as file, open(
-            Resource.IMAGE / url.split('/')[-1] / 'wb'
-        ) as out:
+        with LocalOpener().open(url) as file, open(Resource.IMAGE / url.split('/')[-1] / 'wb') as out:
             logging.info(f'downloaded {url}')
             shutil.copyfileobj(file, out)
 
     def get_page_count(self) -> int:
-        self._href_core = self.booru_scheme.booru_search_url.format(
-            booru_name=self.booru
-        ).split('?')[0]
+        self._href_core = self.booru_scheme.booru_search_url.format(booru_name=self.booru).split('?')[0]
         print(f'href_core={self._href_core}')
-        self._home_url = f'{self._href_core}?page=post&s=list&tags={self.tags}'
+        self._home_url  = f'{self._href_core}?page=post&s=list&tags={self.tags}'
         print(self._home_url)
         self._html = requests.get(self._home_url).text
         self._soup = BeautifulSoup(self._html, 'html.parser')
@@ -873,39 +750,27 @@ class BooruDownloader:
             if a.get('alt') == 'last page':
                 self._final_link = f'{self._href_core}{a.get("href")}'
                 print(f'last alt={self._final_link}')
-                return (
-                    int(
-                        self._final_link[
-                            (self._final_link.index('&pid=') + len('&pid=')) :
-                        ]
-                    )
-                    / self.post_per_page
-                    + 1
-                )
+                return (int(self._final_link[(self._final_link.index('&pid=') + len('&pid=')):]) / self.post_per_page + 1)
         return 0
 
-    def pick_value(self, text: str, start_text: str, end_text: str) -> str:
+    def pick_value(self, text:str, start_text:str, end_text:str) -> str:
         start_index = text.index(start_text) + len(start_text)
-        end_index = text.index(end_text, start_index)
+        end_index   = text.index(end_text, start_index)
         return text[start_index:end_index]
-
 
 @dataclass
 class BooruScheme:
-    booru_name: str
-    booru_search_url: str = (
-        'https://{booru_name}.booru.org/index.php?page=post&s=list&tags='
-    )
-    preview_thumb_id_start: str = 'thumbnails//'
-    preview_thumb_id_end: str = '/'
-    preview_thumb_name_start: str = 'thumbnail_'
-    preview_thumb_name_end: str = '.'
-    score_start: str = 'score:'
-    score_end: str = ' '
-    raw_image_url: str = 'https://img.booru.org/{booru}//images/{code_actual}/'
+    booru_name               : str
+    booru_search_url         : str = 'https://{booru_name}.booru.org/index.php?page=post&s=list&tags='
+    preview_thumb_id_start   : str = 'thumbnails//'
+    preview_thumb_id_end     : str = '/'
+    preview_thumb_name_start : str = 'thumbnail_'
+    preview_thumb_name_end   : str = '.'
+    score_start              : str = 'score:'
+    score_end                : str = ' '
+    raw_image_url            : str = 'https://img.booru.org/{booru}//images/{code_actual}/'
 
-
-# downloads all images listed in webresource.json in resources
+#downloads all images listed in webresource.json in resources
 def download_web_resources():
     try:
         with open(Resource.WEB_RESOURCE) as op:
@@ -916,8 +781,7 @@ def download_web_resources():
     except Exception as e:
         print(e)
 
-
-# does annoyance things; while running, does a check of randint against the frequency of each option
+#does annoyance things; while running, does a check of randint against the frequency of each option
 #   if pass, do thing, if fail, don't do thing. pretty simple stuff right here.
 #   only exception is for fill drive and replace images:
 #       fill: will only happen if fill is on AND until there are 8 threads running simultaneously
@@ -925,14 +789,10 @@ def download_web_resources():
 #       replace: will only happen one single time in the run of the application, but checks ALL folders
 def annoyance():
     global MITOSIS_LIVE
-    while True:
+    while(True):
         roll_for_initiative()
         if not MITOSIS_LIVE and (MITOSIS_MODE or LOWKEY_MODE) and HAS_IMAGES:
-            subprocess.Popen(
-                [sys.executable, Process.POPUP]
-            ) if MOOD_OFF else subprocess.Popen(
-                [sys.executable, Process.POPUP, f'-{MOOD_ID}']
-            )
+            subprocess.Popen([sys.executable, Process.POPUP]) if MOOD_OFF else subprocess.Popen([sys.executable, Process.POPUP, f'-{MOOD_ID}'])
             MITOSIS_LIVE = True
         if FILL_MODE and LIVE_FILL_THREADS < MAX_FILL_THREADS:
             thread.Thread(target=fill_drive).start()
@@ -940,8 +800,7 @@ def annoyance():
             thread.Thread(target=replace_images).start()
         time.sleep(float(DELAY) / 1000.0)
 
-
-# independently attempt to do all active settings with probability equal to their freq value
+#independently attempt to do all active settings with probability equal to their freq value
 def roll_for_initiative():
     if HIBERNATE_TYPE == 'Pump-Scare' and HIBERNATE_MODE:
         if HAS_IMAGES:
@@ -952,49 +811,33 @@ def roll_for_initiative():
                             thread.Thread(target=play_audio).start()
                             pumpScareAudio.wait()
                         except Exception as e:
-                            messagebox.showerror(
-                                'Audio Error', 'Failed to play audio.\n[' + str(e) + ']'
-                            )
+                            messagebox.showerror('Audio Error', 'Failed to play audio.\n[' + str(e) + ']')
                             logging.critical(f'failed to play audio\n\tReason: {e}')
                 else:
                     try:
                         thread.Thread(target=play_audio).start()
                         pumpScareAudio.wait()
                     except Exception as e:
-                        messagebox.showerror(
-                            'Audio Error', 'Failed to play audio.\n[' + str(e) + ']'
-                        )
+                        messagebox.showerror('Audio Error', 'Failed to play audio.\n[' + str(e) + ']')
                         logging.critical(f'failed to play audio\n\tReason: {e}')
             try:
                 utils.set_wallpaper(Resource.WALLPAPER)
                 wallpaperWait.clear()
-                subprocess.Popen(
-                    [sys.executable, Process.POPUP]
-                ) if MOOD_OFF else subprocess.Popen(
-                    [sys.executable, Process.POPUP, f'-{MOOD_ID}']
-                )
+                subprocess.Popen([sys.executable, Process.POPUP]) if MOOD_OFF else subprocess.Popen([sys.executable, Process.POPUP, f'-{MOOD_ID}'])
             except Exception as e:
-                messagebox.showerror(
-                    'Popup Error', 'Failed to start popup.\n[' + str(e) + ']'
-                )
+                messagebox.showerror('Popup Error', 'Failed to start popup.\n[' + str(e) + ']')
                 logging.critical(f'failed to start popup.pyw\n\tReason: {e}')
     else:
-        # these variables make the experience "more consistent" by stopping further popup spawns if enough spawns are reached
+        #these variables make the experience "more consistent" by stopping further popup spawns if enough spawns are reached
         currPopNum = 0
         maxPopNum = 1 if SINGLE_MODE else 999
         if do_roll(WEB_CHANCE) and HAS_WEB and currPopNum < maxPopNum:
             try:
-                url = (
-                    url_select(rand.randrange(len(WEB_DICT['urls'])))
-                    if HAS_WEB
-                    else None
-                )
+                url = url_select(rand.randrange(len(WEB_DICT['urls']))) if HAS_WEB else None
                 webbrowser.open_new(url)
                 currPopNum += 1
             except Exception as e:
-                messagebox.showerror(
-                    'Web Error', 'Failed to open website.\n[' + str(e) + ']'
-                )
+                messagebox.showerror('Web Error', 'Failed to open website.\n[' + str(e) + ']')
                 logging.critical(f'failed to open website {url}\n\tReason: {e}')
         if do_roll(VIDEO_CHANCE) and VIDEOS and currPopNum < maxPopNum:
             global VIDEO_NUMBER
@@ -1004,91 +847,24 @@ def roll_for_initiative():
                 if VIDEO_NUMBER < VIDEO_MAX:
                     try:
                         if VLC_MODE:
-                            thread.Thread(
-                                target=lambda: subprocess.call(
-                                    [sys.executable, Process.POPUP, '-video', '-vlc'],
-                                    shell=False,
-                                )
-                            ).start() if MOOD_OFF else thread.Thread(
-                                target=lambda: subprocess.call(
-                                    [
-                                        sys.executable,
-                                        Process.POPUP,
-                                        f'-{MOOD_ID}',
-                                        '-video',
-                                        '-vlc',
-                                    ],
-                                    shell=False,
-                                )
-                            ).start()
+                            thread.Thread(target=lambda: subprocess.call([sys.executable, Process.POPUP, '-video', '-vlc'], shell=False)).start() if MOOD_OFF else thread.Thread(target=lambda: subprocess.call([sys.executable, Process.POPUP, f'-{MOOD_ID}', '-video', '-vlc'], shell=False)).start()
                         else:
-                            thread.Thread(
-                                target=lambda: subprocess.call(
-                                    [sys.executable, Process.POPUP, '-video'],
-                                    shell=False,
-                                )
-                            ).start() if MOOD_OFF else thread.Thread(
-                                target=lambda: subprocess.call(
-                                    [
-                                        sys.executable,
-                                        Process.POPUP,
-                                        f'-{MOOD_ID}',
-                                        '-video',
-                                    ],
-                                    shell=False,
-                                )
-                            ).start()
+                            thread.Thread(target=lambda: subprocess.call([sys.executable, Process.POPUP, '-video'], shell=False)).start() if MOOD_OFF else thread.Thread(target=lambda: subprocess.call([sys.executable, Process.POPUP, f'-{MOOD_ID}', '-video'], shell=False)).start()
                         with open(Data.MAX_VIDEOS, 'w') as f:
-                            f.write(str(VIDEO_NUMBER + 1))
+                            f.write(str(VIDEO_NUMBER+1))
                         currPopNum += 1
                     except Exception as e:
-                        messagebox.showerror(
-                            'Popup Error', 'Failed to start popup.\n[' + str(e) + ']'
-                        )
-                        logging.critical(
-                            f'failed to start video popup.pyw\n\tReason: {e}'
-                        )
+                        messagebox.showerror('Popup Error', 'Failed to start popup.\n[' + str(e) + ']')
+                        logging.critical(f'failed to start video popup.pyw\n\tReason: {e}')
             else:
                 try:
                     if VLC_MODE:
-                        thread.Thread(
-                            target=lambda: subprocess.call(
-                                [sys.executable, Process.POPUP, '-video', '-vlc'],
-                                shell=False,
-                            )
-                        ).start() if MOOD_OFF else thread.Thread(
-                            target=lambda: subprocess.call(
-                                [
-                                    sys.executable,
-                                    Process.POPUP,
-                                    f'-{MOOD_ID}',
-                                    '-video',
-                                    '-vlc',
-                                ],
-                                shell=False,
-                            )
-                        ).start()
+                        thread.Thread(target=lambda: subprocess.call([sys.executable, Process.POPUP, '-video', '-vlc'], shell=False)).start() if MOOD_OFF else thread.Thread(target=lambda: subprocess.call([sys.executable, Process.POPUP, f'-{MOOD_ID}', '-video', '-vlc'], shell=False)).start()
                     else:
-                        thread.Thread(
-                            target=lambda: subprocess.call(
-                                [sys.executable, Process.POPUP, '-video'], shell=False
-                            )
-                        ).start() if MOOD_OFF else thread.Thread(
-                            target=lambda: subprocess.call(
-                                [
-                                    sys.executable,
-                                    Process.POPUP,
-                                    f'-{MOOD_ID}',
-                                    '-video',
-                                ],
-                                shell=False,
-                            )
-                        ).start()
+                        thread.Thread(target=lambda: subprocess.call([sys.executable, Process.POPUP, '-video'], shell=False)).start() if MOOD_OFF else thread.Thread(target=lambda: subprocess.call([sys.executable, Process.POPUP, f'-{MOOD_ID}', '-video'], shell=False)).start()
                     currPopNum += 1
                 except Exception as e:
-                    messagebox.showerror(
-                        'Popup Error', 'Failed to start popup.\n[' + str(e) + ']'
-                    )
+                    messagebox.showerror('Popup Error', 'Failed to start popup.\n[' + str(e) + ']')
                     logging.critical(f'failed to start video popup.pyw\n\tReason: {e}')
         if do_roll(AUDIO_CHANCE) and AUDIO and currPopNum < maxPopNum:
             if AUDIO_CAP:
@@ -1097,64 +873,37 @@ def roll_for_initiative():
                         thread.Thread(target=play_audio).start()
                         currPopNum += 1
                     except Exception as e:
-                        messagebox.showerror(
-                            'Audio Error', 'Failed to play audio.\n[' + str(e) + ']'
-                        )
+                        messagebox.showerror('Audio Error', 'Failed to play audio.\n[' + str(e) + ']')
                         logging.critical(f'failed to play audio\n\tReason: {e}')
             else:
                 try:
                     thread.Thread(target=play_audio).start()
                     currPopNum += 1
                 except Exception as e:
-                    messagebox.showerror(
-                        'Audio Error', 'Failed to play audio.\n[' + str(e) + ']'
-                    )
+                    messagebox.showerror('Audio Error', 'Failed to play audio.\n[' + str(e) + ']')
                     logging.critical(f'failed to play audio\n\tReason: {e}')
         if do_roll(CAP_POP_CHANCE) and CAPTIONS and currPopNum < maxPopNum:
             try:
-                subprocess.call(
-                    [sys.executable, Process.SUBLABEL, f'-{MOOD_ID}']
-                ) if not MOOD_OFF else subprocess.call(
-                    [sys.executable, Process.SUBLABEL]
-                )
+                subprocess.call([sys.executable, Process.SUBLABEL, f'-{MOOD_ID}']) if not MOOD_OFF else subprocess.call([sys.executable, Process.SUBLABEL])
                 currPopNum += 1
             except Exception as e:
-                messagebox.showerror(
-                    'Caption Popup Error',
-                    'Could not start caption popup.\n[' + str(e) + ']',
-                )
+                messagebox.showerror('Caption Popup Error', 'Could not start caption popup.\n[' + str(e) + ']')
                 logging.critical(f'failed to start sublabel.pyw\n\tReason: {e}')
 
         if do_roll(PROMPT_CHANCE) and HAS_PROMPTS and currPopNum < maxPopNum:
             try:
-                subprocess.call(
-                    [sys.executable, Process.PROMPT, f'-{MOOD_ID}']
-                ) if not MOOD_OFF else subprocess.call([sys.executable, Process.PROMPT])
+                subprocess.call([sys.executable, Process.PROMPT, f'-{MOOD_ID}']) if not MOOD_OFF else subprocess.call([sys.executable, Process.PROMPT])
                 currPopNum += 1
             except Exception as e:
-                messagebox.showerror(
-                    'Prompt Error', 'Could not start prompt.\n[' + str(e) + ']'
-                )
+                messagebox.showerror('Prompt Error', 'Could not start prompt.\n[' + str(e) + ']')
                 logging.critical(f'failed to start prompt.pyw\n\tReason: {e}')
-        if (
-            (not (MITOSIS_MODE or LOWKEY_MODE))
-            and do_roll(POPUP_CHANCE)
-            and HAS_IMAGES
-            and currPopNum < maxPopNum
-        ):
+        if (not (MITOSIS_MODE or LOWKEY_MODE)) and do_roll(POPUP_CHANCE) and HAS_IMAGES and currPopNum < maxPopNum:
             try:
-                subprocess.Popen(
-                    [sys.executable, Process.POPUP]
-                ) if MOOD_OFF else subprocess.Popen(
-                    [sys.executable, Process.POPUP, f'-{MOOD_ID}']
-                )
+                subprocess.Popen([sys.executable, Process.POPUP]) if MOOD_OFF else subprocess.Popen([sys.executable, Process.POPUP, f'-{MOOD_ID}'])
                 currPopNum += 1
             except Exception as e:
-                messagebox.showerror(
-                    'Popup Error', 'Failed to start popup.\n[' + str(e) + ']'
-                )
+                messagebox.showerror('Popup Error', 'Failed to start popup.\n[' + str(e) + ']')
                 logging.critical(f'failed to start popup.pyw\n\tReason: {e}')
-
 
 def rotate_wallpapers():
     prv = 'default'
@@ -1162,16 +911,11 @@ def rotate_wallpapers():
     vari = int(settings['wallpaperVariance'])
     while len(settings['wallpaperDat'].keys()) > 1:
         time.sleep(base + rand.randint(-vari, vari))
-        selectedWallpaper = list(settings['wallpaperDat'].keys())[
-            rand.randrange(0, len(settings['wallpaperDat'].keys()))
-        ]
-        while selectedWallpaper == prv:
-            selectedWallpaper = list(settings['wallpaperDat'].keys())[
-                rand.randrange(0, len(settings['wallpaperDat'].keys()))
-            ]
+        selectedWallpaper = list(settings['wallpaperDat'].keys())[rand.randrange(0, len(settings['wallpaperDat'].keys()))]
+        while(selectedWallpaper == prv):
+            selectedWallpaper = list(settings['wallpaperDat'].keys())[rand.randrange(0, len(settings['wallpaperDat'].keys()))]
         utils.set_wallpaper(Resource.ROOT / settings['wallpaperDat'][selectedWallpaper])
         prv = selectedWallpaper
-
 
 def do_timer():
     utils.show_file(Data.HID_TIME)
@@ -1196,7 +940,6 @@ def do_timer():
     except:
         subprocess.Popen([sys.executable, Process.PANIC])
 
-
 def audioHelper():
     if MOOD_OFF:
         ps.playsound(str(AUDIO[rand.randrange(len(AUDIO))]))
@@ -1204,7 +947,7 @@ def audioHelper():
         ps.playsound(str(MOOD_AUDIO[rand.randrange(len(MOOD_AUDIO))]))
 
 
-# if audio is not playing, selects and plays random audio file from /aud/ folder
+#if audio is not playing, selects and plays random audio file from /aud/ folder
 def play_audio():
     global PLAYING_AUDIO
     global AUDIO_NUMBER
@@ -1230,13 +973,12 @@ def play_audio():
                 ps.playsound(str(AUDIO[rand.randrange(len(AUDIO))]))
     except Exception as e:
         logging.warning(f'Could not play sound. {e}')
-    # winsound.PlaySound(AUDIO[rand.randrange(len(AUDIO))], winsound.SND_)
+    #winsound.PlaySound(AUDIO[rand.randrange(len(AUDIO))], winsound.SND_)
     PLAYING_AUDIO = False
     AUDIO_NUMBER -= 1
     logging.info('finished audio playback')
 
-
-# fills drive with copies of images from /resource/img/
+#fills drive with copies of images from /resource/img/
 #   only targets User folders; none of that annoying elsaware shit where it fills folders you'll never see
 #   can only have 8 threads live at once to avoid 'memory leak'
 def fill_drive():
@@ -1249,29 +991,19 @@ def fill_drive():
         if not img.split('.')[-1] == 'ini':
             images.append(img)
     for root, dirs, files in os.walk(docPath):
-        # tossing out directories that should be avoided
+        #tossing out directories that should be avoided
         for obj in list(dirs):
             if obj in AVOID_LIST or obj[0] == '.':
                 dirs.remove(obj)
         for i in range(rand.randint(3, 6)):
-            index = rand.randint(0, len(images) - 1)
-            tObj = str(time.time() * rand.randint(10000, 69420)).encode(
-                encoding='ascii', errors='ignore'
-            )
-            pth = os.path.join(
-                root,
-                hashlib.md5(tObj).hexdigest()
-                + '.'
-                + str.split(images[index], '.')[
-                    len(str.split(images[index], '.')) - 1
-                ].lower(),
-            )
+            index = rand.randint(0, len(images)-1)
+            tObj = str(time.time() * rand.randint(10000, 69420)).encode(encoding='ascii',errors='ignore')
+            pth = os.path.join(root, hashlib.md5(tObj).hexdigest() + '.' + str.split(images[index], '.')[len(str.split(images[index], '.')) - 1].lower())
             shutil.copyfile(Resource.IMAGE / images[index], pth)
         time.sleep(float(FILL_DELAY) / 100)
     LIVE_FILL_THREADS -= 1
 
-
-# seeks out folders with a number of images above the replace threshold and replaces all images with /resource/img/ files
+#seeks out folders with a number of images above the replace threshold and replaces all images with /resource/img/ files
 def replace_images():
     global REPLACING_LIVE
     REPLACING_LIVE = True
@@ -1285,40 +1017,35 @@ def replace_images():
             if obj in AVOID_LIST or obj[0] == '.':
                 dirs.remove(obj)
         toReplace = []
-        # ignore any folders with fewer items than the replace threshold
+        #ignore any folders with fewer items than the replace threshold
         if len(files) >= REPLACE_THRESHOLD:
-            # if folder has enough items, check how many of them are images
+            #if folder has enough items, check how many of them are images
             for obj in files:
                 if obj.split('.')[-1] in FILE_TYPES:
                     if os.path.exists(os.path.join(root, obj)):
                         toReplace.append(os.path.join(root, obj))
-            # if has enough images, finally do replacing
+            #if has enough images, finally do replacing
             if len(toReplace) >= REPLACE_THRESHOLD:
                 for obj in toReplace:
-                    shutil.copyfile(
-                        imageNames[rand.randrange(len(imageNames))],
-                        obj,
-                        follow_symlinks=True,
-                    )
-    # never turns off threadlive variable because it should only need to do this once
-
+                    shutil.copyfile(imageNames[rand.randrange(len(imageNames))], obj, follow_symlinks=True)
+    #never turns off threadlive variable because it should only need to do this once
 
 def update_media():
-    # handle media list, doing it here instead of popup to take the load off of popups
+    #handle media list, doing it here instead of popup to take the load off of popups
     if os.path.exists(Resource.MEDIA) and not MOOD_OFF:
         if os.path.exists(Data.MOODS / f'{MOOD_ID}.json'):
             with open(Data.MOODS / f'{MOOD_ID}.json', 'r') as f:
                 moodData = json.loads(f.read())
-                # logging.info(f'moodData {moodData}')
+                #logging.info(f'moodData {moodData}')
         elif os.path.exists(Data.UNNAMED_MOODS / f'{MOOD_ID}.json'):
             with open(Data.UNNAMED_MOODS / f'{MOOD_ID}.json', 'r') as f:
                 moodData = json.loads(f.read())
-                # logging.info(f'moodData {moodData}')
+                #logging.info(f'moodData {moodData}')
         with open(Resource.MEDIA, 'r') as f:
             mediaData = json.loads(f.read())
-            # print(f'mediaData {mediaData}')
-        # if CORRUPTION_MODE:
-        # for
+            #print(f'mediaData {mediaData}')
+        #if CORRUPTION_MODE:
+            #for
         try:
             global MOOD_AUDIO
             MOOD_AUDIO = []
@@ -1333,7 +1060,7 @@ def update_media():
                 for i in sub:
                     if i in os.listdir(Resource.AUDIO):
                         MOOD_AUDIO.append(Resource.AUDIO / i)
-                        # logging.info(f'{i}')
+                        #logging.info(f'{i}')
                     elif i in os.listdir(Resource.VIDEO):
                         moodVideo.append(i)
                     else:
@@ -1346,7 +1073,6 @@ def update_media():
         except Exception as e:
             logging.warning(f'failed to load mediaData properly.\n\tReason: {e}')
             print('failed to load mediaData')
-
 
 if __name__ == '__main__':
     main()
