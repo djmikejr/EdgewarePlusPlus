@@ -69,42 +69,16 @@ The EdgeWare++ Pack Editor is now live [here](https://github.com/araten10/Edgewa
 
 •*Experimental Linux support that may or may not break in the future (read the section above!)*
 
-## Planned Additions:
+## Planned Additions
 
-•*Giving mitosis a percentage activation slider*
+Planned additions, as well as currently known issues, can now be found on the [issues page](https://github.com/araten10/EdgewarePlusPlus/issues).
 
-•*Rewriting all the old config presets ~~to work with the new version~~, and a few new ones as well!* (turns out the old configs work fine (at least for me), but they could do with a little updating for new settings)
-
-•*Allowing users to write config preset descriptions in the config window*
-
-•*Allowing pack creators to somehow make Edgeware "change over time", for example, getting more depraved or having the themes change the longer it runs. Would likely use the mood system.*
-
-•*Making a demo video/images so people can get an idea of what they're downloading ~~but this might take a while since it requires me to clean my desktop~~*
-
-•*Making some new demo packs showcasing added features, allows me to not only show off my work but also be a horny bastard and browse porn*
-
-I'm also wanting to add features to the pack editor, will probably do that when this is in a state where I feel mostly done with what I wanted to accomplish.
-
-**Suggestions**
-
-Suggestions I got from people who used the software and I thought would be interesting enough to try. Lower priority than my own planned additions, but still something I hope to add (or attempt to) in the future!
-
-•*Randomized settings button*
-
-•*Support for confining edgeware to a single monitor, which actually sounds like a really good idea but i'd want to test it on a few monitor setups and it sounds fairly technical*
-
-•*Windows "stealing focus", forcing you to do things like enter prompts before you're allowed to do anything else*
-
-•*Different folder for long audio files or "BGM", to be able to separate short and longer sounds (or another solution to this if not a folder)*
-
-•*Themes being able to associate with moods*
-
-•*Popup opening/closing sounds, would also theoretically hook into moods as well*
 ## Packs
 
 [**EdgeWare++ Test Pack**](https://mega.nz/file/0acUQarB#QNyaZPkGYOGQgOi_W-up6n14rv_w8NSP-hN16qczC44)
 **Version: 1**
 A test pack featuring a sampler of all (finished) features found in EdgeWare++, and the pack i've been using to test functionality in. Some features are not complete and will be patched in as time goes on.
+
 ## Frequently Asked Questions
 
 >Q: Where do I download more packs?
