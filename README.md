@@ -83,9 +83,15 @@ A test pack featuring a sampler of all (finished) features found in EdgeWare++, 
 
 >Q: Where do I download more packs?
 
-A: Unfortunately, packs are kind of scattered about... Since there is no specific place to congregate EdgeWare packs (to my knowledge), people usually end up posting them to their personal twitters or discord servers. Additionally, some people charge money for their own packs and/or bundle a complete copy of EdgeWare with their pack, making it even harder to give a definite answer to this question
+A: Unfortunately, packs are kind of scattered about... Since there is no specific place to congregate EdgeWare packs (to my knowledge), people usually end up posting them to their personal twitters or discord servers. Additionally, some people charge money for their own packs and/or bundle a complete copy of EdgeWare with their pack, making it even harder to give a definite answer to this question.
 
 There are a few places you can start, however. PetitTournesol's original github page has multiple packs, although they don't support new ++ features. /r/edgingware on reddit is mostly focused to tech support, but there are multiple packs there, including a helpful reference pack. I believe hgoon.booru also has a thread for EdgeWare packs on the forum, but since it's a bit of an obscure booru and requires an account to post, i'm sure many still fall through the cracks.
+
+>Q: Somebody sent me this pack and it's not working! I checked inside of it, and it has an entire copy of EdgeWare with it? Can I put it into my pre-existing EdgeWare installation?
+
+You can go into the resource folder of the pack you got, extract everything inside of it, and zip it with a desired name. This way, you can import the pack normally. If you already have an install of EdgeWare++, it is recommended you do this over using their installation unless it comes from a trusted source. While many people make packs like this to make using EdgeWare simpler for people who have never heard of it before, there's also the possibility of the files being modified to be malicious.
+
+If you know that the pack creator set specific config settings for their EdgeWare installation pack, you can also create a "config.json" file inside your newly created pack zip, and copy all of the contents of their "config.cfg" into it. This will allow you to import their config settings in the *Pack Info* tab, near the bottom.
 
 >Q: Do you plan on making a discord for EdgeWare?
 
