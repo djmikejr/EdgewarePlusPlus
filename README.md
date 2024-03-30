@@ -111,7 +111,13 @@ But also feel free to follow me on twitter, interact with me there, and other su
 
 >Q: Does EdgeWare work on android/mac/ios?
 
-A: I only have plans to develop EdgeWare for windows, and LewdDevelopment is currently only developing EdgeWare for Linux.
+A: I only have plans to develop EdgeWare for windows, and LewdDevelopment is currently only developing EdgeWare for Linux. 
+
+>Q: Are there other programs out there like EdgeWare?
+
+A: The main one that comes to mind is [goonto](https://github.com/dogkisser/goonto), which is similar to EdgeWare but without the need for packs or a python installation (also works on macOS for those of you with the question above this one).
+
+[Walltaker](https://walltaker.joi.how/) is also pretty popular, but is much more social and only focuses on changing your desktop wallpaper.
 
 ## Changelog
 
