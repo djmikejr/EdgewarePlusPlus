@@ -43,7 +43,7 @@ from tkinter import (
 from pathlib import Path
 from PIL import Image, ImageTk
 from utils import utils
-from utils.paths import Defaults, Data, LOG_PATH, Resource
+from utils.paths import Defaults, Data, LOG_PATH, Resource, Process
 from utils.tooltip import CreateToolTip
 
 PATH = Path(__file__).parent
