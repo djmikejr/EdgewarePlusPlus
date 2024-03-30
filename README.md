@@ -139,6 +139,6 @@ But also feel free to follow me on twitter, interact with me there, and other su
 
 A: I only have plans to develop EdgeWare for windows, and LewdDevelopment is currently only developing EdgeWare for Linux.
 
-##Changelog
+## Changelog
 
 The changelog can be viewed [here](CHANGELOG.md).
