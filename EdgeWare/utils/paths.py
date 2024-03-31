@@ -77,7 +77,7 @@ class Data:
 class Defaults:
     ROOT = PATH / 'default_assets'
 
-    CONFIG = PATH / 'configDefault.dat'
+    CONFIG = PATH / 'config_default.json'
 
     CORRUPTION_ABRUPT = ROOT / 'corruption_abruptfade.png'
     CORRUPTION_DEFAULT = ROOT / 'corruption_defaultfade.png'

@@ -24,6 +24,7 @@ from tkinter import messagebox, simpledialog
 from pathlib import Path
 from utils import utils
 from utils.paths import Data, Defaults, Process, Resource
+from utils.settings import load_settings
 
 PATH = Path(__file__).parent
 os.chdir(PATH)
@@ -34,78 +35,13 @@ SYS_ARGS = sys.argv.copy()
 SYS_ARGS.pop(0)
 logging.info(f'args: {SYS_ARGS}')
 
-settings = {}
-#func for loading settings, really just grouping it
-def load_settings():
-    global settings
-    logging.info('loading config settings...')
-    settings = {}
-
-    #creating objects to check vs live config for version updates
-    with open(Defaults.CONFIG) as r:
-        logging.info('reading in default config values')
-        defaultLines = r.readlines()
-        default_setting_keys = defaultLines[0].split(',')
-        default_setting_keys[-1] = default_setting_keys[-1].replace('\n', '')
-        default_setting_values = defaultLines[1].split(',')
-
-    for var in default_setting_keys:
-        settings[var] = default_setting_values[default_setting_keys.index(var)]
-
-    #checking if config file exists and then writing the default config settings to a new file if it doesn't
-    if not os.path.exists(Data.CONFIG):
-        with open(Data.CONFIG, 'w') as f:
-            f.write(json.dumps(settings))
-            logging.warning('could not find config.cfg, wrote new file.')
-
-    #reading in config file
-    with open(Data.CONFIG, 'r') as f:
-        settings = json.loads(f.readline())
-        logging.info('read in settings from config.cfg')
-
-    #if the config version and the version listed in the configdefault version are different to try to update with
-    #new setting tags if any are missing.
-    if settings['version'] != default_setting_values[0]:
-        logging.warning(f'local version {settings["version"]} does not match default version, config will be updated')
-        regen_settings = {}
-        for obj in default_setting_keys:
-            try:
-                regen_settings[obj] = settings[obj]
-            except:
-                logging.info(f'added missing key: {obj}')
-                regen_settings[obj] = default_setting_values[default_setting_keys.index(obj)]
-        regen_settings['version'] = default_setting_values[0]
-        regen_settings = json.loads(str(regen_settings).replace('\'', '"'))
-        settings = regen_settings
-        with open(Data.CONFIG, 'w') as f:
-            f.write(str(regen_settings).replace('\'', '"'))
-            logging.info('wrote updated config to config.cfg')
-
-    #handling proper initialization of wallpapers
-    default_wallpaper_dict = {'default': 'wallpaper.png'}
-    logging.info('converting wallpaper string to dict')
-    try:
-        if settings['wallpaperDat'] == 'WPAPER_DEF':
-            logging.info('default wallpaper data used')
-            settings['wallpaperDat'] = default_wallpaper_dict
-        else:
-            if type(settings['wallpaperDat']) == dict:
-                logging.info('wallpaperdat already dict')
-                print('passed')
-            else:
-                settings['wallpaperDat'] = ast.literal_eval(settings['wallpaperDat'].replace('\\', '/'))
-                logging.info('parsed wallpaper dict from string')
-    except Exception as e:
-        settings['wallpaperDat'] = default_wallpaper_dict
-        logging.warning(f'failed to parse wallpaper from string, using default value instead\n\tReason: {e}')
-
 #load settings, if first run open options, then reload options from file
-load_settings()
+settings = load_settings(logging)
 if not settings['is_configed']==1:
     logging.info('running config for first setup, is_configed flag is false.')
     subprocess.run([sys.executable, 'config.pyw'])
     logging.info('reloading settings')
-    load_settings()
+    settings = load_settings(logging)
 
 AVOID_LIST = ['EdgeWare', 'AppData'] #default avoid list for fill/replace
 FILE_TYPES = ['png', 'jpg', 'jpeg'] #recognized file types for replace

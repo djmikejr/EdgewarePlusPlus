@@ -18,6 +18,7 @@ from pathlib import Path
 from PIL import Image, ImageTk
 from utils import utils
 from utils.paths import Defaults, Data, LOG_PATH, Resource, Process
+from utils.settings import load_settings
 from utils.tooltip import CreateToolTip
 
 PATH = Path(__file__).parent
@@ -158,74 +159,12 @@ local_version = '0.0.0_NOCONNECT'
 UPDCHECK_PP_URL = 'http://raw.githubusercontent.com/araten10/EdgewarePlusPlus/main/EdgeWare/configDefault.dat'
 local_pp_version = '0.0.0_NOCONNECT'
 
-logging.info('opening configDefault')
-with open(Defaults.CONFIG) as r:
-    defaultSettingLines = r.readlines()
-    varNames = defaultSettingLines[0].split(',')
-    varNames[-1] = varNames[-1].replace('\n', '')
-    defaultVars = defaultSettingLines[1].split(',')
-logging.info(f'done with configDefault\n\tdefault={defaultVars}')
+settings = load_settings(logging)
+defaultSettings = {}
+with open(Defaults.CONFIG, 'r') as f:
+    defaultSettings = json.loads(f.read())
 
-local_version = defaultVars[0]
-local_pp_version = defaultVars[1]
-
-settings = {}
-for var in varNames:
-    settings[var] = defaultVars[varNames.index(var)]
-
-defaultSettings = settings.copy()
-
-if not os.path.exists(Data.CONFIG):
-    logging.warning('no "config.cfg" file found, creating new "config.cfg".')
-    with open(Data.CONFIG, 'w') as f:
-        f.write(json.dumps(settings))
-    logging.info('created new config file.')
-
-with open(Data.CONFIG, 'r') as f:
-    logging.info('json loading settings')
-    try:
-        settings = json.loads(f.readline())
-    except Exception as e:
-        logging.fatal(f'could not load settings.\n\nReason: {e}')
-        exit()
-
-
-#inserts new settings if versions are literally different
-# or if the count of settings between actual and default is different
-if settings['version'] != defaultVars[0] or len(settings) != len(defaultSettings):
-    logging.warning('version difference/settingJson len mismatch, regenerating new settings with missing keys...')
-    tempSettingDict = {}
-    for name in varNames:
-        try:
-            tempSettingDict[name] = settings[name]
-        except:
-            tempSettingDict[name] = defaultVars[varNames.index(name)]
-            logging.info(f'added missing key: {name}')
-    tempSettingDict['version'] = defaultVars[0]
-    settings = tempSettingDict.copy()
-    with open(Data.CONFIG, 'w') as f:
-        #bugfix for the config crash issue
-        tempSettingDict['wallpaperDat'] = str(tempSettingDict['wallpaperDat']).replace("'", '%^%')
-        tempSettingString = str(tempSettingDict).replace("'", '"')
-        f.write(tempSettingString.replace("%^%", "'"))
-        logging.info('wrote regenerated settings.')
-
-logging.info('converting wallpaper dict string.')
-DEFAULT_WALLPAPERDAT = {'default': 'wallpaper.png'}
-try:
-    if settings['wallpaperDat'] == 'WPAPER_DEF':
-        logging.info('default wallpaper dict inserted.')
-        settings['wallpaperDat'] = DEFAULT_WALLPAPERDAT
-    else:
-        #print(settings['wallpaperDat'])
-        if type(settings['wallpaperDat']) == dict:
-            logging.info('wallpaper object already dict?')
-        else:
-            settings['wallpaperDat'] = ast.literal_eval(settings['wallpaperDat'].replace('\\', '/'))
-            logging.info('evaluated settings wallpaper str to dict.')
-except Exception as e:
-    settings['wallpaperDat'] = DEFAULT_WALLPAPERDAT
-    logging.warning(f'failed to process wallpaper dict.\n\tReason: {e}\nused default wallpaper dict instead.')
+varNames = defaultSettings.keys()
 
 pass_ = ''
 
@@ -486,7 +425,7 @@ def show_window():
             logging.warning(f'failed config var loading.\n\tReason: {e}')
             emergencySettings = {}
             for var in varNames:
-                emergencySettings[var] = defaultVars[varNames.index(var)]
+                emergencySettings[var] = defaultSettings[var]
             with open(Data.CONFIG, 'w') as f:
                 f.write(json.dumps(emergencySettings))
             with open(Data.CONFIG, 'r') as f:
@@ -765,13 +704,13 @@ def show_window():
     #zipDropdown = OptionMenu(tabGeneral, zipDropVar, *DOWNLOAD_STRINGS)
     #zipDownloadButton = Button(tabGeneral, text='Download Zip', command=lambda: downloadZip(zipDropVar.get(), zipLabel))
     #zipLabel = Label(zipGitFrame, text=f'Current Zip:\n{pickZip()}', background='lightgray', wraplength=100)
-    local_verLabel = Label(verFrame, text=f'EdgeWare Local Version:\n{defaultVars[0]}')
-    web_verLabel = Label(verFrame, text=f'EdgeWare GitHub Version:\n{webv}', bg=(BUTTON_FACE if (defaultVars[0] == webv) else 'red'))
+    local_verLabel = Label(verFrame, text=f'EdgeWare Local Version:\n{defaultSettings["version"]}')
+    web_verLabel = Label(verFrame, text=f'EdgeWare GitHub Version:\n{webv}', bg=(BUTTON_FACE if (defaultSettings["version"] == webv) else 'red'))
     openGitButton = Button(zipGitFrame, text='Open Github (EdgeWare Base)', command=lambda: webbrowser.open('https://github.com/PetitTournesol/Edgeware'))
 
     verPlusFrame = Frame(infoHostFrame)
-    local_verPlusLabel = Label(verPlusFrame, text=f'EdgeWare++ Local Version:\n{defaultVars[1]}')
-    web_verPlusLabel = Label(verPlusFrame, text=f'EdgeWare++ GitHub Version:\n{webvpp}', bg=(BUTTON_FACE if (defaultVars[1] == webvpp) else 'red'))
+    local_verPlusLabel = Label(verPlusFrame, text=f'EdgeWare++ Local Version:\n{defaultSettings["versionplusplus"]}')
+    web_verPlusLabel = Label(verPlusFrame, text=f'EdgeWare++ GitHub Version:\n{webvpp}', bg=(BUTTON_FACE if (defaultSettings["versionplusplus"] == webvpp) else 'red'))
     openGitPlusButton = Button(zipGitFrame, text='Open Github (EdgeWare++)', command=lambda: webbrowser.open('https://github.com/araten10/EdgewarePlusPlus'))
 
     infoHostFrame.pack(fill='x')
