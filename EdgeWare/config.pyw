@@ -154,10 +154,7 @@ if info_id == '0' and os.path.exists(Resource.ROOT):
 
 #url to check online version
 UPDCHECK_URL = 'http://raw.githubusercontent.com/PetitTournesol/Edgeware/main/EdgeWare/configDefault.dat'
-local_version = '0.0.0_NOCONNECT'
-
 UPDCHECK_PP_URL = 'http://raw.githubusercontent.com/araten10/EdgewarePlusPlus/main/EdgeWare/configDefault.dat'
-local_pp_version = '0.0.0_NOCONNECT'
 
 settings = load_settings(logging)
 defaultSettings = {}
@@ -165,6 +162,8 @@ with open(Defaults.CONFIG, 'r') as f:
     defaultSettings = json.loads(f.read())
 
 varNames = defaultSettings.keys()
+local_version = defaultSettings['version']
+local_pp_version = defaultSettings['versionplusplus']
 
 pass_ = ''
 
