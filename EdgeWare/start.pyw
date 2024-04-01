@@ -39,7 +39,7 @@ logging.info(f'args: {SYS_ARGS}')
 settings = load_settings(logging)
 if not settings['is_configed']==1:
     logging.info('running config for first setup, is_configed flag is false.')
-    subprocess.run([sys.executable, 'config.pyw'])
+    subprocess.run([sys.executable, Process.CONFIG])
     logging.info('reloading settings')
     settings = load_settings(logging)
 
