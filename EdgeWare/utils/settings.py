@@ -26,7 +26,7 @@ def load_settings(logging):
 
     # If the length of the settings are different, attempt to add any missing
     # settings from the defaults to the actual config
-    if len(settings['versionplusplus']) != len(default_settings['versionplusplus']):
+    if len(settings) != len(default_settings):
         logging.warning('setting JSON len mismatch, regenerating new settings with missing keys...')
         for key in default_settings:
             if key not in settings:
