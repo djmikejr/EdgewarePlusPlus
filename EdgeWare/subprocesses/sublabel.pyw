@@ -1,19 +1,19 @@
 import tkinter as tk
 import json
 import random
-import pathlib
 import sys
 import os
 import logging
 import random as rand
 from screeninfo import get_monitors
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).parent.parent))
 from utils import utils
 from utils.paths import Data, Resource
 
 SYS_ARGS = sys.argv.copy()
 SYS_ARGS.pop(0)
-PATH = str(pathlib.Path(__file__).parent.absolute())
-os.chdir(PATH)
 
 utils.init_logging(logging, 'sublabel')
 #This sublabel.pyw originally provided very generously by u/basicmo!

@@ -12,11 +12,11 @@ class Process:
     PANIC = PATH / 'panic.pyw'
     START = PATH / 'start.pyw'
 
-    DISCORD = PATH / 'discord_handler.pyw'
-    POPUP = PATH / 'popup.pyw'
-    PROMPT = PATH / 'prompt.pyw'
-    STARTUP = PATH / 'startup_flair.pyw'
-    SUBLABEL = PATH / 'sublabel.pyw'
+    DISCORD = PATH / 'subprocesses' / 'discord_handler.pyw'
+    POPUP = PATH / 'subprocesses' / 'popup.pyw'
+    PROMPT = PATH / 'subprocesses' / 'prompt.pyw'
+    STARTUP = PATH / 'subprocesses' / 'startup_flair.pyw'
+    SUBLABEL = PATH / 'subprocesses' / 'sublabel.pyw'
 
 @dataclass
 class Resource:
