@@ -80,7 +80,7 @@ class Defaults:
     CORRUPTION_ABRUPT = ROOT / 'corruption_abruptfade.png'
     CORRUPTION_DEFAULT = ROOT / 'corruption_defaultfade.png'
     CORRUPTION_NOISE = ROOT / 'corruption_noisefade.png'
-    CONFIG = ROOT / 'config_default.json'
+    CONFIG = ROOT / 'default_config.json'
     CONFIG_ICON = ROOT / 'config_icon.ico'
     ICON = ROOT / 'default_icon.ico'
     IMAGE = ROOT / 'default_image.png'

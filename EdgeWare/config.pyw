@@ -154,7 +154,7 @@ if info_id == '0' and os.path.exists(Resource.ROOT):
 
 #url to check online version
 UPDCHECK_URL = 'http://raw.githubusercontent.com/PetitTournesol/Edgeware/main/EdgeWare/configDefault.dat'
-UPDCHECK_PP_URL = 'http://raw.githubusercontent.com/araten10/EdgewarePlusPlus/main/EdgeWare/configDefault.dat'
+UPDCHECK_PP_URL = 'http://raw.githubusercontent.com/araten10/EdgewarePlusPlus/main/EdgeWare/default_assets/default_config.json'
 
 settings = load_settings(logging)
 defaultSettings = {}
@@ -465,8 +465,8 @@ def show_window():
     ctutorialstart_group = []
     ctutorialtransition_group = []
 
-    webv = getLiveVersion(UPDCHECK_URL, 0)
-    webvpp = getLiveVersion(UPDCHECK_PP_URL, 1)
+    webv = getLiveVersion(UPDCHECK_URL, False)
+    webvpp = getLiveVersion(UPDCHECK_PP_URL, True)
 
     #tab display code start
     tabMaster    = ttk.Notebook(root)       #tab manager
@@ -2841,13 +2841,16 @@ def safeCheck(varList:list[StringVar | IntVar | BooleanVar], nameList:list[str])
 def validateBooru(name:str) -> bool:
     return requests.get(BOORU_URL.replace(BOORU_FLAG, name)).status_code == 200
 
-def getLiveVersion(url:str, id:int) -> str:
+def getLiveVersion(url:str, pp:bool) -> str:
     test = settings['toggleInternet']
-    if settings['toggleInternet'] == 0 or settings['toggleInternet'] == '0':
+    if test == 0 or test == '0':
         try:
             logging.info('fetching github version')
             with open(urllib.request.urlretrieve(url)[0], 'r') as liveDCfg:
-                return(liveDCfg.read().split('\n')[1].split(',')[id])
+                if pp:
+                    return(json.loads(liveDCfg.read())['versionplusplus'])
+                else:
+                    return(liveDCfg.read().split('\n')[1].split(',')[0])
         except Exception as e:
             logging.warning(f'failed to fetch github version.\n\tReason: {e}')
             return 'Could not check version.'
