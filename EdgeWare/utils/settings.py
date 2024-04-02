@@ -1,3 +1,4 @@
+import ast
 import json
 import os
 import shutil
@@ -35,5 +36,11 @@ def load_settings(logging):
         with open(Data.CONFIG, 'w') as f:
             f.write(json.dumps(settings))
             logging.info('wrote updated config to config.cfg')
+
+    # TODO: Wallpapers should be stored as JSON objects
+    try:
+        settings['wallpaperDat'] = ast.literal_eval(settings['wallpaperDat'])
+    except Exception as e:
+        logging.warning(f'failed to parse wallpaper from string\n\tReason: {e}')
 
     return settings

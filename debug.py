@@ -34,6 +34,6 @@ while True:
         subprocess.run([sys.executable] + processes[num - 1])
         print('Done')
     else:
-        print('Input must be between 1 and 6')
+        print('Input must be between 0 and 6')
 
 print('Goodbye!')
