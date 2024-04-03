@@ -84,6 +84,7 @@ class Defaults:
     CONFIG_ICON = ROOT / 'config_icon.ico'
     ICON = ROOT / 'default_icon.ico'
     IMAGE = ROOT / 'default_image.png'
+    PANIC_ICON = ROOT / 'panic_icon.ico'
     PANIC_WALLPAPER = ROOT / 'default_win10.jpg'
     SPIRAL = ROOT / 'default_spiral.gif'
     SPLASH = ROOT / 'loading_splash.png'

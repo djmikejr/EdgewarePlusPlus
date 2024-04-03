@@ -1,10 +1,12 @@
 import codecs
-from configparser import ConfigParser
 import os
-from pathlib import Path
 import shlex
 import sys
 import subprocess
+import json
+from configparser import ConfigParser
+from pathlib import Path
+from utils.paths import Defaults, Process
 
 def panic_script():
     subprocess.run('for pid in $(ps -u $USER -ef | grep -E "python.* *+.pyw" | awk \'{print $2}\'); do echo $pid; kill -9 $pid; done', shell=True)
@@ -301,44 +303,25 @@ def does_desktop_shortcut_exist(name: str):
         os.path.expanduser('~/Desktop') / file.with_name(f'{file.name}.desktop')
     ).exists()
 
-def make_shortcut(
-    path: Path,
-    icon: Path | str,
-    script_or_command: str | list[str],
-    title: str | None = None,
-    file_name: str | None = None,
-) -> bool:
-    if title is None:
-        if isinstance(script_or_command, str):
-            title = script_or_command
-        elif isinstance(icon, str):
-            title = icon
-        else:
-            title = icon.name.replace('_icon', '')
-
-    if isinstance(icon, str):
-        icon = path / 'default_assets' / f'{icon}_icon.ico'
-
-    if file_name is None:
-        file_name = title.lower()
-
-    if isinstance(script_or_command, str):
-        script_path = str((path / f'{script_or_command}').absolute())
-        script_or_command = [sys.executable, script_path]
+def make_shortcut(title: str, process: Path, icon: Path, location: Path | None = None) -> bool:
+    with open(Defaults.CONFIG, 'r') as f:
+        default_settings = json.loads(f.read())
+        version = default_settings['versionplusplus']
 
     shortcut_content = f'''[Desktop Entry]
-Version=1.0
+Version={version}
 Name={title}
-Exec={shlex.join(script_or_command)}
-Icon={str(icon.absolute())}
+Exec={shlex.join([str(sys.executable), str(process)])}
+Icon={icon}
 Terminal=false
 Type=Application
 Categories=Application;'''
 
-    file_name = f'{file_name}.desktop'
-    desktop_file = Path(os.path.expanduser('~/Desktop')) / file_name
+    file_name = f'{title.lower()}.desktop'
+    file = (location if location else Path(os.path.expanduser('~/Desktop'))) / file_name
+
     try:
-        desktop_file.write_text(shortcut_content)
+        file.write_text(shortcut_content)
         if _get_desktop_environment() == 'gnome':
             subprocess.run(
                 [
@@ -353,25 +336,12 @@ Categories=Application;'''
         return False
     return True
 
-# FIXME: Shouldn't be started with profile as it is not made to launch GUI application.
-# Another problem is that VSCODE run .profile, and so run edgeware on start. Tempfix
-def toggle_run_at_startup(path: Path, state: bool):
-    command = f'{sys.executable} {str((path / "start.pyw").absolute())}&'
-
-    edgeware_content = f'''############## EDGEWARE ##############
-if [[ ! '${{GIO_LAUNCHED_DESKTOP_FILE}}' == '/usr/share/applications/code.desktop' ]] && [[ ! '${{TERM_PROGRAM}}' == 'vscode' ]]; then
-    {command}
-fi
-############## EDGEWARE ##############
-'''
-
-    edgeware_profile = Path(os.path.expanduser('~/.profile'))
-
-    profile = edgeware_profile.read_text()
-    edgeware_profile.with_name('.profile_ew_backup').write_text(profile)
-
-    if state:
-        profile += edgeware_content
-    else:
-        profile = profile.replace(edgeware_content, '')
-    edgeware_profile.write_text(profile)
+def toggle_run_at_startup(state: bool):
+    autostart_path = Path(os.path.expanduser('~/.config/autostart'))
+    try:
+        if state:
+            make_shortcut('Edgeware', Process.START, Defaults.ICON, autostart_path)
+        else:
+            os.remove(autostart_path / 'edgeware.desktop')
+    except Exception as e:
+        logging.warning('failed to toggle autostart')

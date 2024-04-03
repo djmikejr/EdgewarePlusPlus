@@ -286,11 +286,11 @@ if SHOW_ON_DISCORD:
 #making missing desktop shortcuts
 if DESKTOP_ICONS:
     if not utils.does_desktop_shortcut_exist('Edgeware'):
-        utils.make_shortcut(PATH, 'default', 'start.pyw', 'Edgeware')
+        utils.make_shortcut('Edgeware', Process.START, Defaults.ICON)
     if not utils.does_desktop_shortcut_exist('Config'):
-        utils.make_shortcut(PATH, 'config', 'config.pyw', 'Config')
+        utils.make_shortcut('Config', Process.CONFIG, Defaults.CONFIG_ICON)
     if not utils.does_desktop_shortcut_exist('Panic'):
-        utils.make_shortcut(PATH, 'panic', 'panic.pyw', 'Panic')
+        utils.make_shortcut('Panic', Process.PANIC, Defaults.PANIC_ICON)
 
 if LOADING_FLAIR and (__name__ == "__main__"):
     logging.info('started loading flair')

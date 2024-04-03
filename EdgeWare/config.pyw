@@ -2730,10 +2730,10 @@ def write_save(varList:list[StringVar | IntVar | BooleanVar], nameList:list[str]
     settings['wallpaperDat'] = f'{settings["wallpaperDat"]}'
     settings['is_configed'] = 1
 
-    utils.toggle_run_at_startup(PATH, varList[nameList.index('start_on_logon')].get())
+    utils.toggle_run_at_startup(varList[nameList.index('start_on_logon')].get())
 
     if int(varList[nameList.index('timerMode')].get()) == 1:
-        #utils.toggle_run_at_startup(PATH, True)
+        #utils.toggle_run_at_startup(True)
 
         #revealing hidden files
         utils.show_file(Data.PASS_HASH)
@@ -2753,7 +2753,7 @@ def write_save(varList:list[StringVar | IntVar | BooleanVar], nameList:list[str]
     else:
         try:
             if not varList[nameList.index('start_on_logon')].get():
-                utils.toggle_run_at_startup(PATH, False)
+                utils.toggle_run_at_startup(False)
             utils.show_file(Data.PASS_HASH)
             utils.show_file(Data.HID_TIME)
             os.remove(Data.PASS_HASH)
