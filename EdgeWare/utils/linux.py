@@ -4,6 +4,7 @@ import shlex
 import sys
 import subprocess
 import json
+import logging
 from configparser import ConfigParser
 from pathlib import Path
 from utils.paths import Defaults, Process
