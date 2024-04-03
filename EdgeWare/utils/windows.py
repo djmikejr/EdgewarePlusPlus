@@ -61,7 +61,7 @@ def make_shortcut(title: str, process: Path, icon: Path, location: Path | None =
         ]) # write built shortcut script text to temporary batch file
 
     try:
-        logging.info(f'making shortcut to {script}')
+        logging.info(f'making shortcut to {process.name}')
         subprocess.run(bat.name)
         success = True
     except Exception as e:
