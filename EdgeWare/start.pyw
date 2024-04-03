@@ -269,22 +269,34 @@ except Exception as e:
     logging.fatal(f'failed to unpack resource zip or read default resources.\n\tReason:{e}')
     os.kill(os.getpid(), 9)
 
-#writing corruption file if it doesn't exist/wiping it if the mode isn't on launch
+corruptionData = {}
 if CORRUPTION_MODE:
     try:
+        #read and save corruption data
+        with open(Resource.CORRUPTION, 'r') as f:
+            corruptionData = json.loads(f.read())
+            print(corruptionData["moods"]["1"]["add"])
+        #writing corruption file if it doesn't exist/wiping it if the mode isn't on launch
         if not os.path.exists(Data.ROOT):
             os.mkdir(Data.ROOT)
-            #the launches will reset when the user specifies in the config, or a new pack is loaded
-            if not os.path.exists(Data.CORRUPTION_LAUNCHES):
-                with open(Data.CORRUPTION_LAUNCHES, 'w') as f:
-                    f.write('0')
-            with open(Data.CORRUPTION_POPUPS, 'w') as f:
+        #the launches will reset when the user specifies in the config, or a new pack is loaded
+        if not os.path.exists(Data.CORRUPTION_LAUNCHES):
+            with open(Data.CORRUPTION_LAUNCHES, 'w') as f:
                 f.write('0')
-            with open(Data.CORRUPTION_LEVEL, 'w') as f:
-                f.write('0')
+        with open(Data.CORRUPTION_POPUPS, 'w') as f:
+            f.write('0')
+        with open(Data.CORRUPTION_LEVEL, 'w') as f:
+            if CORRUPTION_PURITY:
+                #purity mode starts at max value and works backwards
+                f.write(str(len(corruptionData["moods"].keys())))
+            else:
+                #starts at 1 and not 0 for simplicity's sake
+                f.write('1')
+
     except Exception as e:
-        print(f'error loading corruption. {e}')
-        logging.warning(f'failed to initialize corruption properly.\n\tReason: {e}')
+        messagebox.showerror('Launch Error', 'Could not launch Edgeware due to corruption initialization failing.\n[' + str(e) + ']')
+        logging.fatal(f'failed to initialize corruption properly.\n\tReason: {e}')
+        os.kill(os.getpid(), 9)
 
 HAS_PROMPTS = False
 WEB_JSON_FOUND = False
@@ -487,8 +499,10 @@ def main():
     except Exception as e:
         logging.warning(f'failed to clean or create data files\n\tReason: {e}')
         print('failed to clean or create data files')
-
-    update_media()
+    corruptedList = []
+    if CORRUPTION_MODE:
+        corruptedList = update_corruption()
+    update_media(corruptedList)
 
     #do downloading for booru stuff
     if settings.get('downloadEnabled') == 1:
@@ -1017,23 +1031,64 @@ def replace_images():
                 for obj in toReplace:
                     shutil.copyfile(imageNames[rand.randrange(len(imageNames))], obj, follow_symlinks=True)
     #never turns off threadlive variable because it should only need to do this once
+def update_corruption():
+    try:
+        corruptList = []
+        with open(Resource.CORRUPTION, 'r') as f:
+            corruptionData = json.loads(f.read())
+        with open(Data.CORRUPTION_LEVEL, 'r') as f:
+            corruptionLevel = int(f.read())
+        #haven't tested yet could not work
+        if not CORRUPTION_PURITY:
+            i = 1
+            while i <= corruptionLevel:
+                for mood in corruptionData["moods"][str(i)]["remove"]:
+                    if mood in corruptList:
+                        del corruptList[mood]
+                for mood in corruptionData["moods"][str(i)]["add"]:
+                    if mood not in corruptList:
+                        corruptList.append(mood)
+                i += 1
+        else:
+            i = len(corruptionData["moods"].keys())
+            while i >= corruptionLevel:
+                for mood in corruptionData["moods"][str(i)]["remove"]:
+                    if mood in corruptList:
+                        del corruptList[mood]
+                for mood in corruptionData["moods"][str(i)]["add"]:
+                    if mood not in corruptList:
+                        corruptList.append(mood)
+                i -= 1
+        print(f'corruption now at level {corruptionLevel}: {corruptList}')
+        return corruptList
+    except Exception as e:
+        logging.warning(f'failed to update corruption.\n\tReason: {e}')
+        print(f'failed to update corruption. {e}')
 
-def update_media():
+def update_media(corrlist:list):
     #handle media list, doing it here instead of popup to take the load off of popups
     if os.path.exists(Resource.MEDIA) and not MOOD_OFF:
         if os.path.exists(Data.MOODS / f'{MOOD_ID}.json'):
             with open(Data.MOODS / f'{MOOD_ID}.json', 'r') as f:
                 moodData = json.loads(f.read())
-                #logging.info(f'moodData {moodData}')
+                #print(f'moodData {moodData}')
         elif os.path.exists(Data.UNNAMED_MOODS / f'{MOOD_ID}.json'):
             with open(Data.UNNAMED_MOODS / f'{MOOD_ID}.json', 'r') as f:
                 moodData = json.loads(f.read())
-                #logging.info(f'moodData {moodData}')
+                #print(f'moodData {moodData}')
         with open(Resource.MEDIA, 'r') as f:
             mediaData = json.loads(f.read())
-            #print(f'mediaData {mediaData}')
-        #if CORRUPTION_MODE:
-            #for
+            print(f'mediaData {mediaData}')
+        if CORRUPTION_MODE and corrlist:
+            try:
+                corruptedMedia = mediaData
+                for mood in list(mediaData):
+                    if mood not in corrlist:
+                        corruptedMedia.pop(mood)
+                print(f'corruptedMedia {corruptedMedia}')
+            except Exception as e:
+                logging.warning(f'failed to compare corruption list to mood list.\n\tReason:{e}')
+                print(f'failed to compare corruption. {e}')
         try:
             global MOOD_AUDIO
             MOOD_AUDIO = []
@@ -1053,14 +1108,14 @@ def update_media():
                         moodVideo.append(i)
                     else:
                         mergedList.append(i)
-
+            print(mergedList)
             with open(Data.MEDIA_IMAGES, 'w') as f:
                 f.write(json.dumps(mergedList))
             with open(Data.MEDIA_VIDEO, 'w') as f:
                 f.write(json.dumps(moodVideo))
         except Exception as e:
             logging.warning(f'failed to load mediaData properly.\n\tReason: {e}')
-            print('failed to load mediaData')
+            print(f'failed to load mediaData. {e}')
 
 if __name__ == '__main__':
     main()
