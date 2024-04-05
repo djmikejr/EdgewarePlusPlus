@@ -39,6 +39,12 @@ def does_desktop_shortcut_exist(name: str):
         os.path.expanduser('~/Desktop') / file.with_name(f'{file.name}.lnk')
     ).exists()
 
+def _remove_username(e):
+    return str(e).lower().replace(
+        os.environ['USERPROFILE'].lower().replace('\\', '\\\\'),
+        '[USERNAME_REDACTED]'
+    )
+
 def make_shortcut(title: str, process: Path, icon: Path, location: Path | None = None) -> bool:
     success = False
 
@@ -65,9 +71,8 @@ def make_shortcut(title: str, process: Path, icon: Path, location: Path | None =
         subprocess.run(bat.name)
         success = True
     except Exception as e:
-        print('failed')
         logging.warning(
-            f'failed to call or remove temp batch file for making shortcuts\n\tReason: {e}'
+            f'failed to call or remove temp batch file for making shortcuts\n\tReason: {_remove_username(e)}'
         )
 
     if os.path.exists(bat.name):
@@ -88,6 +93,4 @@ def toggle_run_at_startup(state: bool):
             os.remove(startup_path / 'edgeware.lnk')
             logging.info('toggled startup run off.')
     except Exception as e:
-        errText = str(e).lower().replace(os.environ['USERPROFILE'].lower().replace('\\', '\\\\'), '[USERNAME_REDACTED]')
-        logging.warning(f'failed to toggle startup bat.\n\tReason: {errText}')
-        print('uwu')
+        logging.warning(f'failed to toggle startup bat.\n\tReason: {_remove_username(e)}')
