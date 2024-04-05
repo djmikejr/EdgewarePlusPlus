@@ -4,7 +4,7 @@ import subprocess
 import tempfile
 import logging
 from pathlib import Path
-from utils.paths import Process
+from utils.paths import Defaults, Process
 
 user = ctypes.windll.user32
 
