@@ -371,7 +371,7 @@ class TrayHandler:
                     #revealing hidden files
                     try:
                         utils.show_file(Data.PASS_HASH)
-                        utils.show_file(Data.PASS_HASH)
+                        utils.show_file(Data.HID_TIME)
                         os.remove(Data.PASS_HASH)
                         os.remove(Data.HID_TIME)
                         subprocess.Popen([sys.executable, Process.PANIC])
