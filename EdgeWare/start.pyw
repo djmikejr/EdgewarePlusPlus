@@ -1047,7 +1047,6 @@ def update_corruption():
             corruptionData = json.loads(f.read())
         with open(Data.CORRUPTION_LEVEL, 'r') as f:
             corruptionLevel = int(f.read())
-        #haven't tested yet could not work
         if not CORRUPTION_PURITY:
             i = 1
             while i <= corruptionLevel:
@@ -1059,6 +1058,17 @@ def update_corruption():
                         corruptList.append(mood)
                 i += 1
         else:
+            #generate initial list, as if corruption has run through every level
+            i = 1
+            while i <= len(corruptionData["moods"].keys()):
+                for mood in corruptionData["moods"][str(i)]["remove"]:
+                    if mood in corruptList:
+                        corruptList.remove(mood)
+                for mood in corruptionData["moods"][str(i)]["add"]:
+                    if mood not in corruptList:
+                        corruptList.append(mood)
+                i += 1
+            #actually run purity mode normally
             i = len(corruptionData["moods"].keys())
             while i >= corruptionLevel:
                 for mood in corruptionData["moods"][str(i)]["remove"]:
