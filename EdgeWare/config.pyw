@@ -1594,6 +1594,10 @@ def show_window():
             toggleAssociateSettings_manual(True, ctutorialtransition_group, 'lime green', 'forest green')
             toggleAssociateSettings(True, ctutorialstart_group)
             triggerHelper(corruptionTriggerVar.get(), True)
+        else:
+            toggleAssociateSettings(True, ctutorialstart_group)
+            toggleAssociateSettings(True, ctutorialtransition_group)
+            triggerHelper(corruptionTriggerVar.get(), False)
         toggleAssociateSettings(os.path.isfile(Resource.CORRUPTION), corruptionEnabled_group)
 
     corruptionTabMaster.bind('<<NotebookTabChanged>>', corruptionTutorialHelper)
