@@ -24,6 +24,7 @@ from tkinter import messagebox, simpledialog
 from pathlib import Path
 from utils import utils
 from utils.paths import Data, Defaults, Process, Resource
+import traceback
 
 PATH = Path(__file__).parent
 os.chdir(PATH)
@@ -189,9 +190,9 @@ CORRUPTION_MODE = int(settings['corruptionMode']) == 1
 CORRUPTION_FADE = settings['corruptionFadeType']
 CORRUPTION_TRIGGER = settings['corruptionTrigger']
 #adding all three as individual vars instead of checking for trigger type because of an idea: randomized corruption per-launch?
-CORRUPTION_TIME = settings['corruptionTime']
-CORRUPTION_POPUPS = settings['corruptionPopups']
-CORRUPTION_LAUNCHES = settings['corruptionLaunches']
+CORRUPTION_TIME = int(settings['corruptionTime'])
+CORRUPTION_POPUPS = int(settings['corruptionPopups'])
+CORRUPTION_LAUNCHES = int(settings['corruptionLaunches'])
 
 CORRUPTION_DEVMODE = int(settings['corruptionDevMode']) == 1
 CORRUPTION_WALLCYCLE = int(settings['corruptionWallpaperCycle']) == 1
@@ -228,6 +229,7 @@ hiberWait = thread.Event()
 wallpaperWait = thread.Event()
 runningHibernate = thread.Event()
 pumpScareAudio = thread.Event()
+corruptionWait = thread.Event()
 
 #start init portion, check resources, config, etc.
 try:
@@ -499,8 +501,11 @@ def main():
     except Exception as e:
         logging.warning(f'failed to clean or create data files\n\tReason: {e}')
         print('failed to clean or create data files')
+
+    #initial corruption setup and mood calibration
     corruptedList = []
     if CORRUPTION_MODE:
+        thread.Thread(target=lambda: corruption_timer(len(corruptionData["moods"].keys()))).start()
         corruptedList = update_corruption()
     update_media(corruptedList)
 
@@ -801,6 +806,10 @@ def annoyance():
         if REPLACE_MODE and not REPLACING_LIVE:
             thread.Thread(target=replace_images).start()
         time.sleep(float(DELAY) / 1000.0)
+        if CORRUPTION_MODE:
+            corruptedList = []
+            corruptedList = update_corruption()
+            update_media(corruptedList)
 
 #independently attempt to do all active settings with probability equal to their freq value
 def roll_for_initiative():
@@ -1044,7 +1053,7 @@ def update_corruption():
             while i <= corruptionLevel:
                 for mood in corruptionData["moods"][str(i)]["remove"]:
                     if mood in corruptList:
-                        del corruptList[mood]
+                        corruptList.remove(mood)
                 for mood in corruptionData["moods"][str(i)]["add"]:
                     if mood not in corruptList:
                         corruptList.append(mood)
@@ -1054,7 +1063,7 @@ def update_corruption():
             while i >= corruptionLevel:
                 for mood in corruptionData["moods"][str(i)]["remove"]:
                     if mood in corruptList:
-                        del corruptList[mood]
+                        corruptList.remove(mood)
                 for mood in corruptionData["moods"][str(i)]["add"]:
                     if mood not in corruptList:
                         corruptList.append(mood)
@@ -1064,6 +1073,7 @@ def update_corruption():
     except Exception as e:
         logging.warning(f'failed to update corruption.\n\tReason: {e}')
         print(f'failed to update corruption. {e}')
+        traceback.print_exc()
 
 def update_media(corrlist:list):
     #handle media list, doing it here instead of popup to take the load off of popups
@@ -1078,14 +1088,14 @@ def update_media(corrlist:list):
                 #print(f'moodData {moodData}')
         with open(Resource.MEDIA, 'r') as f:
             mediaData = json.loads(f.read())
-            print(f'mediaData {mediaData}')
+            #print(f'mediaData {mediaData}')
         if CORRUPTION_MODE and corrlist:
             try:
                 corruptedMedia = mediaData
                 for mood in list(mediaData):
                     if mood not in corrlist:
                         corruptedMedia.pop(mood)
-                print(f'corruptedMedia {corruptedMedia}')
+                #print(f'corruptedMedia {corruptedMedia}')
             except Exception as e:
                 logging.warning(f'failed to compare corruption list to mood list.\n\tReason:{e}')
                 print(f'failed to compare corruption. {e}')
@@ -1116,6 +1126,35 @@ def update_media(corrlist:list):
         except Exception as e:
             logging.warning(f'failed to load mediaData properly.\n\tReason: {e}')
             print(f'failed to load mediaData. {e}')
+
+def corruption_timer(totalLevels:int):
+    with open(Data.CORRUPTION_LEVEL, 'r') as f:
+        corruptionLevel = int(f.read())
+    if CORRUPTION_PURITY:
+        while True:
+            if CORRUPTION_TRIGGER == "Timed":
+                corruptionWait.wait(timeout=CORRUPTION_TIME)
+            with open(Data.CORRUPTION_LEVEL, 'r+') as f:
+                corruptionLevel = int(f.read())
+                if corruptionLevel <= 1:
+                    break
+                f.seek(0)
+                f.write(str(corruptionLevel-1))
+                f.truncate()
+                print(corruptionLevel-1)
+    else:
+        while True:
+            if CORRUPTION_TRIGGER == "Timed":
+                corruptionWait.wait(timeout=CORRUPTION_TIME)
+            with open(Data.CORRUPTION_LEVEL, 'r+') as f:
+                corruptionLevel = int(f.read())
+                if corruptionLevel >= totalLevels:
+                    break
+                f.seek(0)
+                f.write(str(corruptionLevel+1))
+                f.truncate()
+                print(corruptionLevel+1)
+
 
 if __name__ == '__main__':
     main()
