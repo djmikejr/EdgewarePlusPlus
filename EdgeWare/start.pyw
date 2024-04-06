@@ -288,12 +288,12 @@ if CORRUPTION_MODE:
         with open(Data.CORRUPTION_POPUPS, 'w') as f:
             f.write('0')
         with open(Data.CORRUPTION_LEVEL, 'w') as f:
-            if CORRUPTION_PURITY:
-                #purity mode starts at max value and works backwards
-                f.write(str(len(corruptionData["moods"].keys())))
-            else:
+            if not CORRUPTION_PURITY:
                 #starts at 1 and not 0 for simplicity's sake
                 f.write('1')
+            else:
+                #purity mode starts at max value and works backwards
+                f.write(str(len(corruptionData["moods"].keys())))
 
     except Exception as e:
         messagebox.showerror('Launch Error', 'Could not launch Edgeware due to corruption initialization failing.\n[' + str(e) + ']')
@@ -1130,19 +1130,7 @@ def update_media(corrlist:list):
 def corruption_timer(totalLevels:int):
     with open(Data.CORRUPTION_LEVEL, 'r') as f:
         corruptionLevel = int(f.read())
-    if CORRUPTION_PURITY:
-        while True:
-            if CORRUPTION_TRIGGER == "Timed":
-                corruptionWait.wait(timeout=CORRUPTION_TIME)
-            with open(Data.CORRUPTION_LEVEL, 'r+') as f:
-                corruptionLevel = int(f.read())
-                if corruptionLevel <= 1:
-                    break
-                f.seek(0)
-                f.write(str(corruptionLevel-1))
-                f.truncate()
-                print(corruptionLevel-1)
-    else:
+    if not CORRUPTION_PURITY:
         while True:
             if CORRUPTION_TRIGGER == "Timed":
                 corruptionWait.wait(timeout=CORRUPTION_TIME)
@@ -1154,6 +1142,18 @@ def corruption_timer(totalLevels:int):
                 f.write(str(corruptionLevel+1))
                 f.truncate()
                 print(corruptionLevel+1)
+    else:
+        while True:
+            if CORRUPTION_TRIGGER == "Timed":
+                corruptionWait.wait(timeout=CORRUPTION_TIME)
+            with open(Data.CORRUPTION_LEVEL, 'r+') as f:
+                corruptionLevel = int(f.read())
+                if corruptionLevel <= 1:
+                    break
+                f.seek(0)
+                f.write(str(corruptionLevel-1))
+                f.truncate()
+                print(corruptionLevel-1)
 
 
 if __name__ == '__main__':
