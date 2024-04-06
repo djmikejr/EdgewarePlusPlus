@@ -1067,6 +1067,13 @@ def update_corruption():
                 for mood in corruptionData["moods"][str(i)]["add"]:
                     if mood not in corruptList:
                         corruptList.append(mood)
+                if i < len(corruptionData["moods"].keys()):
+                    for mood in corruptionData["moods"][str(i+1)]["remove"]:
+                        if mood not in corruptList:
+                            corruptList.append(mood)
+                    for mood in corruptionData["moods"][str(i+1)]["add"]:
+                        if mood in corruptList:
+                            corruptList.remove(mood)
                 i -= 1
         print(f'corruption now at level {corruptionLevel}: {corruptList}')
         return corruptList
