@@ -25,6 +25,7 @@ from pathlib import Path
 from utils import utils
 from utils.paths import Data, Defaults, Process, Resource
 from utils.settings import load_settings
+import traceback
 
 PATH = Path(__file__).parent
 os.chdir(PATH)
@@ -125,9 +126,9 @@ CORRUPTION_MODE = int(settings['corruptionMode']) == 1
 CORRUPTION_FADE = settings['corruptionFadeType']
 CORRUPTION_TRIGGER = settings['corruptionTrigger']
 #adding all three as individual vars instead of checking for trigger type because of an idea: randomized corruption per-launch?
-CORRUPTION_TIME = settings['corruptionTime']
-CORRUPTION_POPUPS = settings['corruptionPopups']
-CORRUPTION_LAUNCHES = settings['corruptionLaunches']
+CORRUPTION_TIME = int(settings['corruptionTime'])
+CORRUPTION_POPUPS = int(settings['corruptionPopups'])
+CORRUPTION_LAUNCHES = int(settings['corruptionLaunches'])
 
 CORRUPTION_DEVMODE = int(settings['corruptionDevMode']) == 1
 CORRUPTION_WALLCYCLE = int(settings['corruptionWallpaperCycle']) == 1
@@ -164,6 +165,7 @@ hiberWait = thread.Event()
 wallpaperWait = thread.Event()
 runningHibernate = thread.Event()
 pumpScareAudio = thread.Event()
+corruptionWait = thread.Event()
 
 #start init portion, check resources, config, etc.
 try:
@@ -205,22 +207,34 @@ except Exception as e:
     logging.fatal(f'failed to unpack resource zip or read default resources.\n\tReason:{e}')
     os.kill(os.getpid(), 9)
 
-#writing corruption file if it doesn't exist/wiping it if the mode isn't on launch
+corruptionData = {}
 if CORRUPTION_MODE:
     try:
+        #read and save corruption data
+        with open(Resource.CORRUPTION, 'r') as f:
+            corruptionData = json.loads(f.read())
+            print(corruptionData["moods"]["1"]["add"])
+        #writing corruption file if it doesn't exist/wiping it if the mode isn't on launch
         if not os.path.exists(Data.ROOT):
             os.mkdir(Data.ROOT)
-            #the launches will reset when the user specifies in the config, or a new pack is loaded
-            if not os.path.exists(Data.CORRUPTION_LAUNCHES):
-                with open(Data.CORRUPTION_LAUNCHES, 'w') as f:
-                    f.write('0')
-            with open(Data.CORRUPTION_POPUPS, 'w') as f:
+        #the launches will reset when the user specifies in the config, or a new pack is loaded
+        if not os.path.exists(Data.CORRUPTION_LAUNCHES):
+            with open(Data.CORRUPTION_LAUNCHES, 'w') as f:
                 f.write('0')
-            with open(Data.CORRUPTION_LEVEL, 'w') as f:
-                f.write('0')
+        with open(Data.CORRUPTION_POPUPS, 'w') as f:
+            f.write('0')
+        with open(Data.CORRUPTION_LEVEL, 'w') as f:
+            if not CORRUPTION_PURITY:
+                #starts at 1 and not 0 for simplicity's sake
+                f.write('1')
+            else:
+                #purity mode starts at max value and works backwards
+                f.write(str(len(corruptionData["moods"].keys())))
+
     except Exception as e:
-        print(f'error loading corruption. {e}')
-        logging.warning(f'failed to initialize corruption properly.\n\tReason: {e}')
+        messagebox.showerror('Launch Error', 'Could not launch Edgeware due to corruption initialization failing.\n[' + str(e) + ']')
+        logging.fatal(f'failed to initialize corruption properly.\n\tReason: {e}')
+        os.kill(os.getpid(), 9)
 
 HAS_PROMPTS = False
 WEB_JSON_FOUND = False
@@ -424,7 +438,12 @@ def main():
         logging.warning(f'failed to clean or create data files\n\tReason: {e}')
         print('failed to clean or create data files')
 
-    update_media()
+    #initial corruption setup and mood calibration
+    corruptedList = []
+    if CORRUPTION_MODE:
+        thread.Thread(target=lambda: corruption_timer(len(corruptionData["moods"].keys()))).start()
+        corruptedList = update_corruption()
+    update_media(corruptedList)
 
     #do downloading for booru stuff
     if settings.get('downloadEnabled') == 1:
@@ -723,6 +742,10 @@ def annoyance():
         if REPLACE_MODE and not REPLACING_LIVE:
             thread.Thread(target=replace_images).start()
         time.sleep(float(DELAY) / 1000.0)
+        if CORRUPTION_MODE:
+            corruptedList = []
+            corruptedList = update_corruption()
+            update_media(corruptedList)
 
 #independently attempt to do all active settings with probability equal to their freq value
 def roll_for_initiative():
@@ -953,23 +976,82 @@ def replace_images():
                 for obj in toReplace:
                     shutil.copyfile(imageNames[rand.randrange(len(imageNames))], obj, follow_symlinks=True)
     #never turns off threadlive variable because it should only need to do this once
+def update_corruption():
+    try:
+        corruptList = []
+        with open(Resource.CORRUPTION, 'r') as f:
+            corruptionData = json.loads(f.read())
+        with open(Data.CORRUPTION_LEVEL, 'r') as f:
+            corruptionLevel = int(f.read())
+        if not CORRUPTION_PURITY:
+            i = 1
+            while i <= corruptionLevel:
+                for mood in corruptionData["moods"][str(i)]["remove"]:
+                    if mood in corruptList:
+                        corruptList.remove(mood)
+                for mood in corruptionData["moods"][str(i)]["add"]:
+                    if mood not in corruptList:
+                        corruptList.append(mood)
+                i += 1
+        else:
+            #generate initial list, as if corruption has run through every level
+            i = 1
+            while i <= len(corruptionData["moods"].keys()):
+                for mood in corruptionData["moods"][str(i)]["remove"]:
+                    if mood in corruptList:
+                        corruptList.remove(mood)
+                for mood in corruptionData["moods"][str(i)]["add"]:
+                    if mood not in corruptList:
+                        corruptList.append(mood)
+                i += 1
+            #actually run purity mode normally
+            i = len(corruptionData["moods"].keys())
+            while i >= corruptionLevel:
+                for mood in corruptionData["moods"][str(i)]["remove"]:
+                    if mood in corruptList:
+                        corruptList.remove(mood)
+                for mood in corruptionData["moods"][str(i)]["add"]:
+                    if mood not in corruptList:
+                        corruptList.append(mood)
+                if i < len(corruptionData["moods"].keys()):
+                    for mood in corruptionData["moods"][str(i+1)]["remove"]:
+                        if mood not in corruptList:
+                            corruptList.append(mood)
+                    for mood in corruptionData["moods"][str(i+1)]["add"]:
+                        if mood in corruptList:
+                            corruptList.remove(mood)
+                i -= 1
+        print(f'corruption now at level {corruptionLevel}: {corruptList}')
+        return corruptList
+    except Exception as e:
+        logging.warning(f'failed to update corruption.\n\tReason: {e}')
+        print(f'failed to update corruption. {e}')
+        traceback.print_exc()
 
-def update_media():
+def update_media(corrlist:list):
     #handle media list, doing it here instead of popup to take the load off of popups
     if os.path.exists(Resource.MEDIA) and not MOOD_OFF:
         if os.path.exists(Data.MOODS / f'{MOOD_ID}.json'):
             with open(Data.MOODS / f'{MOOD_ID}.json', 'r') as f:
                 moodData = json.loads(f.read())
-                #logging.info(f'moodData {moodData}')
+                #print(f'moodData {moodData}')
         elif os.path.exists(Data.UNNAMED_MOODS / f'{MOOD_ID}.json'):
             with open(Data.UNNAMED_MOODS / f'{MOOD_ID}.json', 'r') as f:
                 moodData = json.loads(f.read())
-                #logging.info(f'moodData {moodData}')
+                #print(f'moodData {moodData}')
         with open(Resource.MEDIA, 'r') as f:
             mediaData = json.loads(f.read())
             #print(f'mediaData {mediaData}')
-        #if CORRUPTION_MODE:
-            #for
+        if CORRUPTION_MODE and corrlist:
+            try:
+                corruptedMedia = mediaData
+                for mood in list(mediaData):
+                    if mood not in corrlist:
+                        corruptedMedia.pop(mood)
+                #print(f'corruptedMedia {corruptedMedia}')
+            except Exception as e:
+                logging.warning(f'failed to compare corruption list to mood list.\n\tReason:{e}')
+                print(f'failed to compare corruption. {e}')
         try:
             global MOOD_AUDIO
             MOOD_AUDIO = []
@@ -989,14 +1071,43 @@ def update_media():
                         moodVideo.append(i)
                     else:
                         mergedList.append(i)
-
+            print(mergedList)
             with open(Data.MEDIA_IMAGES, 'w') as f:
                 f.write(json.dumps(mergedList))
             with open(Data.MEDIA_VIDEO, 'w') as f:
                 f.write(json.dumps(moodVideo))
         except Exception as e:
             logging.warning(f'failed to load mediaData properly.\n\tReason: {e}')
-            print('failed to load mediaData')
+            print(f'failed to load mediaData. {e}')
+
+def corruption_timer(totalLevels:int):
+    with open(Data.CORRUPTION_LEVEL, 'r') as f:
+        corruptionLevel = int(f.read())
+    if not CORRUPTION_PURITY:
+        while True:
+            if CORRUPTION_TRIGGER == "Timed":
+                corruptionWait.wait(timeout=CORRUPTION_TIME)
+            with open(Data.CORRUPTION_LEVEL, 'r+') as f:
+                corruptionLevel = int(f.read())
+                if corruptionLevel >= totalLevels:
+                    break
+                f.seek(0)
+                f.write(str(corruptionLevel+1))
+                f.truncate()
+                print(corruptionLevel+1)
+    else:
+        while True:
+            if CORRUPTION_TRIGGER == "Timed":
+                corruptionWait.wait(timeout=CORRUPTION_TIME)
+            with open(Data.CORRUPTION_LEVEL, 'r+') as f:
+                corruptionLevel = int(f.read())
+                if corruptionLevel <= 1:
+                    break
+                f.seek(0)
+                f.write(str(corruptionLevel-1))
+                f.truncate()
+                print(corruptionLevel-1)
+
 
 if __name__ == '__main__':
     main()

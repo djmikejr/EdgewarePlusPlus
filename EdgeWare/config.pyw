@@ -2678,7 +2678,7 @@ def importResource(parent:Tk) -> bool:
         if openLocation == None:
             return False
         if os.path.exists(Resource.ROOT):
-            resp = confirmBox(parent, 'Confirm', 'Current resource folder will be deleted and overwritten. Is this okay?'
+            resp = confirmBox(parent, 'Confirm', 'Current resource folder will be deleted and overwritten. Corruption launches will be reset. Is this okay?'
                                 '\nNOTE: This might take a while when importing larger packs, please be patient!')
             if not resp:
                 logging.info('exited import resource overwrite')
@@ -2689,6 +2689,7 @@ def importResource(parent:Tk) -> bool:
             zip.extractall(Resource.ROOT)
             logging.info('extracted all from zip')
         messagebox.showinfo('Done', 'Resource importing completed.')
+        clearLaunches(False)
         refresh()
         return True
     except Exception as e:
@@ -2729,6 +2730,8 @@ def write_save(varList:list[StringVar | IntVar | BooleanVar], nameList:list[str]
     settings['wallpaperDat'] = str(settings['wallpaperDat'])
     settings['wallpaperDat'] = f'{settings["wallpaperDat"]}'
     settings['is_configed'] = 1
+    if not os.path.isfile(Resource.CORRUPTION):
+        settings['corruptionMode'] = 0
 
     utils.toggle_run_at_startup(varList[nameList.index('start_on_logon')].get())
 
