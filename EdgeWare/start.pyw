@@ -624,6 +624,7 @@ class BooruDownloader:
         self.max_page       = int(self.get_page_count())
 
     def download(self, page_start:int = 0, page_end:int = 1, min_score:int = None) -> None:
+        imgnum = 0
         self._page_start = max(page_start, 0)
         self._page_start = min(self._page_start, self.page_count)
         self._page_end   = min(page_end, self.max_page+1) if page_end >= self._page_start else self._page_start + 1
@@ -660,7 +661,8 @@ class BooruDownloader:
                     try:
                         self._file_name_full = f'{self._file_name}.{extension}'
                         self._full_url = f'{self.booru_scheme.raw_image_url.format(booru=self.booru, code_actual=self._code_actual)}{self._file_name_full}'
-                        self.direct_download(self._full_url)
+                        self.direct_download(self._full_url, imgnum)
+                        imgnum += 1
                         break
                     except:
                         continue
@@ -673,12 +675,15 @@ class BooruDownloader:
         for page in range(0, self.max_page):
             self.download(page, min_score=min_score)
 
-    def direct_download(self, url:str) -> None:
-        class LocalOpener(urllib.request.FancyURLopener):
-            version = 'Mozilla/5.0'
-        with LocalOpener().open(url) as file, open(Resource.IMAGE / url.split('/')[-1] / 'wb') as out:
-            logging.info(f'downloaded {url}')
-            shutil.copyfileobj(file, out)
+    def direct_download(self, url:str,imgnum:int) -> None:
+        r = requests.get(url)
+        if r.status_code == 404:
+            raise Exception("Response 404")
+        img_data = r.content
+        extension = url.split('.')[-1]
+        logging.info('image'+str(imgnum)+'.'+extension)
+        with open('resource/img/booruimage'+str(imgnum)+'.'+extension, 'wb') as handler:
+            handler.write(img_data)
 
     def get_page_count(self) -> int:
         self._href_core = self.booru_scheme.booru_search_url.format(booru_name=self.booru).split('?')[0]
