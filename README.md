@@ -77,9 +77,9 @@ Planned additions, as well as currently known issues, can now be found on the [i
 
 ## Packs
 
-[**EdgeWare++ Test Pack**](https://mega.nz/file/0acUQarB#QNyaZPkGYOGQgOi_W-up6n14rv_w8NSP-hN16qczC44)
-**Version: 1**
-A test pack featuring a sampler of all (finished) features found in EdgeWare++, and the pack i've been using to test functionality in. Some features are not complete and will be patched in as time goes on.
+[**EdgeWare++ Test Pack**](https://mega.nz/file/VbsEmbLD#gCLx6Ftv161oT7u3yiU8altS07QSElTz-Xo9kRmcugM)
+**Version: 2**
+A test pack featuring a sampler of most (finished) features found in EdgeWare++, and the pack i've been using to test functionality in. Some features are not complete and will be patched in as time goes on.
 
 ## Frequently Asked Questions
 
@@ -88,6 +88,10 @@ A test pack featuring a sampler of all (finished) features found in EdgeWare++, 
 A: Unfortunately, packs are kind of scattered about... Since there is no specific place to congregate EdgeWare packs (to my knowledge), people usually end up posting them to their personal twitters or discord servers. Additionally, some people charge money for their own packs and/or bundle a complete copy of EdgeWare with their pack, making it even harder to give a definite answer to this question.
 
 There are a few places you can start, however. PetitTournesol's original github page has multiple packs, although they don't support new ++ features. /r/edgingware on reddit is mostly focused to tech support, but there are multiple packs there, including a helpful reference pack. I believe hgoon.booru also has a thread for EdgeWare packs on the forum, but since it's a bit of an obscure booru and requires an account to post, i'm sure many still fall through the cracks.
+
+>Q: I found a bug!
+
+A: Fantastic! (well, not really.) The best place to post something like this is the [issues page](https://github.com/araten10/EdgewarePlusPlus/issues), where it can be properly filed and looked at/addressed by us or other people/pull requests. If it is something that seems like it might be a personal issue or relating to your specific setup, feel free to drop me a line on twitter. Just know that I might not be able to personally fix the issue, especially if I can't replicate it on any of my machines!
 
 >Q: Somebody sent me this pack and it's not working! I checked inside of it, and it has an entire copy of EdgeWare with it? Can I put it into my pre-existing EdgeWare installation?
 
@@ -119,7 +123,7 @@ But also feel free to follow me on twitter, interact with me there, and other su
 
 >Q: Does EdgeWare work on android/mac/ios?
 
-A: I only have plans to develop EdgeWare for windows, and LewdDevelopment is currently only developing EdgeWare for Linux. 
+A: I only have plans to develop EdgeWare for windows, and LewdDevelopment is currently only developing EdgeWare for Linux.
 
 >Q: Are there other programs out there like EdgeWare?
 
