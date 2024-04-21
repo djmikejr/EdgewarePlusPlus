@@ -99,6 +99,9 @@ MOVING_SPEED = 5
 MOVING_CHANCE = 0
 MOVING_STATUS = False
 MOVING_RANDOM = False
+CORRUPTION_TRIGGER = 'Timed'
+CORRUPTION_MODE = False
+SUBLIMINAL_ALPHA = 0.2
 
 with open(Data.CONFIG, 'r') as cfg:
     settings = json.loads(cfg.read())
@@ -125,6 +128,7 @@ with open(Data.CONFIG, 'r') as cfg:
     SUBLIMINAL_MODE = check_setting('popupSubliminals')
     SUBLIMINAL_CHANCE = int(settings['subliminalsChance'])
     MAX_SUBLIMINALS = int(settings['maxSubliminals'])
+    SUBLIMINAL_ALPHA = int(settings['subliminalsAlpha']) / 100
 
     LANCZOS_MODE = check_setting('antiOrLanczos')
 
@@ -152,6 +156,8 @@ with open(Data.CONFIG, 'r') as cfg:
     MOVING_RANDOM = check_setting('movingRandom')
 
     CORRUPTION_DEVMODE = check_setting('corruptionDevMode')
+    CORRUPTION_TRIGGER = settings['corruptionTrigger']
+    CORRUPTION_MODE = check_setting('corruptionMode')
 
 if MOVING_CHANCE >= rand.randint(1,100):
     BUTTONLESS = True
@@ -259,7 +265,7 @@ class GifLabel(tk.Label):
                 hold_image = self.image.resize((resized_width, resized_height), Image.BOX)
                 if back_image is not None:
                     hold_image, back_image = hold_image.convert('RGBA'), back_image.convert('RGBA')
-                    hold_image = Image.blend(back_image, hold_image, 0.2)
+                    hold_image = Image.blend(back_image, hold_image, SUBLIMINAL_ALPHA)
                 self.frames.append(ImageTk.PhotoImage(hold_image.copy()))
                 self.image.seek(i)
         except Exception as e:
@@ -605,7 +611,8 @@ def run():
 
     if CORRUPTION_DEVMODE:
         devmodeLabel1 = Label(root, text='clev=', wraplength=resized_image.width - border_wid_const, bg=back, fg=fore)
-        devmodeLabel2 = Label(root, text='poplev=', wraplength=resized_image.width - border_wid_const, bg=back, fg=fore)
+        devmodeLabel2 = Label(root, text='popmood=', wraplength=resized_image.width - border_wid_const, bg=back, fg=fore)
+        devmodeLabel2 = Label(root, text='popnum=', wraplength=resized_image.width - border_wid_const, bg=back, fg=fore)
         devmodeLabel3 = Label(root, text=f'filen={pathlib.Path(item).name}', wraplength=resized_image.width - border_wid_const, bg=back, fg=fore)
         devmodeLabel1.place(x= 5, y= int(resized_image.height/2))
         devmodeLabel2.place(x= 5, y= int(resized_image.height/2) + devmodeLabel2.winfo_reqheight() + 2)
@@ -623,6 +630,12 @@ def run():
 
     if HIBERNATE_MODE and check_setting('fixWallpaper'):
         with open(Data.HIBERNATE, 'r+') as f:
+            i = int(f.readline())
+            f.seek(0)
+            f.write(str(i+1))
+            f.truncate()
+    if CORRUPTION_MODE and CORRUPTION_TRIGGER == "Popup":
+        with open(Data.CORRUPTION_POPUPS, 'r+') as f:
             i = int(f.readline())
             f.seek(0)
             f.write(str(i+1))
@@ -828,4 +841,4 @@ if __name__ == '__main__':
     except Exception as e:
         utils.init_logging(logging, 'popup')
         logging.fatal(f'failed to start popup\n{e}')
-        #traceback.print_exc() 
+        #traceback.print_exc()

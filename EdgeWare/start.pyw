@@ -222,6 +222,12 @@ if CORRUPTION_MODE:
         if not os.path.exists(Data.CORRUPTION_LAUNCHES):
             with open(Data.CORRUPTION_LAUNCHES, 'w') as f:
                 f.write('0')
+        elif CORRUPTION_TRIGGER == "Launch":
+            with open(Data.CORRUPTION_LAUNCHES, 'r+') as f:
+                i = int(f.readline())
+                f.seek(0)
+                f.write(str(i+1))
+                f.truncate()
         with open(Data.CORRUPTION_POPUPS, 'w') as f:
             f.write('0')
         with open(Data.CORRUPTION_LEVEL, 'w') as f:
@@ -443,6 +449,7 @@ def main():
     corruptedList = []
     if CORRUPTION_MODE:
         thread.Thread(target=lambda: corruption_timer(len(corruptionData["moods"].keys()))).start()
+        time.sleep(0.1)
         corruptedList = update_corruption()
     update_media(corruptedList)
 
@@ -895,7 +902,7 @@ def update_corruption():
                         if mood in corruptList:
                             corruptList.remove(mood)
                 i -= 1
-        print(f'corruption now at level {corruptionLevel}: {corruptList}')
+        print(f'current corruption list: {corruptList}')
         return corruptList
     except Exception as e:
         logging.warning(f'failed to update corruption.\n\tReason: {e}')
@@ -957,10 +964,30 @@ def update_media(corrlist:list):
 def corruption_timer(totalLevels:int):
     with open(Data.CORRUPTION_LEVEL, 'r') as f:
         corruptionLevel = int(f.read())
-    if not CORRUPTION_PURITY:
-        while True:
-            if CORRUPTION_TRIGGER == "Timed":
-                corruptionWait.wait(timeout=CORRUPTION_TIME)
+    while True:
+        if CORRUPTION_TRIGGER == "Timed":
+            corruptionWait.wait(timeout=CORRUPTION_TIME)
+        if CORRUPTION_TRIGGER == "Popup":
+            while True:
+                with open(Data.CORRUPTION_POPUPS, 'r+') as f:
+                    if int(f.read()) >= CORRUPTION_POPUPS:
+                        f.seek(0)
+                        f.write('0')
+                        f.truncate()
+                        break
+        if CORRUPTION_TRIGGER == "Launch":
+            with open(Data.CORRUPTION_LAUNCHES, 'r') as f:
+                corruptionLevel = totalLevels if CORRUPTION_PURITY else 1
+                currLaunches = int(f.read())
+                for i in range(1, totalLevels):
+                    if currLaunches >= (CORRUPTION_LAUNCHES * i):
+                        corruptionLevel = corruptionLevel - 1 if CORRUPTION_PURITY else corruptionLevel + 1
+                        print(f'corruption level increase! It is now {corruptionLevel}. Current launches is {currLaunches}')
+            with open(Data.CORRUPTION_LEVEL, 'w') as f:
+                f.write(str(corruptionLevel))
+                print(f'corruption written, now at level {corruptionLevel}')
+            break
+        if not CORRUPTION_PURITY:
             with open(Data.CORRUPTION_LEVEL, 'r+') as f:
                 corruptionLevel = int(f.read())
                 if corruptionLevel >= totalLevels:
@@ -968,11 +995,8 @@ def corruption_timer(totalLevels:int):
                 f.seek(0)
                 f.write(str(corruptionLevel+1))
                 f.truncate()
-                print(corruptionLevel+1)
-    else:
-        while True:
-            if CORRUPTION_TRIGGER == "Timed":
-                corruptionWait.wait(timeout=CORRUPTION_TIME)
+                print(f'corruption now at level {corruptionLevel+1}')
+        else:
             with open(Data.CORRUPTION_LEVEL, 'r+') as f:
                 corruptionLevel = int(f.read())
                 if corruptionLevel <= 1:
@@ -980,7 +1004,7 @@ def corruption_timer(totalLevels:int):
                 f.seek(0)
                 f.write(str(corruptionLevel-1))
                 f.truncate()
-                print(corruptionLevel-1)
+                print(f'corruption now at level {corruptionLevel-1}')
 
 
 if __name__ == '__main__':

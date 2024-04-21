@@ -7,6 +7,23 @@
 
 •+0.2-0.1 to version number: very small update, usually just a bugfix, accessibility options, UI tweaks
 
+**Version 11** *(not officially out yet, shhh)*
+
+A lot has changed! So much so that I actually am having the unique problem of having to *look up* what was fixed since the last version. This is because **LewdDevelopment** has been helping catch me up to speed on Github and we've been rolling out smaller updates, using branches, etc.
+
+•*Corruption has been added in a beta-like state*
+
+•*The test pack has been updated to be able to test corruption*
+
+•*Moved a bunch of backend files to a subprocesses subfolder, to reduce confusion for new users*
+>This might potentially break the "Edgeware Update Checker" in older versions, but luckily it will tell them to update regardless
+
+•*Simplified a bunch of backend and condensed backend PATHs*
+
+•*Cleaned up the github pages and moved the changelog to it's own .md file*
+
+•*Added a setting to subliminals that allows you to change the transparency*
+
 **Version 10.2**
 
 Continued work on corruption among other things. There might be big changes happening to this github page, as I am now working with a friend (@ecchigooner) and they are helping me actually understand github instead of pretending to understand github. This actually might be one of the last times Edgeware updates like this, as i'm hoping to get a grasp on releases and making things actually semi-official instead of whatever i'm doing right now...  
@@ -16,7 +33,7 @@ Continued work on corruption among other things. There might be big changes happ
 •*Commented out the display tree on the corruption page for now, something like it will return but I want to focus on finishing corruption before having to debug it!*
 
 •*Backend work on corruption*
->Startup now checks for a corruption data file, you can now
+>Startup now checks for a corruption data file
 
 •*Implemented "Dev Mode" in the corruption tab, which overlays information very unsexily on popups*
 >This currently includes filename and current corruption level, but might be expanded in the future. Let me know if there are any developer statistics you want to see!

@@ -369,6 +369,8 @@ def show_window():
             capPopTimerVar            = IntVar(root, value=int(settings['capPopTimer']))
             capPopMoodVar             = BooleanVar(root, value=(int(settings['capPopMood'])==1))
 
+            subliminalsAlphaVar       = IntVar(root, value=int(settings['subliminalsAlpha']))
+
 
             #grouping for sanity's sake later
             in_var_group = [delayVar, popupVar, webVar, audioVar, promptVar, fillVar,
@@ -392,7 +394,7 @@ def show_window():
                             corruptionThemeCycleVar, corruptionPurityModeVar, corruptionFullPermVar,
                             sMessageChanceVar, sMessageDurationVar, sMessageTransparencyVar,
                             movingChanceVar, movingSpeedVar, movingRandomVar, capPopChanceVar,
-                            capPopOpacityVar, capPopTimerVar, capPopMoodVar]
+                            capPopOpacityVar, capPopTimerVar, capPopMoodVar, subliminalsAlphaVar]
 
             in_var_names = ['delay', 'popupMod', 'webMod', 'audioMod', 'promptMod', 'fill',
                             'fill_delay', 'replace', 'replaceThresh', 'start_on_logon',
@@ -414,7 +416,7 @@ def show_window():
                             'corruptionWallpaperCycle', 'corruptionThemeCycle', 'corruptionPurityMode',
                             'corruptionFullPerm', 'sMessageChance', 'sMessageDuration', 'sMessageTransparency',
                             'movingChance', 'movingSpeed', 'movingRandom', 'capPopChance', 'capPopOpacity',
-                            'capPopTimer', 'capPopMood']
+                            'capPopTimer', 'capPopMood', 'subliminalsAlpha']
             break
         except Exception as e:
             messagebox.showwarning(
@@ -1195,8 +1197,8 @@ def show_window():
     subliminalsFrame = Frame(maxPopupFrame)
 
     subliminalsChanceFrame = Frame(subliminalsFrame)
+    subliminalsAlphaFrame = Frame(subliminalsFrame)
     maxSubliminalsFrame = Frame(subliminalsFrame)
-    #extra space for one more?
 
     maxAudioToggle = Checkbutton(maxAudioFrame, text='Cap Audio', variable=maxAToggleVar, command=lambda: toggleAssociateSettings(maxAToggleVar.get(), maxAudio_group))
     maxAudioScale = Scale(maxAudioFrame, label='Max Audio Popups', from_=1, to=50, orient='horizontal', variable=maxAudioVar)
@@ -1222,6 +1224,12 @@ def show_window():
     subliminals_group.append(subliminalsChanceScale)
     subliminals_group.append(subliminalsChanceManual)
 
+    subliminalsAlphaScale = Scale(subliminalsAlphaFrame, label='Sublim. Alpha (%)', from_=1, to=99, orient='horizontal', variable=subliminalsAlphaVar)
+    subliminalsAlphaManual = Button(subliminalsAlphaFrame, text='Manual Sub Alpha...', command=lambda: assign(subliminalsAlphaVar, simpledialog.askinteger('Manual Subliminal Chance', prompt='[1-99]: ')))
+
+    subliminals_group.append(subliminalsAlphaScale)
+    subliminals_group.append(subliminalsAlphaManual)
+
     maxSubliminalsScale = Scale(maxSubliminalsFrame, label='Max Subliminals', from_=1, to=200, orient='horizontal', variable=maxSubliminalsVar)
     maxSubliminalsManual = Button(maxSubliminalsFrame, text='Manual Max Sub...', command=lambda: assign(maxSubliminalsVar, simpledialog.askinteger('Manual Max Subliminals', prompt='[1-200]: ')))
 
@@ -1235,7 +1243,7 @@ def show_window():
     maxAudioScale.pack(fill='x', padx=1, expand=1)
     maxAudioManual.pack(fill='x')
 
-    maxVideoFrame.pack(fill='y', side='left', padx=3, expand=1)
+    maxVideoFrame.pack(side='left', padx=3, expand=1)
     maxVideoToggle.pack(fill='x')
     maxVideoScale.pack(fill='x', padx=1, expand=1)
     maxVideoManual.pack(fill='x')
@@ -1243,11 +1251,15 @@ def show_window():
     subliminalsFrame.pack(side='left')
     toggleSubliminalButton.pack(fill='x')
 
-    subliminalsChanceFrame.pack(fill='y', side='left', padx=3, expand=1)
+    subliminalsChanceFrame.pack(side='left', padx=3, expand=1)
     subliminalsChanceScale.pack(fill='x', padx=1, expand=1)
     subliminalsChanceManual.pack(fill='x')
 
-    maxSubliminalsFrame.pack(fill='y', side='left', padx=3, expand=1)
+    subliminalsAlphaFrame.pack(side='left', padx=3, expand=1)
+    subliminalsAlphaScale.pack(fill='x', padx=1, expand=1)
+    subliminalsAlphaManual.pack(fill='x')
+
+    maxSubliminalsFrame.pack(side='left', padx=3, expand=1)
     maxSubliminalsScale.pack(fill='x', padx=1, expand=1)
     maxSubliminalsManual.pack(fill='x')
 
@@ -1531,7 +1543,8 @@ def show_window():
     corrpurityttp = CreateToolTip(corruptionPurityToggle, 'Starts corruption mode at the highest corruption level, then works backwards to level 1. '
                                         'Retains all of your other settings for this mode, if applicable.')
     corruptiondevttp = CreateToolTip(corruptionDevToggle, 'Enables captions on popups that show various info.\n\nclev: current corruption level when popup spawned\n'
-                                        'poplev: the corruption level of the popup\'s mood\n filen: the filename of the popup\'s image/video')
+                                        'popmood: the popup\'s mood\npopnum: if popup trigger enabled, the number of the popup\n'
+                                        'filen: the filename of the popup\'s image/video')
 
     #-Info-
 
