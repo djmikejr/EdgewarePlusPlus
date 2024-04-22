@@ -15,8 +15,12 @@ A lot has changed! So much so that I actually am having the unique problem of ha
 
 •*The test pack has been updated to be able to test corruption*
 
+•*Restored some basic functionality to the booru downloader (thanks @TallLeaf!)*
+
 •*Moved a bunch of backend files to a subprocesses subfolder, to reduce confusion for new users*
->This might potentially break the "Edgeware Update Checker" in older versions, but luckily it will tell them to update regardless
+
+•*Changed the default config file into a JSON file*
+>This will break the "Edgeware Update Checker" in older versions, but luckily it will tell them to update regardless
 
 •*Simplified a bunch of backend and condensed backend PATHs*
 
