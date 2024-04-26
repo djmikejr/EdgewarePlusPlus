@@ -1407,8 +1407,8 @@ def show_window():
     corruptionTimerButton = Button(cTimerFrame, text='Manual time...', command=lambda: assign(corruptionTimeVar, simpledialog.askinteger('Manual Level Time (sec)', prompt='[5-1800]: ')))
     corruptionTimerScale = Scale(cTimerFrame, label='Level Time', variable=corruptionTimeVar, orient='horizontal', from_=5, to=1800)
     cPopupsFrame = Frame(corruptionTimeFrame)
-    corruptionPopupsButton = Button(cPopupsFrame, text='Manual popups...', command=lambda: assign(corruptionPopupsVar, simpledialog.askinteger('Manual Level Popups (per transition)', prompt='[3-100]: ')))
-    corruptionPopupsScale = Scale(cPopupsFrame, label='Level Popups', variable=corruptionPopupsVar, orient='horizontal', from_=3, to=100)
+    corruptionPopupsButton = Button(cPopupsFrame, text='Manual popups...', command=lambda: assign(corruptionPopupsVar, simpledialog.askinteger('Manual Level Popups (per transition)', prompt='[1-100]: ')))
+    corruptionPopupsScale = Scale(cPopupsFrame, label='Level Popups', variable=corruptionPopupsVar, orient='horizontal', from_=1, to=100)
     cLaunchesFrame = Frame(corruptionTimeFrame)
     corruptionLaunchesButton = Button(cLaunchesFrame, text='Manual launches...', command=lambda: assign(corruptionLaunchesVar, simpledialog.askinteger('Manual Level Launches (per transition)', prompt='[2-31]: ')))
     corruptionLaunchesScale = Scale(cLaunchesFrame, label='Level Launches', variable=corruptionLaunchesVar, orient='horizontal', from_=2, to=31)
@@ -1536,8 +1536,8 @@ def show_window():
     corruptionPurityToggle.pack(fill='x', side='top')
     corruptionDevToggle.pack(fill='x', side='top')
 
-    corrwallpaperttp = CreateToolTip(corruptionWallpaperToggle, 'Prevents the wallpaper from cycling as you go through corruption levels, instead staying at '
-                                        'the first wallpaper set for corruption level 1.')
+    corrwallpaperttp = CreateToolTip(corruptionWallpaperToggle, 'Prevents the wallpaper from cycling as you go through corruption levels, instead defaulting to '
+                                        'a pack defined static one.')
     corrthemettp = CreateToolTip(corruptionThemeToggle, 'Prevents the theme from cycling as you go through corruption levels, instead staying as '
                                         'the theme you set in the \"General\" tab of the config window.')
     corrpurityttp = CreateToolTip(corruptionPurityToggle, 'Starts corruption mode at the highest corruption level, then works backwards to level 1. '

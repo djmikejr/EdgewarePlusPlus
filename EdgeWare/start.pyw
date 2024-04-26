@@ -214,7 +214,7 @@ if CORRUPTION_MODE:
         #read and save corruption data
         with open(Resource.CORRUPTION, 'r') as f:
             corruptionData = json.loads(f.read())
-            print(corruptionData["moods"]["1"]["add"])
+            #print(corruptionData["moods"]["1"]["add"])
         #writing corruption file if it doesn't exist/wiping it if the mode isn't on launch
         if not os.path.exists(Data.ROOT):
             os.mkdir(Data.ROOT)
@@ -328,10 +328,33 @@ if LOADING_FLAIR and (__name__ == "__main__"):
         else:
             subprocess.run([sys.executable, Process.STARTUP])
 
-#set wallpaper
-if not HIBERNATE_MODE:
+#checks if user is in corruption mode, then sets wallpaper accordingly
+def wallpaper_check(else_path: Path | str):
+    try:
+        if CORRUPTION_MODE:
+            if not CORRUPTION_WALLCYCLE:
+                with open(Data.CORRUPTION_LEVEL, 'r') as f:
+                    corruptionLevel = f.read()
+                try:
+                    wp_path = Resource.ROOT / str(corruptionData["wallpapers"][corruptionLevel])
+                except:
+                    print('wallpaper does not exist for this corruption level')
+                    return
+            else:
+                wp_path = Resource.ROOT / str(corruptionData["wallpapers"]["default"])
+        else:
+            wp_path = else_path
+
+        print(f'current wallpaper path: {wp_path}')
+        utils.set_wallpaper(wp_path)
+    except Exception as e:
+        print(f'Error changing wallpaper. {e}')
+        logging.warning(f'failed to change wallpaper.\n\tReason: {e}')
+
+#set wallpaper if not specific modes that set it later
+if not HIBERNATE_MODE and not CORRUPTION_MODE:
     logging.info('set user wallpaper to default wallpaper.png')
-    utils.set_wallpaper(Resource.WALLPAPER)
+    wallpaper_check(Resource.WALLPAPER)
 
 #selects url to be opened in new tab by web browser
 def url_select(arg:int):
@@ -451,6 +474,7 @@ def main():
         thread.Thread(target=lambda: corruption_timer(len(corruptionData["moods"].keys()))).start()
         time.sleep(0.1)
         corruptedList = update_corruption()
+        wallpaper_check(Resource.WALLPAPER)
     update_media(corruptedList)
 
     #do downloading for booru stuff
@@ -478,12 +502,22 @@ def main():
     #run annoyance thread or do hibernate mode
     if HIBERNATE_MODE:
         logging.info('starting in hibernate mode')
+        with open(Data.CORRUPTION_LEVEL, 'r') as f:
+            trackedLevel = int(f.read())
         triggerThread = thread.Thread(target=checkWallpaperStatus)
         if FIX_WALLPAPER:
             triggerThread.start()
         while True:
             hiberWait.clear()
             waitTime = rand.randint(HIBERNATE_MIN, HIBERNATE_MAX)
+            if CORRUPTION_MODE:
+                with open(Data.CORRUPTION_LEVEL, 'r') as f:
+                    currentLevel = int(f.read())
+                if trackedLevel != currentLevel:
+                    corruptedList = []
+                    corruptedList = update_corruption()
+                    update_media(corruptedList)
+                    trackedLevel = currentLevel
             if HIBERNATE_TRUTH == 'Chaos':
                 try:
                     global HIBERNATE_TYPE
@@ -496,7 +530,7 @@ def main():
             hiberWait.wait(float(waitTime))
             runningHibernate.clear()
             if HIBERNATE_TYPE != 'Pump-Scare':
-                utils.set_wallpaper(Resource.WALLPAPER)
+                wallpaper_check(Resource.WALLPAPER)
                 wallpaperWait.clear()
             if HIBERNATE_TYPE == 'Original':
                 try:
@@ -613,7 +647,18 @@ def do_roll(mod:float) -> bool:
 #       replace: will only happen one single time in the run of the application, but checks ALL folders
 def annoyance():
     global MITOSIS_LIVE
+    with open(Data.CORRUPTION_LEVEL, 'r') as f:
+        trackedLevel = int(f.read())
     while(True):
+        if CORRUPTION_MODE:
+            with open(Data.CORRUPTION_LEVEL, 'r') as f:
+                currentLevel = int(f.read())
+            if trackedLevel != currentLevel:
+                corruptedList = []
+                corruptedList = update_corruption()
+                update_media(corruptedList)
+                wallpaper_check(Resource.WALLPAPER)
+                trackedLevel = currentLevel
         roll_for_initiative()
         if not MITOSIS_LIVE and (MITOSIS_MODE or LOWKEY_MODE) and HAS_IMAGES:
             subprocess.Popen([sys.executable, Process.POPUP]) if MOOD_OFF else subprocess.Popen([sys.executable, Process.POPUP, f'-{MOOD_ID}'])
@@ -623,10 +668,6 @@ def annoyance():
         if REPLACE_MODE and not REPLACING_LIVE:
             thread.Thread(target=replace_images).start()
         time.sleep(float(DELAY) / 1000.0)
-        if CORRUPTION_MODE:
-            corruptedList = []
-            corruptedList = update_corruption()
-            update_media(corruptedList)
 
 #independently attempt to do all active settings with probability equal to their freq value
 def roll_for_initiative():
@@ -649,7 +690,7 @@ def roll_for_initiative():
                         messagebox.showerror('Audio Error', 'Failed to play audio.\n[' + str(e) + ']')
                         logging.critical(f'failed to play audio\n\tReason: {e}')
             try:
-                utils.set_wallpaper(Resource.WALLPAPER)
+                wallpaper_check(Resource.WALLPAPER)
                 wallpaperWait.clear()
                 subprocess.Popen([sys.executable, Process.POPUP]) if MOOD_OFF else subprocess.Popen([sys.executable, Process.POPUP, f'-{MOOD_ID}'])
             except Exception as e:
@@ -768,11 +809,14 @@ def do_timer():
     except:
         subprocess.Popen([sys.executable, Process.PANIC])
 
-def audioHelper():
-    if MOOD_OFF:
-        ps.playsound(str(AUDIO[rand.randrange(len(AUDIO))]))
-    else:
-        ps.playsound(str(MOOD_AUDIO[rand.randrange(len(MOOD_AUDIO))]))
+def audioHelper(moodAudio:list):
+    try:
+        if MOOD_OFF:
+            ps.playsound(str(AUDIO[rand.randrange(len(AUDIO))]))
+        else:
+            ps.playsound(str(moodAudio[rand.randrange(len(moodAudio))]))
+    except Exception as e:
+        print(f'error managing audio. {e}')
 
 
 #if audio is not playing, selects and plays random audio file from /aud/ folder
@@ -786,7 +830,7 @@ def play_audio():
     AUDIO_NUMBER += 1
     try:
         if HIBERNATE_TYPE == 'Pump-Scare' and HIBERNATE_MODE:
-            p = multiprocessing.Process(target=audioHelper)
+            p = multiprocessing.Process(target=audioHelper, args=(MOOD_AUDIO,))
             p.start()
             if PUMP_SCARE_OFFSET != 0:
                 time.sleep(PUMP_SCARE_OFFSET)
@@ -947,7 +991,7 @@ def update_media(corrlist:list):
                 for i in sub:
                     if i in os.listdir(Resource.AUDIO):
                         MOOD_AUDIO.append(Resource.AUDIO / i)
-                        #logging.info(f'{i}')
+                        #print(f'{i}')
                     elif i in os.listdir(Resource.VIDEO):
                         moodVideo.append(i)
                     else:
@@ -982,10 +1026,10 @@ def corruption_timer(totalLevels:int):
                 for i in range(1, totalLevels):
                     if currLaunches >= (CORRUPTION_LAUNCHES * i):
                         corruptionLevel = corruptionLevel - 1 if CORRUPTION_PURITY else corruptionLevel + 1
-                        print(f'corruption level increase! It is now {corruptionLevel}. Current launches is {currLaunches}')
+                        #print(f'corruption level change! It is now {corruptionLevel}. Current launches is {currLaunches}')
             with open(Data.CORRUPTION_LEVEL, 'w') as f:
                 f.write(str(corruptionLevel))
-                print(f'corruption written, now at level {corruptionLevel}')
+                #print(f'corruption written, now at level {corruptionLevel}')
             break
         if not CORRUPTION_PURITY:
             with open(Data.CORRUPTION_LEVEL, 'r+') as f:
@@ -1005,7 +1049,6 @@ def corruption_timer(totalLevels:int):
                 f.write(str(corruptionLevel-1))
                 f.truncate()
                 print(f'corruption now at level {corruptionLevel-1}')
-
 
 if __name__ == '__main__':
     main()
