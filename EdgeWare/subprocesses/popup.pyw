@@ -644,7 +644,7 @@ def run():
     root.attributes('-alpha', OPACITY / 100)
 
     if MOVING_STATUS:
-        move_window(root,resized_image.height,resized_image.width,locX,locY)
+        thread.Thread(target=lambda: move_window(root,resized_image.height,resized_image.width,locX,locY), daemon=True).start()
 
     root.mainloop()
 
