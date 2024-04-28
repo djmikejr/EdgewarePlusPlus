@@ -839,6 +839,6 @@ if __name__ == '__main__':
         thread.Thread(target=pumpScare).start()
         run()
     except Exception as e:
-        utils.init_logging(logging, 'popup')
+        utils.init_logging('popup')
         logging.fatal(f'failed to start popup\n{e}')
         #traceback.print_exc()

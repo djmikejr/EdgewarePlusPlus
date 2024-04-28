@@ -23,7 +23,7 @@ from utils.tooltip import CreateToolTip
 PATH = Path(__file__).parent
 os.chdir(PATH)
 
-utils.init_logging(logging, 'dbg', 'config')
+utils.init_logging('dbg', 'config')
 
 #if you are working on this i'm just letting you know there's like almost no documentation for ttkwidgets
 #source code is here https://github.com/TkinterEP/ttkwidgets/blob/master/ttkwidgets/checkboxtreeview.py
@@ -155,7 +155,7 @@ if info_id == '0' and os.path.exists(Resource.ROOT):
 UPDCHECK_URL = 'http://raw.githubusercontent.com/PetitTournesol/Edgeware/main/EdgeWare/configDefault.dat'
 UPDCHECK_PP_URL = 'http://raw.githubusercontent.com/araten10/EdgewarePlusPlus/main/EdgeWare/default_assets/default_config.json'
 
-settings = load_settings(logging)
+settings = load_settings()
 defaultSettings = {}
 with open(Defaults.CONFIG, 'r') as f:
     defaultSettings = json.loads(f.read())

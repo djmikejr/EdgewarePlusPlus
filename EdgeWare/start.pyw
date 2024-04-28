@@ -26,19 +26,19 @@ import traceback
 PATH = Path(__file__).parent
 os.chdir(PATH)
 
-utils.init_logging(logging, 'ew_start', 'start')
+utils.init_logging('ew_start', 'start')
 
 SYS_ARGS = sys.argv.copy()
 SYS_ARGS.pop(0)
 logging.info(f'args: {SYS_ARGS}')
 
 #load settings, if first run open options, then reload options from file
-settings = load_settings(logging)
+settings = load_settings()
 if not settings['is_configed']==1:
     logging.info('running config for first setup, is_configed flag is false.')
     subprocess.run([sys.executable, Process.CONFIG])
     logging.info('reloading settings')
-    settings = load_settings(logging)
+    settings = load_settings()
 
 AVOID_LIST = ['EdgeWare', 'AppData'] #default avoid list for fill/replace
 FILE_TYPES = ['png', 'jpg', 'jpeg'] #recognized file types for replace

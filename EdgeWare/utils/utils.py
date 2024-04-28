@@ -1,8 +1,9 @@
 import sys
 import time
+import logging
 from utils.paths import LOG_PATH
 
-def init_logging(logging, filename, source = None):
+def init_logging(filename, source = None):
     if not os.path.exists(LOG_PATH):
         os.mkdir(LOG_PATH)
 

@@ -15,7 +15,7 @@ from utils.paths import Data, Resource
 SYS_ARGS = sys.argv.copy()
 SYS_ARGS.pop(0)
 
-utils.init_logging(logging, 'sublabel')
+utils.init_logging('sublabel')
 #This sublabel.pyw originally provided very generously by u/basicmo!
 
 def check_setting(name:str, default:bool=False) -> bool:

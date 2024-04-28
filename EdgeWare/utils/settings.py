@@ -2,11 +2,12 @@ import ast
 import json
 import os
 import shutil
+import logging
 from utils.paths import Data, Defaults
 
 # Loads settings from the config file or generates / updates it from the default
 # configuration
-def load_settings(logging):
+def load_settings():
     logging.info('loading config settings...')
     default_settings = {}
     settings = {}
