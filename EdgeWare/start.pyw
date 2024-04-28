@@ -1,9 +1,7 @@
-import urllib
 import hashlib
 import os
 import subprocess
 import multiprocessing
-import ast
 import time
 import webbrowser
 import zipfile
@@ -14,12 +12,9 @@ import threading as thread
 import tkinter as tk
 import logging
 import sys
-import requests
 import pystray
 import playsound as ps
 from PIL import Image
-from bs4 import BeautifulSoup
-from dataclasses import dataclass
 from tkinter import messagebox, simpledialog
 from pathlib import Path
 from utils import utils
@@ -599,7 +594,7 @@ def main():
                     logging.warning(f'failed to successfully run {HIBERNATE_TYPE} hibernate.\n\tReason: {e}')
             if HIBERNATE_TYPE == 'Pump-Scare':
                 try:
-                    print(f'hibernate type is pump-scare.')
+                    print('hibernate type is pump-scare.')
                     roll_for_initiative()
                 except Exception as e:
                     logging.warning(f'failed to successfully run {HIBERNATE_TYPE} hibernate.\n\tReason: {e}')

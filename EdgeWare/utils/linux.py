@@ -338,5 +338,5 @@ def toggle_run_at_startup(state: bool):
             make_shortcut('Edgeware', Process.START, Defaults.ICON, autostart_path)
         else:
             os.remove(autostart_path / 'edgeware.desktop')
-    except Exception as e:
+    except Exception:
         logging.warning('failed to toggle autostart')

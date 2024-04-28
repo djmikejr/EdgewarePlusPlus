@@ -1,6 +1,5 @@
 import os
 import sys
-import pathlib
 import json
 import random as rand
 import tkinter as tk

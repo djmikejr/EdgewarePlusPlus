@@ -7,7 +7,6 @@ from tkinter import Tk, Frame, Label, RAISED, messagebox
 from PIL import Image, ImageTk
 from itertools import cycle
 from pathlib import Path
-from pathlib import Path
 
 sys.path.append(str(Path(__file__).parent.parent))
 from utils.paths import Defaults, Resource

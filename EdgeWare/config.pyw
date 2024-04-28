@@ -4,7 +4,6 @@ import shutil
 import subprocess
 import webbrowser
 import zipfile
-import ast
 import urllib.request
 import hashlib
 import sys
