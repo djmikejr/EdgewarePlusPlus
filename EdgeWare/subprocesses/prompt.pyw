@@ -123,7 +123,7 @@ def unborderedWindow():
     inputBox.pack()
 
     subButton = Button(root, text=submission_text, command=lambda: checkTotal(root, txt, inputBox.get(1.0, "end-1c")), bg=back, fg=fore,
-                        activebackground=back, activeforeground=fore)
+                       activebackground=back, activeforeground=fore)
     subButton.place(x=wid - 5 - subButton.winfo_reqwidth(), y=hgt - 5 - subButton.winfo_reqheight())
     root.mainloop()
 
@@ -143,18 +143,23 @@ def buildText():
     #strVar += MOOD_ID
     return strVar.strip()
 
+# Checks that the number of mistakes is at most maxMistakes and if so,
+# closes the prompt window. The number of mistakes is computed as the edit
+# (Levenshtein) distance between a and b.
+# https://en.wikipedia.org/wiki/Levenshtein_distance
 def checkTotal(root, a, b):
-    if checkText(a, b):
-        root.destroy()
+    d = [[j for j in range(0, len(b) + 1)]] + [[i] for i in range(1, len(a) + 1)]
 
-def checkText(a, b):
-    mistakes = 0
-    if len(a) != len(b):
-        mistakes += abs(len(a)-len(b))
-    for i in range(min(len(a), len(b))):
-        if a[i] != b[i]:
-            mistakes += 1
-    return mistakes <= maxMistakes
+    for j in range(1, len(b) + 1):
+        for i in range(1, len(a) + 1):
+            d[i].append(min(
+                d[i - 1][j] + 1,
+                d[i][j - 1] + 1,
+                d[i - 1][j - 1] + (0 if a[i - 1] == b[j - 1] else 1)
+            ))
+
+    if d[len(a)][len(b)] <= maxMistakes:
+        root.destroy()
 
 try:
     unborderedWindow()
