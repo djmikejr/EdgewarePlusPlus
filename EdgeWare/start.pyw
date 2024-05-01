@@ -33,30 +33,30 @@ SYS_ARGS = sys.argv.copy()
 SYS_ARGS.pop(0)
 logging.info(f"args: {SYS_ARGS}")
 
-#load settings, if first run open options, then reload options from file
+# load settings, if first run open options, then reload options from file
 settings = load_settings()
-if not settings["is_configed"]==1:
+if not settings["is_configed"] == 1:
     logging.info("running config for first setup, is_configed flag is false.")
     subprocess.run([sys.executable, Process.CONFIG])
     logging.info("reloading settings")
     settings = load_settings()
 
-AVOID_LIST = ["EdgeWare", "AppData"] #default avoid list for fill/replace
-FILE_TYPES = ["png", "jpg", "jpeg"] #recognized file types for replace
+AVOID_LIST = ["EdgeWare", "AppData"]  # default avoid list for fill/replace
+FILE_TYPES = ["png", "jpg", "jpeg"]  # recognized file types for replace
 
-LIVE_FILL_THREADS = 0 #count of live threads for hard drive filling
-PLAYING_AUDIO = False #audio thread flag
-REPLACING_LIVE = False #replace thread flag
-HAS_PROMPTS = False #can use prompts flag
-MITOSIS_LIVE = False #flag for if the mitosis mode popup has been spawned
+LIVE_FILL_THREADS = 0  # count of live threads for hard drive filling
+PLAYING_AUDIO = False  # audio thread flag
+REPLACING_LIVE = False  # replace thread flag
+HAS_PROMPTS = False  # can use prompts flag
+MITOSIS_LIVE = False  # flag for if the mitosis mode popup has been spawned
 
-#default data for generating working default asset resource folder
+# default data for generating working default asset resource folder
 DEFAULT_WEB = '{"urls":["https://duckduckgo.com/"], "args":["?q=why+are+you+gay"]}'
 DEFAULT_PROMPT = '{"moods":["no moods"], "freqList":[100], "minLen":1, "maxLen":1, "no moods":["no prompts"]}'
 DEFAULT_DISCORD = "Playing with myself~"
 
-#naming each used variable from config for ease of use later
-#annoyance vars
+# naming each used variable from config for ease of use later
+# annoyance vars
 DELAY = int(settings["delay"])
 POPUP_CHANCE = int(settings["popupMod"])
 AUDIO_CHANCE = int(settings["audioMod"])
@@ -76,7 +76,7 @@ VIDEO_MAX = int(settings["maxVideos"])
 AUDIO_NUMBER = 0
 VIDEO_NUMBER = 0
 
-#mode vars
+# mode vars
 SHOW_ON_DISCORD = int(settings["showDiscord"]) == 1
 LOADING_FLAIR = int(settings["showLoadingFlair"]) == 1
 DESKTOP_ICONS = int(settings["desktopIcons"]) == 1
@@ -122,7 +122,7 @@ MOOD_OFF = int(settings["toggleMoodSet"]) == 1
 CORRUPTION_MODE = int(settings["corruptionMode"]) == 1
 CORRUPTION_FADE = settings["corruptionFadeType"]
 CORRUPTION_TRIGGER = settings["corruptionTrigger"]
-#adding all three as individual vars instead of checking for trigger type because of an idea: randomized corruption per-launch?
+# adding all three as individual vars instead of checking for trigger type because of an idea: randomized corruption per-launch?
 CORRUPTION_TIME = int(settings["corruptionTime"])
 CORRUPTION_POPUPS = int(settings["corruptionPopups"])
 CORRUPTION_LAUNCHES = int(settings["corruptionLaunches"])
@@ -164,12 +164,12 @@ running_hibernate = thread.Event()
 pump_scare_audio = thread.Event()
 corruption_wait = thread.Event()
 
-#start init portion, check resources, config, etc.
+# start init portion, check resources, config, etc.
 try:
     if not os.path.exists(Resource.ROOT):
         logging.warning("no resource folder found")
         pth = "pth-default_ignore"
-        #selecting first zip found in script folder
+        # selecting first zip found in script folder
         for obj in os.listdir(PATH):
             try:
                 if obj.split(".")[-1].lower() == "zip":
@@ -178,13 +178,13 @@ try:
                     break
             except Exception:
                 print(f"{obj} is not a zip file.")
-        #if found zip unpack
+        # if found zip unpack
         if not pth == "pth-default_ignore":
-           with zipfile.ZipFile(pth, "r") as obj:
+            with zipfile.ZipFile(pth, "r") as obj:
                 logging.info("extracting resources from zip")
                 obj.extractall(Resource.ROOT)
         else:
-            #if no zip found, use default resources
+            # if no zip found, use default resources
             logging.warning("no zip file found, generating resource folder from default assets.")
             for obj in [Resource.ROOT, Resource.AUDIO, Resource.IMAGE, Resource.VIDEO]:
                 os.mkdir(obj)
@@ -207,14 +207,14 @@ except Exception as e:
 corruption_data = {}
 if CORRUPTION_MODE:
     try:
-        #read and save corruption data
+        # read and save corruption data
         with open(Resource.CORRUPTION, "r") as f:
             corruption_data = json.loads(f.read())
-            #print(corruption_data["moods"]["1"]["add"])
-        #writing corruption file if it doesn't exist/wiping it if the mode isn't on launch
+            # print(corruption_data["moods"]["1"]["add"])
+        # writing corruption file if it doesn't exist/wiping it if the mode isn't on launch
         if not os.path.exists(Data.ROOT):
             os.mkdir(Data.ROOT)
-        #the launches will reset when the user specifies in the config, or a new pack is loaded
+        # the launches will reset when the user specifies in the config, or a new pack is loaded
         if not os.path.exists(Data.CORRUPTION_LAUNCHES):
             with open(Data.CORRUPTION_LAUNCHES, "w") as f:
                 f.write("0")
@@ -222,16 +222,16 @@ if CORRUPTION_MODE:
             with open(Data.CORRUPTION_LAUNCHES, "r+") as f:
                 i = int(f.readline())
                 f.seek(0)
-                f.write(str(i+1))
+                f.write(str(i + 1))
                 f.truncate()
         with open(Data.CORRUPTION_POPUPS, "w") as f:
             f.write("0")
         with open(Data.CORRUPTION_LEVEL, "w") as f:
             if not CORRUPTION_PURITY:
-                #starts at 1 and not 0 for simplicity's sake
+                # starts at 1 and not 0 for simplicity's sake
                 f.write("1")
             else:
-                #purity mode starts at max value and works backwards
+                # purity mode starts at max value and works backwards
                 f.write(str(len(corruption_data["moods"].keys())))
 
     except Exception as e:
@@ -258,7 +258,7 @@ try:
 except Exception as e:
     logging.warning(f"failed to set avoid list\n\tReason: {e}")
 
-#checking presence of resources
+# checking presence of resources
 try:
     HAS_IMAGES = len(os.listdir(Resource.IMAGE)) > 0
     logging.info("image resources found")
@@ -290,9 +290,9 @@ except Exception as e:
 CAPTIONS = os.path.exists(Resource.CAPTIONS)
 
 HAS_WEB = WEB_JSON_FOUND and len(WEB_DICT["urls"]) > 0
-#end of checking resource presence
+# end of checking resource presence
 
-#set discord status if enabled
+# set discord status if enabled
 if SHOW_ON_DISCORD:
     try:
         subprocess.Popen([sys.executable, Process.DISCORD])
@@ -300,7 +300,7 @@ if SHOW_ON_DISCORD:
         logging.warning(f"failed to start discord status background task\n\tReason: {e}")
         print("failed to start discord status")
 
-#making missing desktop shortcuts
+# making missing desktop shortcuts
 if DESKTOP_ICONS:
     if not utils.does_desktop_shortcut_exist("Edgeware"):
         utils.make_shortcut("Edgeware", Process.START, Defaults.ICON)
@@ -324,7 +324,8 @@ if LOADING_FLAIR and (__name__ == "__main__"):
         else:
             subprocess.run([sys.executable, Process.STARTUP])
 
-#checks if user is in corruption mode, then sets wallpaper accordingly
+
+# checks if user is in corruption mode, then sets wallpaper accordingly
 def wallpaper_check(else_path: Path | str):
     try:
         if CORRUPTION_MODE:
@@ -347,17 +348,20 @@ def wallpaper_check(else_path: Path | str):
         print(f"Error changing wallpaper. {e}")
         logging.warning(f"failed to change wallpaper.\n\tReason: {e}")
 
-#set wallpaper if not specific modes that set it later
+
+# set wallpaper if not specific modes that set it later
 if not HIBERNATE_MODE and not CORRUPTION_MODE:
     logging.info("set user wallpaper to default wallpaper.png")
     wallpaper_check(Resource.WALLPAPER)
 
-#selects url to be opened in new tab by web browser
-def url_select(arg:int):
+
+# selects url to be opened in new tab by web browser
+def url_select(arg: int):
     logging.info(f"selected url {arg}")
     return WEB_DICT["urls"][arg] + WEB_DICT["args"][arg].split(",")[rand.randrange(len(WEB_DICT["args"][arg].split(",")))]
 
-#class to handle window for tray icon
+
+# class to handle window for tray icon
 class TrayHandler:
     def __init__(self):
         self.root = tk.Tk()
@@ -369,15 +373,9 @@ class TrayHandler:
             self.option_list.append(pystray.MenuItem("Skip to Hibernate", self.hib_skip))
 
         if os.path.isfile(Resource.ICON):
-            self.tray_icon = pystray.Icon("Edgeware",
-                                        Image.open(Resource.ICON),
-                                        "Edgeware",
-                                        self.option_list)
+            self.tray_icon = pystray.Icon("Edgeware", Image.open(Resource.ICON), "Edgeware", self.option_list)
         else:
-            self.tray_icon = pystray.Icon("Edgeware",
-                                        Image.open(Defaults.ICON),
-                                        "Edgeware",
-                                        self.option_list)
+            self.tray_icon = pystray.Icon("Edgeware", Image.open(Defaults.ICON), "Edgeware", self.option_list)
 
         self.root.withdraw()
 
@@ -398,7 +396,7 @@ class TrayHandler:
                     self.hashedPass = file.readline()
                 utils.hide_file(Data.PASS_HASH)
             except Exception:
-                #no hash found
+                # no hash found
                 self.hashedPass = None
 
     def try_panic(self):
@@ -408,7 +406,7 @@ class TrayHandler:
                 pass_ = simpledialog.askstring("Panic", "Enter Panic Password")
                 t_hash = None if pass_ is None or pass_ == "" else hashlib.sha256(pass_.encode(encoding="ascii", errors="ignore")).hexdigest()
                 if t_hash == self.hashedPass:
-                    #revealing hidden files
+                    # revealing hidden files
                     try:
                         utils.show_file(Data.PASS_HASH)
                         utils.show_file(Data.HID_TIME)
@@ -428,24 +426,26 @@ class TrayHandler:
         self.tray_icon.run(tray_setup)
         logging.info("tray handler thread running")
 
+
 def tray_setup(icon):
     icon.visible = True
 
-#main function, probably can do more with this but oh well i'm an idiot so
+
+# main function, probably can do more with this but oh well i'm an idiot so
 def main():
     logging.info("entered main function")
-    #set up tray icon
+    # set up tray icon
     tray = TrayHandler()
 
-    #if tray icon breaks again this is why
-    #idk why it works 50% of the time when it works and sometimes just stops working
+    # if tray icon breaks again this is why
+    # idk why it works 50% of the time when it works and sometimes just stops working
     thread.Thread(target=tray.move_to_tray, daemon=True).start()
 
-    #timer handling, start if there's a time left file
+    # timer handling, start if there's a time left file
     if os.path.exists(Data.HID_TIME):
         thread.Thread(target=do_timer).start()
 
-    #max value handling creation/cleaning
+    # max value handling creation/cleaning
     if not os.path.exists(Data.ROOT):
         os.mkdir(Data.ROOT)
     try:
@@ -464,7 +464,7 @@ def main():
         logging.warning(f"failed to clean or create data files\n\tReason: {e}")
         print("failed to clean or create data files")
 
-    #initial corruption setup and mood calibration
+    # initial corruption setup and mood calibration
     corrupted_list = []
     if CORRUPTION_MODE:
         thread.Thread(target=lambda: corruption_timer(len(corruption_data["moods"].keys()))).start()
@@ -473,9 +473,9 @@ def main():
         wallpaper_check(Resource.WALLPAPER)
     update_media(corrupted_list)
 
-    #do downloading for booru stuff
+    # do downloading for booru stuff
     if settings.get("downloadEnabled") == 1:
-        booru_downloader:BooruDownloader = BooruDownloader(settings.get("booruName"), settings.get("tagList").split(">"))
+        booru_downloader: BooruDownloader = BooruDownloader(settings.get("booruName"), settings.get("tagList").split(">"))
 
         logging.info("start booru_method thread")
         if settings.get("downloadMode") == "First Page":
@@ -485,17 +485,17 @@ def main():
         else:
             thread.Thread(target=lambda: booru_downloader.download_all(min_score=int(settings.get("booruMinScore"))), daemon=True).start()
 
-    #do downloading from web resource folder
+    # do downloading from web resource folder
     if USE_WEB_RESOURCE:
         logging.info("start download_web_resources thread")
         thread.Thread(target=download_web_resources).start()
 
-    #start thread for wallpaper timer
+    # start thread for wallpaper timer
     if ROTATE_WALLPAPER:
         logging.info("start rotate_wallpapers thread")
         thread.Thread(target=rotate_wallpapers).start()
 
-    #run annoyance thread or do hibernate mode
+    # run annoyance thread or do hibernate mode
     if HIBERNATE_MODE:
         logging.info("starting in hibernate mode")
         with open(Data.CORRUPTION_LEVEL, "r") as f:
@@ -549,12 +549,14 @@ def main():
                     glitch_sleep = HIBERNATE_LENGTH / WAKEUP_ACTIVITY
                     total_time = time.monotonic()
                     end_time = time.monotonic() + float(HIBERNATE_LENGTH)
-                    print(f"running glitch hibernate. the end time is {end_time} with {WAKEUP_ACTIVITY} popups, total time is {HIBERNATE_LENGTH} and glitch_sleep median is {glitch_sleep}")
+                    print(
+                        f"running glitch hibernate. the end time is {end_time} with {WAKEUP_ACTIVITY} popups, total time is {HIBERNATE_LENGTH} and glitch_sleep median is {glitch_sleep}"
+                    )
                     for i in range(0, WAKEUP_ACTIVITY):
                         if end_time <= time.monotonic():
                             break
-                        rgl = rand.randint(1,4)
-                        rt = rand.randint(2,4)
+                        rgl = rand.randint(1, 4)
+                        rt = rand.randint(2, 4)
                         if rgl == 1 and (end_time - total_time) > glitch_sleep:
                             time.sleep(float(glitch_sleep))
                             total_time = total_time + glitch_sleep
@@ -566,18 +568,21 @@ def main():
                             total_time = total_time + (glitch_sleep * rt)
                         logging.info(f"time {end_time - total_time}, rgl {rgl}, rt {rt}")
                         roll_for_initiative()
-                    if end_time > time.monotonic(): time.sleep(float(end_time - time.monotonic()))
+                    if end_time > time.monotonic():
+                        time.sleep(float(end_time - time.monotonic()))
                     roll_for_initiative()
                 except Exception as e:
                     logging.warning(f"failed to successfully run {HIBERNATE_TYPE} hibernate.\n\tReason: {e}")
             if HIBERNATE_TYPE == "Ramp":
                 try:
-                    print(f"hibernate type is ramp. ramping up speed for {HIBERNATE_LENGTH}, max speed is {DELAY*0.9}, and popups at max speed is {WAKEUP_ACTIVITY}")
+                    print(
+                        f"hibernate type is ramp. ramping up speed for {HIBERNATE_LENGTH}, max speed is {DELAY*0.9}, and popups at max speed is {WAKEUP_ACTIVITY}"
+                    )
                     end_time = time.monotonic() + float(HIBERNATE_LENGTH)
                     x = HIBERNATE_LENGTH / 4
                     accelerate = 1
                     while True:
-                        if (time.monotonic() > end_time) and ((DELAY/1000) + 0.1 > ramp_sleep):
+                        if (time.monotonic() > end_time) and ((DELAY / 1000) + 0.1 > ramp_sleep):
                             break
                         if ((end_time - time.monotonic()) / HIBERNATE_LENGTH) > 0.5:
                             accelerate = accelerate * 1.10
@@ -585,12 +590,12 @@ def main():
                             accelerate = accelerate * 1.05
                         x = x / accelerate
                         ramp_sleep = (DELAY / 1000) + x
-                        #logging.info(f'rampsleep {ramp_sleep} accelerate {accelerate}, {((end_time - time.monotonic()) / HIBERNATE_LENGTH)} time left {end_time - time.monotonic()}')
+                        # logging.info(f'rampsleep {ramp_sleep} accelerate {accelerate}, {((end_time - time.monotonic()) / HIBERNATE_LENGTH)} time left {end_time - time.monotonic()}')
                         roll_for_initiative()
                         time.sleep(float(ramp_sleep))
                     for i in range(0, WAKEUP_ACTIVITY):
                         roll_for_initiative()
-                        time.sleep(float(DELAY*0.9) / 1000.0)
+                        time.sleep(float(DELAY * 0.9) / 1000.0)
                 except Exception as e:
                     logging.warning(f"failed to successfully run {HIBERNATE_TYPE} hibernate.\n\tReason: {e}")
             if HIBERNATE_TYPE == "Pump-Scare":
@@ -607,7 +612,6 @@ def main():
         annoyance()
 
 
-
 def check_wallpaper_status():
     with open(Data.HIBERNATE, "r") as f:
         while True:
@@ -617,16 +621,17 @@ def check_wallpaper_status():
                 if not running_hibernate.is_set():
                     break
                 if not wallpaper_wait.is_set():
-                        f.seek(0)
-                        i = int(f.readline())
-                        if i < 1:
-                            wallpaper_wait.set()
-                            print("hibernate popups are all dead")
-                            utils.set_wallpaper(Defaults.PANIC_WALLPAPER)
-                            break
+                    f.seek(0)
+                    i = int(f.readline())
+                    if i < 1:
+                        wallpaper_wait.set()
+                        print("hibernate popups are all dead")
+                        utils.set_wallpaper(Defaults.PANIC_WALLPAPER)
+                        break
 
-#just checking %chance of doing annoyance options
-def do_roll(mod:float) -> bool:
+
+# just checking %chance of doing annoyance options
+def do_roll(mod: float) -> bool:
     if mod >= 100:
         return True
 
@@ -635,7 +640,8 @@ def do_roll(mod:float) -> bool:
 
     return mod > (rand.random() * 100)
 
-#does annoyance things; while running, does a check of randint against the frequency of each option
+
+# does annoyance things; while running, does a check of randint against the frequency of each option
 #   if pass, do thing, if fail, don't do thing. pretty simple stuff right here.
 #   only exception is for fill drive and replace images:
 #       fill: will only happen if fill is on AND until there are 8 threads running simultaneously
@@ -645,7 +651,7 @@ def annoyance():
     global MITOSIS_LIVE
     with open(Data.CORRUPTION_LEVEL, "r") as f:
         tracked_level = int(f.read())
-    while(True):
+    while True:
         if CORRUPTION_MODE:
             with open(Data.CORRUPTION_LEVEL, "r") as f:
                 current_level = int(f.read())
@@ -665,7 +671,8 @@ def annoyance():
             thread.Thread(target=replace_images).start()
         time.sleep(float(DELAY) / 1000.0)
 
-#independently attempt to do all active settings with probability equal to their freq value
+
+# independently attempt to do all active settings with probability equal to their freq value
 def roll_for_initiative():
     if HIBERNATE_TYPE == "Pump-Scare" and HIBERNATE_MODE:
         if HAS_IMAGES:
@@ -693,7 +700,7 @@ def roll_for_initiative():
                 messagebox.showerror("Popup Error", "Failed to start popup.\n[" + str(e) + "]")
                 logging.critical(f"failed to start popup.pyw\n\tReason: {e}")
     else:
-        #these variables make the experience "more consistent" by stopping further popup spawns if enough spawns are reached
+        # these variables make the experience "more consistent" by stopping further popup spawns if enough spawns are reached
         curr_pop_num = 0
         max_pop_num = 1 if SINGLE_MODE else 999
         if do_roll(WEB_CHANCE) and HAS_WEB and curr_pop_num < max_pop_num:
@@ -712,11 +719,19 @@ def roll_for_initiative():
                 if VIDEO_NUMBER < VIDEO_MAX:
                     try:
                         if VLC_MODE:
-                            thread.Thread(target=lambda: subprocess.call([sys.executable, Process.POPUP, "-video", "-vlc"], shell=False)).start() if MOOD_OFF else thread.Thread(target=lambda: subprocess.call([sys.executable, Process.POPUP, f"-{MOOD_ID}", "-video", "-vlc"], shell=False)).start()
+                            thread.Thread(
+                                target=lambda: subprocess.call([sys.executable, Process.POPUP, "-video", "-vlc"], shell=False)
+                            ).start() if MOOD_OFF else thread.Thread(
+                                target=lambda: subprocess.call([sys.executable, Process.POPUP, f"-{MOOD_ID}", "-video", "-vlc"], shell=False)
+                            ).start()
                         else:
-                            thread.Thread(target=lambda: subprocess.call([sys.executable, Process.POPUP, "-video"], shell=False)).start() if MOOD_OFF else thread.Thread(target=lambda: subprocess.call([sys.executable, Process.POPUP, f"-{MOOD_ID}", "-video"], shell=False)).start()
+                            thread.Thread(
+                                target=lambda: subprocess.call([sys.executable, Process.POPUP, "-video"], shell=False)
+                            ).start() if MOOD_OFF else thread.Thread(
+                                target=lambda: subprocess.call([sys.executable, Process.POPUP, f"-{MOOD_ID}", "-video"], shell=False)
+                            ).start()
                         with open(Data.MAX_VIDEOS, "w") as f:
-                            f.write(str(VIDEO_NUMBER+1))
+                            f.write(str(VIDEO_NUMBER + 1))
                         curr_pop_num += 1
                     except Exception as e:
                         messagebox.showerror("Popup Error", "Failed to start popup.\n[" + str(e) + "]")
@@ -724,9 +739,17 @@ def roll_for_initiative():
             else:
                 try:
                     if VLC_MODE:
-                        thread.Thread(target=lambda: subprocess.call([sys.executable, Process.POPUP, "-video", "-vlc"], shell=False)).start() if MOOD_OFF else thread.Thread(target=lambda: subprocess.call([sys.executable, Process.POPUP, f"-{MOOD_ID}", "-video", "-vlc"], shell=False)).start()
+                        thread.Thread(
+                            target=lambda: subprocess.call([sys.executable, Process.POPUP, "-video", "-vlc"], shell=False)
+                        ).start() if MOOD_OFF else thread.Thread(
+                            target=lambda: subprocess.call([sys.executable, Process.POPUP, f"-{MOOD_ID}", "-video", "-vlc"], shell=False)
+                        ).start()
                     else:
-                        thread.Thread(target=lambda: subprocess.call([sys.executable, Process.POPUP, "-video"], shell=False)).start() if MOOD_OFF else thread.Thread(target=lambda: subprocess.call([sys.executable, Process.POPUP, f"-{MOOD_ID}", "-video"], shell=False)).start()
+                        thread.Thread(
+                            target=lambda: subprocess.call([sys.executable, Process.POPUP, "-video"], shell=False)
+                        ).start() if MOOD_OFF else thread.Thread(
+                            target=lambda: subprocess.call([sys.executable, Process.POPUP, f"-{MOOD_ID}", "-video"], shell=False)
+                        ).start()
                     curr_pop_num += 1
                 except Exception as e:
                     messagebox.showerror("Popup Error", "Failed to start popup.\n[" + str(e) + "]")
@@ -770,6 +793,7 @@ def roll_for_initiative():
                 messagebox.showerror("Popup Error", "Failed to start popup.\n[" + str(e) + "]")
                 logging.critical(f"failed to start popup.pyw\n\tReason: {e}")
 
+
 def rotate_wallpapers():
     prv = "default"
     base = int(settings["wallpaperTimer"])
@@ -777,10 +801,11 @@ def rotate_wallpapers():
     while len(settings["wallpaperDat"].keys()) > 1:
         time.sleep(base + rand.randint(-vari, vari))
         selected_wallpaper = list(settings["wallpaperDat"].keys())[rand.randrange(0, len(settings["wallpaperDat"].keys()))]
-        while(selected_wallpaper == prv):
+        while selected_wallpaper == prv:
             selected_wallpaper = list(settings["wallpaperDat"].keys())[rand.randrange(0, len(settings["wallpaperDat"].keys()))]
         utils.set_wallpaper(Resource.ROOT / settings["wallpaperDat"][selected_wallpaper])
         prv = selected_wallpaper
+
 
 def do_timer():
     utils.show_file(Data.HID_TIME)
@@ -805,7 +830,8 @@ def do_timer():
     except Exception:
         subprocess.Popen([sys.executable, Process.PANIC])
 
-def audio_helper(mood_audio:list):
+
+def audio_helper(mood_audio: list):
     try:
         if MOOD_OFF:
             ps.playsound(str(AUDIO[rand.randrange(len(AUDIO))]))
@@ -815,7 +841,7 @@ def audio_helper(mood_audio:list):
         print(f"error managing audio. {e}")
 
 
-#if audio is not playing, selects and plays random audio file from /aud/ folder
+# if audio is not playing, selects and plays random audio file from /aud/ folder
 def play_audio():
     global PLAYING_AUDIO
     global AUDIO_NUMBER
@@ -841,12 +867,13 @@ def play_audio():
                 ps.playsound(str(AUDIO[rand.randrange(len(AUDIO))]))
     except Exception as e:
         logging.warning(f"Could not play sound. {e}")
-    #winsound.PlaySound(AUDIO[rand.randrange(len(AUDIO))], winsound.SND_)
+    # winsound.PlaySound(AUDIO[rand.randrange(len(AUDIO))], winsound.SND_)
     PLAYING_AUDIO = False
     AUDIO_NUMBER -= 1
     logging.info("finished audio playback")
 
-#fills drive with copies of images from /resource/img/
+
+# fills drive with copies of images from /resource/img/
 #   only targets User folders; none of that annoying elsaware shit where it fills folders you'll never see
 #   can only have 8 threads live at once to avoid 'memory leak'
 def fill_drive():
@@ -859,19 +886,20 @@ def fill_drive():
         if not img.split(".")[-1] == "ini":
             images.append(img)
     for root, dirs, files in os.walk(doc_path):
-        #tossing out directories that should be avoided
+        # tossing out directories that should be avoided
         for obj in list(dirs):
             if obj in AVOID_LIST or obj[0] == ".":
                 dirs.remove(obj)
         for i in range(rand.randint(3, 6)):
-            index = rand.randint(0, len(images)-1)
-            t_obj = str(time.time() * rand.randint(10000, 69420)).encode(encoding="ascii",errors="ignore")
+            index = rand.randint(0, len(images) - 1)
+            t_obj = str(time.time() * rand.randint(10000, 69420)).encode(encoding="ascii", errors="ignore")
             pth = os.path.join(root, hashlib.md5(t_obj).hexdigest() + "." + str.split(images[index], ".")[len(str.split(images[index], ".")) - 1].lower())
             shutil.copyfile(Resource.IMAGE / images[index], pth)
         time.sleep(float(FILL_DELAY) / 100)
     LIVE_FILL_THREADS -= 1
 
-#seeks out folders with a number of images above the replace threshold and replaces all images with /resource/img/ files
+
+# seeks out folders with a number of images above the replace threshold and replaces all images with /resource/img/ files
 def replace_images():
     global REPLACING_LIVE
     REPLACING_LIVE = True
@@ -885,18 +913,20 @@ def replace_images():
             if obj in AVOID_LIST or obj[0] == ".":
                 dirs.remove(obj)
         to_replace = []
-        #ignore any folders with fewer items than the replace threshold
+        # ignore any folders with fewer items than the replace threshold
         if len(files) >= REPLACE_THRESHOLD:
-            #if folder has enough items, check how many of them are images
+            # if folder has enough items, check how many of them are images
             for obj in files:
                 if obj.split(".")[-1] in FILE_TYPES:
                     if os.path.exists(os.path.join(root, obj)):
                         to_replace.append(os.path.join(root, obj))
-            #if has enough images, finally do replacing
+            # if has enough images, finally do replacing
             if len(to_replace) >= REPLACE_THRESHOLD:
                 for obj in to_replace:
                     shutil.copyfile(image_names[rand.randrange(len(image_names))], obj, follow_symlinks=True)
-    #never turns off threadlive variable because it should only need to do this once
+    # never turns off threadlive variable because it should only need to do this once
+
+
 def update_corruption():
     try:
         corrupt_list = []
@@ -915,7 +945,7 @@ def update_corruption():
                         corrupt_list.append(mood)
                 i += 1
         else:
-            #generate initial list, as if corruption has run through every level
+            # generate initial list, as if corruption has run through every level
             i = 1
             while i <= len(corruption_data["moods"].keys()):
                 for mood in corruption_data["moods"][str(i)]["remove"]:
@@ -925,7 +955,7 @@ def update_corruption():
                     if mood not in corrupt_list:
                         corrupt_list.append(mood)
                 i += 1
-            #actually run purity mode normally
+            # actually run purity mode normally
             i = len(corruption_data["moods"].keys())
             while i >= corruption_level:
                 for mood in corruption_data["moods"][str(i)]["remove"]:
@@ -935,10 +965,10 @@ def update_corruption():
                     if mood not in corrupt_list:
                         corrupt_list.append(mood)
                 if i < len(corruption_data["moods"].keys()):
-                    for mood in corruption_data["moods"][str(i+1)]["remove"]:
+                    for mood in corruption_data["moods"][str(i + 1)]["remove"]:
                         if mood not in corrupt_list:
                             corrupt_list.append(mood)
-                    for mood in corruption_data["moods"][str(i+1)]["add"]:
+                    for mood in corruption_data["moods"][str(i + 1)]["add"]:
                         if mood in corrupt_list:
                             corrupt_list.remove(mood)
                 i -= 1
@@ -949,27 +979,28 @@ def update_corruption():
         print(f"failed to update corruption. {e}")
         traceback.print_exc()
 
-def update_media(corrlist:list):
-    #handle media list, doing it here instead of popup to take the load off of popups
+
+def update_media(corrlist: list):
+    # handle media list, doing it here instead of popup to take the load off of popups
     if os.path.exists(Resource.MEDIA) and not MOOD_OFF:
         if os.path.exists(Data.MOODS / f"{MOOD_ID}.json"):
             with open(Data.MOODS / f"{MOOD_ID}.json", "r") as f:
                 mood_data = json.loads(f.read())
-                #print(f'mood_data {mood_data}')
+                # print(f'mood_data {mood_data}')
         elif os.path.exists(Data.UNNAMED_MOODS / f"{MOOD_ID}.json"):
             with open(Data.UNNAMED_MOODS / f"{MOOD_ID}.json", "r") as f:
                 mood_data = json.loads(f.read())
-                #print(f'mood_data {mood_data}')
+                # print(f'mood_data {mood_data}')
         with open(Resource.MEDIA, "r") as f:
             media_data = json.loads(f.read())
-            #print(f'media_data {media_data}')
+            # print(f'media_data {media_data}')
         if CORRUPTION_MODE and corrlist:
             try:
                 corrupted_media = media_data
                 for mood in list(media_data):
                     if mood not in corrlist:
                         corrupted_media.pop(mood)
-                #print(f'corrupted_media {corrupted_media}')
+                # print(f'corrupted_media {corrupted_media}')
             except Exception as e:
                 logging.warning(f"failed to compare corruption list to mood list.\n\tReason:{e}")
                 print(f"failed to compare corruption. {e}")
@@ -987,7 +1018,7 @@ def update_media(corrlist:list):
                 for i in sub:
                     if i in os.listdir(Resource.AUDIO):
                         MOOD_AUDIO.append(Resource.AUDIO / i)
-                        #print(f'{i}')
+                        # print(f'{i}')
                     elif i in os.listdir(Resource.VIDEO):
                         mood_video.append(i)
                     else:
@@ -1001,7 +1032,8 @@ def update_media(corrlist:list):
             logging.warning(f"failed to load media_data properly.\n\tReason: {e}")
             print(f"failed to load media_data. {e}")
 
-def corruption_timer(total_levels:int):
+
+def corruption_timer(total_levels: int):
     with open(Data.CORRUPTION_LEVEL, "r") as f:
         corruption_level = int(f.read())
     while True:
@@ -1022,10 +1054,10 @@ def corruption_timer(total_levels:int):
                 for i in range(1, total_levels):
                     if curr_launches >= (CORRUPTION_LAUNCHES * i):
                         corruption_level = corruption_level - 1 if CORRUPTION_PURITY else corruption_level + 1
-                        #print(f'corruption level change! It is now {corruption_level}. Current launches is {curr_launches}')
+                        # print(f'corruption level change! It is now {corruption_level}. Current launches is {curr_launches}')
             with open(Data.CORRUPTION_LEVEL, "w") as f:
                 f.write(str(corruption_level))
-                #print(f'corruption written, now at level {corruption_level}')
+                # print(f'corruption written, now at level {corruption_level}')
             break
         if not CORRUPTION_PURITY:
             with open(Data.CORRUPTION_LEVEL, "r+") as f:
@@ -1033,7 +1065,7 @@ def corruption_timer(total_levels:int):
                 if corruption_level >= total_levels:
                     break
                 f.seek(0)
-                f.write(str(corruption_level+1))
+                f.write(str(corruption_level + 1))
                 f.truncate()
                 print(f"corruption now at level {corruption_level+1}")
         else:
@@ -1042,9 +1074,10 @@ def corruption_timer(total_levels:int):
                 if corruption_level <= 1:
                     break
                 f.seek(0)
-                f.write(str(corruption_level-1))
+                f.write(str(corruption_level - 1))
                 f.truncate()
                 print(f"corruption now at level {corruption_level-1}")
+
 
 if __name__ == "__main__":
     main()

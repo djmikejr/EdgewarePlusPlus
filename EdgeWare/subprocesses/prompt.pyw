@@ -21,7 +21,7 @@ has_data = False
 text_data = {}
 MAX_MISTAKES = 3
 submission_text = "I Submit <3"
-command_text    = "Type for me, slut~"
+command_text = "Type for me, slut~"
 mood_data = {}
 THEME = "Original"
 
@@ -58,6 +58,7 @@ if os.path.exists(Resource.PROMPT):
 
 if not has_data:
     messagebox.showerror("Prompt Error", 'Resource folder contains no "prompt.json". Either set prompt freq to 0 or add "prompt.json" to resource folder.')
+
 
 def unbordered_window():
     if not has_data:
@@ -106,14 +107,14 @@ def unbordered_window():
 
     txt = build_text()
 
-    monitor = rand.choice(get_monitors()) # TODO: Only on primary monitor?
+    monitor = rand.choice(get_monitors())  # TODO: Only on primary monitor?
     wid = monitor.width / 4
     hgt = monitor.height / 2
 
     text_label = Label(root, text=txt, wraplength=wid, bg=back, fg=fore)
     text_label.pack()
 
-    root.geometry("%dx%d+%d+%d" % (wid, hgt, monitor.x + 2*wid - wid / 2, monitor.y + hgt - hgt / 2))
+    root.geometry("%dx%d+%d+%d" % (wid, hgt, monitor.x + 2 * wid - wid / 2, monitor.y + hgt - hgt / 2))
 
     root.frame = Frame(root, borderwidth=2, relief=RAISED, bg=back)
     root.frame.pack_propagate(True)
@@ -123,10 +124,18 @@ def unbordered_window():
     input_box = Text(root, bg=textb, fg=textf)
     input_box.pack()
 
-    sub_button = Button(root, text=submission_text, command=lambda: check_total(root, txt, input_box.get(1.0, "end-1c")), bg=back, fg=fore,
-                       activebackground=back, activeforeground=fore)
+    sub_button = Button(
+        root,
+        text=submission_text,
+        command=lambda: check_total(root, txt, input_box.get(1.0, "end-1c")),
+        bg=back,
+        fg=fore,
+        activebackground=back,
+        activeforeground=fore,
+    )
     sub_button.place(x=wid - 5 - sub_button.winfo_reqwidth(), y=hgt - 5 - sub_button.winfo_reqheight())
     root.mainloop()
+
 
 def build_text():
     mood_list = text_data["moods"]
@@ -134,15 +143,16 @@ def build_text():
     if MOOD_ID != "0":
         for i, mood in enumerate(mood_list):
             if mood not in mood_data["prompts"]:
-                del mood_list[i-1]
-                del freq_list[i-1]
+                del mood_list[i - 1]
+                del freq_list[i - 1]
     output_phrase_count = rand.randint(int(text_data["minLen"]), int(text_data["maxLen"]))
     str_var = ""
     selection = rand.choices(mood_list, freq_list, k=1)
     for i in range(output_phrase_count):
         str_var += text_data[selection[0]][rand.randrange(0, len(text_data[selection[0]]))] + " "
-    #str_var += MOOD_ID
+    # str_var += MOOD_ID
     return str_var.strip()
+
 
 # Checks that the number of mistakes is at most MAX_MISTAKES and if so,
 # closes the prompt window. The number of mistakes is computed as the edit
@@ -153,14 +163,17 @@ def check_total(root, a, b):
 
     for j in range(1, len(b) + 1):
         for i in range(1, len(a) + 1):
-            d[i].append(min(
-                d[i - 1][j] + 1,
-                d[i][j - 1] + 1,
-                d[i - 1][j - 1] + (0 if a[i - 1] == b[j - 1] else 1)
-            ))
+            d[i].append(
+                min(
+                    d[i - 1][j] + 1,
+                    d[i][j - 1] + 1,
+                    d[i - 1][j - 1] + (0 if a[i - 1] == b[j - 1] else 1)
+                )
+            )  # fmt: skip
 
     if d[len(a)][len(b)] <= MAX_MISTAKES:
         root.destroy()
+
 
 try:
     unbordered_window()

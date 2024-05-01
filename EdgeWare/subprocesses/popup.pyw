@@ -21,7 +21,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 from utils import utils
 from utils.paths import Data, Defaults, Process, Resource
 
-#import traceback
+# import traceback
 try:
     import vlc
 except Exception:
@@ -30,8 +30,9 @@ except Exception:
 SYS_ARGS = sys.argv.copy()
 SYS_ARGS.pop(0)
 
+
 class PrefixData:
-    def __init__(self, name, captions = None, images = None, max = 1, chance = 100.0):
+    def __init__(self, name, captions=None, images=None, max=1, chance=100.0):
         # The name of the prefix
         self.name = name
 
@@ -53,16 +54,18 @@ class PrefixData:
         # Chance of this prefix being used (% out of 100, and it's a float to allow < 1% chance)
         self.chance = float(chance)
 
+
 prefixes = {}
-#End Imported Code
+# End Imported Code
 
 
-def check_setting(name:str, default:bool=False) -> bool:
+def check_setting(name: str, default: bool = False) -> bool:
     default = False if default is None else default
     try:
         return int(settings.get(name)) == 1
     except Exception:
         return default
+
 
 ALLOW_SCREAM = True
 SHOW_CAPTIONS = False
@@ -160,11 +163,11 @@ with open(Data.CONFIG, "r") as cfg:
     CORRUPTION_TRIGGER = settings["corruptionTrigger"]
     CORRUPTION_MODE = check_setting("corruptionMode")
 
-if MOVING_CHANCE >= rand.randint(1,100):
+if MOVING_CHANCE >= rand.randint(1, 100):
     BUTTONLESS = True
     MOVING_STATUS = True
 
-#take out first arg and make it into the mood ID
+# take out first arg and make it into the mood ID
 MOOD_ID = "0"
 if not MOOD_OFF:
     MOOD_ID = SYS_ARGS[0].strip("-")
@@ -179,7 +182,7 @@ if MOOD_ID != "0":
             mood_data = json.loads(f.read())
 
 
-#used for timer mode, checks if password is required to panic
+# used for timer mode, checks if password is required to panic
 if PANIC_REQUIRES_VALIDATION:
     try:
         utils.show_file(Data.PASS_HASH)
@@ -187,7 +190,7 @@ if PANIC_REQUIRES_VALIDATION:
             HASHED_PATH = file.readline()
         utils.hide_file(Data.PASS_HASH)
     except Exception:
-        #no hash found
+        # no hash found
         HASHED_PATH = None
 
 if WEB_OPEN:
@@ -195,19 +198,19 @@ if WEB_OPEN:
     if os.path.exists(Resource.WEB):
         with open(Resource.WEB, "r") as web_file:
             web_dict = json.loads(web_file.read())
-            #web_mood_dict = web_dict
+            # web_mood_dict = web_dict
 
-        #if not MOOD_OFF:
-            #try:
-                #for i, mood in enumerate(web_dict['moods']):
-                    #if mood not in mood_data['web']:
-                        #web_mood_dict['urls'].pop(i)
-                        #web_mood_dict['args'].pop(i)
-                        #web_mood_dict['moods'].pop(i)
-                #messagebox.showinfo('test', f'{web_mood_dict}, {type(web_mood_dict)}')
-            #except Exception as e:
-                #messagebox.showinfo('test', f'{e}')
-                #print('error loading web moods, or web moods not supported in pack.')
+        # if not MOOD_OFF:
+        #     try:
+        #         for i, mood in enumerate(web_dict['moods']):
+        #             if mood not in mood_data['web']:
+        #                 web_mood_dict['urls'].pop(i)
+        #                 web_mood_dict['args'].pop(i)
+        #                 web_mood_dict['moods'].pop(i)
+        #         messagebox.showinfo('test', f'{web_mood_dict}, {type(web_mood_dict)}')
+        #     except Exception as e:
+        #         messagebox.showinfo('test', f'{e}')
+        #         print('error loading web moods, or web moods not supported in pack.')
 try:
     with open(Resource.CAPTIONS, "r") as caption_file:
         CAPTIONS = json.load(caption_file)
@@ -220,7 +223,6 @@ try:
     # Everything in the 'prefix' block gets the default values
     for prefix in CAPTIONS.get("prefix", []):
         prefixes[prefix] = PrefixData(prefix)
-
 
     for prefix in CAPTIONS.get("prefix_settings", []):
         base = CAPTIONS["prefix_settings"][prefix]
@@ -247,12 +249,13 @@ except Exception:
     prefixes["default"] = PrefixData("default", images="", max=1, chance=100.0)
     print("no captions.json")
 
-#gif label class
+
+# gif label class
 class GifLabel(tk.Label):
-    def load(self, path:str, resized_width:int, resized_height:int, delay:int=75, back_image:Image.Image=None):
+    def load(self, path: str, resized_width: int, resized_height: int, delay: int = 75, back_image: Image.Image = None):
         self.image = Image.open(path)
         self.configure(background="black")
-        self.frames:list[ImageTk.PhotoImage] = []
+        self.frames: list[ImageTk.PhotoImage] = []
         if "duration" in self.image.info:
             self.delay = int(self.image.info["duration"])
         else:
@@ -280,9 +283,9 @@ class GifLabel(tk.Label):
             self.after(self.delay, self.next_frame)
 
 
-#video label class
+# video label class
 class VideoLabel(tk.Label):
-    def load(self, path:str, resized_width:int, resized_height:int):
+    def load(self, path: str, resized_width: int, resized_height: int):
         import imageio
         from moviepy.editor import AudioFileClip
         from videoprops import get_video_properties
@@ -297,7 +300,7 @@ class VideoLabel(tk.Label):
         try:
             self.audio_track = self.audio.to_soundarray()
             print(self.audio_track)
-            self.audio_track = [[VIDEO_VOLUME*v[0], VIDEO_VOLUME*v[1]] for v in self.audio_track]
+            self.audio_track = [[VIDEO_VOLUME * v[0], VIDEO_VOLUME * v[1]] for v in self.audio_track]
             self.duration = float(self.video_properties["duration"])
         except Exception:
             self.audio_track = None
@@ -307,9 +310,11 @@ class VideoLabel(tk.Label):
 
     def play(self):
         from types import NoneType
+
         if not isinstance(self.audio_track, NoneType):
             try:
                 import sounddevice
+
                 sounddevice.play(self.audio_track, samplerate=len(self.audio_track) / self.duration, loop=True)
             except Exception as e:
                 print(f"failed to play sound, reason:\n\t{e}")
@@ -322,20 +327,22 @@ class VideoLabel(tk.Label):
                 self.time_offset_end = time.perf_counter()
                 time.sleep(max(0, self.delay - (self.time_offset_end - self.time_offset_start)))
 
-#moving window originally provided very generously by u/basicmo!
-mspd = rand.randint(-MOVING_SPEED,MOVING_SPEED)
-while mspd == 0:
-    mspd = rand.randint(-MOVING_SPEED,MOVING_SPEED)
 
-def move_window(master, resized_height:int, resized_width:int, xlocation:int, ylocation:int):
+# moving window originally provided very generously by u/basicmo!
+mspd = rand.randint(-MOVING_SPEED, MOVING_SPEED)
+while mspd == 0:
+    mspd = rand.randint(-MOVING_SPEED, MOVING_SPEED)
+
+
+def move_window(master, resized_height: int, resized_width: int, xlocation: int, ylocation: int):
     width = resized_width
     height = resized_height
     if MOVING_RANDOM:
-        move_speed_x = rand.randint(-MOVING_SPEED,MOVING_SPEED)
-        move_speed_y = rand.randint(-MOVING_SPEED,MOVING_SPEED)
+        move_speed_x = rand.randint(-MOVING_SPEED, MOVING_SPEED)
+        move_speed_y = rand.randint(-MOVING_SPEED, MOVING_SPEED)
         while (move_speed_x == 0) and (move_speed_y == 0):
-            move_speed_x = rand.randint(-MOVING_SPEED,MOVING_SPEED)
-            move_speed_y = rand.randint(-MOVING_SPEED,MOVING_SPEED)
+            move_speed_x = rand.randint(-MOVING_SPEED, MOVING_SPEED)
+            move_speed_y = rand.randint(-MOVING_SPEED, MOVING_SPEED)
     else:
         move_speed_x = mspd
         move_speed_y = mspd
@@ -361,7 +368,8 @@ def move_window(master, resized_height:int, resized_width:int, xlocation:int, yl
         master.update()
         master.after(10)
 
-def pick_resource(basepath, vid_yes:bool):
+
+def pick_resource(basepath, vid_yes: bool):
     if MOOD_ID != "0" and os.path.exists(Resource.MEDIA):
         try:
             if vid_yes:
@@ -387,18 +395,18 @@ def pick_resource(basepath, vid_yes:bool):
         matched = "none"
         if MOOD_FILENAME:
             for prefix_name in prefixes:
-                    if item.startswith(prefixes[prefix_name].images):
-                        matched = "partial"
-                        if do_roll(prefixes[prefix_name].chance):
-                            matched = "matched"
-                            break
+                if item.startswith(prefixes[prefix_name].images):
+                    matched = "partial"
+                    if do_roll(prefixes[prefix_name].chance):
+                        matched = "matched"
+                        break
             if matched == "none":
                 prefix_name = "default"
 
             # In the case where there was a match to a prefix, but didn't win the roll, we want to try again
             elif matched == "partial":
                 continue
-        #if the mood filename setting is off, roll for a random mood based on chance
+        # if the mood filename setting is off, roll for a random mood based on chance
         else:
             if MOOD_ID != "0":
                 while True:
@@ -426,6 +434,7 @@ def pick_resource(basepath, vid_yes:bool):
         # print(prefix.name, item, caption, max)
         return item, caption, max
 
+
 root = Tk()
 
 fore = "#000000"
@@ -452,8 +461,9 @@ if THEME == "Bimbo":
     back = "#ffc5cd"
     mainfont.configure(family="Constantia")
 
+
 def run():
-    #var things
+    # var things
     video_mode = False
     resource_path = Resource.IMAGE
     if len(SYS_ARGS) >= 1 and SYS_ARGS[0] == "-video":
@@ -471,6 +481,7 @@ def run():
                 item, caption_text, root.click_count = pick_resource(resource_path, video_mode)
     else:
         from videoprops import get_video_properties
+
         video_path = str(Resource.VIDEO / item)
         video_properties = get_video_properties(video_path)
         image = Image.new("RGB", (video_properties["width"], video_properties["height"]))
@@ -487,15 +498,15 @@ def run():
     border_wid_const = 5
     monitor = rand.choice(get_monitors())
 
-    #window start
+    # window start
     root.bind("<KeyPress>", lambda key: panic(key))
     root.configure(bg="black")
     root.frame = Frame(root)
     root.wm_attributes("-topmost", -1)
     utils.set_borderless(root)
 
-    #many thanks to @MercyNudes for fixing my old braindead scaling method (https://twitter.com/MercyNudes)
-    def resize(img:Image.Image) -> Image.Image:
+    # many thanks to @MercyNudes for fixing my old braindead scaling method (https://twitter.com/MercyNudes)
+    def resize(img: Image.Image) -> Image.Image:
         size_source = max(img.width, img.height) / min(monitor.width, monitor.height)
         size_target = rand.randint(30, 70) / 100 if not LOWKEY_MODE else rand.randint(20, 50) / 100
         resize_factor = size_target / size_source
@@ -511,34 +522,40 @@ def run():
         check_subliminal()
 
     if do_deny and not animated_gif:
-        blur_modes = [ImageFilter.GaussianBlur(5), ImageFilter.GaussianBlur(10), ImageFilter.GaussianBlur(20),
-                      ImageFilter.BoxBlur(5),      ImageFilter.BoxBlur(10),       ImageFilter.BoxBlur(20)]
+        blur_modes = [
+            ImageFilter.GaussianBlur(5),
+            ImageFilter.GaussianBlur(10),
+            ImageFilter.GaussianBlur(20),
+            ImageFilter.BoxBlur(5),
+            ImageFilter.BoxBlur(10),
+            ImageFilter.BoxBlur(20),
+        ]
         rand.shuffle(blur_modes)
         resized_image = resized_image.filter(blur_modes.pop())
 
     photoimage_image = ImageTk.PhotoImage(resized_image)
     image.close()
 
-    #different handling for videos vs gifs vs normal images
+    # different handling for videos vs gifs vs normal images
     if video_mode:
         if len(SYS_ARGS) >= 2 and SYS_ARGS[1] == "-vlc":
-            #vlc mode
+            # vlc mode
             label = Label(root, width=resized_image.width, height=resized_image.height)
             label.pack()
             start_vlc(video_path, label)
         else:
-            #video mode
+            # video mode
             label = VideoLabel(root)
-            label.load(path = video_path, resized_width = resized_image.width, resized_height = resized_image.height)
+            label.load(path=video_path, resized_width=resized_image.width, resized_height=resized_image.height)
             label.pack()
             thread.Thread(target=lambda: label.play(), daemon=True).start()
     elif animated_gif:
-        #gif mode
+        # gif mode
         label = GifLabel(root)
-        label.load(path=os.path.abspath(f"{item}"), resized_width = resized_image.width, resized_height = resized_image.height)
+        label.load(path=os.path.abspath(f"{item}"), resized_width=resized_image.width, resized_height=resized_image.height)
         label.pack()
     else:
-        #standard image mode
+        # standard image mode
         if not SUBLIMINAL_MODE:
             label = Label(root, image=photoimage_image, bg="black")
             label.pack()
@@ -558,7 +575,7 @@ def run():
                 label.next_frame()
 
                 f.seek(0)
-                f.write(str(i+1))
+                f.write(str(i + 1))
                 f.truncate()
 
         if do_deny:
@@ -568,8 +585,9 @@ def run():
             else:
                 deny_text = rand.choice(CAPTIONS["denial"])
             deny_label = Label(label, text=deny_text, wraplength=resized_image.width - border_wid_const)
-            deny_label.place(x=int(resized_image.width / 2) - int(deny_label.winfo_reqwidth() / 2),
-                            y=int(resized_image.height / 2) - int(deny_label.winfo_reqheight() / 2))
+            deny_label.place(
+                x=int(resized_image.width / 2) - int(deny_label.winfo_reqwidth() / 2), y=int(resized_image.height / 2) - int(deny_label.winfo_reqheight() / 2)
+            )
 
     loc_x = rand.randint(monitor.x, monitor.x + monitor.width - (resized_image.width))
     loc_y = rand.randint(monitor.y, max(monitor.y + monitor.height - (resized_image.height), 0))
@@ -615,10 +633,9 @@ def run():
         devmode_label_2 = Label(root, text="popmood=", wraplength=resized_image.width - border_wid_const, bg=back, fg=fore)
         devmode_label_2 = Label(root, text="popnum=", wraplength=resized_image.width - border_wid_const, bg=back, fg=fore)
         devmode_label_3 = Label(root, text=f"filen={pathlib.Path(item).name}", wraplength=resized_image.width - border_wid_const, bg=back, fg=fore)
-        devmode_label_1.place(x= 5, y= int(resized_image.height/2))
-        devmode_label_2.place(x= 5, y= int(resized_image.height/2) + devmode_label_2.winfo_reqheight() + 2)
-        devmode_label_3.place(x= 5, y= int(resized_image.height/2) + devmode_label_3.winfo_reqheight() + devmode_label_2.winfo_reqheight() + 4)
-
+        devmode_label_1.place(x=5, y=int(resized_image.height / 2))
+        devmode_label_2.place(x=5, y=int(resized_image.height / 2) + devmode_label_2.winfo_reqheight() + 2)
+        devmode_label_3.place(x=5, y=int(resized_image.height / 2) + devmode_label_3.winfo_reqheight() + devmode_label_2.winfo_reqheight() + 4)
 
     if BUTTONLESS:
         label.bind("<ButtonRelease-1>", buttonless_click)
@@ -633,13 +650,13 @@ def run():
         with open(Data.HIBERNATE, "r+") as f:
             i = int(f.readline())
             f.seek(0)
-            f.write(str(i+1))
+            f.write(str(i + 1))
             f.truncate()
     if CORRUPTION_MODE and CORRUPTION_TRIGGER == "Popup":
         with open(Data.CORRUPTION_POPUPS, "r+") as f:
             i = int(f.readline())
             f.seek(0)
-            f.write(str(i+1))
+            f.write(str(i + 1))
             f.truncate()
 
     root.attributes("-alpha", OPACITY / 100)
@@ -649,22 +666,25 @@ def run():
 
     root.mainloop()
 
+
 def start_vlc(vid, label):
-    #word of advice: if you go messing around with python-vlc there's almost no documentation for it
-    #this is a hack that will repeat the video 999,999 times, because I tried to find something less terrible for hours but couldn't
+    # word of advice: if you go messing around with python-vlc there's almost no documentation for it
+    # this is a hack that will repeat the video 999,999 times, because I tried to find something less terrible for hours but couldn't
     instance = vlc.Instance("--input-repeat=999999")
     media_player = instance.media_player_new()
     media_player.set_hwnd(label.winfo_id())
     media_player.video_set_mouse_input(False)
     media_player.video_set_key_input(False)
-    media_player.audio_set_volume(int(VIDEO_VOLUME*100))
+    media_player.audio_set_volume(int(VIDEO_VOLUME * 100))
 
     media = instance.media_new(vid)
     media_player.set_media(media)
     media_player.play()
 
+
 def check_deny() -> bool:
     return DENIAL_MODE and rand.randint(1, 100) <= DENIAL_CHANCE
+
 
 def check_subliminal():
     global SUBLIMINAL_MODE
@@ -674,12 +694,13 @@ def check_subliminal():
         elif rand.randint(1, 100) > SUBLIMINAL_CHANCE:
             SUBLIMINAL_MODE = False
 
-def live_life(parent:tk, length:int):
+
+def live_life(parent: tk, length: int):
     while root.click_count > 0:
         time.sleep(length)
         click(allow_die=False)
-    for i in range(100-OPACITY, 100):
-        parent.attributes("-alpha", 1-i/100)
+    for i in range(100 - OPACITY, 100):
+        parent.attributes("-alpha", 1 - i / 100)
         time.sleep(FADE_OUT_TIME / 100)
     if LOWKEY_MODE:
         subprocess.Popen([sys.executable, Process.POPUP])
@@ -688,25 +709,26 @@ def live_life(parent:tk, length:int):
             i = int(f.readline())
             if i > 0:
                 f.seek(0)
-                f.write(str(i-1))
+                f.write(str(i - 1))
                 f.truncate()
     if len(SYS_ARGS) >= 1 and SYS_ARGS[0] == "-video":
         with open(Data.MAX_VIDEOS, "r+") as f:
             i = int(f.readline())
             if i > 0:
                 f.seek(0)
-                f.write(str(i-1))
+                f.write(str(i - 1))
                 f.truncate()
     if SUBLIMINAL_MODE:
         with open(Data.MAX_SUBLIMINALS, "r+") as f:
             i = int(f.readline())
             if i > 0:
                 f.seek(0)
-                f.write(str(i-1))
+                f.write(str(i - 1))
                 f.truncate()
     os.kill(os.getpid(), 9)
 
-def do_roll(mod:float) -> bool:
+
+def do_roll(mod: float) -> bool:
     if mod >= 100:
         return True
 
@@ -715,16 +737,19 @@ def do_roll(mod:float) -> bool:
 
     return mod > (rand.random() * 100)
 
-def select_url(arg:str):
-    #if MOOD_OFF:
+
+def select_url(arg: str):
+    # if MOOD_OFF:
     return web_dict["urls"][arg] + web_dict["args"][arg].split(",")[rand.randrange(len(web_dict["args"][arg].split(",")))]
-    #else:
-        #return web_mood_dict['urls'][arg] + web_mood_dict['args'][arg].split(',')[rand.randrange(len(web_mood_dict['args'][arg].split(',')))]
+    # else:
+    # return web_mood_dict['urls'][arg] + web_mood_dict['args'][arg].split(',')[rand.randrange(len(web_mood_dict['args'][arg].split(',')))]
+
 
 def buttonless_click(event):
     click()
 
-def click(allow_die = True):
+
+def click(allow_die=True):
     # global click_count, caption_string, button_string
 
     root.click_count -= 1
@@ -752,37 +777,39 @@ def click(allow_die = True):
             else:
                 root.button_string.set(root.button_text)
 
+
 def die():
-    if WEB_OPEN and web_dict and do_roll((100-WEB_PROB) / 2) and not LOWKEY_MODE:
+    if WEB_OPEN and web_dict and do_roll((100 - WEB_PROB) / 2) and not LOWKEY_MODE:
         url_path = select_url(rand.randrange(len(web_dict["urls"])))
         webbrowser.open_new(url_path)
     if MITOSIS_MODE or LOWKEY_MODE:
-        for i in (range(0, MITOSIS_STRENGTH) if not LOWKEY_MODE else [1]):
+        for i in range(0, MITOSIS_STRENGTH) if not LOWKEY_MODE else [1]:
             subprocess.Popen([sys.executable, Process.POPUP])
     if HIBERNATE_MODE and check_setting("fixWallpaper"):
         with open(Data.HIBERNATE, "r+") as f:
             i = int(f.readline())
             if i > 0:
                 f.seek(0)
-                f.write(str(i-1))
+                f.write(str(i - 1))
                 f.truncate()
     if len(SYS_ARGS) >= 1 and SYS_ARGS[0] == "-video":
         with open(Data.MAX_VIDEOS, "r+") as f:
             i = int(f.readline())
             if i > 0:
                 f.seek(0)
-                f.write(str(i-1))
+                f.write(str(i - 1))
                 f.truncate()
     if SUBLIMINAL_MODE:
         with open(Data.MAX_SUBLIMINALS, "r+") as f:
             i = int(f.readline())
             if i > 0:
                 f.seek(0)
-                f.write(str(i-1))
+                f.write(str(i - 1))
                 f.truncate()
     os.kill(os.getpid(), 9)
 
-#def select_caption(filename:str) -> str:
+
+# def select_caption(filename:str) -> str:
 #    for obj in CAPTIONS['prefix']:
 #        if MOOD_FILENAME:
 #            if MOOD_ID != '0':
@@ -803,20 +830,21 @@ def die():
 #                    return ls[rand.randrange(0, len(CAPTIONS[obj]))]
 #    return CAPTIONS['default'][rand.randrange(0, len(CAPTIONS['default']))] if (len(CAPTIONS['default']) > 0) else None
 
+
 def panic(key):
-    key_condition = (key.keysym == PANIC_KEY or key.keycode == PANIC_KEY)
+    key_condition = key.keysym == PANIC_KEY or key.keycode == PANIC_KEY
     if PANIC_REQUIRES_VALIDATION and key_condition:
         try:
             pass_ = simpledialog.askstring("Panic", "Enter Panic Password")
             print("ASKING FOR PASS")
             t_hash = None if pass_ == None or pass_ == "" else hashlib.sha256(pass_.encode(encoding="ascii", errors="ignore")).hexdigest()
         except Exception:
-            #if some issue occurs with the hash or time files just emergency panic
+            # if some issue occurs with the hash or time files just emergency panic
             subprocess.Popen([sys.executable, Process.PANIC])
         print(t_hash)
         print(HASHED_PATH)
         if t_hash == HASHED_PATH:
-            #revealing hidden files
+            # revealing hidden files
             try:
                 utils.show_file(Data.PASS_HASH)
                 utils.show_file(Data.HID_TIME)
@@ -824,16 +852,18 @@ def panic(key):
                 os.remove(Data.HID_TIME)
                 subprocess.Popen([sys.executable, Process.PANIC])
             except Exception:
-                #if some issue occurs with the hash or time files just emergency panic
+                # if some issue occurs with the hash or time files just emergency panic
                 subprocess.Popen([sys.executable, Process.PANIC])
     else:
         if not PANIC_DISABLED and key_condition:
             subprocess.Popen([sys.executable, Process.PANIC])
 
+
 def pump_scare():
     if HIBERNATE_MODE and HIBERNATE_TYPE == "Pump-Scare":
         time.sleep(2.5)
         die()
+
 
 if __name__ == "__main__":
     try:
@@ -842,4 +872,4 @@ if __name__ == "__main__":
     except Exception as e:
         utils.init_logging("popup")
         logging.fatal(f"failed to start popup\n{e}")
-        #traceback.print_exc()
+        # traceback.print_exc()

@@ -14,15 +14,15 @@ IMGID_CONSTS = ["furcock_img", "blacked_img", "censored_img", "goon_img", "goon2
 txt = ""
 
 try:
-    #grab discord status from discord.dat, mark as having file
+    # grab discord status from discord.dat, mark as having file
     with open(Resource.DISCORD, "r") as f:
-        txt=f.read()
+        txt = f.read()
 except Exception:
     print("failed text read")
 
 if not txt == "":
     try:
-        #if has file, tries to split at newline break
+        # if has file, tries to split at newline break
         #   uses first line as the string for text description
         #   uses second line as the image id for requesting image from discord api
         ls = txt.split("\n")
@@ -32,12 +32,14 @@ if not txt == "":
     except Exception:
         print("failed line split")
 
-#open discord api pipe and such
+
+# open discord api pipe and such
 def do_discord():
     conn = presence.Presence("820204081410736148")
     conn.connect()
     conn.update(state=text_obj[0], large_image=text_obj[1], start=int(time.time()))
     while True:
         time.sleep(15)
+
 
 do_discord()

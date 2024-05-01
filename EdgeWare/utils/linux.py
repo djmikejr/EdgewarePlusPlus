@@ -13,7 +13,7 @@ from utils.paths import Defaults, Process
 
 
 def panic_script():
-    subprocess.run('for pid in $(ps -u $USER -ef | grep -E "python.* *+.pyw" | awk \'{print $2}\'); do echo $pid; kill -9 $pid; done', shell=True)
+    subprocess.run("for pid in $(ps -u $USER -ef | grep -E \"python.* *+.pyw\" | awk '{print $2}'); do echo $pid; kill -9 $pid; done", shell=True)
 
 
 def set_borderless(root):
@@ -86,9 +86,7 @@ def set_wallpaper(wallpaper_path: Path | str):
         ## see http://blog.zx2c4.com/699 for a solution that might work
         elif desktop_env in ["kde3", "trinity"]:
             # From http://ubuntuforums.org/archive/index.php/t-803417.html
-            args = (
-                'dcop kdesktop KBackgroundIface setWallpaper 0 "%s" 6' % wallpaper_path
-            )
+            args = 'dcop kdesktop KBackgroundIface setWallpaper 0 "%s" 6' % wallpaper_path
             subprocess.Popen(args, shell=True)
         elif desktop_env == "xfce4":
             # From http://www.commandlinefu.com/commands/view/2055/change-wallpaper-for-xfce4-4.6.0
@@ -125,15 +123,11 @@ def set_wallpaper(wallpaper_path: Path | str):
                 subprocess.Popen(args2)
             args = ["xfdesktop", "--reload"]
             subprocess.Popen(args)
-        elif (
-            desktop_env == "razor-qt"
-        ):  # TODO: implement reload of desktop when possible
+        elif desktop_env == "razor-qt":  # TODO: implement reload of desktop when possible
             if first_run:
                 desktop_conf = ConfigParser()
                 # Development version
-                desktop_conf_file = os.path.join(
-                    _get_config_dir("razor"), "desktop.conf"
-                )
+                desktop_conf_file = os.path.join(_get_config_dir("razor"), "desktop.conf")
                 if os.path.isfile(desktop_conf_file):
                     config_option = r"screens\1\desktops\1\wallpaper"
                 else:
@@ -141,9 +135,7 @@ def set_wallpaper(wallpaper_path: Path | str):
                     config_option = r"desktops\1\wallpaper"
                 desktop_conf.read(os.path.join(desktop_conf_file))
                 try:
-                    if desktop_conf.has_option(
-                        "razor", config_option
-                    ):  # only replacing a value
+                    if desktop_conf.has_option("razor", config_option):  # only replacing a value
                         desktop_conf.set("razor", config_option, wallpaper_path)
                         with codecs.open(
                             desktop_conf_file,
@@ -207,15 +199,9 @@ def set_wallpaper(wallpaper_path: Path | str):
         #        END'''
         #        subprocess.Popen(SCRIPT%wallpaper_path, shell=True)
         else:
-            if (
-                first_run
-            ):  # don't spam the user with the same message over and over again
-                sys.stderr.write(
-                    "Warning: Failed to set wallpaper. Your desktop environment is not supported."
-                )
-                sys.stderr.write(
-                    "You can try manually to set Your wallpaper to %s" % wallpaper_path
-                )
+            if first_run:  # don't spam the user with the same message over and over again
+                sys.stderr.write("Warning: Failed to set wallpaper. Your desktop environment is not supported.")
+                sys.stderr.write("You can try manually to set Your wallpaper to %s" % wallpaper_path)
             return False
         if first_run:
             first_run = False
@@ -243,9 +229,7 @@ def show_file(path: Path | str):
 
 def does_desktop_shortcut_exist(name: str):
     file = Path(name)
-    return Path(
-        os.path.expanduser("~/Desktop") / file.with_name(f"{file.name}.desktop")
-    ).exists()
+    return Path(os.path.expanduser("~/Desktop") / file.with_name(f"{file.name}.desktop")).exists()
 
 
 def make_shortcut(title: str, process: Path, icon: Path, location: Path | None = None) -> bool:

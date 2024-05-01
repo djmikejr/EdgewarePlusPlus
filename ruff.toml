@@ -1,4 +1,6 @@
 extend-include = ["*.pyw"]
+exclude = ["tooltip.py", "config.pyw"]
+line-length = 160
 
 [lint]
 select = [

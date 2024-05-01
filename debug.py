@@ -19,7 +19,7 @@ processes = [
     [Process.POPUP, "-video"],
     [Process.PROMPT],
     [Process.SUBLABEL]
-]
+]  # fmt: off
 
 while True:
     num = input("Select number: ")
