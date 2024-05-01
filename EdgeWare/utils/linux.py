@@ -2,6 +2,7 @@ import codecs
 import json
 import logging
 import os
+import re
 import shlex
 import subprocess
 import sys
@@ -14,8 +15,10 @@ from utils.paths import Defaults, Process
 def panic_script():
     subprocess.run('for pid in $(ps -u $USER -ef | grep -E "python.* *+.pyw" | awk \'{print $2}\'); do echo $pid; kill -9 $pid; done', shell=True)
 
+
 def set_borderless(root):
     root.wm_attributes("-type", "splash")
+
 
 def set_wallpaper(wallpaper_path: Path | str):
     global first_run
@@ -221,6 +224,7 @@ def set_wallpaper(wallpaper_path: Path | str):
         sys.stderr.write("ERROR: Failed to set wallpaper. There might be a bug.\n")
         return False
 
+
 def hide_file(path: Path | str):
     if isinstance(path, str):
         path = Path(path)
@@ -235,6 +239,78 @@ def show_file(path: Path | str):
     hidden_path = path.parent / f".{path.name}"
     if hidden_path.exists():
         hidden_path.rename(path)
+
+
+def does_desktop_shortcut_exist(name: str):
+    file = Path(name)
+    return Path(
+        os.path.expanduser("~/Desktop") / file.with_name(f"{file.name}.desktop")
+    ).exists()
+
+
+def make_shortcut(title: str, process: Path, icon: Path, location: Path | None = None) -> bool:
+    with open(Defaults.CONFIG, "r") as f:
+        default_settings = json.loads(f.read())
+        version = default_settings["versionplusplus"]
+
+    shortcut_content = f"""[Desktop Entry]
+Version={version}
+Name={title}
+Exec={shlex.join([str(sys.executable), str(process)])}
+Icon={icon}
+Terminal=false
+Type=Application
+Categories=Application;"""
+
+    file_name = f"{title.lower()}.desktop"
+    file = (location if location else Path(os.path.expanduser("~/Desktop"))) / file_name
+
+    try:
+        file.write_text(shortcut_content)
+        if _get_desktop_environment() == "gnome":
+            subprocess.run(
+                [
+                    "gio",
+                    "set",
+                    str(file.absolute()),
+                    "metadata::trusted",
+                    "true",
+                ]
+            )
+    except Exception:
+        return False
+    return True
+
+
+def toggle_run_at_startup(state: bool):
+    autostart_path = Path(os.path.expanduser("~/.config/autostart"))
+    try:
+        if state:
+            make_shortcut("Edgeware", Process.START, Defaults.ICON, autostart_path)
+        else:
+            os.remove(autostart_path / "edgeware.desktop")
+    except Exception:
+        logging.warning("failed to toggle autostart")
+
+
+def _get_config_dir(app_name: str):
+    if "XDG_CONFIG_HOME" in os.environ:
+        confighome = os.environ["XDG_CONFIG_HOME"]
+    else:
+        confighome = os.environ.get("XDG_HOMD_CONFIG", os.path.expanduser(".config"))
+    configdir = os.path.join(confighome, app_name)
+    return configdir
+
+
+def _is_running(process):
+    # From http://www.bloggerpolis.com/2011/05/how-to-check-if-a-process-is-running-using-python/
+    s = subprocess.Popen(["ps", "axw"], stdout=subprocess.PIPE)
+    if s.stdout:
+        for x in s.stdout:
+            if re.search(process, x):
+                return True
+    return False
+
 
 # Source(Martin Hansen, Serge Stroobandt): https://stackoverflow.com/a/21213358
 def _get_desktop_environment():
@@ -293,52 +369,3 @@ def _get_desktop_environment():
     elif _is_running("ksmserver"):
         return "kde"
     return "unknown"
-
-def does_desktop_shortcut_exist(name: str):
-    file = Path(name)
-    return Path(
-        os.path.expanduser("~/Desktop") / file.with_name(f"{file.name}.desktop")
-    ).exists()
-
-def make_shortcut(title: str, process: Path, icon: Path, location: Path | None = None) -> bool:
-    with open(Defaults.CONFIG, "r") as f:
-        default_settings = json.loads(f.read())
-        version = default_settings["versionplusplus"]
-
-    shortcut_content = f"""[Desktop Entry]
-Version={version}
-Name={title}
-Exec={shlex.join([str(sys.executable), str(process)])}
-Icon={icon}
-Terminal=false
-Type=Application
-Categories=Application;"""
-
-    file_name = f"{title.lower()}.desktop"
-    file = (location if location else Path(os.path.expanduser("~/Desktop"))) / file_name
-
-    try:
-        file.write_text(shortcut_content)
-        if _get_desktop_environment() == "gnome":
-            subprocess.run(
-                [
-                    "gio",
-                    "set",
-                    str(desktop_file.absolute()),
-                    "metadata::trusted",
-                    "true",
-                ]
-            )
-    except Exception:
-        return False
-    return True
-
-def toggle_run_at_startup(state: bool):
-    autostart_path = Path(os.path.expanduser("~/.config/autostart"))
-    try:
-        if state:
-            make_shortcut("Edgeware", Process.START, Defaults.ICON, autostart_path)
-        else:
-            os.remove(autostart_path / "edgeware.desktop")
-    except Exception:
-        logging.warning("failed to toggle autostart")
