@@ -39,10 +39,10 @@ if len(SYS_ARGS) >= 1 and SYS_ARGS[0] != "0":
 if MOOD_ID != "0":
     if os.path.exists(Data.MOODS / f"{MOOD_ID}.json"):
         with open(Data.MOODS / f"{MOOD_ID}.json") as f:
-            moodData = json.loads(f.read())
+            mood_data = json.loads(f.read())
     elif os.path.exists(Data.UNNAMED_MOODS /  f"{MOOD_ID}.json"):
         with open(Data.UNNAMED_MOODS / f"{MOOD_ID}.json") as f:
-            moodData = json.loads(f.read())
+            mood_data = json.loads(f.read())
 
 with open(Data.CONFIG) as cfg:
     settings = json.loads(cfg.read())
@@ -99,7 +99,7 @@ def display_subliminal_message():
                     if MOOD_ID != "0":
                         allsub = []
                         for key in l:
-                            if key in moodData["captions"]:
+                            if key in mood_data["captions"]:
                                 allsub.append(l[key])
                     else:
                         allsub = list(l.values())

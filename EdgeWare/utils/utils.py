@@ -1,4 +1,5 @@
 import logging
+import os
 import sys
 import time
 
@@ -9,20 +10,23 @@ def init_logging(filename, source = None):
     if not os.path.exists(LOG_PATH):
         os.mkdir(LOG_PATH)
 
-    LOG_TIME = time.asctime().replace(" ", "_").replace(":", "-")
+    log_time = time.asctime().replace(" ", "_").replace(":", "-")
     logging.basicConfig(
-        filename=LOG_PATH / f"{LOG_TIME}-{filename}.txt",
+        filename=LOG_PATH / f"{log_time}-{filename}.txt",
         format="%(levelname)s:%(message)s",
         level=logging.DEBUG
     )
     if source:
         logging.info(f"Started {source} logging successfully.")
 
+
 def is_linux():
     return "linux" in sys.platform
 
+
 def is_windows():
     return "win32" in sys.platform
+
 
 if is_linux():
     from .linux import *

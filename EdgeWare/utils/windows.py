@@ -40,12 +40,6 @@ def does_desktop_shortcut_exist(name: str):
         os.path.expanduser("~/Desktop") / file.with_name(f"{file.name}.lnk")
     ).exists()
 
-def _remove_username(e):
-    return str(e).lower().replace(
-        os.environ["USERPROFILE"].lower().replace("\\", "\\\\"),
-        "[USERNAME_REDACTED]"
-    )
-
 def make_shortcut(title: str, process: Path, icon: Path, location: Path | None = None) -> bool:
     success = False
 
@@ -95,3 +89,9 @@ def toggle_run_at_startup(state: bool):
             logging.info("toggled startup run off.")
     except Exception as e:
         logging.warning(f"failed to toggle startup bat.\n\tReason: {_remove_username(e)}")
+
+def _remove_username(e):
+    return str(e).lower().replace(
+        os.environ["USERPROFILE"].lower().replace("\\", "\\\\"),
+        "[USERNAME_REDACTED]"
+    )

@@ -22,7 +22,7 @@ def load_settings():
 
     with open(Defaults.CONFIG, "r") as f:
         default_settings = json.loads(f.read())
-        logging.info("read in settings from config_default.json")
+        logging.info("read in settings from default_config.json")
 
     with open(Data.CONFIG, "r") as f:
         settings = json.loads(f.read())

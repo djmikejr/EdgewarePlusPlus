@@ -47,7 +47,7 @@ class GifLabel(tk.Label):
             self.config(image=next(self.frames_))
             self.after(self.delay, self.next_frame)
 
-def doAnimation():
+def do_animation():
     root = Tk()
     root.configure(bg="black")
     root.frame = Frame(root, borderwidth=2, relief=RAISED)
@@ -95,4 +95,4 @@ def anim(root):
 
     os.kill(os.getpid(), 9)
 
-doAnimation()
+do_animation()

@@ -30,7 +30,7 @@ except Exception:
 SYS_ARGS = sys.argv.copy()
 SYS_ARGS.pop(0)
 
-class prefix_data:
+class PrefixData:
     def __init__(self, name, captions = None, images = None, max = 1, chance = 100.0):
         # The name of the prefix
         self.name = name
@@ -173,10 +173,10 @@ if not MOOD_OFF:
 if MOOD_ID != "0":
     if os.path.exists(Data.MOODS / f"{MOOD_ID}.json"):
         with open(Data.MOODS / f"{MOOD_ID}.json", "r") as f:
-            moodData = json.loads(f.read())
+            mood_data = json.loads(f.read())
     elif os.path.exists(Data.UNNAMED_MOODS / f"{MOOD_ID}.json"):
         with open(Data.UNNAMED_MOODS / f"{MOOD_ID}.json", "r") as f:
-            moodData = json.loads(f.read())
+            mood_data = json.loads(f.read())
 
 
 #used for timer mode, checks if password is required to panic
@@ -200,7 +200,7 @@ if WEB_OPEN:
         #if not MOOD_OFF:
             #try:
                 #for i, mood in enumerate(web_dict['moods']):
-                    #if mood not in moodData['web']:
+                    #if mood not in mood_data['web']:
                         #web_mood_dict['urls'].pop(i)
                         #web_mood_dict['args'].pop(i)
                         #web_mood_dict['moods'].pop(i)
@@ -215,11 +215,11 @@ try:
             SUBMISSION_TEXT = CAPTIONS["subtext"]
         except Exception:
             print("will use default submission text")
-        prefixes["default"] = prefix_data("default", images="", max=1, chance=100.0)
+        prefixes["default"] = PrefixData("default", images="", max=1, chance=100.0)
 
     # Everything in the 'prefix' block gets the default values
     for prefix in CAPTIONS.get("prefix", []):
-        prefixes[prefix] = prefix_data(prefix)
+        prefixes[prefix] = PrefixData(prefix)
 
 
     for prefix in CAPTIONS.get("prefix_settings", []):
@@ -238,13 +238,13 @@ try:
                 entry.images = images
                 entry.max = max_popup
         else:
-            prefixes[prefix] = prefix_data(prefix, captions=caption, images=images, max=max_popup, chance=chance)
+            prefixes[prefix] = PrefixData(prefix, captions=caption, images=images, max=max_popup, chance=chance)
 
     # Default has to have a reasonable chance of popping up
     if prefixes["default"].chance <= 10:
         prefixes["default"].chance = 10
 except Exception:
-    prefixes["default"] = prefix_data("default", images="", max=1, chance=100.0)
+    prefixes["default"] = PrefixData("default", images="", max=1, chance=100.0)
     print("no captions.json")
 
 #gif label class
@@ -331,17 +331,17 @@ def move_window(master, resized_height:int, resized_width:int, xlocation:int, yl
     width = resized_width
     height = resized_height
     if MOVING_RANDOM:
-        move_speedX = rand.randint(-MOVING_SPEED,MOVING_SPEED)
-        move_speedY = rand.randint(-MOVING_SPEED,MOVING_SPEED)
-        while (move_speedX == 0) and (move_speedY == 0):
-            move_speedX = rand.randint(-MOVING_SPEED,MOVING_SPEED)
-            move_speedY = rand.randint(-MOVING_SPEED,MOVING_SPEED)
+        move_speed_x = rand.randint(-MOVING_SPEED,MOVING_SPEED)
+        move_speed_y = rand.randint(-MOVING_SPEED,MOVING_SPEED)
+        while (move_speed_x == 0) and (move_speed_y == 0):
+            move_speed_x = rand.randint(-MOVING_SPEED,MOVING_SPEED)
+            move_speed_y = rand.randint(-MOVING_SPEED,MOVING_SPEED)
     else:
-        move_speedX = mspd
-        move_speedY = mspd
+        move_speed_x = mspd
+        move_speed_y = mspd
 
-    dx = move_speedX
-    dy = move_speedY
+    dx = move_speed_x
+    dy = move_speed_y
 
     x, y = xlocation, ylocation  # Initial position
     while True:
@@ -349,22 +349,22 @@ def move_window(master, resized_height:int, resized_width:int, xlocation:int, yl
         y += dy
 
         if x + width >= master.winfo_screenwidth():
-            dx = -abs(move_speedX)
+            dx = -abs(move_speed_x)
         elif x <= 0:
-            dx = abs(move_speedX)
+            dx = abs(move_speed_x)
         if y + height >= master.winfo_screenheight():
-            dy = -abs(move_speedY)
+            dy = -abs(move_speed_y)
         elif y <= 0:
-            dy = abs(move_speedY)
+            dy = abs(move_speed_y)
 
         master.geometry(f"{width}x{height}+{x}+{y}")
         master.update()
         master.after(10)
 
-def pick_resource(basepath, vidYes:bool):
+def pick_resource(basepath, vid_yes:bool):
     if MOOD_ID != "0" and os.path.exists(Resource.MEDIA):
         try:
-            if vidYes:
+            if vid_yes:
                 with open(Data.MEDIA_VIDEO, "r") as f:
                     items = json.loads(f.read())
             else:
@@ -403,7 +403,7 @@ def pick_resource(basepath, vidYes:bool):
             if MOOD_ID != "0":
                 while True:
                     prefix_name = rand.choice(list(prefixes))
-                    if prefix_name in moodData["captions"]:
+                    if prefix_name in mood_data["captions"]:
                         if do_roll(prefixes[prefix_name].chance):
                             break
             else:
@@ -525,7 +525,7 @@ def run():
             #vlc mode
             label = Label(root, width=resized_image.width, height=resized_image.height)
             label.pack()
-            startVLC(video_path, label)
+            start_vlc(video_path, label)
         else:
             #video mode
             label = VideoLabel(root)
@@ -567,31 +567,31 @@ def run():
                 deny_text = "Not for you~"
             else:
                 deny_text = rand.choice(CAPTIONS["denial"])
-            denyLabel = Label(label, text=deny_text, wraplength=resized_image.width - border_wid_const)
-            denyLabel.place(x=int(resized_image.width / 2) - int(denyLabel.winfo_reqwidth() / 2),
-                            y=int(resized_image.height / 2) - int(denyLabel.winfo_reqheight() / 2))
+            deny_label = Label(label, text=deny_text, wraplength=resized_image.width - border_wid_const)
+            deny_label.place(x=int(resized_image.width / 2) - int(deny_label.winfo_reqwidth() / 2),
+                            y=int(resized_image.height / 2) - int(deny_label.winfo_reqheight() / 2))
 
-    locX = rand.randint(monitor.x, monitor.x + monitor.width - (resized_image.width))
-    locY = rand.randint(monitor.y, max(monitor.y + monitor.height - (resized_image.height), 0))
+    loc_x = rand.randint(monitor.x, monitor.x + monitor.width - (resized_image.width))
+    loc_y = rand.randint(monitor.y, max(monitor.y + monitor.height - (resized_image.height), 0))
 
     if LOWKEY_MODE:
         global LOWKEY_CORNER
         if LOWKEY_CORNER == 4:
             LOWKEY_CORNER = rand.randrange(0, 3)
         if LOWKEY_CORNER == 0:
-            locX = monitor.width - (resized_image.width)
-            locY = monitor.y
+            loc_x = monitor.width - (resized_image.width)
+            loc_y = monitor.y
         elif LOWKEY_CORNER == 1:
-            locX = monitor.x
-            locY = monitor.y
+            loc_x = monitor.x
+            loc_y = monitor.y
         elif LOWKEY_CORNER == 2:
-            locX = monitor.x
-            locY = monitor.height - (resized_image.height)
+            loc_x = monitor.x
+            loc_y = monitor.height - (resized_image.height)
         elif LOWKEY_CORNER == 3:
-            locX = monitor.x + monitor.width - (resized_image.width)
-            locY = monitor.y + monitor.height - (resized_image.height)
+            loc_x = monitor.x + monitor.width - (resized_image.width)
+            loc_y = monitor.y + monitor.height - (resized_image.height)
 
-    root.geometry(f"{resized_image.width + border_wid_const - 1}x{resized_image.height + border_wid_const - 1}+{locX}+{locY}")
+    root.geometry(f"{resized_image.width + border_wid_const - 1}x{resized_image.height + border_wid_const - 1}+{loc_x}+{loc_y}")
 
     if animated_gif:
         label.next_frame()
@@ -607,17 +607,17 @@ def run():
     if caption_text:
         root.caption_string = StringVar()
         root.caption_string.set(root.caption_text)
-        captionLabel = Label(root, textvariable=root.caption_string, wraplength=resized_image.width - border_wid_const, bg=back, fg=fore)
-        captionLabel.place(x=5, y=5)
+        caption_label = Label(root, textvariable=root.caption_string, wraplength=resized_image.width - border_wid_const, bg=back, fg=fore)
+        caption_label.place(x=5, y=5)
 
     if CORRUPTION_DEVMODE:
-        devmodeLabel1 = Label(root, text="clev=", wraplength=resized_image.width - border_wid_const, bg=back, fg=fore)
-        devmodeLabel2 = Label(root, text="popmood=", wraplength=resized_image.width - border_wid_const, bg=back, fg=fore)
-        devmodeLabel2 = Label(root, text="popnum=", wraplength=resized_image.width - border_wid_const, bg=back, fg=fore)
-        devmodeLabel3 = Label(root, text=f"filen={pathlib.Path(item).name}", wraplength=resized_image.width - border_wid_const, bg=back, fg=fore)
-        devmodeLabel1.place(x= 5, y= int(resized_image.height/2))
-        devmodeLabel2.place(x= 5, y= int(resized_image.height/2) + devmodeLabel2.winfo_reqheight() + 2)
-        devmodeLabel3.place(x= 5, y= int(resized_image.height/2) + devmodeLabel3.winfo_reqheight() + devmodeLabel2.winfo_reqheight() + 4)
+        devmode_label_1 = Label(root, text="clev=", wraplength=resized_image.width - border_wid_const, bg=back, fg=fore)
+        devmode_label_2 = Label(root, text="popmood=", wraplength=resized_image.width - border_wid_const, bg=back, fg=fore)
+        devmode_label_2 = Label(root, text="popnum=", wraplength=resized_image.width - border_wid_const, bg=back, fg=fore)
+        devmode_label_3 = Label(root, text=f"filen={pathlib.Path(item).name}", wraplength=resized_image.width - border_wid_const, bg=back, fg=fore)
+        devmode_label_1.place(x= 5, y= int(resized_image.height/2))
+        devmode_label_2.place(x= 5, y= int(resized_image.height/2) + devmode_label_2.winfo_reqheight() + 2)
+        devmode_label_3.place(x= 5, y= int(resized_image.height/2) + devmode_label_3.winfo_reqheight() + devmode_label_2.winfo_reqheight() + 4)
 
 
     if BUTTONLESS:
@@ -645,11 +645,11 @@ def run():
     root.attributes("-alpha", OPACITY / 100)
 
     if MOVING_STATUS:
-        thread.Thread(target=lambda: move_window(root,resized_image.height,resized_image.width,locX,locY), daemon=True).start()
+        thread.Thread(target=lambda: move_window(root, resized_image.height, resized_image.width, loc_x, loc_y), daemon=True).start()
 
     root.mainloop()
 
-def startVLC(vid, label):
+def start_vlc(vid, label):
     #word of advice: if you go messing around with python-vlc there's almost no documentation for it
     #this is a hack that will repeat the video 999,999 times, because I tried to find something less terrible for hours but couldn't
     instance = vlc.Instance("--input-repeat=999999")
@@ -754,8 +754,8 @@ def click(allow_die = True):
 
 def die():
     if WEB_OPEN and web_dict and do_roll((100-WEB_PROB) / 2) and not LOWKEY_MODE:
-        urlPath = select_url(rand.randrange(len(web_dict["urls"])))
-        webbrowser.open_new(urlPath)
+        url_path = select_url(rand.randrange(len(web_dict["urls"])))
+        webbrowser.open_new(url_path)
     if MITOSIS_MODE or LOWKEY_MODE:
         for i in (range(0, MITOSIS_STRENGTH) if not LOWKEY_MODE else [1]):
             subprocess.Popen([sys.executable, Process.POPUP])
@@ -786,7 +786,7 @@ def die():
 #    for obj in CAPTIONS['prefix']:
 #        if MOOD_FILENAME:
 #            if MOOD_ID != '0':
-#                if filename.startswith(obj) and obj in moodData['captions']:
+#                if filename.startswith(obj) and obj in mood_data['captions']:
 #                    ls = CAPTIONS[obj]
 #                    ls.extend(CAPTIONS['default'])
 #                    return ls[rand.randrange(0, len(CAPTIONS[obj]))]
@@ -797,7 +797,7 @@ def die():
 #                    return ls[rand.randrange(0, len(CAPTIONS[obj]))]
 #        else:
 #            if MOOD_ID != '0':
-#                if obj in moodData['captions']:
+#                if obj in mood_data['captions']:
 #                    ls = CAPTIONS[obj]
 #                    ls.extend(CAPTIONS['default'])
 #                    return ls[rand.randrange(0, len(CAPTIONS[obj]))]
@@ -830,14 +830,14 @@ def panic(key):
         if not PANIC_DISABLED and key_condition:
             subprocess.Popen([sys.executable, Process.PANIC])
 
-def pumpScare():
+def pump_scare():
     if HIBERNATE_MODE and HIBERNATE_TYPE == "Pump-Scare":
         time.sleep(2.5)
         die()
 
 if __name__ == "__main__":
     try:
-        thread.Thread(target=pumpScare).start()
+        thread.Thread(target=pump_scare).start()
         run()
     except Exception as e:
         utils.init_logging("popup")
