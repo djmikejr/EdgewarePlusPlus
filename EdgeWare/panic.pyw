@@ -1,4 +1,5 @@
 import os
+
 from utils import utils
 from utils.paths import Data, Defaults
 
@@ -6,7 +7,7 @@ from utils.paths import Data, Defaults
 try:
     utils.show_file(Data.HID_TIME)
 except:
-    ''
+    ""
 if os.path.exists(Data.HID_TIME):
     utils.hide_file(Data.HID_TIME)
     # Do nothing if timer is present

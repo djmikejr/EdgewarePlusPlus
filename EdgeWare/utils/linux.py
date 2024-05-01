@@ -1,19 +1,21 @@
 import codecs
-import os
-import shlex
-import sys
-import subprocess
 import json
 import logging
+import os
+import shlex
+import subprocess
+import sys
 from configparser import ConfigParser
 from pathlib import Path
+
 from utils.paths import Defaults, Process
+
 
 def panic_script():
     subprocess.run('for pid in $(ps -u $USER -ef | grep -E "python.* *+.pyw" | awk \'{print $2}\'); do echo $pid; kill -9 $pid; done', shell=True)
 
 def set_borderless(root):
-    root.wm_attributes('-type', 'splash')
+    root.wm_attributes("-type", "splash")
 
 def set_wallpaper(wallpaper_path: Path | str):
     global first_run
@@ -26,125 +28,125 @@ def set_wallpaper(wallpaper_path: Path | str):
     # command line: KDE, Enlightenment
     desktop_env = _get_desktop_environment()
     try:
-        if desktop_env in ['gnome', 'unity', 'cinnamon']:
-            uri = '''file://%s''' % wallpaper_path
+        if desktop_env in ["gnome", "unity", "cinnamon"]:
+            uri = """file://%s""" % wallpaper_path
             args = [
-                'gsettings',
-                'set',
-                'org.gnome.desktop.background',
-                'picture-uri',
+                "gsettings",
+                "set",
+                "org.gnome.desktop.background",
+                "picture-uri",
                 uri,
             ]
             subprocess.Popen(args)
             args = [
-                'gsettings',
-                'set',
-                'org.gnome.desktop.background',
-                'picture-uri-dark',
+                "gsettings",
+                "set",
+                "org.gnome.desktop.background",
+                "picture-uri-dark",
                 uri,
             ]
             subprocess.Popen(args)
-        elif desktop_env == 'mate':
+        elif desktop_env == "mate":
             try:  # MATE >= 1.6
                 # info from http://wiki.mate-desktop.org/docs:gsettings
                 args = [
-                    'gsettings',
-                    'set',
-                    'org.mate.background',
-                    'picture-filename',
-                    '''%s''' % wallpaper_path,
+                    "gsettings",
+                    "set",
+                    "org.mate.background",
+                    "picture-filename",
+                    """%s""" % wallpaper_path,
                 ]
                 subprocess.Popen(args)
             except:  # MATE < 1.6
                 # From https://bugs.launchpad.net/variety/+bug/1033918
                 args = [
-                    'mateconftool-2',
-                    '-t',
-                    'string',
-                    '--set',
-                    '/desktop/mate/background/picture_filename',
-                    '''%s''' % wallpaper_path,
+                    "mateconftool-2",
+                    "-t",
+                    "string",
+                    "--set",
+                    "/desktop/mate/background/picture_filename",
+                    """%s""" % wallpaper_path,
                 ]
                 subprocess.Popen(args)
-        elif desktop_env == 'gnome2':  # Not tested
+        elif desktop_env == "gnome2":  # Not tested
             # From https://bugs.launchpad.net/variety/+bug/1033918
             args = [
-                'gconftool-2',
-                '-t',
-                'string',
-                '--set',
-                '/desktop/gnome/background/picture_filename',
-                '''%s''' % wallpaper_path,
+                "gconftool-2",
+                "-t",
+                "string",
+                "--set",
+                "/desktop/gnome/background/picture_filename",
+                """%s""" % wallpaper_path,
             ]
             subprocess.Popen(args)
         ## KDE4 is difficult
         ## see http://blog.zx2c4.com/699 for a solution that might work
-        elif desktop_env in ['kde3', 'trinity']:
+        elif desktop_env in ["kde3", "trinity"]:
             # From http://ubuntuforums.org/archive/index.php/t-803417.html
             args = (
                 'dcop kdesktop KBackgroundIface setWallpaper 0 "%s" 6' % wallpaper_path
             )
             subprocess.Popen(args, shell=True)
-        elif desktop_env == 'xfce4':
+        elif desktop_env == "xfce4":
             # From http://www.commandlinefu.com/commands/view/2055/change-wallpaper-for-xfce4-4.6.0
             if first_run:
                 args0 = [
-                    'xfconf-query',
-                    '-c',
-                    'xfce4-desktop',
-                    '-p',
-                    '/backdrop/screen0/monitor0/image-path',
-                    '-s',
+                    "xfconf-query",
+                    "-c",
+                    "xfce4-desktop",
+                    "-p",
+                    "/backdrop/screen0/monitor0/image-path",
+                    "-s",
                     wallpaper_path,
                 ]
                 args1 = [
-                    'xfconf-query',
-                    '-c',
-                    'xfce4-desktop',
-                    '-p',
-                    '/backdrop/screen0/monitor0/image-style',
-                    '-s',
-                    '3',
+                    "xfconf-query",
+                    "-c",
+                    "xfce4-desktop",
+                    "-p",
+                    "/backdrop/screen0/monitor0/image-style",
+                    "-s",
+                    "3",
                 ]
                 args2 = [
-                    'xfconf-query',
-                    '-c',
-                    'xfce4-desktop',
-                    '-p',
-                    '/backdrop/screen0/monitor0/image-show',
-                    '-s',
-                    'true',
+                    "xfconf-query",
+                    "-c",
+                    "xfce4-desktop",
+                    "-p",
+                    "/backdrop/screen0/monitor0/image-show",
+                    "-s",
+                    "true",
                 ]
                 subprocess.Popen(args0)
                 subprocess.Popen(args1)
                 subprocess.Popen(args2)
-            args = ['xfdesktop', '--reload']
+            args = ["xfdesktop", "--reload"]
             subprocess.Popen(args)
         elif (
-            desktop_env == 'razor-qt'
+            desktop_env == "razor-qt"
         ):  # TODO: implement reload of desktop when possible
             if first_run:
                 desktop_conf = ConfigParser()
                 # Development version
                 desktop_conf_file = os.path.join(
-                    _get_config_dir('razor'), 'desktop.conf'
+                    _get_config_dir("razor"), "desktop.conf"
                 )
                 if os.path.isfile(desktop_conf_file):
-                    config_option = r'screens\1\desktops\1\wallpaper'
+                    config_option = r"screens\1\desktops\1\wallpaper"
                 else:
-                    desktop_conf_file = os.path.expanduser('.razor/desktop.conf')
-                    config_option = r'desktops\1\wallpaper'
+                    desktop_conf_file = os.path.expanduser(".razor/desktop.conf")
+                    config_option = r"desktops\1\wallpaper"
                 desktop_conf.read(os.path.join(desktop_conf_file))
                 try:
                     if desktop_conf.has_option(
-                        'razor', config_option
+                        "razor", config_option
                     ):  # only replacing a value
-                        desktop_conf.set('razor', config_option, wallpaper_path)
+                        desktop_conf.set("razor", config_option, wallpaper_path)
                         with codecs.open(
                             desktop_conf_file,
-                            'w',
-                            encoding='utf-8',
-                            errors='replace',
+                            "w",
+                            encoding="utf-8",
+                            errors="replace",
                         ) as f:
                             desktop_conf.write(f)
                 except:
@@ -152,32 +154,32 @@ def set_wallpaper(wallpaper_path: Path | str):
             else:
                 # TODO: reload desktop when possible
                 pass
-        elif desktop_env in ['fluxbox', 'jwm', 'openbox', 'afterstep']:
+        elif desktop_env in ["fluxbox", "jwm", "openbox", "afterstep"]:
             # http://fluxbox-wiki.org/index.php/Howto_set_the_background
             # used fbsetbg on jwm too since I am too lazy to edit the XML configuration
             # now where fbsetbg does the job excellent anyway.
             # and I have not figured out how else it can be set on Openbox and AfterSTep
             # but fbsetbg works excellent here too.
             try:
-                args = ['fbsetbg', wallpaper_path]
+                args = ["fbsetbg", wallpaper_path]
                 subprocess.Popen(args)
             except:
-                sys.stderr.write('ERROR: Failed to set wallpaper with fbsetbg!\n')
-                sys.stderr.write('Please make sre that You have fbsetbg installed.\n')
-        elif desktop_env == 'icewm':
+                sys.stderr.write("ERROR: Failed to set wallpaper with fbsetbg!\n")
+                sys.stderr.write("Please make sre that You have fbsetbg installed.\n")
+        elif desktop_env == "icewm":
             # command found at http://urukrama.wordpress.com/2007/12/05/desktop-backgrounds-in-window-managers/
-            args = ['icewmbg', wallpaper_path]
+            args = ["icewmbg", wallpaper_path]
             subprocess.Popen(args)
-        elif desktop_env == 'blackbox':
+        elif desktop_env == "blackbox":
             # command found at http://blackboxwm.sourceforge.net/BlackboxDocumentation/BlackboxBackground
-            args = ['bsetbg', '-full', wallpaper_path]
+            args = ["bsetbg", "-full", wallpaper_path]
             subprocess.Popen(args)
-        elif desktop_env == 'lxde':
-            args = 'pcmanfm --set-wallpaper %s --wallpaper-mode=scaled' % wallpaper_path
+        elif desktop_env == "lxde":
+            args = "pcmanfm --set-wallpaper %s --wallpaper-mode=scaled" % wallpaper_path
             subprocess.Popen(args, shell=True)
-        elif desktop_env == 'windowmaker':
+        elif desktop_env == "windowmaker":
             # From http://www.commandlinefu.com/commands/view/3857/set-wallpaper-on-windowmaker-in-one-line
-            args = 'wmsetbg -s -u %s' % wallpaper_path
+            args = "wmsetbg -s -u %s" % wallpaper_path
             subprocess.Popen(args, shell=True)
         ## NOT TESTED BELOW - don't want to mess things up ##
         # elif desktop_env=='enlightenment': # I have not been able to make it work on e17. On e16 it would have been something in this direction
@@ -206,23 +208,23 @@ def set_wallpaper(wallpaper_path: Path | str):
                 first_run
             ):  # don't spam the user with the same message over and over again
                 sys.stderr.write(
-                    'Warning: Failed to set wallpaper. Your desktop environment is not supported.'
+                    "Warning: Failed to set wallpaper. Your desktop environment is not supported."
                 )
                 sys.stderr.write(
-                    'You can try manually to set Your wallpaper to %s' % wallpaper_path
+                    "You can try manually to set Your wallpaper to %s" % wallpaper_path
                 )
             return False
         if first_run:
             first_run = False
         return True
     except:
-        sys.stderr.write('ERROR: Failed to set wallpaper. There might be a bug.\n')
+        sys.stderr.write("ERROR: Failed to set wallpaper. There might be a bug.\n")
         return False
 
 def hide_file(path: Path | str):
     if isinstance(path, str):
         path = Path(path)
-    hidden_path = path.parent / f'.{path.name}'
+    hidden_path = path.parent / f".{path.name}"
     if path.exists():
         path.rename(hidden_path)
 
@@ -230,7 +232,7 @@ def hide_file(path: Path | str):
 def show_file(path: Path | str):
     if isinstance(path, str):
         path = Path(path)
-    hidden_path = path.parent / f'.{path.name}'
+    hidden_path = path.parent / f".{path.name}"
     if hidden_path.exists():
         hidden_path.rename(path)
 
@@ -240,91 +242,91 @@ def _get_desktop_environment():
     # and http://ubuntuforums.org/showthread.php?t=652320
     # and http://ubuntuforums.org/showthread.php?t=652320
     # and http://ubuntuforums.org/showthread.php?t=1139057
-    desktop_session = os.environ.get('DESKTOP_SESSION')
+    desktop_session = os.environ.get("DESKTOP_SESSION")
     if desktop_session is not None:
         # easier to match if we doesn't have to deal with character cases
         desktop_session = desktop_session.lower()
         if desktop_session in [
-            'gnome',
-            'unity',
-            'cinnamon',
-            'mate',
-            'xfce4',
-            'lxde',
-            'fluxbox',
-            'blackbox',
-            'openbox',
-            'icewm',
-            'jwm',
-            'afterstep',
-            'trinity',
-            'kde',
+            "gnome",
+            "unity",
+            "cinnamon",
+            "mate",
+            "xfce4",
+            "lxde",
+            "fluxbox",
+            "blackbox",
+            "openbox",
+            "icewm",
+            "jwm",
+            "afterstep",
+            "trinity",
+            "kde",
         ]:
             return desktop_session
         ## Special cases ##
         # Canonical sets $DESKTOP_SESSION to Lubuntu rather than LXDE if using LXDE.
         # There is no guarantee that they will not do the same with the other desktop environments.
-        elif 'xfce' in desktop_session or desktop_session.startswith('xubuntu'):
-            return 'xfce4'
-        elif desktop_session.startswith('ubuntustudio'):
-            return 'kde'
-        elif desktop_session.startswith('ubuntu'):
-            return 'gnome'
-        elif desktop_session.startswith('lubuntu'):
-            return 'lxde'
-        elif desktop_session.startswith('kubuntu'):
-            return 'kde'
-        elif desktop_session.startswith('razor'):  # e.g. razorkwin
-            return 'razor-qt'
-        elif desktop_session.startswith('wmaker'):  # e.g. wmaker-common
-            return 'windowmaker'
-        elif desktop_session.startswith('pop'):  # e.g. wmaker-common
-            return 'gnome'
-    if os.environ.get('KDE_FULL_SESSION') == 'true':
-        return 'kde'
-    elif os.environ.get('GNOME_DESKTOP_SESSION_ID'):
-        if 'deprecated' not in os.environ.get('GNOME_DESKTOP_SESSION_ID'):  # type: ignore
-            return 'gnome2'
+        elif "xfce" in desktop_session or desktop_session.startswith("xubuntu"):
+            return "xfce4"
+        elif desktop_session.startswith("ubuntustudio"):
+            return "kde"
+        elif desktop_session.startswith("ubuntu"):
+            return "gnome"
+        elif desktop_session.startswith("lubuntu"):
+            return "lxde"
+        elif desktop_session.startswith("kubuntu"):
+            return "kde"
+        elif desktop_session.startswith("razor"):  # e.g. razorkwin
+            return "razor-qt"
+        elif desktop_session.startswith("wmaker"):  # e.g. wmaker-common
+            return "windowmaker"
+        elif desktop_session.startswith("pop"):  # e.g. wmaker-common
+            return "gnome"
+    if os.environ.get("KDE_FULL_SESSION") == "true":
+        return "kde"
+    elif os.environ.get("GNOME_DESKTOP_SESSION_ID"):
+        if "deprecated" not in os.environ.get("GNOME_DESKTOP_SESSION_ID"):  # type: ignore
+            return "gnome2"
     # From http://ubuntuforums.org/showthread.php?t=652320
-    elif _is_running('xfce-mcs-manage'):
-        return 'xfce4'
-    elif _is_running('ksmserver'):
-        return 'kde'
-    return 'unknown'
+    elif _is_running("xfce-mcs-manage"):
+        return "xfce4"
+    elif _is_running("ksmserver"):
+        return "kde"
+    return "unknown"
 
 def does_desktop_shortcut_exist(name: str):
     file = Path(name)
     return Path(
-        os.path.expanduser('~/Desktop') / file.with_name(f'{file.name}.desktop')
+        os.path.expanduser("~/Desktop") / file.with_name(f"{file.name}.desktop")
     ).exists()
 
 def make_shortcut(title: str, process: Path, icon: Path, location: Path | None = None) -> bool:
-    with open(Defaults.CONFIG, 'r') as f:
+    with open(Defaults.CONFIG, "r") as f:
         default_settings = json.loads(f.read())
-        version = default_settings['versionplusplus']
+        version = default_settings["versionplusplus"]
 
-    shortcut_content = f'''[Desktop Entry]
+    shortcut_content = f"""[Desktop Entry]
 Version={version}
 Name={title}
 Exec={shlex.join([str(sys.executable), str(process)])}
 Icon={icon}
 Terminal=false
 Type=Application
-Categories=Application;'''
+Categories=Application;"""
 
-    file_name = f'{title.lower()}.desktop'
-    file = (location if location else Path(os.path.expanduser('~/Desktop'))) / file_name
+    file_name = f"{title.lower()}.desktop"
+    file = (location if location else Path(os.path.expanduser("~/Desktop"))) / file_name
 
     try:
         file.write_text(shortcut_content)
-        if _get_desktop_environment() == 'gnome':
+        if _get_desktop_environment() == "gnome":
             subprocess.run(
                 [
-                    'gio',
-                    'set',
+                    "gio",
+                    "set",
                     str(desktop_file.absolute()),
-                    'metadata::trusted',
-                    'true',
+                    "metadata::trusted",
+                    "true",
                 ]
             )
     except:
@@ -332,11 +334,11 @@ Categories=Application;'''
     return True
 
 def toggle_run_at_startup(state: bool):
-    autostart_path = Path(os.path.expanduser('~/.config/autostart'))
+    autostart_path = Path(os.path.expanduser("~/.config/autostart"))
     try:
         if state:
-            make_shortcut('Edgeware', Process.START, Defaults.ICON, autostart_path)
+            make_shortcut("Edgeware", Process.START, Defaults.ICON, autostart_path)
         else:
-            os.remove(autostart_path / 'edgeware.desktop')
+            os.remove(autostart_path / "edgeware.desktop")
     except Exception:
-        logging.warning('failed to toggle autostart')
+        logging.warning("failed to toggle autostart")

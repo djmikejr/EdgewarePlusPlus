@@ -1,12 +1,13 @@
-import tkinter as tk
 import json
-import random
-import sys
-import os
 import logging
+import os
+import random
 import random as rand
-from screeninfo import get_monitors
+import sys
+import tkinter as tk
 from pathlib import Path
+
+from screeninfo import get_monitors
 
 sys.path.append(str(Path(__file__).parent.parent))
 from utils import utils
@@ -15,7 +16,7 @@ from utils.paths import Data, Resource
 SYS_ARGS = sys.argv.copy()
 SYS_ARGS.pop(0)
 
-utils.init_logging('sublabel')
+utils.init_logging("sublabel")
 #This sublabel.pyw originally provided very generously by u/basicmo!
 
 def check_setting(name:str, default:bool=False) -> bool:
@@ -29,59 +30,59 @@ CAP_OPACITY = 100
 CAP_TIMER = 300
 SUBLIMINAL_MOOD = True
 MOOD_OFF = True
-THEME = 'Original'
+THEME = "Original"
 
-MOOD_ID = '0'
-if len(SYS_ARGS) >= 1 and SYS_ARGS[0] != '0':
-    MOOD_ID = SYS_ARGS[0].strip('-')
+MOOD_ID = "0"
+if len(SYS_ARGS) >= 1 and SYS_ARGS[0] != "0":
+    MOOD_ID = SYS_ARGS[0].strip("-")
 
-if MOOD_ID != '0':
-    if os.path.exists(Data.MOODS / f'{MOOD_ID}.json'):
-        with open(Data.MOODS / f'{MOOD_ID}.json') as f:
+if MOOD_ID != "0":
+    if os.path.exists(Data.MOODS / f"{MOOD_ID}.json"):
+        with open(Data.MOODS / f"{MOOD_ID}.json") as f:
             moodData = json.loads(f.read())
-    elif os.path.exists(Data.UNNAMED_MOODS /  f'{MOOD_ID}.json'):
-        with open(Data.UNNAMED_MOODS / f'{MOOD_ID}.json') as f:
+    elif os.path.exists(Data.UNNAMED_MOODS /  f"{MOOD_ID}.json"):
+        with open(Data.UNNAMED_MOODS / f"{MOOD_ID}.json") as f:
             moodData = json.loads(f.read())
 
 with open(Data.CONFIG) as cfg:
     settings = json.loads(cfg.read())
-    CAP_OPACITY = int(settings['capPopOpacity'])
-    CAP_TIMER = int(settings['capPopTimer'])
-    SUBLIMINAL_MOOD = check_setting('capPopMood')
-    MOOD_OFF = check_setting('toggleMoodSet')
-    THEME = settings['themeType']
+    CAP_OPACITY = int(settings["capPopOpacity"])
+    CAP_TIMER = int(settings["capPopTimer"])
+    SUBLIMINAL_MOOD = check_setting("capPopMood")
+    MOOD_OFF = check_setting("toggleMoodSet")
+    THEME = settings["themeType"]
 
 #background is one hex value off here, because it looks pretty ugly if they're different colours, so we keep them close so there is no visual difference
 try:
-    if THEME == 'Original':
-        fore = '#000000'
-        back = '#000001' if utils.is_windows() else '#f0f0f0'
-        mainfont = 'Segoe UI'
-    if THEME == 'Dark':
-        fore = '#f9faff'
-        back = '#f9fafe' if utils.is_windows() else '#282c34'
-        mainfont = 'Segoe UI'
-    if THEME == 'The One':
-        fore = '#00ff41'
-        back = '#00ff42' if utils.is_windows() else '#282c34'
-        mainfont = 'Consolas'
-    if THEME == 'Ransom':
-        fore = '#ffffff'
-        back = '#fffffe' if utils.is_windows() else '#841212'
-        mainfont = 'Arial Bold'
-    if THEME == 'Goth':
-        fore = '#ba9aff'
-        back = '#ba9afe' if utils.is_windows() else '#282c34'
-        mainfont = 'Constantia'
-    if THEME == 'Bimbo':
-        fore = '#ff3aa3'
-        back = '#ff3aa4' if utils.is_windows() else '#ffc5cd'
-        mainfont = 'Constantia'
+    if THEME == "Original":
+        fore = "#000000"
+        back = "#000001" if utils.is_windows() else "#f0f0f0"
+        mainfont = "Segoe UI"
+    if THEME == "Dark":
+        fore = "#f9faff"
+        back = "#f9fafe" if utils.is_windows() else "#282c34"
+        mainfont = "Segoe UI"
+    if THEME == "The One":
+        fore = "#00ff41"
+        back = "#00ff42" if utils.is_windows() else "#282c34"
+        mainfont = "Consolas"
+    if THEME == "Ransom":
+        fore = "#ffffff"
+        back = "#fffffe" if utils.is_windows() else "#841212"
+        mainfont = "Arial Bold"
+    if THEME == "Goth":
+        fore = "#ba9aff"
+        back = "#ba9afe" if utils.is_windows() else "#282c34"
+        mainfont = "Constantia"
+    if THEME == "Bimbo":
+        fore = "#ff3aa3"
+        back = "#ff3aa4" if utils.is_windows() else "#ffc5cd"
+        mainfont = "Constantia"
 except Exception as e:
-    logging.fatal(f'failed to load theme. {e}')
-    fore = '#000000'
-    back = '#000001' if utils.is_windows() else '#f0f0f0'
-    mainfont = 'Segoe UI'
+    logging.fatal(f"failed to load theme. {e}")
+    fore = "#000000"
+    back = "#000001" if utils.is_windows() else "#f0f0f0"
+    mainfont = "Segoe UI"
 
 def display_subliminal_message():
     # Load subliminal messages from captions.json
@@ -92,13 +93,13 @@ def display_subliminal_message():
                 if l.get("subliminal", []) and SUBLIMINAL_MOOD:
                     return l.get("subliminal", [])
                 else:
-                    if 'prefix' in l: del l['prefix']
-                    if 'subtext' in l: del l['subtext']
-                    if 'prefix_settings' in l: del l['prefix_settings']
-                    if MOOD_ID != '0':
+                    if "prefix" in l: del l["prefix"]
+                    if "subtext" in l: del l["subtext"]
+                    if "prefix_settings" in l: del l["prefix_settings"]
+                    if MOOD_ID != "0":
                         allsub = []
                         for key in l:
-                            if key in moodData['captions']:
+                            if key in moodData["captions"]:
                                 allsub.append(l[key])
                     else:
                         allsub = list(l.values())
@@ -106,7 +107,7 @@ def display_subliminal_message():
                     #logging.info(flatlist)
                     return flatlist
         except Exception as e:
-            logging.fatal(f'failed to get sublabel prefixes. {e}')
+            logging.fatal(f"failed to get sublabel prefixes. {e}")
             return []
 
     # Get a random subliminal message
@@ -141,13 +142,13 @@ def display_subliminal_message():
 
     # Configure the window
     label.master.overrideredirect(True)
-    label.master.geometry(f'+{x}+{y}')
+    label.master.geometry(f"+{x}+{y}")
     label.master.lift()
-    label.master.wm_attributes('-topmost', True)
+    label.master.wm_attributes("-topmost", True)
     if utils.is_windows():
-        label.master.wm_attributes('-disabled', True)
-        label.master.wm_attributes('-transparentcolor', back)
-    label.winfo_toplevel().attributes('-alpha',CAP_OPACITY/100)
+        label.master.wm_attributes("-disabled", True)
+        label.master.wm_attributes("-transparentcolor", back)
+    label.winfo_toplevel().attributes("-alpha",CAP_OPACITY/100)
     label.pack()
 
     # Update the label's size

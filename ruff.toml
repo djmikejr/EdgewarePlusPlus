@@ -1,0 +1,15 @@
+extend-include = ["*.pyw"]
+
+[lint]
+select = [
+  "F",
+  "E",
+  "W",
+  "I",
+  "N",
+  "Q"
+]
+
+ignore = [
+  "E501"
+]

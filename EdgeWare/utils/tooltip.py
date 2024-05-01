@@ -18,7 +18,7 @@ class CreateToolTip(object):
     create a tooltip for a given widget
     """
     instances = []
-    def __init__(self, widget, text='widget info', bg = None, fg = None, bc = None):
+    def __init__(self, widget, text="widget info", bg = None, fg = None, bc = None):
         self.waittime = 1000     #miliseconds
         self.wraplength = 500   #pixels
         self.widget = widget
@@ -31,15 +31,15 @@ class CreateToolTip(object):
         if bg:
             self.background = bg
         else:
-            self.background = '#ffffff'
+            self.background = "#ffffff"
         if fg:
             self.foreground = fg
         else:
-            self.foreground = '#000000'
+            self.foreground = "#000000"
         if bc:
             self.bordercolor = bc
         else:
-            self.bordercolor = '#000000'
+            self.bordercolor = "#000000"
         self.__class__.instances.append(self)
 
     def enter(self, event=None):
@@ -70,7 +70,7 @@ class CreateToolTip(object):
         self.tw.wm_overrideredirect(True)
         self.tw.wm_geometry("+%d+%d" % (x, y))
         self.borderframe = tk.Frame(self.tw, background = self.bordercolor)
-        label = tk.Label(self.borderframe, text=self.text, justify='left',
+        label = tk.Label(self.borderframe, text=self.text, justify="left",
                        background= self.background, wraplength = self.wraplength,
                        foreground= self.foreground)
         self.borderframe.pack()
@@ -83,15 +83,15 @@ class CreateToolTip(object):
             tw.destroy()
 
 # testing ...
-if __name__ == '__main__':
+if __name__ == "__main__":
     root = tk.Tk()
     btn1 = tk.Button(root, text="button 1")
     btn1.pack(padx=10, pady=5)
     button1_ttp = CreateToolTip(btn1, \
-   'Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, '
-   'consectetur, adipisci velit. Neque porro quisquam est qui dolorem ipsum '
-   'quia dolor sit amet, consectetur, adipisci velit. Neque porro quisquam '
-   'est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit.')
+   "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, "
+   "consectetur, adipisci velit. Neque porro quisquam est qui dolorem ipsum "
+   "quia dolor sit amet, consectetur, adipisci velit. Neque porro quisquam "
+   "est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit.")
 
     btn2 = tk.Button(root, text="button 2")
     btn2.pack(padx=10, pady=5)
@@ -105,5 +105,5 @@ if __name__ == '__main__':
     button2_ttp = CreateToolTip(btn2, \
     "First thing's first, I'm the realest. Drop this and let the whole world "
     "feel it. And I'm still in the Murda Bizness. I could hold you down, like "
-    "I'm givin' lessons in  physics. You should want a bad Vic like this.", bg = '#282c34', fg = '#ffffff')
+    "I'm givin' lessons in  physics. You should want a bad Vic like this.", bg = "#282c34", fg = "#ffffff")
     root.mainloop()

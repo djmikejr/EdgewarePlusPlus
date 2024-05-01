@@ -1,15 +1,16 @@
 import ctypes
+import logging
 import os
 import subprocess
 import tempfile
-import logging
 from pathlib import Path
+
 from utils.paths import Defaults, Process
 
 user = ctypes.windll.user32
 
 def panic_script():
-    os.startfile('panic.bat')
+    os.startfile("panic.bat")
 
 def set_borderless(root):
     root.overrideredirect(1)
@@ -36,43 +37,43 @@ def show_file(path: Path | str):
 def does_desktop_shortcut_exist(name: str):
     file = Path(name)
     return Path(
-        os.path.expanduser('~/Desktop') / file.with_name(f'{file.name}.lnk')
+        os.path.expanduser("~/Desktop") / file.with_name(f"{file.name}.lnk")
     ).exists()
 
 def _remove_username(e):
     return str(e).lower().replace(
-        os.environ['USERPROFILE'].lower().replace('\\', '\\\\'),
-        '[USERNAME_REDACTED]'
+        os.environ["USERPROFILE"].lower().replace("\\", "\\\\"),
+        "[USERNAME_REDACTED]"
     )
 
 def make_shortcut(title: str, process: Path, icon: Path, location: Path | None = None) -> bool:
     success = False
 
-    file_name = f'{title.lower()}.lnk'
-    file = (location if location else Path(os.path.expanduser('~\\Desktop'))) / file_name
+    file_name = f"{title.lower()}.lnk"
+    file = (location if location else Path(os.path.expanduser("~\\Desktop"))) / file_name
 
-    with tempfile.NamedTemporaryFile('w', suffix='.bat', delete=False, ) as bat:
+    with tempfile.NamedTemporaryFile("w", suffix=".bat", delete=False, ) as bat:
         bat.writelines([
             '@echo off\n'
-            'set SCRIPT="%TEMP%\%RANDOM%-%RANDOM%-%RANDOM%-%RANDOM%.vbs"\n',
+            'set SCRIPT="%TEMP%\\%RANDOM%-%RANDOM%-%RANDOM%-%RANDOM%.vbs"\n',
             'echo Set oWS = WScript.CreateObject("WScript.Shell") >> %SCRIPT%\n',
             'echo sLinkFile = "' + str(file) + '" >> %SCRIPT%\n',
-            'echo Set oLink = oWS.CreateShortcut(sLinkFile) >> %SCRIPT%\n',
+            "echo Set oLink = oWS.CreateShortcut(sLinkFile) >> %SCRIPT%\n",
             'echo oLink.WorkingDirectory = "' + str(process.parent) + '\\" >> %SCRIPT%\n',
             'echo oLink.IconLocation = "' + str(icon) + '" >> %SCRIPT%\n',
             'echo oLink.TargetPath = "' + str(process) + '" >> %SCRIPT%\n',
-            'echo oLink.Save >> %SCRIPT%\n',
-            'cscript /nologo %SCRIPT%\n',
-            'del %SCRIPT%'
+            "echo oLink.Save >> %SCRIPT%\n",
+            "cscript /nologo %SCRIPT%\n",
+            "del %SCRIPT%"
         ]) # write built shortcut script text to temporary batch file
 
     try:
-        logging.info(f'making shortcut to {process.name}')
+        logging.info(f"making shortcut to {process.name}")
         subprocess.run(bat.name)
         success = True
     except Exception as e:
         logging.warning(
-            f'failed to call or remove temp batch file for making shortcuts\n\tReason: {_remove_username(e)}'
+            f"failed to call or remove temp batch file for making shortcuts\n\tReason: {_remove_username(e)}"
         )
 
     if os.path.exists(bat.name):
@@ -83,14 +84,14 @@ def make_shortcut(title: str, process: Path, icon: Path, location: Path | None =
 def toggle_run_at_startup(state: bool):
     try:
         startup_path = Path(os.path.expanduser(
-            '~\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup'
+            "~\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup"
         ))
-        logging.info(f'trying to toggle startup bat to {state}')
+        logging.info(f"trying to toggle startup bat to {state}")
         if state:
-            make_shortcut('Edgeware', Process.START, Defaults.ICON, startup_path)
-            logging.info('toggled startup run on.')
+            make_shortcut("Edgeware", Process.START, Defaults.ICON, startup_path)
+            logging.info("toggled startup run on.")
         else:
-            os.remove(startup_path / 'edgeware.lnk')
-            logging.info('toggled startup run off.')
+            os.remove(startup_path / "edgeware.lnk")
+            logging.info("toggled startup run off.")
     except Exception as e:
-        logging.warning(f'failed to toggle startup bat.\n\tReason: {_remove_username(e)}')
+        logging.warning(f"failed to toggle startup bat.\n\tReason: {_remove_username(e)}")
