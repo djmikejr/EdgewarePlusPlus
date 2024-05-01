@@ -17,7 +17,7 @@ try:
     #grab discord status from discord.dat, mark as having file
     with open(Resource.DISCORD, "r") as f:
         txt=f.read()
-except:
+except Exception:
     print("failed text read")
 
 if not txt == "":
@@ -29,7 +29,7 @@ if not txt == "":
         textObj[0] = ls[0]
         if ls[1] in IMGID_CONSTS:
             textObj[1] = ls[1]
-    except:
+    except Exception:
         print("failed line split")
 
 #open discord api pipe and such

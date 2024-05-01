@@ -25,7 +25,7 @@ while True:
     num = input("Select number: ")
     try:
         num = int(num)
-    except:
+    except Exception:
         print("Input must be an integer")
         continue
 

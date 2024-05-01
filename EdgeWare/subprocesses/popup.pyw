@@ -24,7 +24,7 @@ from utils.paths import Data, Defaults, Process, Resource
 #import traceback
 try:
     import vlc
-except:
+except Exception:
     print("vlc failed to load.")
 
 SYS_ARGS = sys.argv.copy()
@@ -61,7 +61,7 @@ def check_setting(name:str, default:bool=False) -> bool:
     default = False if default is None else default
     try:
         return int(settings.get(name)) == 1
-    except:
+    except Exception:
         return default
 
 ALLOW_SCREAM = True
@@ -186,7 +186,7 @@ if PANIC_REQUIRES_VALIDATION:
         with open(Data.PASS_HASH, "r") as file:
             HASHED_PATH = file.readline()
         utils.hide_file(Data.PASS_HASH)
-    except:
+    except Exception:
         #no hash found
         HASHED_PATH = None
 
@@ -213,7 +213,7 @@ try:
         CAPTIONS = json.load(caption_file)
         try:
             SUBMISSION_TEXT = CAPTIONS["subtext"]
-        except:
+        except Exception:
             print("will use default submission text")
         prefixes["default"] = prefix_data("default", images="", max=1, chance=100.0)
 
@@ -243,7 +243,7 @@ try:
     # Default has to have a reasonable chance of popping up
     if prefixes["default"].chance <= 10:
         prefixes["default"].chance = 10
-except:
+except Exception:
     prefixes["default"] = prefix_data("default", images="", max=1, chance=100.0)
     print("no captions.json")
 
@@ -299,7 +299,7 @@ class VideoLabel(tk.Label):
             print(self.audio_track)
             self.audio_track = [[VIDEO_VOLUME*v[0], VIDEO_VOLUME*v[1]] for v in self.audio_track]
             self.duration = float(self.video_properties["duration"])
-        except:
+        except Exception:
             self.audio_track = None
             self.duration = None
         self.video_frames = imageio.get_reader(path)
@@ -467,7 +467,7 @@ def run():
             try:
                 image = Image.open(os.path.abspath(item))
                 break
-            except:
+            except Exception:
                 item, caption_text, root.click_count = pick_resource(resource_path, video_mode)
     else:
         from videoprops import get_video_properties
@@ -810,7 +810,7 @@ def panic(key):
             pass_ = simpledialog.askstring("Panic", "Enter Panic Password")
             print("ASKING FOR PASS")
             t_hash = None if pass_ == None or pass_ == "" else hashlib.sha256(pass_.encode(encoding="ascii", errors="ignore")).hexdigest()
-        except:
+        except Exception:
             #if some issue occurs with the hash or time files just emergency panic
             subprocess.Popen([sys.executable, Process.PANIC])
         print(t_hash)
@@ -823,7 +823,7 @@ def panic(key):
                 os.remove(Data.PASS_HASH)
                 os.remove(Data.HID_TIME)
                 subprocess.Popen([sys.executable, Process.PANIC])
-            except:
+            except Exception:
                 #if some issue occurs with the hash or time files just emergency panic
                 subprocess.Popen([sys.executable, Process.PANIC])
     else:

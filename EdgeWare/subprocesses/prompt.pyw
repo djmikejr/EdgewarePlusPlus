@@ -49,11 +49,11 @@ if os.path.exists(Resource.PROMPT):
         textData = json.loads(f.read())
         try:
             submission_text = textData["subtext"]
-        except:
+        except Exception:
             print("no subtext")
         try:
             command_text = textData["commandtext"]
-        except:
+        except Exception:
             print("no commandtext")
 
 if not hasData:

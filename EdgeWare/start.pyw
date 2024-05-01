@@ -176,7 +176,7 @@ try:
                     logging.info(f"found zip file {obj}")
                     pth = os.path.join(PATH, obj)
                     break
-            except:
+            except Exception:
                 print(f"{obj} is not a zip file.")
         #if found zip unpack
         if not pth == "pth-default_ignore":
@@ -333,7 +333,7 @@ def wallpaper_check(else_path: Path | str):
                     corruptionLevel = f.read()
                 try:
                     wp_path = Resource.ROOT / str(corruptionData["wallpapers"][corruptionLevel])
-                except:
+                except Exception:
                     print("wallpaper does not exist for this corruption level")
                     return
             else:
@@ -397,7 +397,7 @@ class TrayHandler:
                 with open(Data.PASS_HASH, "r") as file:
                     self.hashedPass = file.readline()
                 utils.hide_file(Data.PASS_HASH)
-            except:
+            except Exception:
                 #no hash found
                 self.hashedPass = None
 
@@ -415,7 +415,7 @@ class TrayHandler:
                         os.remove(Data.PASS_HASH)
                         os.remove(Data.HID_TIME)
                         subprocess.Popen([sys.executable, Process.PANIC])
-                    except:
+                    except Exception:
                         logging.critical("panic initiated due to failed pass/timer check")
                         self.tray_icon.stop()
                         subprocess.Popen([sys.executable, Process.PANIC])
@@ -802,7 +802,7 @@ def do_timer():
         os.remove(Data.PASS_HASH)
         os.remove(Data.HID_TIME)
         subprocess.Popen([sys.executable, Process.PANIC])
-    except:
+    except Exception:
         subprocess.Popen([sys.executable, Process.PANIC])
 
 def audioHelper(moodAudio:list):

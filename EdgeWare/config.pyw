@@ -214,7 +214,7 @@ if settings["toggleMoodSet"] != True:
                         with open(Resource.MEDIA) as media:
                             media_dict = json.loads(media.read())
                             mood_dict["media"] += media_dict
-                except:
+                except Exception:
                     logging.warning("media mood extraction failed.")
 
                 try:
@@ -227,7 +227,7 @@ if settings["toggleMoodSet"] != True:
                             if "subliminal" in captions_dict: del captions_dict["subliminal"]
                             if "prefix_settings" in captions_dict: del captions_dict["prefix_settings"]
                             mood_dict["captions"] += captions_dict
-                except:
+                except Exception:
                     logging.warning("captions mood extraction failed.")
 
                 try:
@@ -236,7 +236,7 @@ if settings["toggleMoodSet"] != True:
                         with open(Resource.PROMPT) as prompt:
                             prompt_dict = json.loads(prompt.read())
                             mood_dict["prompts"] += prompt_dict["moods"]
-                except:
+                except Exception:
                     logging.warning("prompt mood extraction failed.")
 
                 try:
@@ -247,7 +247,7 @@ if settings["toggleMoodSet"] != True:
                             for n in web_dict["moods"]:
                                 if n not in mood_dict["web"]:
                                     mood_dict["web"].append(n)
-                except:
+                except Exception:
                     logging.warning("web mood extraction failed.")
 
                 mood.write(json.dumps(mood_dict))
@@ -266,7 +266,7 @@ def show_window():
     try:
         root.iconbitmap(Defaults.CONFIG_ICON)
         logging.info("set iconbitmap.")
-    except:
+    except Exception:
         logging.warning("failed to set iconbitmap.")
     fail_loop = 0
 
@@ -2688,7 +2688,7 @@ def pickZip() -> str:
         try:
             if dirListObject.split(".")[-1].lower() == "zip":
                 return dirListObject.split(".")[0]
-        except:
+        except Exception:
             print("{} is not a zip file.".format(dirListObject))
     return "[No Zip Found]"
 
@@ -2757,7 +2757,7 @@ def confirmBox(parent:Tk, btitle:str, message:str) -> bool:
     root.mainloop()
     try:
         root.destroy()
-    except:
+    except Exception:
         False
     return allow
 
@@ -2815,11 +2815,11 @@ def write_save(varList:list[StringVar | IntVar | BooleanVar], nameList:list[str]
             p = varList[nameList.index(name)].get()
             #standard named variables
             temp[name] = p if type(p) is int or type(p) is str else (1 if type(p) is bool and p else 0)
-        except:
+        except Exception:
             #nonstandard named variables
             try:
                 temp[name] = int(settings[name])
-            except:
+            except Exception:
                 temp[name] = settings[name]
 
     with open(Data.CONFIG, "w") as file:
@@ -2971,7 +2971,7 @@ def autoImportWallpapers(tkListObj:Listbox):
             try:
                 del settings["wallpaperDat"][tkListObj.get(1)]
                 tkListObj.delete(1)
-            except:
+            except Exception:
                 break
         for file in os.listdir(Resource.ROOT):
             if (file.endswith(".png") or file.endswith(".jpg") or file.endswith(".jpeg")) and file != "wallpaper.png":
@@ -2990,7 +2990,7 @@ def updateText(objList:Entry or Label, var:str, var_Label:str):
                 obj.insert(1, var)
             elif isinstance(obj, Label):
                 obj.configure(text=f"Expected value: {defaultSettings[var_Label]}")
-    except:
+    except Exception:
         print("idk what would cause this but just in case uwu")
 
 def refresh():
@@ -3031,7 +3031,7 @@ def toggleAssociateSettings_manual(ownerState:bool, objList:list, colorOn:int, c
 def assign(obj:StringVar or IntVar or BooleanVar, var:str or int or bool):
     try:
         obj.set(var)
-    except:
+    except Exception:
         ""
         #no assignment
 
@@ -3075,7 +3075,7 @@ def savePreset(name:str) -> bool:
                 file.write(json.dumps(file_json))
             return True
         return False
-    except:
+    except Exception:
         return True
 
 def getDescriptText(name:str) -> str:
@@ -3085,7 +3085,7 @@ def getDescriptText(name:str) -> str:
             for line in file.readlines():
                 text += line
             return text
-    except:
+    except Exception:
         return "This preset has no description file."
 
 def updateMoods(type:str, id:str, check:bool):

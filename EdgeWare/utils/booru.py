@@ -85,7 +85,7 @@ class BooruDownloader:
                         self._full_url = f"{self.booru_scheme.raw_image_url.format(booru=self.booru, code_actual=self._code_actual)}{self._file_name_full}"
                         direct_download(self._full_url)
                         break
-                    except:
+                    except Exception:
                         continue
 
     def download_random(self, min_score:int=None) -> None:

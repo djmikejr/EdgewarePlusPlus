@@ -57,7 +57,7 @@ def set_wallpaper(wallpaper_path: Path | str):
                     """%s""" % wallpaper_path,
                 ]
                 subprocess.Popen(args)
-            except:  # MATE < 1.6
+            except Exception:  # MATE < 1.6
                 # From https://bugs.launchpad.net/variety/+bug/1033918
                 args = [
                     "mateconftool-2",
@@ -149,7 +149,7 @@ def set_wallpaper(wallpaper_path: Path | str):
                             errors="replace",
                         ) as f:
                             desktop_conf.write(f)
-                except:
+                except Exception:
                     pass
             else:
                 # TODO: reload desktop when possible
@@ -163,7 +163,7 @@ def set_wallpaper(wallpaper_path: Path | str):
             try:
                 args = ["fbsetbg", wallpaper_path]
                 subprocess.Popen(args)
-            except:
+            except Exception:
                 sys.stderr.write("ERROR: Failed to set wallpaper with fbsetbg!\n")
                 sys.stderr.write("Please make sre that You have fbsetbg installed.\n")
         elif desktop_env == "icewm":
@@ -217,7 +217,7 @@ def set_wallpaper(wallpaper_path: Path | str):
         if first_run:
             first_run = False
         return True
-    except:
+    except Exception:
         sys.stderr.write("ERROR: Failed to set wallpaper. There might be a bug.\n")
         return False
 
@@ -329,7 +329,7 @@ Categories=Application;"""
                     "true",
                 ]
             )
-    except:
+    except Exception:
         return False
     return True
 

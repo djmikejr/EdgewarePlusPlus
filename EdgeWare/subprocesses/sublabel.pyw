@@ -23,7 +23,7 @@ def check_setting(name:str, default:bool=False) -> bool:
     default = False if default is None else default
     try:
         return int(settings.get(name)) == 1
-    except:
+    except Exception:
         return default
 
 CAP_OPACITY = 100
