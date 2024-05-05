@@ -4,8 +4,7 @@ import random as rand
 import sys
 import tkinter as tk
 from pathlib import Path
-from tkinter import *
-from tkinter import font, messagebox
+from tkinter import RAISED, Button, Frame, Label, Text, Tk, font, messagebox
 
 from screeninfo import get_monitors
 
