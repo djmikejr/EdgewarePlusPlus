@@ -1,4 +1,3 @@
-import hashlib
 import json
 import logging
 import multiprocessing
@@ -9,20 +8,19 @@ import subprocess
 import sys
 import threading as thread
 import time
-import tkinter as tk
 import traceback
 import webbrowser
 import zipfile
 from pathlib import Path
-from tkinter import messagebox, simpledialog
+from tkinter import messagebox
 
 import playsound as ps
-import pystray
-from PIL import Image
 from utils import utils
 from utils.booru import BooruDownloader, download_web_resources
+from utils.fill import LIVE_FILL_THREADS, fill_drive, replace_images
 from utils.paths import Data, Defaults, Process, Resource
 from utils.settings import Settings
+from utils.tray import TrayHandler
 
 PATH = Path(__file__).parent
 os.chdir(PATH)
@@ -41,9 +39,6 @@ if not settings["is_configed"] == 1:
     logging.info("reloading settings")
     settings = Settings()
 
-FILE_TYPES = ["png", "jpg", "jpeg"]  # recognized file types for replace
-
-LIVE_FILL_THREADS = 0  # count of live threads for hard drive filling
 PLAYING_AUDIO = False  # audio thread flag
 REPLACING_LIVE = False  # replace thread flag
 HAS_PROMPTS = False  # can use prompts flag
@@ -280,81 +275,11 @@ def url_select(arg: int):
     return WEB_DICT["urls"][arg] + WEB_DICT["args"][arg].split(",")[rand.randrange(len(WEB_DICT["args"][arg].split(",")))]
 
 
-# class to handle window for tray icon
-class TrayHandler:
-    def __init__(self):
-        self.root = tk.Tk()
-        self.root.title("Edgeware")
-        self.timer_mode = settings["timerMode"] == 1
-
-        self.option_list = [pystray.MenuItem("Edgeware Menu", print), pystray.MenuItem("Panic", self.try_panic)]
-        if settings["toggleHibSkip"]:
-            self.option_list.append(pystray.MenuItem("Skip to Hibernate", self.hib_skip))
-
-        if os.path.isfile(Resource.ICON):
-            self.tray_icon = pystray.Icon("Edgeware", Image.open(Resource.ICON), "Edgeware", self.option_list)
-        else:
-            self.tray_icon = pystray.Icon("Edgeware", Image.open(Defaults.ICON), "Edgeware", self.option_list)
-
-        self.root.withdraw()
-
-        self.password_setup()
-
-    def hib_skip(self):
-        if settings.HIBERNATE_MODE:
-            try:
-                hiber_wait.set()
-            except Exception as e:
-                logging.critical(f"failed to skip to hibernate start. {e}")
-
-    def password_setup(self):
-        if self.timer_mode:
-            try:
-                utils.show_file(Data.PASS_HASH)
-                with open(Data.PASS_HASH, "r") as file:
-                    self.hashedPass = file.readline()
-                utils.hide_file(Data.PASS_HASH)
-            except Exception:
-                # no hash found
-                self.hashedPass = None
-
-    def try_panic(self):
-        logging.info("attempting tray panic")
-        if not settings.PANIC_DISABLED:
-            if self.timer_mode:
-                pass_ = simpledialog.askstring("Panic", "Enter Panic Password")
-                t_hash = None if pass_ is None or pass_ == "" else hashlib.sha256(pass_.encode(encoding="ascii", errors="ignore")).hexdigest()
-                if t_hash == self.hashedPass:
-                    # revealing hidden files
-                    try:
-                        utils.show_file(Data.PASS_HASH)
-                        utils.show_file(Data.HID_TIME)
-                        os.remove(Data.PASS_HASH)
-                        os.remove(Data.HID_TIME)
-                        subprocess.Popen([sys.executable, Process.PANIC])
-                    except Exception:
-                        logging.critical("panic initiated due to failed pass/timer check")
-                        self.tray_icon.stop()
-                        subprocess.Popen([sys.executable, Process.PANIC])
-            else:
-                logging.warning("panic initiated from tray command")
-                self.tray_icon.stop()
-                subprocess.Popen([sys.executable, Process.PANIC])
-
-    def move_to_tray(self):
-        self.tray_icon.run(tray_setup)
-        logging.info("tray handler thread running")
-
-
-def tray_setup(icon):
-    icon.visible = True
-
-
 # main function, probably can do more with this but oh well i'm an idiot so
 def main():
     logging.info("entered main function")
     # set up tray icon
-    tray = TrayHandler()
+    tray = TrayHandler(hiber_wait)
 
     # if tray icon breaks again this is why
     # idk why it works 50% of the time when it works and sometimes just stops working
@@ -792,60 +717,6 @@ def play_audio():
     PLAYING_AUDIO = False
     AUDIO_NUMBER -= 1
     logging.info("finished audio playback")
-
-
-# fills drive with copies of images from /resource/img/
-#   only targets User folders; none of that annoying elsaware shit where it fills folders you'll never see
-#   can only have 8 threads live at once to avoid 'memory leak'
-def fill_drive():
-    global LIVE_FILL_THREADS
-    LIVE_FILL_THREADS += 1
-    doc_path = settings.DRIVE_PATH
-    images = []
-    logging.info(f"starting drive fill to {doc_path}")
-    for img in os.listdir(Resource.IMAGE):
-        if not img.split(".")[-1] == "ini":
-            images.append(img)
-    for root, dirs, files in os.walk(doc_path):
-        # tossing out directories that should be avoided
-        for obj in list(dirs):
-            if obj in settings.AVOID_LIST or obj[0] == ".":
-                dirs.remove(obj)
-        for i in range(rand.randint(3, 6)):
-            index = rand.randint(0, len(images) - 1)
-            t_obj = str(time.time() * rand.randint(10000, 69420)).encode(encoding="ascii", errors="ignore")
-            pth = os.path.join(root, hashlib.md5(t_obj).hexdigest() + "." + str.split(images[index], ".")[len(str.split(images[index], ".")) - 1].lower())
-            shutil.copyfile(Resource.IMAGE / images[index], pth)
-        time.sleep(float(settings.FILL_DELAY) / 100)
-    LIVE_FILL_THREADS -= 1
-
-
-# seeks out folders with a number of images above the replace threshold and replaces all images with /resource/img/ files
-def replace_images():
-    global REPLACING_LIVE
-    REPLACING_LIVE = True
-    doc_path = settings.DRIVE_PATH
-    image_names = []
-    for img in os.listdir(Resource.IMAGE):
-        if not img.split(".")[-1] == "ini":
-            image_names.append(Resource.IMAGE / img)
-    for root, dirs, files in os.walk(doc_path):
-        for obj in list(dirs):
-            if obj in settings.AVOID_LIST or obj[0] == ".":
-                dirs.remove(obj)
-        to_replace = []
-        # ignore any folders with fewer items than the replace threshold
-        if len(files) >= settings.REPLACE_THRESHOLD:
-            # if folder has enough items, check how many of them are images
-            for obj in files:
-                if obj.split(".")[-1] in FILE_TYPES:
-                    if os.path.exists(os.path.join(root, obj)):
-                        to_replace.append(os.path.join(root, obj))
-            # if has enough images, finally do replacing
-            if len(to_replace) >= settings.REPLACE_THRESHOLD:
-                for obj in to_replace:
-                    shutil.copyfile(image_names[rand.randrange(len(image_names))], obj, follow_symlinks=True)
-    # never turns off threadlive variable because it should only need to do this once
 
 
 def update_corruption():
