@@ -20,6 +20,7 @@ from screeninfo import get_monitors
 sys.path.append(str(Path(__file__).parent.parent))
 from utils import utils
 from utils.paths import Data, Defaults, Process, Resource
+from utils.settings import Settings
 
 # import traceback
 try:
@@ -58,118 +59,17 @@ class PrefixData:
 prefixes = {}
 # End Imported Code
 
+settings = Settings()
 
-def check_setting(name: str, default: bool = False) -> bool:
-    default = False if default is None else default
-    try:
-        return int(settings.get(name)) == 1
-    except Exception:
-        return default
-
-
-ALLOW_SCREAM = True
-SHOW_CAPTIONS = False
-PANIC_DISABLED = False
-EXTREME_MODE = False
-WEB_OPEN = False
-HAS_LIFESPAN = False
-LIFESPAN = 0
-WEB_PROB = 0
-MITOSIS_STRENGTH = 2
 SUBMISSION_TEXT = "I Submit <3"
-PANIC_KEY = ""
-PANIC_REQUIRES_VALIDATION = False
 HASHED_PATH = None
 CAPTIONS = {}
-LOWKEY_MODE = False
-LOWKEY_CORNER = 0
-DELAY = 0
-OPACITY = 100
-VIDEO_VOLUME = 0.25
 FADE_OUT_TIME = 1.5
-DENIAL_MODE = False
-DENIAL_CHANCE = 0
-SUBLIMINAL_MODE = False
-SUBLIMINAL_CHANCE = 100
-MAX_SUBLIMINALS = 200
-LANCZOS_MODE = True
-BUTTONLESS = False
-HIBERNATE_MODE = False
-MOOD_OFF = True
-MOOD_FILENAME = True
-MULTI_CLICK = False
-THEME = "Original"
-MOVING_SPEED = 5
-MOVING_CHANCE = 0
-MOVING_STATUS = False
-MOVING_RANDOM = False
-CORRUPTION_TRIGGER = "Timed"
-CORRUPTION_MODE = False
-SUBLIMINAL_ALPHA = 0.2
-
-with open(Data.CONFIG, "r") as cfg:
-    settings = json.loads(cfg.read())
-    SHOW_CAPTIONS = check_setting("showCaptions")
-    PANIC_DISABLED = check_setting("panicDisabled")
-    MITOSIS_MODE = check_setting("mitosisMode")
-    WEB_OPEN = check_setting("webPopup")
-    WEB_PROB = int(settings["webMod"])
-    PANIC_KEY = settings["panicButton"]
-    HAS_LIFESPAN = check_setting("timeoutPopups")
-    LIFESPAN = int(settings["popupTimeout"])
-    MITOSIS_STRENGTH = int(settings["mitosisStrength"])
-    PANIC_REQUIRES_VALIDATION = check_setting("timerMode")
-    LOWKEY_MODE = check_setting("lkToggle")
-    LOWKEY_CORNER = int(settings["lkCorner"])
-    DELAY = int(settings["delay"])
-    OPACITY = int(settings["lkScaling"])
-    VIDEO_VOLUME = float(settings["videoVolume"]) / 100
-
-    VIDEO_VOLUME = min(max(0, VIDEO_VOLUME), 1)
-
-    DENIAL_MODE = check_setting("denialMode")
-    DENIAL_CHANCE = int(settings["denialChance"])
-    SUBLIMINAL_MODE = check_setting("popupSubliminals")
-    SUBLIMINAL_CHANCE = int(settings["subliminalsChance"])
-    MAX_SUBLIMINALS = int(settings["maxSubliminals"])
-    SUBLIMINAL_ALPHA = int(settings["subliminalsAlpha"]) / 100
-
-    LANCZOS_MODE = check_setting("antiOrLanczos")
-
-    BUTTONLESS = check_setting("buttonless")
-
-    MULTI_CLICK = check_setting("multiClick")
-
-    HIBERNATE_MODE = check_setting("hibernateMode")
-
-    THEME = settings["themeType"]
-
-    if HIBERNATE_MODE:
-        if settings["hibernateType"] == "Chaos":
-            with open(Data.CHAOS_TYPE, "r") as ct:
-                HIBERNATE_TYPE = ct.read()
-        else:
-            HIBERNATE_TYPE = settings["hibernateType"]
-    if SYS_ARGS:
-        MOOD_OFF = check_setting("toggleMoodSet")
-
-    MOOD_FILENAME = check_setting("captionFilename")
-
-    MOVING_CHANCE = int(settings["movingChance"])
-    MOVING_SPEED = int(settings["movingSpeed"])
-    MOVING_RANDOM = check_setting("movingRandom")
-
-    CORRUPTION_DEVMODE = check_setting("corruptionDevMode")
-    CORRUPTION_TRIGGER = settings["corruptionTrigger"]
-    CORRUPTION_MODE = check_setting("corruptionMode")
-
-if MOVING_CHANCE >= rand.randint(1, 100):
-    BUTTONLESS = True
-    MOVING_STATUS = True
+MOVING_STATUS = settings.MOVING_CHANCE >= rand.randint(1, 100)
 
 # take out first arg and make it into the mood ID
 MOOD_ID = "0"
-if not MOOD_OFF:
+if not settings.MOOD_OFF:
     MOOD_ID = SYS_ARGS[0].strip("-")
     SYS_ARGS.pop(0)
 
@@ -183,7 +83,7 @@ if MOOD_ID != "0":
 
 
 # used for timer mode, checks if password is required to panic
-if PANIC_REQUIRES_VALIDATION:
+if settings.TIMER_MODE:
     try:
         utils.show_file(Data.PASS_HASH)
         with open(Data.PASS_HASH, "r") as file:
@@ -193,7 +93,7 @@ if PANIC_REQUIRES_VALIDATION:
         # no hash found
         HASHED_PATH = None
 
-if WEB_OPEN:
+if settings.WEB_OPEN:
     web_dict = ""
     if os.path.exists(Resource.WEB):
         with open(Resource.WEB, "r") as web_file:
@@ -269,7 +169,7 @@ class GifLabel(tk.Label):
                 hold_image = self.image.resize((resized_width, resized_height), Image.BOX)
                 if back_image is not None:
                     hold_image, back_image = hold_image.convert("RGBA"), back_image.convert("RGBA")
-                    hold_image = Image.blend(back_image, hold_image, SUBLIMINAL_ALPHA)
+                    hold_image = Image.blend(back_image, hold_image, settings.SUBLIMINAL_ALPHA)
                 self.frames.append(ImageTk.PhotoImage(hold_image.copy()))
                 self.image.seek(i)
         except Exception as e:
@@ -300,7 +200,7 @@ class VideoLabel(tk.Label):
         try:
             self.audio_track = self.audio.to_soundarray()
             print(self.audio_track)
-            self.audio_track = [[VIDEO_VOLUME * v[0], VIDEO_VOLUME * v[1]] for v in self.audio_track]
+            self.audio_track = [[settings.VIDEO_VOLUME * v[0], settings.VIDEO_VOLUME * v[1]] for v in self.audio_track]
             self.duration = float(self.video_properties["duration"])
         except Exception:
             self.audio_track = None
@@ -329,20 +229,20 @@ class VideoLabel(tk.Label):
 
 
 # moving window originally provided very generously by u/basicmo!
-mspd = rand.randint(-MOVING_SPEED, MOVING_SPEED)
+mspd = rand.randint(-settings.MOVING_SPEED, settings.MOVING_SPEED)
 while mspd == 0:
-    mspd = rand.randint(-MOVING_SPEED, MOVING_SPEED)
+    mspd = rand.randint(-settings.MOVING_SPEED, settings.MOVING_SPEED)
 
 
 def move_window(master, resized_height: int, resized_width: int, xlocation: int, ylocation: int):
     width = resized_width
     height = resized_height
-    if MOVING_RANDOM:
-        move_speed_x = rand.randint(-MOVING_SPEED, MOVING_SPEED)
-        move_speed_y = rand.randint(-MOVING_SPEED, MOVING_SPEED)
+    if settings.MOVING_RANDOM:
+        move_speed_x = rand.randint(-settings.MOVING_SPEED, settings.MOVING_SPEED)
+        move_speed_y = rand.randint(-settings.MOVING_SPEED, settings.MOVING_SPEED)
         while (move_speed_x == 0) and (move_speed_y == 0):
-            move_speed_x = rand.randint(-MOVING_SPEED, MOVING_SPEED)
-            move_speed_y = rand.randint(-MOVING_SPEED, MOVING_SPEED)
+            move_speed_x = rand.randint(-settings.MOVING_SPEED, settings.MOVING_SPEED)
+            move_speed_y = rand.randint(-settings.MOVING_SPEED, settings.MOVING_SPEED)
     else:
         move_speed_x = mspd
         move_speed_y = mspd
@@ -393,7 +293,7 @@ def pick_resource(basepath, vid_yes: bool):
             item = rand.choice(items)
 
         matched = "none"
-        if MOOD_FILENAME:
+        if settings.MOOD_FILENAME:
             for prefix_name in prefixes:
                 if item.startswith(prefixes[prefix_name].images):
                     matched = "partial"
@@ -424,7 +324,7 @@ def pick_resource(basepath, vid_yes: bool):
         caption = ""
         max = 1
 
-        if SHOW_CAPTIONS and CAPTIONS and prefix.captions:
+        if settings.SHOW_CAPTIONS and CAPTIONS and prefix.captions:
             if prefix.captions in CAPTIONS:
                 caption = rand.choice(CAPTIONS[prefix.captions])
                 if prefix.max > 1:
@@ -441,22 +341,22 @@ fore = "#000000"
 back = "#f0f0f0"
 mainfont = font.nametofont("TkDefaultFont")
 
-if THEME == "Dark":
+if settings.THEME == "Dark":
     fore = "#f9faff"
     back = "#282c34"
-if THEME == "The One":
+if settings.THEME == "The One":
     fore = "#00ff41"
     back = "#282c34"
     mainfont.configure(family="Consolas", size=8)
-if THEME == "Ransom":
+if settings.THEME == "Ransom":
     fore = "#ffffff"
     back = "#841212"
     mainfont.configure(family="Arial Bold")
-if THEME == "Goth":
+if settings.THEME == "Goth":
     fore = "#ba9aff"
     back = "#282c34"
     mainfont.configure(family="Constantia")
-if THEME == "Bimbo":
+if settings.THEME == "Bimbo":
     fore = "#ff3aa3"
     back = "#ffc5cd"
     mainfont.configure(family="Constantia")
@@ -508,9 +408,9 @@ def run():
     # many thanks to @MercyNudes for fixing my old braindead scaling method (https://twitter.com/MercyNudes)
     def resize(img: Image.Image) -> Image.Image:
         size_source = max(img.width, img.height) / min(monitor.width, monitor.height)
-        size_target = rand.randint(30, 70) / 100 if not LOWKEY_MODE else rand.randint(20, 50) / 100
+        size_target = rand.randint(30, 70) / 100 if not settings.LOWKEY_MODE else rand.randint(20, 50) / 100
         resize_factor = size_target / size_source
-        if LANCZOS_MODE:
+        if settings.LANCZOS_MODE:
             return image.resize((int(image.width * resize_factor), int(image.height * resize_factor)), Image.LANCZOS)
         else:
             return image.resize((int(image.width * resize_factor), int(image.height * resize_factor)), Image.ANTIALIAS)
@@ -592,7 +492,7 @@ def run():
     loc_x = rand.randint(monitor.x, monitor.x + monitor.width - (resized_image.width))
     loc_y = rand.randint(monitor.y, max(monitor.y + monitor.height - (resized_image.height), 0))
 
-    if LOWKEY_MODE:
+    if settings.LOWKEY_MODE:
         global LOWKEY_CORNER
         if LOWKEY_CORNER == 4:
             LOWKEY_CORNER = rand.randrange(0, 3)
@@ -614,10 +514,10 @@ def run():
     if animated_gif:
         label.next_frame()
 
-    if HAS_LIFESPAN or LOWKEY_MODE and not (HIBERNATE_TYPE == "Pump-Scare" and HIBERNATE_MODE):
-        thread.Thread(target=lambda: live_life(root, LIFESPAN if not LOWKEY_MODE else DELAY / 1000), daemon=True).start()
+    if settings.HAS_LIFESPAN or settings.LOWKEY_MODE and not (settings.HIBERNATE_TYPE == "Pump-Scare" and settings.HIBERNATE_MODE):
+        thread.Thread(target=lambda: live_life(root, settings.LIFESPAN if not settings.LOWKEY_MODE else settings.DELAY / 1000), daemon=True).start()
 
-    if not MULTI_CLICK:
+    if not settings.MULTI_CLICK:
         root.click_count = 1
 
     root.caption_text = caption_text
@@ -628,7 +528,7 @@ def run():
         caption_label = Label(root, textvariable=root.caption_string, wraplength=resized_image.width - border_wid_const, bg=back, fg=fore)
         caption_label.place(x=5, y=5)
 
-    if CORRUPTION_DEVMODE:
+    if settings.CORRUPTION_DEVMODE:
         devmode_label_1 = Label(root, text="clev=", wraplength=resized_image.width - border_wid_const, bg=back, fg=fore)
         devmode_label_2 = Label(root, text="popmood=", wraplength=resized_image.width - border_wid_const, bg=back, fg=fore)
         devmode_label_2 = Label(root, text="popnum=", wraplength=resized_image.width - border_wid_const, bg=back, fg=fore)
@@ -637,7 +537,7 @@ def run():
         devmode_label_2.place(x=5, y=int(resized_image.height / 2) + devmode_label_2.winfo_reqheight() + 2)
         devmode_label_3.place(x=5, y=int(resized_image.height / 2) + devmode_label_3.winfo_reqheight() + devmode_label_2.winfo_reqheight() + 4)
 
-    if BUTTONLESS:
+    if settings.BUTTONLESS or MOVING_STATUS:
         label.bind("<ButtonRelease-1>", buttonless_click)
     else:
         root.button_string = StringVar()
@@ -646,20 +546,20 @@ def run():
         submit_button = Button(root, textvariable=root.button_string, command=click, bg=back, fg=fore, activebackground=back, activeforeground=fore)
         submit_button.place(x=resized_image.width - 25 - submit_button.winfo_reqwidth(), y=resized_image.height - 5 - submit_button.winfo_reqheight())
 
-    if HIBERNATE_MODE and check_setting("fixWallpaper"):
+    if settings.HIBERNATE_MODE and settings.FIX_WALLPAPER:
         with open(Data.HIBERNATE, "r+") as f:
             i = int(f.readline())
             f.seek(0)
             f.write(str(i + 1))
             f.truncate()
-    if CORRUPTION_MODE and CORRUPTION_TRIGGER == "Popup":
+    if settings.CORRUPTION_MODE and settings.CORRUPTION_TRIGGER == "Popup":
         with open(Data.CORRUPTION_POPUPS, "r+") as f:
             i = int(f.readline())
             f.seek(0)
             f.write(str(i + 1))
             f.truncate()
 
-    root.attributes("-alpha", OPACITY / 100)
+    root.attributes("-alpha", settings.OPACITY / 100)
 
     if MOVING_STATUS:
         thread.Thread(target=lambda: move_window(root, resized_image.height, resized_image.width, loc_x, loc_y), daemon=True).start()
@@ -675,7 +575,7 @@ def start_vlc(vid, label):
     media_player.set_hwnd(label.winfo_id())
     media_player.video_set_mouse_input(False)
     media_player.video_set_key_input(False)
-    media_player.audio_set_volume(int(VIDEO_VOLUME * 100))
+    media_player.audio_set_volume(int(settings.VIDEO_VOLUME * 100))
 
     media = instance.media_new(vid)
     media_player.set_media(media)
@@ -683,15 +583,18 @@ def start_vlc(vid, label):
 
 
 def check_deny() -> bool:
-    return DENIAL_MODE and rand.randint(1, 100) <= DENIAL_CHANCE
+    return settings.DENIAL_MODE and rand.randint(1, 100) <= settings.DENIAL_CHANCE
+
+
+SUBLIMINAL_MODE = settings.SUBLIMINAL_MODE
 
 
 def check_subliminal():
     global SUBLIMINAL_MODE
     with open(Data.MAX_SUBLIMINALS, "r") as f:
-        if int(f.readline()) >= MAX_SUBLIMINALS:
+        if int(f.readline()) >= settings.MAX_SUBLIMINALS:
             SUBLIMINAL_MODE = False
-        elif rand.randint(1, 100) > SUBLIMINAL_CHANCE:
+        elif rand.randint(1, 100) > settings.SUBLIMINAL_CHANCE:
             SUBLIMINAL_MODE = False
 
 
@@ -699,12 +602,12 @@ def live_life(parent: tk, length: int):
     while root.click_count > 0:
         time.sleep(length)
         click(allow_die=False)
-    for i in range(100 - OPACITY, 100):
+    for i in range(100 - settings.OPACITY, 100):
         parent.attributes("-alpha", 1 - i / 100)
         time.sleep(FADE_OUT_TIME / 100)
-    if LOWKEY_MODE:
+    if settings.LOWKEY_MODE:
         subprocess.Popen([sys.executable, Process.POPUP])
-    if HIBERNATE_MODE and check_setting("fixWallpaper"):
+    if settings.HIBERNATE_MODE and settings.FIX_WALLPAPER:
         with open(Data.HIBERNATE, "r+") as f:
             i = int(f.readline())
             if i > 0:
@@ -755,10 +658,9 @@ def click(allow_die=True):
     root.click_count -= 1
 
     if root.click_count > 0:
-        if BUTTONLESS:
+        if settings.BUTTONLESS:
             if root.caption_text:
                 root.caption_string.set(root.caption_text + " (" + str(root.click_count) + ")")
-
         else:
             root.button_string.set(root.button_text + " (" + str(root.click_count) + ")")
 
@@ -768,24 +670,22 @@ def click(allow_die=True):
     else:
         if allow_die:
             die()
-
         else:
-            if BUTTONLESS:
+            if settings.BUTTONLESS:
                 if root.caption_text:
                     root.caption_string.set(root.caption_text)
-
             else:
                 root.button_string.set(root.button_text)
 
 
 def die():
-    if WEB_OPEN and web_dict and do_roll((100 - WEB_PROB) / 2) and not LOWKEY_MODE:
+    if settings.WEB_OPEN and web_dict and do_roll((100 - settings.WEB_CHANCE) / 2) and not settings.LOWKEY_MODE:
         url_path = select_url(rand.randrange(len(web_dict["urls"])))
         webbrowser.open_new(url_path)
-    if MITOSIS_MODE or LOWKEY_MODE:
-        for i in range(0, MITOSIS_STRENGTH) if not LOWKEY_MODE else [1]:
+    if settings.MITOSIS_MODE or settings.LOWKEY_MODE:
+        for i in range(0, settings.MITOSIS_STRENGTH) if not settings.LOWKEY_MODE else [1]:
             subprocess.Popen([sys.executable, Process.POPUP])
-    if HIBERNATE_MODE and check_setting("fixWallpaper"):
+    if settings.HIBERNATE_MODE and settings.FIX_WALLPAPER:
         with open(Data.HIBERNATE, "r+") as f:
             i = int(f.readline())
             if i > 0:
@@ -832,8 +732,8 @@ def die():
 
 
 def panic(key):
-    key_condition = key.keysym == PANIC_KEY or key.keycode == PANIC_KEY
-    if PANIC_REQUIRES_VALIDATION and key_condition:
+    key_condition = key.keysym == settings.PANIC_KEY or key.keycode == settings.PANIC_KEY
+    if settings.TIMER_MODE and key_condition:
         try:
             pass_ = simpledialog.askstring("Panic", "Enter Panic Password")
             print("ASKING FOR PASS")
@@ -855,12 +755,12 @@ def panic(key):
                 # if some issue occurs with the hash or time files just emergency panic
                 subprocess.Popen([sys.executable, Process.PANIC])
     else:
-        if not PANIC_DISABLED and key_condition:
+        if not settings.PANIC_DISABLED and key_condition:
             subprocess.Popen([sys.executable, Process.PANIC])
 
 
 def pump_scare():
-    if HIBERNATE_MODE and HIBERNATE_TYPE == "Pump-Scare":
+    if settings.HIBERNATE_MODE and settings.HIBERNATE_TYPE == "Pump-Scare":
         time.sleep(2.5)
         die()
 

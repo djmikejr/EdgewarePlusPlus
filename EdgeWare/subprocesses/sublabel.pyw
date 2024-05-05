@@ -1,3 +1,5 @@
+# This sublabel.pyw originally provided very generously by u/basicmo!
+
 import json
 import logging
 import os
@@ -12,27 +14,14 @@ from screeninfo import get_monitors
 sys.path.append(str(Path(__file__).parent.parent))
 from utils import utils
 from utils.paths import Data, Resource
+from utils.settings import Settings
 
 SYS_ARGS = sys.argv.copy()
 SYS_ARGS.pop(0)
 
 utils.init_logging("sublabel")
-# This sublabel.pyw originally provided very generously by u/basicmo!
 
-
-def check_setting(name: str, default: bool = False) -> bool:
-    default = False if default is None else default
-    try:
-        return int(settings.get(name)) == 1
-    except Exception:
-        return default
-
-
-CAP_OPACITY = 100
-CAP_TIMER = 300
-SUBLIMINAL_MOOD = True
-MOOD_OFF = True
-THEME = "Original"
+settings = Settings()
 
 MOOD_ID = "0"
 if len(SYS_ARGS) >= 1 and SYS_ARGS[0] != "0":
@@ -46,42 +35,28 @@ if MOOD_ID != "0":
         with open(Data.UNNAMED_MOODS / f"{MOOD_ID}.json") as f:
             mood_data = json.loads(f.read())
 
-with open(Data.CONFIG) as cfg:
-    settings = json.loads(cfg.read())
-    CAP_OPACITY = int(settings["capPopOpacity"])
-    CAP_TIMER = int(settings["capPopTimer"])
-    SUBLIMINAL_MOOD = check_setting("capPopMood")
-    MOOD_OFF = check_setting("toggleMoodSet")
-    THEME = settings["themeType"]
-
 # background is one hex value off here, because it looks pretty ugly if they're different colours, so we keep them close so there is no visual difference
-try:
-    if THEME == "Original":
-        fore = "#000000"
-        back = "#000001" if utils.is_windows() else "#f0f0f0"
-        mainfont = "Segoe UI"
-    if THEME == "Dark":
-        fore = "#f9faff"
-        back = "#f9fafe" if utils.is_windows() else "#282c34"
-        mainfont = "Segoe UI"
-    if THEME == "The One":
-        fore = "#00ff41"
-        back = "#00ff42" if utils.is_windows() else "#282c34"
-        mainfont = "Consolas"
-    if THEME == "Ransom":
-        fore = "#ffffff"
-        back = "#fffffe" if utils.is_windows() else "#841212"
-        mainfont = "Arial Bold"
-    if THEME == "Goth":
-        fore = "#ba9aff"
-        back = "#ba9afe" if utils.is_windows() else "#282c34"
-        mainfont = "Constantia"
-    if THEME == "Bimbo":
-        fore = "#ff3aa3"
-        back = "#ff3aa4" if utils.is_windows() else "#ffc5cd"
-        mainfont = "Constantia"
-except Exception as e:
-    logging.fatal(f"failed to load theme. {e}")
+if settings.THEME == "Dark":
+    fore = "#f9faff"
+    back = "#f9fafe" if utils.is_windows() else "#282c34"
+    mainfont = "Segoe UI"
+elif settings.THEME == "The One":
+    fore = "#00ff41"
+    back = "#00ff42" if utils.is_windows() else "#282c34"
+    mainfont = "Consolas"
+elif settings.THEME == "Ransom":
+    fore = "#ffffff"
+    back = "#fffffe" if utils.is_windows() else "#841212"
+    mainfont = "Arial Bold"
+elif settings.THEME == "Goth":
+    fore = "#ba9aff"
+    back = "#ba9afe" if utils.is_windows() else "#282c34"
+    mainfont = "Constantia"
+elif settings.THEME == "Bimbo":
+    fore = "#ff3aa3"
+    back = "#ff3aa4" if utils.is_windows() else "#ffc5cd"
+    mainfont = "Constantia"
+else:
     fore = "#000000"
     back = "#000001" if utils.is_windows() else "#f0f0f0"
     mainfont = "Segoe UI"
@@ -93,7 +68,7 @@ def display_subliminal_message():
         try:
             with open(Resource.CAPTIONS, "r") as file:
                 l = json.load(file)
-                if l.get("subliminal", []) and SUBLIMINAL_MOOD:
+                if l.get("subliminal", []) and settings.SUBLIMINAL_MOOD:
                     return l.get("subliminal", [])
                 else:
                     if "prefix" in l:
@@ -154,14 +129,14 @@ def display_subliminal_message():
     if utils.is_windows():
         label.master.wm_attributes("-disabled", True)
         label.master.wm_attributes("-transparentcolor", back)
-    label.winfo_toplevel().attributes("-alpha", CAP_OPACITY / 100)
+    label.winfo_toplevel().attributes("-alpha", settings.CAP_OPACITY / 100)
     label.pack()
 
     # Update the label's size
     label.update_idletasks()
 
     # Schedule the destruction of the window after 0.3 seconds
-    label.master.after(CAP_TIMER, label.master.destroy)
+    label.master.after(settings.CAP_TIMER, label.master.destroy)
 
     # Start the Tkinter event loop
 

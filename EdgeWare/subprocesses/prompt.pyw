@@ -12,24 +12,18 @@ from screeninfo import get_monitors
 sys.path.append(str(Path(__file__).parent.parent))
 from utils import utils
 from utils.paths import Data, Resource
+from utils.settings import Settings
 
 SYS_ARGS = sys.argv.copy()
 SYS_ARGS.pop(0)
 
+settings = Settings()
 
 has_data = False
 text_data = {}
-MAX_MISTAKES = 3
 submission_text = "I Submit <3"
 command_text = "Type for me, slut~"
 mood_data = {}
-THEME = "Original"
-
-
-with open(Data.CONFIG) as settings:
-    jsondata = json.loads(settings.read())
-    MAX_MISTAKES = int(jsondata["promptMistakes"])
-    THEME = jsondata["themeType"]
 
 MOOD_ID = "0"
 if len(SYS_ARGS) >= 1 and SYS_ARGS[0] != "0":
@@ -71,30 +65,30 @@ def unbordered_window():
     textf = "#000000"
     mainfont = font.nametofont("TkDefaultFont")
 
-    if THEME == "Dark":
+    if settings.THEME == "Dark":
         fore = "#f9faff"
         back = "#282c34"
         textb = "#1b1d23"
         textf = "#f9faff"
-    if THEME == "The One":
+    if settings.THEME == "The One":
         fore = "#00ff41"
         back = "#282c34"
         textb = "#1b1d23"
         textf = "#00ff41"
         mainfont.configure(family="Consolas", size=8)
-    if THEME == "Ransom":
+    if settings.THEME == "Ransom":
         fore = "#ffffff"
         back = "#841212"
         textb = "#ffffff"
         textf = "#000000"
         mainfont.configure(family="Arial Bold")
-    if THEME == "Goth":
+    if settings.THEME == "Goth":
         fore = "#ba9aff"
         back = "#282c34"
         textb = "#db7cf2"
         textf = "#6a309d"
         mainfont.configure(family="Constantia")
-    if THEME == "Bimbo":
+    if settings.THEME == "Bimbo":
         fore = "#ff3aa3"
         back = "#ffc5cd"
         textb = "#ffc5cd"
@@ -171,7 +165,7 @@ def check_total(root, a, b):
                 )
             )  # fmt: skip
 
-    if d[len(a)][len(b)] <= MAX_MISTAKES:
+    if d[len(a)][len(b)] <= settings.MAX_MISTAKES:
         root.destroy()
 
 
