@@ -606,7 +606,10 @@ def live_life(parent: tk, length: int):
         parent.attributes("-alpha", 1 - i / 100)
         time.sleep(FADE_OUT_TIME / 100)
     if settings.LOWKEY_MODE:
-        subprocess.Popen([sys.executable, Process.POPUP])
+        args = [sys.executable, Process.POPUP]
+        if not settings.MOOD_OFF:
+            args += [f"-{MOOD_ID}"]
+        subprocess.Popen(args)
     if settings.HIBERNATE_MODE and settings.FIX_WALLPAPER:
         with open(Data.HIBERNATE, "r+") as f:
             i = int(f.readline())
@@ -684,7 +687,10 @@ def die():
         webbrowser.open_new(url_path)
     if settings.MITOSIS_MODE or settings.LOWKEY_MODE:
         for i in range(0, settings.MITOSIS_STRENGTH) if not settings.LOWKEY_MODE else [1]:
-            subprocess.Popen([sys.executable, Process.POPUP])
+            args = [sys.executable, Process.POPUP]
+            if not settings.MOOD_OFF:
+                args += [f"-{MOOD_ID}"]
+            subprocess.Popen(args)
     if settings.HIBERNATE_MODE and settings.FIX_WALLPAPER:
         with open(Data.HIBERNATE, "r+") as f:
             i = int(f.readline())
