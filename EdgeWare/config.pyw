@@ -50,7 +50,7 @@ from utils.tooltip import CreateToolTip
 PATH = Path(__file__).parent
 os.chdir(PATH)
 
-utils.init_logging("dbg", "config")
+log_file = utils.init_logging("dbg", "config")
 
 
 # if you are working on this i'm just letting you know there's like almost no documentation for ttkwidgets
@@ -2790,11 +2790,11 @@ def show_window():
                 if os.path.exists(LOG_PATH) and os.listdir(LOG_PATH):
                     logs = os.listdir(LOG_PATH)
                     for f in logs:
-                        if os.path.splitext(f)[0] == os.path.join(LOG_TIME + "-dbg"):
+                        if os.path.splitext(f)[0] == os.path.splitext(log_file)[0]:
                             continue
                         e = os.path.splitext(f)[1].lower()
                         if e == ".txt":
-                            os.remove(LOG_PATH + f)
+                            os.remove(LOG_PATH / f)
                     logNum = len(os.listdir(LOG_PATH)) if os.path.exists(LOG_PATH) else 0
                     logStat.configure(text=f"Total Logs: {logNum}")
         except Exception as e:

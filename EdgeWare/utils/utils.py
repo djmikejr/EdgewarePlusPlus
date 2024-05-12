@@ -11,9 +11,12 @@ def init_logging(filename, source=None):
         os.mkdir(LOG_PATH)
 
     log_time = time.asctime().replace(" ", "_").replace(":", "-")
-    logging.basicConfig(filename=LOG_PATH / f"{log_time}-{filename}.txt", format="%(levelname)s:%(message)s", level=logging.DEBUG, force=True)
+    log_file = f"{log_time}-{filename}.txt"
+    logging.basicConfig(filename=LOG_PATH / log_file, format="%(levelname)s:%(message)s", level=logging.DEBUG, force=True)
     if source:
         logging.info(f"Started {source} logging successfully.")
+
+    return log_file
 
 
 def is_linux():
