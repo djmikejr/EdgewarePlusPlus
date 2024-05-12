@@ -28,6 +28,9 @@ A lot has changed! So much so that I actually am having the unique problem of ha
 
 •*Added a setting to subliminals that allows you to change the transparency*
 
+•*Fixed bugs that might have affected corruption*
+>If you had issues with launching popups before, this probably fixed it!
+
 **Version 10.2**
 
 Continued work on corruption among other things. There might be big changes happening to this github page, as I am now working with a friend (@ecchigooner) and they are helping me actually understand github instead of pretending to understand github. This actually might be one of the last times Edgeware updates like this, as i'm hoping to get a grasp on releases and making things actually semi-official instead of whatever i'm doing right now...  
