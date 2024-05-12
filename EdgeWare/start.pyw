@@ -493,8 +493,9 @@ def do_roll(mod: float) -> bool:
 #       replace: will only happen one single time in the run of the application, but checks ALL folders
 def annoyance():
     global MITOSIS_LIVE
-    with open(Data.CORRUPTION_LEVEL, "r") as f:
-        tracked_level = int(f.read())
+    if settings.CORRUPTION_MODE:
+        with open(Data.CORRUPTION_LEVEL, "r") as f:
+            tracked_level = int(f.read())
     while True:
         if settings.CORRUPTION_MODE:
             with open(Data.CORRUPTION_LEVEL, "r") as f:
