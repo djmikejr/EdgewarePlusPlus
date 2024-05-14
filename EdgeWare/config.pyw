@@ -3225,7 +3225,8 @@ def write_save(varList: list[StringVar | IntVar | BooleanVar], nameList: list[st
     if not os.path.isfile(Resource.CORRUPTION):
         settings["corruptionMode"] = 0
 
-    utils.toggle_run_at_startup(varList[nameList.index("start_on_logon")].get())
+    if int(varList[nameList.index("start_on_logon")].get()) == 1:
+        utils.toggle_run_at_startup(True)
 
     if int(varList[nameList.index("timerMode")].get()) == 1:
         # utils.toggle_run_at_startup(True)
@@ -3249,11 +3250,14 @@ def write_save(varList: list[StringVar | IntVar | BooleanVar], nameList: list[st
         try:
             if not varList[nameList.index("start_on_logon")].get():
                 utils.toggle_run_at_startup(False)
-            utils.show_file(Data.PASS_HASH)
-            utils.show_file(Data.HID_TIME)
-            os.remove(Data.PASS_HASH)
-            os.remove(Data.HID_TIME)
-            logging.info("removed pass/time files.")
+            if os.path.exists(Data.PASS_HASH):
+                utils.show_file(Data.PASS_HASH)
+                os.remove(Data.PASS_HASH)
+                logging.info("removed password file.")
+            if os.path.exists(Data.HID_TIME):
+                utils.show_file(Data.HID_TIME)
+                os.remove(Data.HID_TIME)
+                logging.info("removed timer file.")
         except Exception as e:
             errText = str(e).replace(getpass.getuser(), "[USERNAME_REDACTED]")
             logging.warning(f"failed timer file modifying\n\tReason: {errText}")

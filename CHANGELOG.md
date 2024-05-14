@@ -7,6 +7,10 @@
 
 •+0.2-0.1 to version number: very small update, usually just a bugfix, accessibility options, UI tweaks
 
+**Since last version...**
+
+•*Cleaned up log files so there's less benign errors being thrown for no reason*
+
 **Version 11**
 
 A lot has changed! So much so that I actually am having the unique problem of having to *look up* what was fixed since the last version. This is because **LewdDevelopment** has been helping catch me up to speed on Github and we've been rolling out smaller updates, using branches, etc.
