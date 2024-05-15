@@ -3114,7 +3114,10 @@ def show_window():
 
 def explorerView(url):
     try:
-        subprocess.Popen(f'explorer "{url}"')
+        if utils.is_windows():
+            subprocess.Popen(f'explorer "{url}"')
+        elif utils.is_linux():
+            subprocess.Popen(["xdg-open", url])
     except Exception as e:
         logging.warning(f"failed to open explorer view\n\tReason: {e}")
         messagebox.showerror("Explorer Error", "Failed to open explorer view.")
