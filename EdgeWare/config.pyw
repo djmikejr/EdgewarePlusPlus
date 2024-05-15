@@ -3555,7 +3555,7 @@ def getPresets() -> list[str]:
 def applyPreset(name: str):
     try:
         os.remove(Data.CONFIG)
-        shutil.copyfile(Data.PRESETS / f"{name}.cfg", Data.CONFIG)
+        shutil.copyfile(Data.PRESETS / f"{name.lower()}.cfg", Data.CONFIG)
         refresh()
     except Exception as e:
         messagebox.showerror("Error", f"Failed to load preset.\n\n{e}")
