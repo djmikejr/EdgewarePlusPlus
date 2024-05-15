@@ -3554,7 +3554,10 @@ def getPresets() -> list[str]:
 
 def applyPreset(name: str):
     try:
-        os.remove(Data.CONFIG)
+        #"shutil.copyfile" already remove the file and replace it with the copy of the preset, don't need to remove it beforehand
+        #Plus, it can cause some problems if the file is removed but the copy failed for some reason
+        
+        #os.remove(Data.CONFIG) 
         shutil.copyfile(Data.PRESETS / f"{name.lower()}.cfg", Data.CONFIG)
         refresh()
     except Exception as e:
