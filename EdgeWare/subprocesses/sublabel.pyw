@@ -68,8 +68,8 @@ def display_subliminal_message():
         try:
             with open(Resource.CAPTIONS, "r") as file:
                 l = json.load(file)
-                if l.get("subliminal", []) and settings.SUBLIMINAL_MOOD:
-                    return l.get("subliminal", [])
+                if l.get("subliminals", []) and settings.SUBLIMINAL_MOOD:
+                    return l.get("subliminals", [])
                 else:
                     if "prefix" in l:
                         del l["prefix"]
