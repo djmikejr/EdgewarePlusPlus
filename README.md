@@ -93,6 +93,8 @@ There are a few places you can start, however. PetitTournesol's original github 
 
 A: Fantastic! (well, not really.) The best place to post something like this is the [issues page](https://github.com/araten10/EdgewarePlusPlus/issues), where it can be properly filed and looked at/addressed by us or other people/pull requests. If it is something that seems like it might be a personal issue or relating to your specific setup, feel free to drop me a line on twitter. Just know that I might not be able to personally fix the issue, especially if I can't replicate it on any of my machines!
 
+To help make the issue easier for us to solve, [here](https://twitter.com/ara10ten/status/1789414192702730718) is a short (NSFW!) guide on how to properly report bugs!
+
 >Q: Somebody sent me this pack and it's not working! I checked inside of it, and it has an entire copy of EdgeWare with it? Can I put it into my pre-existing EdgeWare installation?
 
 You can go into the resource folder of the pack you got, extract everything inside of it, and zip it with a desired name. This way, you can import the pack normally. If you already have an install of EdgeWare++, it is recommended you do this over using their installation unless it comes from a trusted source. While many people make packs like this to make using EdgeWare simpler for people who have never heard of it before, there's also the possibility of the files being modified to be malicious.
