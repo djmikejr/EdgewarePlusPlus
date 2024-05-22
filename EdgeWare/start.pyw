@@ -379,8 +379,8 @@ def main():
                     for i in range(0, rand.randint(int(settings.WAKEUP_ACTIVITY / 2), settings.WAKEUP_ACTIVITY)):
                         roll_for_initiative()
                 except Exception as e:
-                    logging.warning(f"failed to successfully run {HIBERNATE_TYPE} hibernate.\n\tReason: {e}")
-            if HIBERNATE_TYPE == "Spaced":
+                    logging.warning(f"failed to successfully run {settings.HIBERNATE_TYPE} hibernate.\n\tReason: {e}")
+            if settings.HIBERNATE_TYPE == "Spaced":
                 try:
                     end_time = time.monotonic() + float(settings.HIBERNATE_LENGTH)
                     print(f"running spaced hibernate. current time is {time.monotonic()}, end time is {end_time}")
@@ -388,8 +388,8 @@ def main():
                         roll_for_initiative()
                         time.sleep(float(settings.DELAY) / 1000.0)
                 except Exception as e:
-                    logging.warning(f"failed to successfully run {HIBERNATE_TYPE} hibernate.\n\tReason: {e}")
-            if HIBERNATE_TYPE == "Glitch":
+                    logging.warning(f"failed to successfully run {settings.HIBERNATE_TYPE} hibernate.\n\tReason: {e}")
+            if settings.HIBERNATE_TYPE == "Glitch":
                 try:
                     glitch_sleep = settings.HIBERNATE_LENGTH / settings.WAKEUP_ACTIVITY
                     total_time = time.monotonic()
@@ -417,8 +417,8 @@ def main():
                         time.sleep(float(end_time - time.monotonic()))
                     roll_for_initiative()
                 except Exception as e:
-                    logging.warning(f"failed to successfully run {HIBERNATE_TYPE} hibernate.\n\tReason: {e}")
-            if HIBERNATE_TYPE == "Ramp":
+                    logging.warning(f"failed to successfully run {settings.HIBERNATE_TYPE} hibernate.\n\tReason: {e}")
+            if settings.HIBERNATE_TYPE == "Ramp":
                 try:
                     print(
                         f"hibernate type is ramp. ramping up speed for {settings.HIBERNATE_LENGTH}, max speed is {settings.DELAY*0.9}, and popups at max speed is {settings.WAKEUP_ACTIVITY}"
@@ -442,13 +442,13 @@ def main():
                         roll_for_initiative()
                         time.sleep(float(settings.DELAY * 0.9) / 1000.0)
                 except Exception as e:
-                    logging.warning(f"failed to successfully run {HIBERNATE_TYPE} hibernate.\n\tReason: {e}")
-            if HIBERNATE_TYPE == "Pump-Scare":
+                    logging.warning(f"failed to successfully run {settings.HIBERNATE_TYPE} hibernate.\n\tReason: {e}")
+            if settings.HIBERNATE_TYPE == "Pump-Scare":
                 try:
                     print("hibernate type is pump-scare.")
                     roll_for_initiative()
                 except Exception as e:
-                    logging.warning(f"failed to successfully run {HIBERNATE_TYPE} hibernate.\n\tReason: {e}")
+                    logging.warning(f"failed to successfully run {settings.HIBERNATE_TYPE} hibernate.\n\tReason: {e}")
             time.sleep(0.5)
             running_hibernate.set()
 
