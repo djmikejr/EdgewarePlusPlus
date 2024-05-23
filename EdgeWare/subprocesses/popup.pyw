@@ -559,6 +559,8 @@ def run():
             f.write(str(i + 1))
             f.truncate()
 
+    if utils.is_linux() :
+        root.wait_visibility(root)
     root.attributes("-alpha", settings.OPACITY / 100)
 
     if MOVING_STATUS:
