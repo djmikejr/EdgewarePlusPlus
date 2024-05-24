@@ -48,7 +48,6 @@ goto top
 echo What pack would you like to compile?
 set /p compileName=Directory Name:
 pack_tool.py "%compileName%"
-if NOT %errorlevel%==0 goto ptCompileError
 echo Done.
 pause
 goto top
