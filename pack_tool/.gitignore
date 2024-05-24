@@ -1,7 +1,1 @@
-*
-!.gitignore
-!COPYING
-!README.md
-!default_pack.yml
-!pack_tool.py
-!requirements.txt
+*/*
