@@ -1,0 +1,14 @@
+# bs4
+get-video-properties
+git+https://github.com/Zulko/moviepy.git # The current version v1.0.3 has a bug with to_soundarray
+imageio
+pillow
+playsound==1.2.2
+pygobject; sys_platform == 'linux' # Required for playsound
+# pypresence
+# pystray
+python-vlc
+# requests
+screeninfo
+sounddevice
+# ttkwidgets

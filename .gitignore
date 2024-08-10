@@ -163,11 +163,5 @@ cython_debug/
 .vs/
 
 # Ignore anything that could be considered a local file
-EdgeWare/config.cfg
-EdgeWare/hid_time.dat
-EdgeWare/pass.hash
-EdgeWare/data/
-EdgeWare/logs/
-EdgeWare/resource/
-EdgeWare/moods/*
-EdgeWare/moods/*/*.json
+edgeware/data/
+edgeware/resource/
