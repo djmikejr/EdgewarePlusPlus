@@ -1,5 +1,5 @@
 # Edgeware++
-![Edgeware++ running on Windows 11](EdgeWare/default_assets/readme/demo2.png)
+![Edgeware++ running on Windows 11](screenshots/demo.png)
 ## What is EdgeWare?
 
 Going to say immediately: **EdgeWare is not a virus, nor does it install itself onto your computer**. All it installs onto your computer by default is python 3.10 and a few extra libraries, which is needed for it to run. EdgeWare **can** potentially modify files on your computer, including deleting or replacing things, but these are all *user set* settings that are not on by default. That being said, other people can download EdgeWare, modify it to be malicious, and upload it elsewhere, so exercise caution when downloading versions from other sites. This project is open source, so feel free to peruse the source code if you're unsure.
