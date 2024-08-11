@@ -75,7 +75,7 @@ class ImagePopup(Popup):
 
     def try_denial_text(self) -> None:
         if self.denial:
-            label = Label(self, text=self.pack.random_denial(), wraplength=self.width)
+            label = Label(self, text=self.pack.random_denial(), wraplength=self.width, fg=self.theme.fg, bg=self.theme.bg)
             label.place(relx=0.5, rely=0.5, anchor="c")
 
     def close(self) -> None:

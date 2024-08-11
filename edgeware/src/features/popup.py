@@ -4,6 +4,7 @@ from threading import Thread
 from tkinter import Button, Label, Tk, Toplevel
 
 from features.misc import open_web, panic
+from features.theme import get_theme
 from screeninfo import get_monitors
 from utils import utils
 from utils.pack import Pack
@@ -16,8 +17,9 @@ class Popup(Toplevel):
 
         self.settings = settings
         self.pack = pack
+        self.theme = get_theme(settings)
 
-        self.bind("<KeyPress>", lambda event: panic(root, settings, event.keysym))
+        self.bind("<KeyPress>", lambda event: panic(root, self.settings, event.keysym))
         self.wm_attributes("-topmost", True)
         self.wm_attributes("-type", "splash")
         # TODO: May be needed for opacity on some Linux setups
@@ -50,14 +52,22 @@ class Popup(Toplevel):
 
     def try_caption(self) -> None:
         if self.settings.captions_in_popups:
-            label = Label(self, text=self.pack.random_caption(), wraplength=self.width)
+            label = Label(self, text=self.pack.random_caption(), wraplength=self.width, fg=self.theme.fg, bg=self.theme.bg)
             label.place(x=5, y=5)
 
     def try_button(self) -> None:
         if self.settings.buttonless:
             self.bind("<ButtonRelease-1>", lambda event: self.close())
         else:
-            button = Button(self, text=self.pack.close_text, command=self.close)
+            button = Button(
+                self,
+                text=self.pack.close_text,
+                command=self.close,
+                fg=self.theme.fg,
+                bg=self.theme.bg,
+                activeforeground=self.theme.fg,
+                activebackground=self.theme.bg,
+            )
             button.place(x=-10, y=-10, relx=1, rely=1, anchor="se")
 
     def try_move(self) -> None:

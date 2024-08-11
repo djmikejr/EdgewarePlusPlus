@@ -1,5 +1,6 @@
 from tkinter import Button, Label, Text, Toplevel
 
+from features.theme import get_theme
 from screeninfo import get_monitors
 from utils.pack import Pack
 from utils.settings import Settings
@@ -11,8 +12,11 @@ class Prompt(Toplevel):
             return
         super().__init__()
 
+        self.theme = get_theme(settings)
+
         self.wm_attributes("-topmost", True)
         self.wm_attributes("-type", "splash")
+        self.configure(background=self.theme.bg)
 
         monitor = next(m for m in get_monitors() if m.is_primary)
         width = monitor.width // 4
@@ -21,14 +25,22 @@ class Prompt(Toplevel):
         y = monitor.y + (monitor.height - height) // 2
         self.geometry(f"{width}x{height}+{x}+{y}")
 
-        Label(self, text="\n" + pack.prompt_command_text + "\n").pack()
+        Label(self, text="\n" + pack.prompt_command_text + "\n", fg=self.theme.fg, bg=self.theme.bg).pack()
 
         prompt = pack.random_prompt()
-        Label(self, text=prompt, wraplength=width).pack()
+        Label(self, text=prompt, wraplength=width, fg=self.theme.fg, bg=self.theme.bg).pack()
 
-        input = Text(self)
+        input = Text(self, fg=self.theme.text_fg, bg=self.theme.text_bg)
         input.pack()
-        button = Button(self, text=pack.prompt_submit_text, command=lambda: self.submit(settings.prompt_max_mistakes, prompt, input.get(1.0, "end-1c")))
+        button = Button(
+            self,
+            text=pack.prompt_submit_text,
+            command=lambda: self.submit(settings.prompt_max_mistakes, prompt, input.get(1.0, "end-1c")),
+            fg=self.theme.fg,
+            bg=self.theme.bg,
+            activeforeground=self.theme.fg,
+            activebackground=self.theme.bg,
+        )
         button.place(x=-10, y=-10, relx=1, rely=1, anchor="se")
 
     def should_init(self) -> bool:

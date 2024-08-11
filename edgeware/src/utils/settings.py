@@ -16,6 +16,7 @@ class Settings:
             config = json.loads(f.read())
 
         # General
+        self.theme = config["themeType"]
         self.startup_splash = bool(config["showLoadingFlair"])
         self.panic_disabled = bool(config["panicDisabled"])
         self.panic_key = config["panicButton"]
