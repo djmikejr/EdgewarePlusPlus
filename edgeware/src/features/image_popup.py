@@ -11,9 +11,12 @@ from widgets.image_label import GifLike, ImageLabel
 
 class ImagePopup(Popup):
     def __init__(self, root: Tk, settings: Settings, pack: Pack):
+        self.subliminal = utils.roll(settings.subliminal_chance)
+        if not self.should_init(settings):
+            return
         super().__init__(root, settings, pack)
 
-        self.denial = utils.roll(settings.denial_chance)
+        self.denial = utils.roll(self.settings.denial_chance)
 
         image = Image.open(self.pack.random_image())
 
@@ -23,9 +26,22 @@ class ImagePopup(Popup):
         self.try_denial_text()
         self.init_finish()
 
+    def should_init(self, settings: Settings) -> bool:
+        global subliminal_number
+        if "subliminal_number" not in globals():
+            subliminal_number = 0
+
+        if not self.subliminal:
+            return True
+
+        if subliminal_number < settings.max_subliminals:
+            subliminal_number += 1
+            return True
+        return False
+
     def try_subliminal(self, image: Image.Image) -> Image.Image | GifLike:
         single_frame = not hasattr(image, "n_frames") or image.n_frames == 1
-        if utils.roll(self.settings.subliminal_chance) and single_frame:
+        if self.subliminal and single_frame:
             blend_image = image.convert("RGBA")
             subliminal = Image.open(self.pack.random_subliminal())
 
@@ -61,3 +77,10 @@ class ImagePopup(Popup):
         if self.denial:
             label = Label(self, text=self.pack.random_denial(), wraplength=self.width)
             label.place(relx=0.5, rely=0.5, anchor="c")
+
+    def close(self) -> None:
+        global subliminal_number
+
+        super().close()
+        if self.subliminal:
+            subliminal_number -= 1

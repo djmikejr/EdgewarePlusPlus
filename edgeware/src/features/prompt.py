@@ -7,14 +7,8 @@ from utils.settings import Settings
 
 class Prompt(Toplevel):
     def __init__(self, settings: Settings, pack: Pack):
-        global prompt_active
-        if "prompt_active" not in globals():
-            prompt_active = False
-
-        if prompt_active:
+        if not self.should_init():
             return
-
-        prompt_active = True
         super().__init__()
 
         self.wm_attributes("-topmost", True)
@@ -36,6 +30,16 @@ class Prompt(Toplevel):
         input.pack()
         button = Button(self, text=pack.prompt_submit_text, command=lambda: self.submit(settings.prompt_max_mistakes, prompt, input.get(1.0, "end-1c")))
         button.place(x=-10, y=-10, relx=1, rely=1, anchor="se")
+
+    def should_init(self) -> bool:
+        global prompt_active
+        if "prompt_active" not in globals():
+            prompt_active = False
+
+        if not prompt_active:
+            prompt_active = True
+            return True
+        return False
 
     # Checks that the number of mistakes is at most max_mistakes and if so,
     # closes the prompt window. The number of mistakes is computed as the edit

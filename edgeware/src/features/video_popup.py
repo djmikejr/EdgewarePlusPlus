@@ -9,6 +9,8 @@ from widgets.video_player import VideoPlayer
 
 class VideoPopup(Popup):
     def __init__(self, root: Tk, settings: Settings, pack: Pack):
+        if not self.should_init(settings):
+            return
         super().__init__(root, settings, pack)
 
         video = pack.random_video()
@@ -21,6 +23,19 @@ class VideoPopup(Popup):
 
         self.init_finish()
 
+    def should_init(self, settings: Settings) -> bool:
+        global video_number
+        if "video_number" not in globals():
+            video_number = 0
+
+        if video_number < settings.max_video:
+            video_number += 1
+            return True
+        return False
+
     def close(self) -> None:
+        global video_number
+
         self.player.on_close()
         super().close()
+        video_number -= 1
