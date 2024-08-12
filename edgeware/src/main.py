@@ -2,7 +2,7 @@ from tkinter import Tk
 
 from features.caption_popup import CaptionPopup
 from features.image_popup import ImagePopup
-from features.misc import handle_wallpaper, open_web, play_audio
+from features.misc import handle_discord, handle_wallpaper, open_web, play_audio
 from features.prompt import Prompt
 from features.startup_splash import StartupSplash
 from features.video_popup import VideoPopup
@@ -40,6 +40,7 @@ if __name__ == "__main__":
 
     def start_main() -> None:
         handle_wallpaper(root, settings, pack)
+        handle_discord(root, settings, pack)
         root.after(0, main(root, settings, pack))
 
     if settings.startup_splash:

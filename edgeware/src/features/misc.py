@@ -1,9 +1,11 @@
 import random
+import time
 import webbrowser
 from threading import Thread
 from tkinter import Tk
 
 from playsound import playsound
+from pypresence import Presence
 from utils import utils
 from utils.pack import Pack
 from utils.paths import PACK_PATH
@@ -54,3 +56,20 @@ def handle_wallpaper(root: Tk, settings: Settings, pack: Pack) -> None:
         rotate()
     else:
         utils.set_wallpaper(pack.wallpaper)
+
+
+def handle_discord(root: Tk, settings: Settings, pack: Pack) -> None:
+    if not settings.show_on_discord:
+        return
+
+    try:
+        presence = Presence("820204081410736148")
+        presence.connect()
+
+        def update() -> None:
+            presence.update(state=pack.discord_text, large_image=pack.discord_image, start=int(time.time()))
+            root.after(15000, update)
+
+        update()
+    except Exception:
+        print("Setting Discord presence failed")

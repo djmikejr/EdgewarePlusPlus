@@ -5,7 +5,7 @@ imageio
 pillow
 playsound==1.2.2
 pygobject; sys_platform == 'linux' # Required for playsound
-# pypresence
+pypresence
 # pystray
 python-vlc
 # requests

@@ -65,6 +65,9 @@ class Settings:
         self.wallpaper_variance = int(config["wallpaperVariance"]) * 1000  # Milliseconds
         self.wallpapers = list(ast.literal_eval(config["wallpaperDat"]).values())
 
+        # Dangerous
+        self.show_on_discord = bool(config["showDiscord"])
+
         # Moving
         self.moving_chance = int(config["movingChance"])  # 0 to 100
         self.moving_speed = int(config["movingSpeed"])

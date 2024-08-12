@@ -17,7 +17,7 @@ class Pack:
     CAPTIONS = PACK_PATH / "captions.json"
     # CONFIG = PACK_PATH / "config.json"
     # CORRUPTION = PACK_PATH / "corruption.json"
-    # DISCORD = PACK_PATH / "discord.dat"
+    DISCORD = PACK_PATH / "discord.dat"
     # ICON = PACK_PATH / "icon.ico"
     # INFO = PACK_PATH / "info.json"
     SPLASH = PACK_PATH / "loading_splash"
@@ -52,6 +52,13 @@ class Pack:
             self.captions = json.loads(f.read())
             self.denial = get(self.captions, "denial", "Not for you~")
             self.close_text = get(self.captions, "subtext", "I Submit <3")
+
+        with open(self.DISCORD) as f:
+            image_ids = ["furcock_img", "blacked_img", "censored_img", "goon_img", "goon2_img", "hypno_img", "futa_img", "healslut_img", "gross_img"]
+
+            discord = f.read().split("\n")
+            self.discord_text = discord[0]
+            self.discord_image = discord[1] if (len(discord) > 1 and discord[1] in image_ids) else "default"
 
         with open(self.PROMPT) as f:
             self.prompts = json.loads(f.read())
