@@ -1,3 +1,5 @@
+import logging
+import sys
 from tkinter import Tk
 
 from features.caption_popup import CaptionPopup
@@ -37,6 +39,8 @@ if __name__ == "__main__":
     root = Tk()
     settings = Settings()
     pack = Pack()
+
+    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
     def start_main() -> None:
         handle_wallpaper(root, settings, pack)

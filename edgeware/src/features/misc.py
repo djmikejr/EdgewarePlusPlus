@@ -1,3 +1,4 @@
+import logging
 import random
 import time
 import webbrowser
@@ -72,4 +73,4 @@ def handle_discord(root: Tk, settings: Settings, pack: Pack) -> None:
 
         update()
     except Exception:
-        print("Setting Discord presence failed")
+        logging.warning("Setting Discord presence failed")

@@ -1,4 +1,5 @@
 import codecs
+import logging
 import os
 import re
 import shutil
@@ -45,7 +46,7 @@ def set_wallpaper_special_cases(wallpaper: Path, desktop: str) -> None:
             else:
                 pass  # TODO: Reload desktop when possible
     except Exception:
-        print("Failed to set wallpaper")
+        logging.warning("Failed to set wallpaper")
 
 
 # Source (Martin Hansen, Serge Stroobandt): https://stackoverflow.com/a/21213358
@@ -125,7 +126,7 @@ def get_wallpaper_commands(wallpaper: Path, desktop: str) -> list[str]:
 
     if desktop == "hyprland":
         if not shutil.which("hyprctl"):
-            first_run_print("hyprpaper requires hyprctl.")
+            first_run_warning("hyprpaper requires hyprctl.")
             return []
         preloaded = False
         process = subprocess.Popen("hyprctl hyprpaper listloaded", shell=True, stdout=subprocess.PIPE)
@@ -165,7 +166,7 @@ def get_wm_wallpaper_commands() -> list[str]:
     elif session == "wayland":
         wallpaper_setters = []
     else:
-        first_run_print(f"Unknown session: {session}")
+        first_run_warning(f"Unknown session: {session}")
 
     for setter in wallpaper_setters:
         # fmt: off
@@ -188,7 +189,7 @@ def get_wm_wallpaper_commands() -> list[str]:
             # of the display IDs and use multiple commands
             process = subprocess.Popen("xrandr --listmonitors | grep -Eo '[0-9]:' | tr -d ':'", shell=True, stdout=subprocess.PIPE)
             if not process.stdout:
-                first_run_print("Couldn't find any X11 displays")
+                first_run_warning("Couldn't find any X11 displays")
                 return []
             format = "nitrogen --head=%s --set-zoom-fill %s"
             return [format % (line.decode().strip(), "%s") for line in process.stdout.readlines()]
@@ -197,22 +198,22 @@ def get_wm_wallpaper_commands() -> list[str]:
             # Esetroot needs libImlib
             process = subprocess.Popen(["ldd", "Esetroot"], stdout=subprocess.PIPE)
             if not process.stdout:
-                first_run_print("There was a problem running ldd on Esetroot.")
+                first_run_warning("There was a problem running ldd on Esetroot.")
                 return []
             for line in process.stdout:
                 if not re.search("libImlib", line):
-                    first_run_print("No wallpaper support for Esetroot: missing libImlib.")
+                    first_run_warning("No wallpaper support for Esetroot: missing libImlib.")
                     return []
                 return ["Esetroot -scale %s"]
 
         if setter == "display":
             if not shutil.which("xwininfo"):
-                first_run_print("display needs xwininfo to query the size of the root window.")
+                first_run_warning("display needs xwininfo to query the size of the root window.")
                 return []
             return ["display -sample `xwininfo -root 2> /dev/null|awk '/geom/{print $2}'` -window root"]
 
 
-def first_run_print(text: str) -> None:
+def first_run_warning(text: str) -> None:
     global first_run
     if first_run:
-        print(text)
+        logging.warning(text)
