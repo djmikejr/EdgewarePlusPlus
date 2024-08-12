@@ -9,7 +9,7 @@ from playsound import playsound
 from pypresence import Presence
 from utils import utils
 from utils.pack import Pack
-from utils.paths import PACK_PATH
+from utils.paths import PACK_PATH, Assets
 from utils.settings import Settings
 
 
@@ -17,7 +17,8 @@ def panic(root: Tk, settings: Settings, key: str | None = None) -> None:
     if key and (settings.panic_disabled or key != settings.panic_key):
         return
 
-    # TODO: Set panic wallpaper
+    # TODO: https://github.com/araten10/EdgewarePlusPlus/issues/24
+    utils.set_wallpaper(Assets.DEFAULT_PANIC_WALLPAPER)
     root.destroy()
 
 
