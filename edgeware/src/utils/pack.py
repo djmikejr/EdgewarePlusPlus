@@ -6,6 +6,7 @@ from pathlib import Path
 from utils.paths import PACK_PATH, Assets
 
 
+# TODO: Handle cases where resources are not present
 class Pack:
     # Directories
     AUDIO = PACK_PATH / "aud"
@@ -18,7 +19,7 @@ class Pack:
     # CONFIG = PACK_PATH / "config.json"
     # CORRUPTION = PACK_PATH / "corruption.json"
     DISCORD = PACK_PATH / "discord.dat"
-    # ICON = PACK_PATH / "icon.ico"
+    ICON = PACK_PATH / "icon.ico"
     # INFO = PACK_PATH / "info.json"
     SPLASH = PACK_PATH / "loading_splash"
     # MEDIA = PACK_PATH / "media.json"
@@ -36,6 +37,7 @@ class Pack:
         self.audio = list_resources(self.AUDIO)
         self.subliminals = list_resources(self.SUBLIMINALS)
 
+        self.icon = self.ICON if os.path.isdir(self.ICON) else Assets.DEFAULT_ICON
         self.wallpaper = self.WALLPAPER
 
         self.startup_splash = Assets.DEFAULT_STARTUP_SPLASH

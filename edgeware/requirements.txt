@@ -6,7 +6,7 @@ pillow
 playsound==1.2.2
 pygobject; sys_platform == 'linux' # Required for playsound
 pypresence
-# pystray
+pystray
 python-vlc
 # requests
 screeninfo

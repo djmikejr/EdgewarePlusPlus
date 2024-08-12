@@ -5,6 +5,8 @@ import webbrowser
 from threading import Thread
 from tkinter import Tk
 
+import pystray
+from PIL import Image
 from playsound import playsound
 from pypresence import Presence
 from utils import utils
@@ -14,7 +16,7 @@ from utils.settings import Settings
 
 
 def panic(root: Tk, settings: Settings, key: str | None = None) -> None:
-    if key and (settings.panic_disabled or key != settings.panic_key):
+    if settings.panic_disabled or key != settings.panic_key:
         return
 
     # TODO: https://github.com/araten10/EdgewarePlusPlus/issues/24
@@ -39,6 +41,12 @@ def play_audio(settings: Settings, pack: Pack) -> None:
 
 def open_web(pack: Pack) -> None:
     webbrowser.open(pack.random_web())
+
+
+def make_tray_icon(root: Tk, settings: Settings, pack: Pack) -> None:
+    menu = [pystray.MenuItem("Panic", lambda: panic(root, settings))]
+    icon = pystray.Icon("Edgeware++", Image.open(pack.icon), "Edgeware++", menu)
+    Thread(target=icon.run, daemon=True).start()
 
 
 def handle_wallpaper(root: Tk, settings: Settings, pack: Pack) -> None:
