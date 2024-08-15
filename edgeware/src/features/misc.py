@@ -94,3 +94,11 @@ def handle_timer_mode(root: Tk, settings: Settings, state: State) -> None:
     if settings.timer_mode:
         state.timer_active = True
         root.after(settings.timer_time, timer_over)
+
+
+def handle_mitosis_mode(root: Tk, settings: Settings, pack: Pack, state: State) -> None:
+    if settings.mitosis_mode:
+        # Import done here to avoid circular imports
+        from features.image_popup import ImagePopup
+
+        ImagePopup(root, settings, pack, state)

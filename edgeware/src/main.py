@@ -4,7 +4,7 @@ from tkinter import Tk
 
 from features.caption_popup import CaptionPopup
 from features.image_popup import ImagePopup
-from features.misc import handle_discord, handle_timer_mode, handle_wallpaper, make_tray_icon, open_web, play_audio
+from features.misc import handle_discord, handle_mitosis_mode, handle_timer_mode, handle_wallpaper, make_tray_icon, open_web, play_audio
 from features.prompt import Prompt
 from features.startup_splash import StartupSplash
 from features.video_popup import VideoPopup
@@ -18,10 +18,10 @@ def main(root: Tk, settings: Settings, pack: Pack, state: State) -> None:
     if utils.roll(settings.audio_chance):
         play_audio(settings, pack, state)
 
-    if utils.roll(settings.video_chance):
+    if not settings.mitosis_mode and utils.roll(settings.video_chance):
         VideoPopup(root, settings, pack, state)
 
-    if utils.roll(settings.image_chance):
+    if not settings.mitosis_mode and utils.roll(settings.image_chance):
         ImagePopup(root, settings, pack, state)
 
     if utils.roll(settings.caption_popup_chance):
@@ -49,6 +49,7 @@ if __name__ == "__main__":
         handle_wallpaper(root, settings, pack)
         handle_discord(root, settings, pack)
         handle_timer_mode(root, settings, state)
+        handle_mitosis_mode(root, settings, pack, state)
         root.after(0, main(root, settings, pack, state))
 
     if settings.startup_splash:

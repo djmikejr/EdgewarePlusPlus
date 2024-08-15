@@ -68,7 +68,7 @@ class Settings:
         # Dangerous
         self.show_on_discord = bool(config["showDiscord"])
 
-        # Moving
+        # Basic modes
         self.moving_chance = int(config["movingChance"])  # 0 to 100
         self.moving_speed = int(config["movingSpeed"])
         self.moving_random = bool(config["movingRandom"])
@@ -76,3 +76,5 @@ class Settings:
         # Dangerous modes
         self.timer_mode = bool(config["timerMode"])
         self.timer_time = int(config["timerSetupTime"]) * 60 * 1000  # Milliseconds
+        self.mitosis_mode = bool(config["mitosisMode"])
+        self.mitosis_strength = int(config["mitosisStrength"])

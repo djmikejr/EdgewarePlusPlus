@@ -16,12 +16,13 @@ class Popup(Toplevel):
     def __init__(self, root: Tk, settings: Settings, pack: Pack, state: State):
         super().__init__()
 
+        self.root = root
         self.settings = settings
         self.pack = pack
         self.state = state
         self.theme = get_theme(settings)
 
-        self.bind("<KeyPress>", lambda event: panic(root, self.settings, self.state, event.keysym))
+        self.bind("<KeyPress>", lambda event: panic(self.root, self.settings, self.state, event.keysym))
         self.wm_attributes("-topmost", True)
         self.wm_attributes("-type", "splash")
         # TODO: May be needed for opacity on some Linux setups
@@ -121,6 +122,24 @@ class Popup(Toplevel):
         if self.settings.web_on_popup_close and utils.roll((100 - self.settings.web_chance) / 2):
             open_web(self.pack)
 
+    def try_mitosis(self) -> None:
+        if self.settings.mitosis_mode:
+            # Imports done here to avoid circular imports
+            from features.image_popup import ImagePopup
+            from features.video_popup import VideoPopup
+
+            for n in range(self.settings.mitosis_strength):
+                try:
+                    choice = random.choices(["image", "video"], [self.settings.image_chance, self.settings.video_chance], k=1)[0]
+                except Exception:
+                    choice = "image"  # Exception thrown when both chances are 0
+
+                if choice == "image":
+                    ImagePopup(self.root, self.settings, self.pack, self.state)
+                else:
+                    VideoPopup(self.root, self.settings, self.pack, self.state)
+
     def close(self) -> None:
         self.try_web_open()
+        self.try_mitosis()
         self.destroy()
