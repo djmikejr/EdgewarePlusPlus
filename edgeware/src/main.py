@@ -1,5 +1,8 @@
 import logging
+import random
 import sys
+from collections.abc import Callable
+from dataclasses import dataclass
 from tkinter import Tk
 
 from features.caption_popup import CaptionPopup
@@ -14,24 +17,35 @@ from utils.settings import Settings
 from utils.utils import State
 
 
+@dataclass
+class RollTarget:
+    function: Callable[[], None]
+    chance: int
+
+    def roll(self) -> None:
+        if utils.roll(self.chance):
+            self.function()
+
+
 def main(root: Tk, settings: Settings, pack: Pack, state: State) -> None:
-    if utils.roll(settings.audio_chance):
-        play_audio(settings, pack, state)
+    targets = [
+        RollTarget(lambda: play_audio(settings, pack, state), settings.audio_chance),
+        RollTarget(lambda: VideoPopup(root, settings, pack, state), settings.video_chance if not settings.mitosis_mode else 0),
+        RollTarget(lambda: ImagePopup(root, settings, pack, state), settings.image_chance if not settings.mitosis_mode else 0),
+        RollTarget(lambda: CaptionPopup(settings, pack), settings.caption_popup_chance),
+        RollTarget(lambda: Prompt(settings, pack, state), settings.prompt_chance),
+        RollTarget(lambda: open_web(pack), settings.web_chance),
+    ]
 
-    if not settings.mitosis_mode and utils.roll(settings.video_chance):
-        VideoPopup(root, settings, pack, state)
-
-    if not settings.mitosis_mode and utils.roll(settings.image_chance):
-        ImagePopup(root, settings, pack, state)
-
-    if utils.roll(settings.caption_popup_chance):
-        CaptionPopup(settings, pack)
-
-    if utils.roll(settings.prompt_chance):
-        Prompt(settings, pack, state)
-
-    if utils.roll(settings.web_chance):
-        open_web(pack)
+    if settings.single_mode:
+        try:
+            function = random.choices(list(map(lambda target: target.function, targets)), list(map(lambda target: target.chance, targets)), k=1)[0]
+        except Exception:
+            function = targets[2].function  # Exception thrown when all chances are 0
+        function()
+    else:
+        for target in targets:
+            target.roll()
 
     root.after(settings.delay, lambda: main(root, settings, pack, state))
 

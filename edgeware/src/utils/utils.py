@@ -1,7 +1,9 @@
 import platform
 import random
+from dataclasses import dataclass
 
 
+@dataclass
 class State:
     audio_number = 0
     prompt_active = False

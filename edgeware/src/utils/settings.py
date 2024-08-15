@@ -28,6 +28,7 @@ class Settings:
         self.timeout_enabled = bool(config["timeoutPopups"])
         self.timeout = int(config["popupTimeout"]) * 1000  # Milliseconds
         self.buttonless = bool(config["buttonless"])
+        self.single_mode = bool(config["singleMode"])
 
         # Overlays
         self.denial_chance = int(config["denialChance"]) if bool(config["denialMode"]) else 0  # 0 to 100

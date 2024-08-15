@@ -130,14 +130,10 @@ class Popup(Toplevel):
 
             for n in range(self.settings.mitosis_strength):
                 try:
-                    choice = random.choices(["image", "video"], [self.settings.image_chance, self.settings.video_chance], k=1)[0]
+                    popup = random.choices([ImagePopup, VideoPopup], [self.settings.image_chance, self.settings.video_chance], k=1)[0]
                 except Exception:
-                    choice = "image"  # Exception thrown when both chances are 0
-
-                if choice == "image":
-                    ImagePopup(self.root, self.settings, self.pack, self.state)
-                else:
-                    VideoPopup(self.root, self.settings, self.pack, self.state)
+                    popup = ImagePopup  # Exception thrown when both chances are 0
+                popup(self.root, self.settings, self.pack, self.state)
 
     def close(self) -> None:
         self.try_web_open()
