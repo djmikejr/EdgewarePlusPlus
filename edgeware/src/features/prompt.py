@@ -4,10 +4,12 @@ from features.theme import get_theme
 from screeninfo import get_monitors
 from utils.pack import Pack
 from utils.settings import Settings
+from utils.utils import State
 
 
 class Prompt(Toplevel):
-    def __init__(self, settings: Settings, pack: Pack):
+    def __init__(self, settings: Settings, pack: Pack, state: State):
+        self.state = state
         if not self.should_init():
             return
         super().__init__()
@@ -44,12 +46,8 @@ class Prompt(Toplevel):
         button.place(x=-10, y=-10, relx=1, rely=1, anchor="se")
 
     def should_init(self) -> bool:
-        global prompt_active
-        if "prompt_active" not in globals():
-            prompt_active = False
-
-        if not prompt_active:
-            prompt_active = True
+        if not self.state.prompt_active:
+            self.state.prompt_active = True
             return True
         return False
 
@@ -58,7 +56,6 @@ class Prompt(Toplevel):
     # (Levenshtein) distance between a and b.
     # https://en.wikipedia.org/wiki/Levenshtein_distance
     def submit(self, max_mistakes: int, a: str, b: str) -> None:
-        global prompt_active
         d = [[j for j in range(0, len(b) + 1)]] + [[i] for i in range(1, len(a) + 1)]
 
         for j in range(1, len(b) + 1):
@@ -73,4 +70,4 @@ class Prompt(Toplevel):
 
         if d[len(a)][len(b)] <= max_mistakes:
             self.destroy()
-            prompt_active = False
+            self.state.prompt_active = False

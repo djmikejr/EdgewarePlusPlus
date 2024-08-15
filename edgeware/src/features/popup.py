@@ -9,17 +9,19 @@ from screeninfo import get_monitors
 from utils import utils
 from utils.pack import Pack
 from utils.settings import Settings
+from utils.utils import State
 
 
 class Popup(Toplevel):
-    def __init__(self, root: Tk, settings: Settings, pack: Pack):
+    def __init__(self, root: Tk, settings: Settings, pack: Pack, state: State):
         super().__init__()
 
         self.settings = settings
         self.pack = pack
+        self.state = state
         self.theme = get_theme(settings)
 
-        self.bind("<KeyPress>", lambda event: panic(root, self.settings, event.keysym))
+        self.bind("<KeyPress>", lambda event: panic(root, self.settings, self.state, event.keysym))
         self.wm_attributes("-topmost", True)
         self.wm_attributes("-type", "splash")
         # TODO: May be needed for opacity on some Linux setups

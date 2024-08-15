@@ -6,15 +6,16 @@ from PIL import Image, ImageFilter
 from utils import utils
 from utils.pack import Pack
 from utils.settings import Settings
+from utils.utils import State
 from widgets.image_label import GifLike, ImageLabel
 
 
 class ImagePopup(Popup):
-    def __init__(self, root: Tk, settings: Settings, pack: Pack):
+    def __init__(self, root: Tk, settings: Settings, pack: Pack, state: State):
         self.subliminal = utils.roll(settings.subliminal_chance)
-        if not self.should_init(settings):
+        if not self.should_init(settings, state):
             return
-        super().__init__(root, settings, pack)
+        super().__init__(root, settings, pack, state)
 
         self.denial = utils.roll(self.settings.denial_chance)
 
@@ -26,16 +27,12 @@ class ImagePopup(Popup):
         self.try_denial_text()
         self.init_finish()
 
-    def should_init(self, settings: Settings) -> bool:
-        global subliminal_number
-        if "subliminal_number" not in globals():
-            subliminal_number = 0
-
+    def should_init(self, settings: Settings, state: State) -> bool:
         if not self.subliminal:
             return True
 
-        if subliminal_number < settings.max_subliminals:
-            subliminal_number += 1
+        if state.subliminal_number < settings.max_subliminals:
+            state.subliminal_number += 1
             return True
         return False
 
@@ -79,8 +76,6 @@ class ImagePopup(Popup):
             label.place(relx=0.5, rely=0.5, anchor="c")
 
     def close(self) -> None:
-        global subliminal_number
-
         super().close()
         if self.subliminal:
-            subliminal_number -= 1
+            self.state.subliminal_number -= 1

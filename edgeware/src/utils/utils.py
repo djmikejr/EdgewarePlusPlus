@@ -2,6 +2,15 @@ import platform
 import random
 
 
+class State:
+    audio_number = 0
+    prompt_active = False
+    subliminal_number = 0
+    video_number = 0
+
+    timer_active = False
+
+
 def roll(chance: int) -> bool:
     return random.randint(1, 100) <= chance
 

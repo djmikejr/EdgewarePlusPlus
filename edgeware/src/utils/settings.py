@@ -72,3 +72,7 @@ class Settings:
         self.moving_chance = int(config["movingChance"])  # 0 to 100
         self.moving_speed = int(config["movingSpeed"])
         self.moving_random = bool(config["movingRandom"])
+
+        # Dangerous modes
+        self.timer_mode = bool(config["timerMode"])
+        self.timer_time = int(config["timerSetupTime"]) * 60 * 1000  # Milliseconds
