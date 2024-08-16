@@ -9,6 +9,8 @@
 
 **Since last version...**
 
+**Version 12**
+
 •*Mitosis mode tagged as a dangerous setting, danger level "medium"*
 
 •*Cleaned up log files so there's less benign errors being thrown for no reason*
@@ -18,6 +20,20 @@
 
 •*Removed multiple unused variables from config*
 >This might require you to remake your config file!
+
+•*A few linux bugfixes, as well as some corruption code cleanup that was causing bugs (thanks, @u904muiasdlg!)*
+
+•*Completely overhauled the config menu, adding multiple subtabs, more explanations on features, and general reorganization*
+>This is the bulk of version 12! Originally I liked keeping things as close to Edgeware's original design intentions, and thus didn't want to shuffle anything around... However, it's been a year or so by this point, with a lot of new features, and it feels inevitable to shift away from it. Only some of the page descriptions are done, but if you've been using Edgeware previous to this there shouldn't be anything confusingly new besides how it's presented to you. Hoping to finish the explanations as time goes on, pushing out this update for now to make sure there's no conflicts with potential code refractoring happening soon.
+
+•*Added a feature to disable the new description messages, for a more compact experience.*
+>This can be found under the "start" tab, when you first launch the config window
+
+•*The default "splash screen" and icon have been changed*
+>To continue on the topic of changing from Edgeware's branding... I have always been fine with Edgeware's original splash screen (enabled through a setting in the config window), but LewdDevelopment caught that it potentially could cause issues with ToS, so we changed it just in case. It's currently a placeholder from the SFW demo pack, but it's very unsexy and ugly, so I'm hoping to find a better replacement...
+
+•*Added a command line pack creation tool to help with things like moods and corruption*
+>Further information can be found in the README.md and default_pack.yml files in the pack_tool subdirectory. Supports assistance for captions, pack info, moods, corruption, and a few other things!
 
 **Version 11**
 
