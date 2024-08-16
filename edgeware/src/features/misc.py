@@ -17,7 +17,7 @@ from utils.utils import State
 
 
 def panic(root: Tk, settings: Settings, state: State, key: str | None = None) -> None:
-    if settings.panic_disabled or key != settings.panic_key:
+    if settings.panic_disabled or (key and key != settings.panic_key):
         return
 
     if settings.timer_mode and state.timer_active:
@@ -45,8 +45,8 @@ def open_web(pack: Pack) -> None:
     webbrowser.open(pack.random_web())
 
 
-def make_tray_icon(root: Tk, settings: Settings, pack: Pack) -> None:
-    menu = [pystray.MenuItem("Panic", lambda: panic(root, settings))]
+def make_tray_icon(root: Tk, settings: Settings, pack: Pack, state: State) -> None:
+    menu = [pystray.MenuItem("Panic", lambda: panic(root, settings, state))]
     icon = pystray.Icon("Edgeware++", Image.open(pack.icon), "Edgeware++", menu)
     Thread(target=icon.run, daemon=True).start()
 

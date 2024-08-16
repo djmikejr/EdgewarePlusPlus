@@ -21,7 +21,7 @@ class ImagePopup(Popup):
 
         image = Image.open(self.pack.random_image())
 
-        self.set_size_and_position(image.width, image.height)
+        self.compute_geometry(image.width, image.height)
         ImageLabel(self, self.try_subliminal(image), (self.width, self.height), self.try_denial_filter()).pack()
 
         self.try_denial_text()

@@ -15,6 +15,9 @@ class Settings:
         with open(Data.CONFIG) as f:
             config = json.loads(f.read())
 
+        # Impacts other settings
+        lowkey_mode = bool(config["lkToggle"])
+
         # General
         self.theme = config["themeType"]
         self.startup_splash = bool(config["showLoadingFlair"])
@@ -25,8 +28,8 @@ class Settings:
         self.delay = int(config["delay"])  # Milliseconds
         self.image_chance = int(config["popupMod"])  # 0 to 100
         self.opacity = int(config["lkScaling"]) / 100  # Float between 0 and 1
-        self.timeout_enabled = bool(config["timeoutPopups"])
-        self.timeout = int(config["popupTimeout"]) * 1000  # Milliseconds
+        self.timeout_enabled = bool(config["timeoutPopups"]) or lowkey_mode
+        self.timeout = int(config["popupTimeout"]) * 1000 if not lowkey_mode else self.delay  # Milliseconds
         self.buttonless = bool(config["buttonless"])
         self.single_mode = bool(config["singleMode"])
 
@@ -38,7 +41,7 @@ class Settings:
 
         # Web
         self.web_chance = int(config["webMod"])  # 0 to 100
-        self.web_on_popup_close = bool(config["webPopup"])
+        self.web_on_popup_close = bool(config["webPopup"]) and not lowkey_mode
 
         # Prompt
         self.prompt_chance = int(config["promptMod"])  # 0 to 1000
@@ -70,6 +73,8 @@ class Settings:
         self.show_on_discord = bool(config["showDiscord"])
 
         # Basic modes
+        self.lowkey_mode = lowkey_mode
+        self.lowkey_corner = int(config["lkCorner"])
         self.moving_chance = int(config["movingChance"])  # 0 to 100
         self.moving_speed = int(config["movingSpeed"])
         self.moving_random = bool(config["movingRandom"])
@@ -77,5 +82,5 @@ class Settings:
         # Dangerous modes
         self.timer_mode = bool(config["timerMode"])
         self.timer_time = int(config["timerSetupTime"]) * 60 * 1000  # Milliseconds
-        self.mitosis_mode = bool(config["mitosisMode"])
-        self.mitosis_strength = int(config["mitosisStrength"])
+        self.mitosis_mode = bool(config["mitosisMode"]) or self.lowkey_mode
+        self.mitosis_strength = int(config["mitosisStrength"]) if not self.lowkey_mode else 1

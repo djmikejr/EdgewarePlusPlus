@@ -23,12 +23,12 @@ class Popup(Toplevel):
         self.theme = get_theme(settings)
 
         self.bind("<KeyPress>", lambda event: panic(self.root, self.settings, self.state, event.keysym))
-        self.wm_attributes("-topmost", True)
-        self.wm_attributes("-type", "splash")
+        self.attributes("-topmost", True)
+        self.attributes("-type", "splash")
         # TODO: May be needed for opacity on some Linux setups
         # self.update_idletasks()
         # self.overrideredirect(True)
-        # self.wait_visibility(self)
+        # self.wait_visibility()
 
         self.opacity = self.settings.opacity
         self.attributes("-alpha", self.opacity)
@@ -38,20 +38,30 @@ class Popup(Toplevel):
         self.try_button()
         self.try_move()
         self.try_timeout()
+        self.geometry(f"{self.width}x{self.height}+{self.x}+{self.y}")
 
-    def set_size_and_position(self, source_width: int, source_height: int) -> None:
+    def compute_geometry(self, source_width: int, source_height: int) -> None:
         self.monitor = random.choice(get_monitors())
 
         source_size = max(source_width, source_height) / min(self.monitor.width, self.monitor.height)
-        target_size = random.randint(30, 70) / 100
+        target_size = (random.randint(30, 70) if not self.settings.lowkey_mode else random.randint(20, 50)) / 100
         scale = target_size / source_size
 
         self.width = int(source_width * scale)
         self.height = int(source_height * scale)
-        self.x = random.randint(self.monitor.x, self.monitor.x + self.monitor.width - self.width)
-        self.y = random.randint(self.monitor.y, self.monitor.y + self.monitor.height - self.height)
 
-        self.geometry(f"{self.width}x{self.height}+{self.x}+{self.y}")
+        if self.settings.lowkey_mode:
+            corner = self.settings.lowkey_corner
+            if corner == 4:  # Random corner
+                corner = random.randint(0, 3)
+
+            right = corner == 0 or corner == 3  # Top right or bottom right
+            bottom = corner == 2 or corner == 3  # Bottom left or bottom right
+            self.x = self.monitor.x + (self.monitor.width - self.width if right else 0)
+            self.y = self.monitor.y + (self.monitor.height - self.height if bottom else 0)
+        else:
+            self.x = random.randint(self.monitor.x, self.monitor.x + self.monitor.width - self.width)
+            self.y = random.randint(self.monitor.y, self.monitor.y + self.monitor.height - self.height)
 
     def try_caption(self) -> None:
         if self.settings.captions_in_popups:
