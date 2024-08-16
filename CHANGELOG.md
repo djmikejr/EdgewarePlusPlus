@@ -35,6 +35,9 @@
 •*Added a command line pack creation tool to help with things like moods and corruption*
 >Further information can be found in the README.md and default_pack.yml files in the pack_tool subdirectory. Supports assistance for captions, pack info, moods, corruption, and a few other things!
 
+•*Deleted legacy configdefault.dat*
+>Was kept around for a few updates to help people move over to the new .json file (found in the default folder) but has now been cleaned to reduce confusion
+
 **Version 11**
 
 A lot has changed! So much so that I actually am having the unique problem of having to *look up* what was fixed since the last version. This is because **LewdDevelopment** has been helping catch me up to speed on Github and we've been rolling out smaller updates, using branches, etc.
