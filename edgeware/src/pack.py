@@ -3,7 +3,7 @@ import os
 import random
 from pathlib import Path
 
-from utils.paths import PACK_PATH, Assets
+from paths import PACK_PATH, Assets
 
 
 # TODO: Handle cases where resources are not present

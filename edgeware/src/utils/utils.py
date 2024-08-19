@@ -1,20 +1,23 @@
 import platform
-import random
 from dataclasses import dataclass
 
 
 @dataclass
 class State:
     audio_number = 0
+    popup_number = 0
     prompt_active = False
     subliminal_number = 0
     video_number = 0
 
     timer_active = False
 
+    hibernate_active = False
+    hibernate_id = None
+    pump_scare = False
 
-def roll(chance: int) -> bool:
-    return random.randint(1, 100) <= chance
+    def reset_wallpaper(self) -> bool:
+        return not self.hibernate_active and self.popup_number == 0
 
 
 def is_linux():

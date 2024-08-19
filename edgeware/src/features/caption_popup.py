@@ -2,10 +2,10 @@ import random
 from tkinter import Label, Toplevel
 
 from features.theme import get_theme
+from pack import Pack
 from screeninfo import get_monitors
+from settings import Settings
 from utils import utils
-from utils.pack import Pack
-from utils.settings import Settings
 
 
 class CaptionPopup(Toplevel):

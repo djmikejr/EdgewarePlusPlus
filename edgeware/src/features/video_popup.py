@@ -1,8 +1,8 @@
 from tkinter import Tk
 
 from features.popup import Popup
-from utils.pack import Pack
-from utils.settings import Settings
+from pack import Pack
+from settings import Settings
 from utils.utils import State
 from videoprops import get_video_properties
 from widgets.video_player import VideoPlayer
@@ -19,7 +19,7 @@ class VideoPopup(Popup):
 
         self.compute_geometry(properties["width"], properties["height"])
         # TODO: Might be necessary to fix bugs
-        # self.wait_visibility(self)
+        self.wait_visibility()
         self.player = VideoPlayer(self, video, (self.width, self.height), self.settings.video_volume, self.settings.vlc_mode)
 
         self.init_finish()

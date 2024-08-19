@@ -2,17 +2,18 @@ import logging
 import random
 import time
 import webbrowser
+from collections.abc import Callable
 from threading import Thread
 from tkinter import Tk, simpledialog
 
 import pystray
+from pack import Pack
+from paths import PACK_PATH, Assets
 from PIL import Image
 from playsound import playsound
 from pypresence import Presence
+from settings import Settings
 from utils import utils
-from utils.pack import Pack
-from utils.paths import PACK_PATH, Assets
-from utils.settings import Settings
 from utils.utils import State
 
 
@@ -45,14 +46,31 @@ def open_web(pack: Pack) -> None:
     webbrowser.open(pack.random_web())
 
 
-def make_tray_icon(root: Tk, settings: Settings, pack: Pack, state: State) -> None:
+def make_tray_icon(root: Tk, settings: Settings, pack: Pack, state: State, hibernate_activity: Callable[[], None]) -> None:
     menu = [pystray.MenuItem("Panic", lambda: panic(root, settings, state))]
+    if settings.hibernate_mode:
+
+        def skip_hibernate() -> None:
+            if state.hibernate_active:
+                return
+
+            try:
+                root.after_cancel(state.hibernate_id)
+            except Exception:
+                pass
+            hibernate_activity()
+
+        menu.append(pystray.MenuItem("Skip to Hibernate", skip_hibernate))
+
     icon = pystray.Icon("Edgeware++", Image.open(pack.icon), "Edgeware++", menu)
     Thread(target=icon.run, daemon=True).start()
 
 
-def handle_wallpaper(root: Tk, settings: Settings, pack: Pack) -> None:
+def handle_wallpaper(root: Tk, settings: Settings, pack: Pack, state: State) -> None:
     def rotate(previous: str = None) -> None:
+        if settings.hibernate_fix_wallpaper and state.reset_wallpaper():
+            return
+
         wallpapers = settings.wallpapers.copy()
         if previous:
             wallpapers.remove(previous)

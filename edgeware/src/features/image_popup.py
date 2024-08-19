@@ -2,22 +2,22 @@ import random
 from tkinter import Label, Tk
 
 from features.popup import Popup
+from pack import Pack
 from PIL import Image, ImageFilter
-from utils import utils
-from utils.pack import Pack
-from utils.settings import Settings
+from roll import roll
+from settings import Settings
 from utils.utils import State
 from widgets.image_label import GifLike, ImageLabel
 
 
 class ImagePopup(Popup):
     def __init__(self, root: Tk, settings: Settings, pack: Pack, state: State):
-        self.subliminal = utils.roll(settings.subliminal_chance)
+        self.subliminal = roll(settings.subliminal_chance)
         if not self.should_init(settings, state):
             return
         super().__init__(root, settings, pack, state)
 
-        self.denial = utils.roll(self.settings.denial_chance)
+        self.denial = roll(self.settings.denial_chance)
 
         image = Image.open(self.pack.random_image())
 

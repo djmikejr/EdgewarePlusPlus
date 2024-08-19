@@ -1,9 +1,9 @@
 from tkinter import Button, Label, Text, Toplevel
 
 from features.theme import get_theme
+from pack import Pack
 from screeninfo import get_monitors
-from utils.pack import Pack
-from utils.settings import Settings
+from settings import Settings
 from utils.utils import State
 
 

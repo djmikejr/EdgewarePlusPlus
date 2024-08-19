@@ -3,9 +3,9 @@ from collections.abc import Callable
 from threading import Thread
 from tkinter import Toplevel
 
+from pack import Pack
 from PIL import Image
 from screeninfo import get_monitors
-from utils.pack import Pack
 from widgets.image_label import ImageLabel
 
 

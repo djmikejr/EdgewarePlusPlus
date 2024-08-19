@@ -3,7 +3,7 @@ import json
 import os
 import shutil
 
-from utils.paths import Assets, Data
+from paths import Assets, Data
 
 
 class Settings:
@@ -84,3 +84,14 @@ class Settings:
         self.timer_time = int(config["timerSetupTime"]) * 60 * 1000  # Milliseconds
         self.mitosis_mode = bool(config["mitosisMode"]) or self.lowkey_mode
         self.mitosis_strength = int(config["mitosisStrength"]) if not self.lowkey_mode else 1
+
+        # Hibernate mode
+        self.hibernate_mode = bool(config["hibernateMode"])
+        self.hibernate_fix_wallpaper = bool(config["fixWallpaper"]) and self.hibernate_mode
+        self.hibernate_type = config["hibernateType"]
+        self.hibernate_delay_min = int(config["hibernateMin"]) * 1000  # Milliseconds
+        self.hibernate_delay_max = int(config["hibernateMax"]) * 1000  # Milliseconds
+        self.hibernate_activity = int(config["wakeupActivity"])
+        self.hibernate_activity_length = int(config["hibernateLength"]) * 1000  # Milliseconds
+        # TODO: Pump-scare audio
+        # self.pump_scare_offset = int(config["pumpScareOffset"])  # Seconds

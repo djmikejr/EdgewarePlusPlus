@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from utils.settings import Settings
+from settings import Settings
 
 
 @dataclass

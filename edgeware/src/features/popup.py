@@ -5,15 +5,18 @@ from tkinter import Button, Label, Tk, Toplevel
 
 from features.misc import open_web, panic
 from features.theme import get_theme
+from pack import Pack
+from paths import Assets
+from roll import roll
 from screeninfo import get_monitors
+from settings import Settings
 from utils import utils
-from utils.pack import Pack
-from utils.settings import Settings
 from utils.utils import State
 
 
 class Popup(Toplevel):
     def __init__(self, root: Tk, settings: Settings, pack: Pack, state: State):
+        state.popup_number += 1
         super().__init__()
 
         self.root = root
@@ -38,6 +41,7 @@ class Popup(Toplevel):
         self.try_button()
         self.try_move()
         self.try_timeout()
+        self.try_pump_scare()
         self.geometry(f"{self.width}x{self.height}+{self.x}+{self.y}")
 
     def compute_geometry(self, source_width: int, source_height: int) -> None:
@@ -111,7 +115,7 @@ class Popup(Toplevel):
             except Exception:
                 pass  # Exception thrown when closing
 
-        if utils.roll(self.settings.moving_chance):
+        if roll(self.settings.moving_chance):
             Thread(target=move, daemon=True).start()
 
     def try_timeout(self) -> None:
@@ -125,11 +129,15 @@ class Popup(Toplevel):
             except Exception:
                 pass  # Exception thrown when manually closed during fade out
 
-        if self.settings.timeout_enabled:
+        if self.settings.timeout_enabled and not self.state.pump_scare:
             self.after(self.settings.timeout, Thread(target=fade_out, daemon=True).start)
 
+    def try_pump_scare(self) -> None:
+        if self.state.pump_scare:
+            self.after(2500, self.close)
+
     def try_web_open(self) -> None:
-        if self.settings.web_on_popup_close and utils.roll((100 - self.settings.web_chance) / 2):
+        if self.settings.web_on_popup_close and roll((100 - self.settings.web_chance) / 2):
             open_web(self.pack)
 
     def try_mitosis(self) -> None:
@@ -145,7 +153,13 @@ class Popup(Toplevel):
                     popup = ImagePopup  # Exception thrown when both chances are 0
                 popup(self.root, self.settings, self.pack, self.state)
 
+    def try_reset_wallpaper(self) -> None:
+        if self.settings.hibernate_fix_wallpaper and self.state.reset_wallpaper():
+            utils.set_wallpaper(Assets.DEFAULT_PANIC_WALLPAPER)
+
     def close(self) -> None:
+        self.state.popup_number -= 1
         self.try_web_open()
         self.try_mitosis()
+        self.try_reset_wallpaper()
         self.destroy()

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-PATH = Path(__file__).parent.parent.parent
+PATH = Path(__file__).parent.parent
 
 PACK_PATH = PATH / "resource"
 
