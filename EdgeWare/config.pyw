@@ -99,6 +99,7 @@ START_PANIC_TEXT = '\"Panic\" is a feature that allows you to instantly halt the
 
 FILE_PRESET_TEXT = 'Please be careful before importing unknown config presets! Double check to make sure you\'re okay with the settings before launching Edgeware.'
 
+DEFAULTFILE_TEXT = 'It might be a good idea to save backups of the original default files in case things get broken or something goes wrong!\n\nNOTE: default_config.json is what stores the version number, etc, and shouldn\'t be edited unless you absolutely know what you\'re doing!'
 POPUP_INTRO_TEXT = 'Here is where you can change the most important settings of Edgeware: the frequency and behaviour of popups. The \"Popup Timer Delay\" is how long a popup takes to spawn, and the overall \"Popup Chance\" then rolls to see if the popup spawns. Keeping the chance at 100% allows for a consistent experience, while lowering it makes for a more random one.\n\nOnce ready to spawn, a popup can be many things: A regular image, a website link (opens in your default browser), a prompt you need to fill out, autoplaying audio or videos, or a subliminal message. All of these are rolled for corresponding to their respective frequency settings, which can be found in the \"Audio/Video\" tab, \"Captions\" tab, and this tab as well. There are also plenty of other settings there to configure popups to your liking~! '
 POPUP_OVERLAY_TEXT = 'Overlays are more or less modifiers for popups- adding onto them without changing their core behaviour.\n\n•Subliminals add a transparent gif over affected popups, defaulting to a hypnotic spiral if there are none added in the current pack. (this may cause performance issues with lots of popups, try a low max to start)\n•Denial \"censors\" a popup by blurring it, simple as.'
 
@@ -653,6 +654,7 @@ def show_window():
     tabFile = ttk.Frame(None) # file management tab
     tabPackInfo = ttk.Frame(None)  # pack information
     tabBooru = ttk.Frame(None) # tab for booru downloader
+    tabDefaultFiles = ttk.Frame(None) # tab for changing default files
 
     tabSubAnnoyance = ttk.Frame(tabMaster)
     notebookAnnoyance = ttk.Notebook(tabSubAnnoyance)
@@ -1641,6 +1643,43 @@ def show_window():
     downloadMode.pack(fill="x")
     minScoreSlider.pack(fill="x")
     downloadResourceEnabled.pack(fill="x")
+
+    # ==========={EDGEWARE++ CHANGE DEFAULTS TAB STARTS HERE}==============#
+    notebookGeneral.add(tabDefaultFiles, text="Change Default Files")
+
+    defFileMessage = Message(tabDefaultFiles, text=DEFAULTFILE_TEXT, justify=CENTER, width=675)
+    defFileMessage.pack(fill="both")
+    #commenting this out because I think this is something very short that should stay regardless of disabling help...
+    #message_group.append(defFileMessage)
+
+    defSplashImage = Image.open(Defaults.SPLASH).resize((int(root.winfo_screenwidth() * 0.13), int(root.winfo_screenwidth() * 0.13)), Image.NEAREST)
+
+    def updateDefaultImage(imgtype, imgname, labelname):
+        selectedFile = filedialog.askopenfile("rb", filetypes=[("image file", ".jpg .jpeg .png")])
+        if not isinstance(selectedFile, type(None)):
+            try:
+                img = Image.open(selectedFile.name).convert("RGB")
+                img.save(imgtype)
+                imgname = ImageTk.PhotoImage(img.resize((int(root.winfo_screenwidth() * 0.13), int(root.winfo_screenwidth() * 0.13)), Image.NEAREST))
+                labelname.config(image=imgname)
+                labelname.update_idletasks()
+            except Exception as e:
+                logging.warning(f"failed to open/change default image\n{e}")
+
+    defSplashFrame = Frame(tabDefaultFiles)
+    defSplashFrameL1 = Frame(defSplashFrame)
+    defSplashFrameL2 = Frame(defSplashFrame)
+    defSplashFrameR = Frame(defSplashFrame)
+    splashImage = ImageTk.PhotoImage(defSplashImage)
+    defSplashButton = Button(defSplashFrameL1, text="Change Default Loading Splash", command=lambda: updateDefaultImage(Defaults.SPLASH, defSplashImage, defSplashLabel))
+    defSplashLabel = Label(defSplashFrameR, text="Current Default Loading Splash", image=splashImage)
+
+    defSplashFrame.pack(fill="x", expand=1)
+    defSplashFrameL1.pack(side="left", fill="y")
+    defSplashFrameR.pack(side="right", fill="x", expand=1)
+    defSplashButton.pack(fill="x", padx=5, pady=5, expand=1)
+    Label(defSplashFrameR, text="Current Default Loading Splash").pack(fill="x")
+    defSplashLabel.pack()
 
     # ==========={EDGEWARE++ "POPUPS" TAB STARTS HERE}===========#
     notebookAnnoyance.add(tabPopups, text="Popups")
