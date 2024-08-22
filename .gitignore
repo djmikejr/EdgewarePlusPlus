@@ -173,7 +173,15 @@ EdgeWare/moods/*
 EdgeWare/moods/*/*.json
 # Ignore defaults that user can potentially change in config
 EdgeWare/default_assets/loading_splash.png
+EdgeWare/default_assets/loading_splash.jpg
+EdgeWare/default_assets/loading_splash.jpeg
 EdgeWare/default_assets/theme_demo.png
+EdgeWare/default_assets/theme_demo.jpg
+EdgeWare/default_assets/theme_demo.jpeg
 EdgeWare/default_assets/panic_icon.ico
 EdgeWare/default_assets/config_icon.ico
 EdgeWare/default_assets/default_icon.ico
+EdgeWare/default_assets/default_spiral.gif
+EdgeWare/default_assets/default_spiral.png
+EdgeWare/default_assets/default_spiral.jpg
+EdgeWare/default_assets/default_spiral.jpeg
