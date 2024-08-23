@@ -73,6 +73,8 @@ The EdgeWare++ Pack Editor is now live [here](https://github.com/araten10/Edgewa
 
 •*Complete overhaul to the configuration window UI to make it easier to use*
 
+•*User friendly way to change default images, such as splash screens or icons*
+
 ## Planned Additions
 
 Planned additions, as well as currently known issues, can now be found on the [issues page](https://github.com/araten10/EdgewarePlusPlus/issues).

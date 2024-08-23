@@ -9,6 +9,11 @@
 
 **Since last version...**
 
+**Version 12.5**
+
+•*A new tab: "Change Default Files"! Allows you to configure the default images that come with EdgeWare++ without doing so via manually overwriting folders.*
+>Had a few people report bugs with version inconsistencies, which ended up being due to them overwriting their newer default_assets folder with the one before we changed the splash screen. I figured I'd give people an easier way to customize EdgeWare without accidentally breaking the .json file! While we continue to find a replacement to the assets we changed, feel free to either revert yours back to the old ones or personalize them to your liking.
+
 **Version 12**
 
 •*Mitosis mode tagged as a dangerous setting, danger level "medium"*
