@@ -1095,7 +1095,7 @@ def show_window():
 
     presetMessage = Message(tabFile, text=FILE_PRESET_TEXT, justify=CENTER, width=675)
     presetMessage.pack(fill="both")
-    message_group.append(presetMessage)
+    #message_group.append(presetMessage)
 
     presetFrame = Frame(tabFile, borderwidth=5, relief=RAISED)
     dropdownSelectFrame = Frame(presetFrame)
@@ -1658,7 +1658,7 @@ def show_window():
     #commenting this out because I think this is something very short that should stay regardless of disabling help
     #message_group.append(defFileMessage)
 
-    defSplashImage = Image.open(Defaults.SPLASH).resize((int(root.winfo_screenwidth() * 0.10), int(root.winfo_screenwidth() * 0.10)), Image.NEAREST)
+    defSplashImage = Image.open(Defaults.SPLASH).resize((int(root.winfo_screenwidth() * 0.09), int(root.winfo_screenwidth() * 0.09)), Image.NEAREST)
     defThemeDemo = Image.open(Defaults.THEME_DEMO)
     defIcon = Image.open(Defaults.ICON).resize((int(root.winfo_screenwidth() * 0.04), int(root.winfo_screenwidth() * 0.04)), Image.NEAREST)
     defConfIcon = Image.open(Defaults.CONFIG_ICON).resize((int(root.winfo_screenwidth() * 0.04), int(root.winfo_screenwidth() * 0.04)), Image.NEAREST)
@@ -1690,7 +1690,7 @@ def show_window():
                 img = Image.open(selectedFile.name).convert("RGB")
                 img.save(imgtype)
                 if imgtype == Defaults.SPLASH:
-                    defSplashImage = ImageTk.PhotoImage(img.resize((int(root.winfo_screenwidth() * 0.10), int(root.winfo_screenwidth() * 0.10)), Image.NEAREST))
+                    defSplashImage = ImageTk.PhotoImage(img.resize((int(root.winfo_screenwidth() * 0.09), int(root.winfo_screenwidth() * 0.09)), Image.NEAREST))
                     defSplashLabel.config(image=defSplashImage)
                     defSplashLabel.update_idletasks()
                 if imgtype == Defaults.THEME_DEMO:
@@ -1727,7 +1727,7 @@ def show_window():
     defaultsFrame1.pack(fill="x")
     defSplashFrame.pack(side="left", fill="both", padx=2, expand=1)
     defSplashFrameL.pack(side="left", fill="both")
-    defSplashFrameR.pack(side="left", fill="x")
+    defSplashFrameR.pack(side="left", fill="x", padx=(5,0))
     defSplashButton.pack(side="top", fill="both", padx=1, pady=(0,5))
     Message(defSplashFrameL, text="LOADING SPLASH:\n\nUsed in \"Show Loading Flair\" setting (found in \"Start\" tab). Packs can have custom "
                                 "splashes, which will appear instead of this. Accepts .jpg or .png and will be resized to fit ~60% of your screen.",
@@ -1744,8 +1744,8 @@ def show_window():
 
     defThemeFrame.pack(side="left", fill="both", padx=2, expand=1)
     defThemeFrameL.pack(side="left", fill="both")
-    defThemeFrameR.pack(side="left", fill="x")
-    defThemeButton.pack(side="top", fill="both", padx=1, pady=(0,5))
+    defThemeFrameR.pack(side="left", fill="x", padx=(5,0))
+    defThemeButton.pack(side="top", fill="both", padx=1)
     Message(defThemeFrameL, text="THEME DEMO:\n\nUsed in the \"Start\" tab, supports .jpg or .png. Must be 150x75! "
                                 "If you don\'t crop your image to that, you\'ll have a bad time!!",
                                 justify=CENTER, borderwidth=5, relief=GROOVE).pack(side="top", fill="both", expand=1)
@@ -1763,7 +1763,7 @@ def show_window():
     defaultsFrame2.pack(fill="x")
     defIconFrame.pack(side="left", fill="both", padx=2, expand=1)
     defIconFrameL.pack(side="left", fill="both")
-    defIconFrameR.pack(side="left", fill="x")
+    defIconFrameR.pack(side="left", fill="x", padx=(5,0))
     defIconButton.pack(side="top", fill="both", padx=1, pady=(0,5))
     Message(defIconFrameL, text="ICON:\n\nUsed in desktop shortcuts and tray icon. Only supports .ico files.",
                                 justify=CENTER, borderwidth=5, relief=GROOVE).pack(side="top", fill="both", expand=1)
@@ -1779,7 +1779,7 @@ def show_window():
 
     defConfIconFrame.pack(side="left", fill="both", padx=2, expand=1)
     defConfIconFrameL.pack(side="left", fill="both")
-    defConfIconFrameR.pack(side="left", fill="x")
+    defConfIconFrameR.pack(side="left", fill="x", padx=(5,0))
     defConfIconButton.pack(side="top", fill="both", padx=1, pady=(0,5))
     Message(defConfIconFrameL, text="CONFIG ICON:\n\nUsed in desktop shortcuts and the config window. Only supports .ico files.",
                                 justify=CENTER, borderwidth=5, relief=GROOVE).pack(side="top", fill="both", expand=1)
@@ -1795,7 +1795,7 @@ def show_window():
 
     defPanicIconFrame.pack(side="left", fill="both", padx=2, expand=1)
     defPanicIconFrameL.pack(side="left", fill="both")
-    defPanicIconFrameR.pack(side="left", fill="x")
+    defPanicIconFrameR.pack(side="left", fill="x", padx=(5,0))
     defPanicIconButton.pack(side="top", fill="both", padx=1, pady=(0,5))
     Message(defPanicIconFrameL, text="PANIC ICON:\n\nUsed in desktop shortcuts. Only supports .ico files.",
                                 justify=CENTER, borderwidth=5, relief=GROOVE).pack(side="top", fill="both", expand=1)
@@ -1813,7 +1813,7 @@ def show_window():
     defaultsFrame3.pack(fill="x")
     defSpiralFrame.pack(side="left", fill="both", padx=2)
     defSpiralFrameL.pack(side="left", fill="both")
-    defSpiralFrameR.pack(side="left", fill="x")
+    defSpiralFrameR.pack(side="left", fill="x", padx=(5,0))
     defSpiralButton.pack(side="top", fill="both", padx=1, pady=(0,5))
     Message(defSpiralFrameL, text="SPIRAL:\n\nUsed in \"Subliminal Overlays\" setting (found in \"Popups\" tab). Packs can have custom "
                                 "Subliminals, which will appear instead of this. Accepts .jpg, .png, or .gif, but should be animated. "
