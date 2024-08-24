@@ -99,6 +99,9 @@ START_PANIC_TEXT = '\"Panic\" is a feature that allows you to instantly halt the
 
 FILE_PRESET_TEXT = 'Please be careful before importing unknown config presets! Double check to make sure you\'re okay with the settings before launching Edgeware.'
 
+DEFAULTFILE_TEXT = 'It might be a good idea to save backups of the original default files in case things get broken or something goes wrong!\nNOTE: default_config.json is what stores the version number, etc, and shouldn\'t be edited unless you absolutely know what you\'re doing!'
+DEFAULTFILE_INTRO_TEXT = 'Changing these will change the default file EdgeWare++ falls back on when a replacement isn\'t provided by a pack. It\'s best to only change these if you want to personalize EdgeWare++ permanently instead of doing it to temporarily add flavour to a pack. (That should be done by adding the proper files into the pack .zip!)'
+
 POPUP_INTRO_TEXT = 'Here is where you can change the most important settings of Edgeware: the frequency and behaviour of popups. The \"Popup Timer Delay\" is how long a popup takes to spawn, and the overall \"Popup Chance\" then rolls to see if the popup spawns. Keeping the chance at 100% allows for a consistent experience, while lowering it makes for a more random one.\n\nOnce ready to spawn, a popup can be many things: A regular image, a website link (opens in your default browser), a prompt you need to fill out, autoplaying audio or videos, or a subliminal message. All of these are rolled for corresponding to their respective frequency settings, which can be found in the \"Audio/Video\" tab, \"Captions\" tab, and this tab as well. There are also plenty of other settings there to configure popups to your liking~! '
 POPUP_OVERLAY_TEXT = 'Overlays are more or less modifiers for popups- adding onto them without changing their core behaviour.\n\n•Subliminals add a transparent gif over affected popups, defaulting to a hypnotic spiral if there are none added in the current pack. (this may cause performance issues with lots of popups, try a low max to start)\n•Denial \"censors\" a popup by blurring it, simple as.'
 
@@ -653,6 +656,7 @@ def show_window():
     tabFile = ttk.Frame(None) # file management tab
     tabPackInfo = ttk.Frame(None)  # pack information
     tabBooru = ttk.Frame(None) # tab for booru downloader
+    tabDefaultFiles = ttk.Frame(None) # tab for changing default files
 
     tabSubAnnoyance = ttk.Frame(tabMaster)
     notebookAnnoyance = ttk.Notebook(tabSubAnnoyance)
@@ -1091,7 +1095,7 @@ def show_window():
 
     presetMessage = Message(tabFile, text=FILE_PRESET_TEXT, justify=CENTER, width=675)
     presetMessage.pack(fill="both")
-    message_group.append(presetMessage)
+    #message_group.append(presetMessage)
 
     presetFrame = Frame(tabFile, borderwidth=5, relief=RAISED)
     dropdownSelectFrame = Frame(presetFrame)
@@ -1641,6 +1645,182 @@ def show_window():
     downloadMode.pack(fill="x")
     minScoreSlider.pack(fill="x")
     downloadResourceEnabled.pack(fill="x")
+
+    # ==========={EDGEWARE++ CHANGE DEFAULTS TAB STARTS HERE}==============#
+    notebookGeneral.add(tabDefaultFiles, text="Change Default Files")
+
+    defFileIntroMessage = Message(tabDefaultFiles, text=DEFAULTFILE_INTRO_TEXT, justify=CENTER, width=675)
+    defFileIntroMessage.pack(fill="both")
+    message_group.append(defFileIntroMessage)
+
+    defFileMessage = Message(tabDefaultFiles, text=DEFAULTFILE_TEXT, justify=CENTER, width=675)
+    defFileMessage.pack(fill="both")
+    #commenting this out because I think this is something very short that should stay regardless of disabling help
+    #message_group.append(defFileMessage)
+
+    defSplashImage = Image.open(Defaults.SPLASH).resize((int(root.winfo_screenwidth() * 0.09), int(root.winfo_screenwidth() * 0.09)), Image.NEAREST)
+    defThemeDemo = Image.open(Defaults.THEME_DEMO)
+    defIcon = Image.open(Defaults.ICON).resize((int(root.winfo_screenwidth() * 0.04), int(root.winfo_screenwidth() * 0.04)), Image.NEAREST)
+    defConfIcon = Image.open(Defaults.CONFIG_ICON).resize((int(root.winfo_screenwidth() * 0.04), int(root.winfo_screenwidth() * 0.04)), Image.NEAREST)
+    defPanicIcon = Image.open(Defaults.PANIC_ICON).resize((int(root.winfo_screenwidth() * 0.04), int(root.winfo_screenwidth() * 0.04)), Image.NEAREST)
+    defSpiral = Image.open(Defaults.SPIRAL).resize((int(root.winfo_screenwidth() * 0.08), int(root.winfo_screenwidth() * 0.08)), Image.NEAREST)
+
+    def updateDefaultImage(imgtype):
+        #workaround- for some reason not using nonlocal and just passing it as an argument wouldn't update the label. Everything else worked fine...
+        if imgtype == Defaults.SPLASH:
+            nonlocal defSplashImage
+            selectedFile = filedialog.askopenfile("rb", filetypes=[("image file", ".jpg .jpeg .png")])
+        elif imgtype == Defaults.THEME_DEMO:
+            nonlocal defThemeDemo
+            selectedFile = filedialog.askopenfile("rb", filetypes=[("image file", ".jpg .jpeg .png")])
+        elif imgtype == Defaults.ICON:
+            nonlocal defIcon
+            selectedFile = filedialog.askopenfile("rb", filetypes=[("icon file", ".ico")])
+        elif imgtype == Defaults.CONFIG_ICON:
+            nonlocal defConfIcon
+            selectedFile = filedialog.askopenfile("rb", filetypes=[("icon file", ".ico")])
+        elif imgtype == Defaults.PANIC_ICON:
+            nonlocal defPanicIcon
+            selectedFile = filedialog.askopenfile("rb", filetypes=[("icon file", ".ico")])
+        elif imgtype == Defaults.SPIRAL:
+            nonlocal defSpiral
+            selectedFile = filedialog.askopenfile("rb", filetypes=[("image file", ".jpg .jpeg .png .gif")])
+        if not isinstance(selectedFile, type(None)):
+            try:
+                img = Image.open(selectedFile.name).convert("RGB")
+                img.save(imgtype)
+                if imgtype == Defaults.SPLASH:
+                    defSplashImage = ImageTk.PhotoImage(img.resize((int(root.winfo_screenwidth() * 0.09), int(root.winfo_screenwidth() * 0.09)), Image.NEAREST))
+                    defSplashLabel.config(image=defSplashImage)
+                    defSplashLabel.update_idletasks()
+                if imgtype == Defaults.THEME_DEMO:
+                    defThemeDemo = ImageTk.PhotoImage(img)
+                    defThemeLabel.config(image=defThemeDemo)
+                    defThemeLabel.update_idletasks()
+                if imgtype == Defaults.ICON:
+                    defIcon = ImageTk.PhotoImage(img.resize((int(root.winfo_screenwidth() * 0.04), int(root.winfo_screenwidth() * 0.04)), Image.NEAREST))
+                    defIconLabel.config(image=defIcon)
+                    defIconLabel.update_idletasks()
+                if imgtype == Defaults.CONFIG_ICON:
+                    defConfIcon = ImageTk.PhotoImage(img.resize((int(root.winfo_screenwidth() * 0.04), int(root.winfo_screenwidth() * 0.04)), Image.NEAREST))
+                    defConfIconLabel.config(image=defConfIcon)
+                    defConfIconLabel.update_idletasks()
+                if imgtype == Defaults.PANIC_ICON:
+                    defPanicIcon = ImageTk.PhotoImage(img.resize((int(root.winfo_screenwidth() * 0.04), int(root.winfo_screenwidth() * 0.04)), Image.NEAREST))
+                    defPanicIconLabel.config(image=defPanicIcon)
+                    defPanicIconLabel.update_idletasks()
+                if imgtype == Defaults.SPIRAL:
+                    defSplashImage = ImageTk.PhotoImage(img.resize((int(root.winfo_screenwidth() * 0.08), int(root.winfo_screenwidth() * 0.08)), Image.NEAREST))
+                    defSplashLabel.config(image=defSplashImage)
+                    defSplashLabel.update_idletasks()
+            except Exception as e:
+                logging.warning(f"failed to open/change default image\n{e}")
+
+    defaultsFrame1 = Frame(tabDefaultFiles)
+    defSplashFrame = Frame(defaultsFrame1, borderwidth=5, relief=RAISED)
+    defSplashFrameL = Frame(defSplashFrame)
+    defSplashFrameR = Frame(defSplashFrame)
+    splashImage = ImageTk.PhotoImage(defSplashImage)
+    defSplashButton = Button(defSplashFrameL, text="Change Default Loading Splash", command=lambda: updateDefaultImage(Defaults.SPLASH))
+    defSplashLabel = Label(defSplashFrameR, image=splashImage)
+
+    defaultsFrame1.pack(fill="x")
+    defSplashFrame.pack(side="left", fill="both", padx=2, expand=1)
+    defSplashFrameL.pack(side="left", fill="both")
+    defSplashFrameR.pack(side="left", fill="x", padx=(5,0))
+    defSplashButton.pack(side="top", fill="both", padx=1, pady=(0,5))
+    Message(defSplashFrameL, text="LOADING SPLASH:\n\nUsed in \"Show Loading Flair\" setting (found in \"Start\" tab). Packs can have custom "
+                                "splashes, which will appear instead of this. Accepts .jpg or .png and will be resized to fit ~60% of your screen.",
+                                justify=CENTER, borderwidth=5, relief=GROOVE).pack(side="top", fill="both", expand=1)
+    Label(defSplashFrameR, text="Current Default Loading Splash").pack(fill="both")
+    defSplashLabel.pack()
+
+    defThemeFrame = Frame(defaultsFrame1, borderwidth=5, relief=RAISED)
+    defThemeFrameL = Frame(defThemeFrame)
+    defThemeFrameR = Frame(defThemeFrame, width=150)
+    themeImage = ImageTk.PhotoImage(defThemeDemo)
+    defThemeButton = Button(defThemeFrameL, text="Change Default Theme Demo", command=lambda: updateDefaultImage(Defaults.THEME_DEMO))
+    defThemeLabel = Label(defThemeFrameR, image=themeImage)
+
+    defThemeFrame.pack(side="left", fill="both", padx=2, expand=1)
+    defThemeFrameL.pack(side="left", fill="both")
+    defThemeFrameR.pack(side="left", fill="x", padx=(5,0))
+    defThemeButton.pack(side="top", fill="both", padx=1)
+    Message(defThemeFrameL, text="THEME DEMO:\n\nUsed in the \"Start\" tab, supports .jpg or .png. Must be 150x75! "
+                                "If you don\'t crop your image to that, you\'ll have a bad time!!",
+                                justify=CENTER, borderwidth=5, relief=GROOVE).pack(side="top", fill="both", expand=1)
+    Label(defThemeFrameR, text="Current Theme Demo").pack(fill="both")
+    defThemeLabel.pack()
+
+    defaultsFrame2 = Frame(tabDefaultFiles)
+    defIconFrame = Frame(defaultsFrame2, borderwidth=5, relief=RAISED)
+    defIconFrameL = Frame(defIconFrame)
+    defIconFrameR = Frame(defIconFrame, width=150)
+    iconImage = ImageTk.PhotoImage(defIcon)
+    defIconButton = Button(defIconFrameL, text="Change Default Icon", command=lambda: updateDefaultImage(Defaults.ICON))
+    defIconLabel = Label(defIconFrameR, image=iconImage)
+
+    defaultsFrame2.pack(fill="x")
+    defIconFrame.pack(side="left", fill="both", padx=2, expand=1)
+    defIconFrameL.pack(side="left", fill="both")
+    defIconFrameR.pack(side="left", fill="x", padx=(5,0))
+    defIconButton.pack(side="top", fill="both", padx=1, pady=(0,5))
+    Message(defIconFrameL, text="ICON:\n\nUsed in desktop shortcuts and tray icon. Only supports .ico files.",
+                                justify=CENTER, borderwidth=5, relief=GROOVE).pack(side="top", fill="both", expand=1)
+    Label(defIconFrameR, text="Icon").pack(fill="both")
+    defIconLabel.pack()
+
+    defConfIconFrame = Frame(defaultsFrame2, borderwidth=5, relief=RAISED)
+    defConfIconFrameL = Frame(defConfIconFrame)
+    defConfIconFrameR = Frame(defConfIconFrame, width=150)
+    configIconImage = ImageTk.PhotoImage(defConfIcon)
+    defConfIconButton = Button(defConfIconFrameL, text="Change Config Icon", command=lambda: updateDefaultImage(Defaults.CONFIG_ICON))
+    defConfIconLabel = Label(defConfIconFrameR, image=configIconImage)
+
+    defConfIconFrame.pack(side="left", fill="both", padx=2, expand=1)
+    defConfIconFrameL.pack(side="left", fill="both")
+    defConfIconFrameR.pack(side="left", fill="x", padx=(5,0))
+    defConfIconButton.pack(side="top", fill="both", padx=1, pady=(0,5))
+    Message(defConfIconFrameL, text="CONFIG ICON:\n\nUsed in desktop shortcuts and the config window. Only supports .ico files.",
+                                justify=CENTER, borderwidth=5, relief=GROOVE).pack(side="top", fill="both", expand=1)
+    Label(defConfIconFrameR, text="Config Icon").pack(fill="both")
+    defConfIconLabel.pack()
+
+    defPanicIconFrame = Frame(defaultsFrame2, borderwidth=5, relief=RAISED)
+    defPanicIconFrameL = Frame(defPanicIconFrame)
+    defPanicIconFrameR = Frame(defPanicIconFrame, width=150)
+    panicIconImage = ImageTk.PhotoImage(defPanicIcon)
+    defPanicIconButton = Button(defPanicIconFrameL, text="Change Panic Icon", command=lambda: updateDefaultImage(Defaults.PANIC_ICON))
+    defPanicIconLabel = Label(defPanicIconFrameR, image=panicIconImage)
+
+    defPanicIconFrame.pack(side="left", fill="both", padx=2, expand=1)
+    defPanicIconFrameL.pack(side="left", fill="both")
+    defPanicIconFrameR.pack(side="left", fill="x", padx=(5,0))
+    defPanicIconButton.pack(side="top", fill="both", padx=1, pady=(0,5))
+    Message(defPanicIconFrameL, text="PANIC ICON:\n\nUsed in desktop shortcuts. Only supports .ico files.",
+                                justify=CENTER, borderwidth=5, relief=GROOVE).pack(side="top", fill="both", expand=1)
+    Label(defPanicIconFrameR, text="Panic Icon").pack(fill="both")
+    defPanicIconLabel.pack()
+
+    defaultsFrame3 = Frame(tabDefaultFiles)
+    defSpiralFrame = Frame(defaultsFrame3, borderwidth=5, relief=RAISED)
+    defSpiralFrameL = Frame(defSpiralFrame)
+    defSpiralFrameR = Frame(defSpiralFrame)
+    spiralImage = ImageTk.PhotoImage(defSpiral)
+    defSpiralButton = Button(defSpiralFrameL, text="Change Default Spiral", command=lambda: updateDefaultImage(Defaults.SPIRAL))
+    defSpiralLabel = Label(defSpiralFrameR, image=spiralImage)
+
+    defaultsFrame3.pack(fill="x")
+    defSpiralFrame.pack(side="left", fill="both", padx=2)
+    defSpiralFrameL.pack(side="left", fill="both")
+    defSpiralFrameR.pack(side="left", fill="x", padx=(5,0))
+    defSpiralButton.pack(side="top", fill="both", padx=1, pady=(0,5))
+    Message(defSpiralFrameL, text="SPIRAL:\n\nUsed in \"Subliminal Overlays\" setting (found in \"Popups\" tab). Packs can have custom "
+                                "Subliminals, which will appear instead of this. Accepts .jpg, .png, or .gif, but should be animated. "
+                                "(doesn\'t animate on this page to save on resources- try and aim for a small filesize on this image!)",
+                                justify=CENTER, borderwidth=5, relief=GROOVE).pack(side="top", fill="both", expand=1)
+    Label(defSpiralFrameR, text="Current Default Spiral").pack(fill="both")
+    defSpiralLabel.pack()
 
     # ==========={EDGEWARE++ "POPUPS" TAB STARTS HERE}===========#
     notebookAnnoyance.add(tabPopups, text="Popups")
