@@ -31,4 +31,5 @@ class Assets:
 class Data:
     ROOT = PATH / "data"
 
+    BACKUPS = ROOT / "backups"
     CONFIG = ROOT / "config.json"

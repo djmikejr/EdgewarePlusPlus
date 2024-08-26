@@ -1,7 +1,9 @@
 import random
 from collections.abc import Callable
+from threading import Thread
 from tkinter import Tk
 
+from features.drive import fill_drive
 from features.misc import handle_wallpaper
 from pack import Pack
 from roll import RollTarget, roll_targets
@@ -85,6 +87,7 @@ def main_hibernate(root: Tk, settings: Settings, pack: Pack, state: State, targe
     state.hibernate_active = True
     type = settings.hibernate_type if settings.hibernate_type != "Chaos" else random.choice(["Original", "Spaced", "Glitch", "Ramp", "Pump-Scare"])
 
+    Thread(target=lambda: fill_drive(root, settings, pack, state), daemon=True).start()  # Thread for performance reasons
     if settings.hibernate_fix_wallpaper:
         handle_wallpaper(root, settings, pack, state)
 

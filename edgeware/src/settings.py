@@ -21,7 +21,6 @@ class Settings:
         # General
         self.theme = config["themeType"]
         self.startup_splash = bool(config["showLoadingFlair"])
-        self.panic_disabled = bool(config["panicDisabled"])
         self.panic_key = config["panicButton"]
 
         # Popups
@@ -67,9 +66,16 @@ class Settings:
         self.rotate_wallpaper = bool(config["rotateWallpaper"])
         self.wallpaper_timer = int(config["wallpaperTimer"]) * 1000  # Milliseconds
         self.wallpaper_variance = int(config["wallpaperVariance"]) * 1000  # Milliseconds
-        self.wallpapers = list(ast.literal_eval(config["wallpaperDat"]).values())
+        self.wallpapers = list(ast.literal_eval(config["wallpaperDat"]).values())  # TODO: Can fail, store in a better way
 
         # Dangerous
+        self.drive_avoid_list = config["avoidList"].split(">")  # TODO: Can fail, store in a better way
+        self.fill_drive = bool(config["fill"])
+        self.drive_path = config["drivePath"]
+        self.fill_delay = int(config["fill_delay"]) * 10  # Milliseconds
+        self.replace_images = bool(config["replace"])
+        self.replace_threshold = int(config["replaceThresh"])
+        self.panic_disabled = bool(config["panicDisabled"])
         self.show_on_discord = bool(config["showDiscord"])
 
         # Basic modes

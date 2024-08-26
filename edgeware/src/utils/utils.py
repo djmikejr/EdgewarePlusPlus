@@ -5,6 +5,7 @@ from dataclasses import dataclass
 @dataclass
 class State:
     audio_number = 0
+    fill_number = 0
     popup_number = 0
     prompt_active = False
     subliminal_number = 0
