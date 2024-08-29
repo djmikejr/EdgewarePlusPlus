@@ -75,6 +75,8 @@ The EdgeWare++ Pack Editor is now live [here](https://github.com/araten10/Edgewa
 
 •*User friendly way to change default images, such as splash screens or icons*
 
+•*Speaking of default images, the splash screen and icons have been changed to shiny new ones! (why? answer is below in the FAQ!)*
+
 ## Planned Additions
 
 Planned additions, as well as currently known issues, can now be found on the [issues page](https://github.com/araten10/EdgewarePlusPlus/issues).
@@ -137,6 +139,14 @@ A: The main one that comes to mind is [goonto](https://github.com/dogkisser/goon
 
 [Walltaker](https://walltaker.joi.how/) is also pretty popular, but is much more social and only focuses on changing your desktop wallpaper.
 
+>Q: Why did you change the default loading splash and icon?
+
+A: We wanted to play it safe and find a more generally SFW appropriate image for the splash screen to assist in distribution across multiple sites. While the new splash screen is still plenty horny (and also a caption by yours truly), it has less a focus on genitals and other such things that could potentially cause issues down the line. The icons were fine, but it felt fitting to match them to the new theme. I apologize in advance to PetitTournesol for semi-de-branding their program!
+
 ## Changelog
 
 The changelog can be viewed [here](CHANGELOG.md).
+
+## Content Removal Policy
+
+If you are the owner of any art or assets used by this program or linked demo packs and are unhappy with their usage, feel free to contact us through twitter or discord and we will happily work things out (assuming we are still active/around/alive at the time of messaging). Please note however, that any pack *not* linked on this page is either by somebody else or for private use. We offer "pack creation tools" for users to make packs of their own liking, but we have no control over what is done with them or how they're distributed.

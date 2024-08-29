@@ -276,7 +276,7 @@ def show_window():
     # window things
     root = Tk()
     root.title("Edgeware++ Config")
-    root.geometry("740x800")
+    root.geometry("740x860")
     try:
         root.iconbitmap(Defaults.CONFIG_ICON)
         logging.info("set iconbitmap.")
@@ -1730,7 +1730,7 @@ def show_window():
     defSplashFrameR.pack(side="left", fill="x", padx=(5,0))
     defSplashButton.pack(side="top", fill="both", padx=1, pady=(0,5))
     Message(defSplashFrameL, text="LOADING SPLASH:\n\nUsed in \"Show Loading Flair\" setting (found in \"Start\" tab). Packs can have custom "
-                                "splashes, which will appear instead of this. Accepts .jpg or .png and will be resized to fit ~60% of your screen.",
+                                "splashes, which will appear instead of this. Accepts .jpg or .png and will be shrunk to a slightly smaller size.",
                                 justify=CENTER, borderwidth=5, relief=GROOVE).pack(side="top", fill="both", expand=1)
     Label(defSplashFrameR, text="Current Default Loading Splash").pack(fill="both")
     defSplashLabel.pack()
