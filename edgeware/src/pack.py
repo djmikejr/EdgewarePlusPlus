@@ -47,13 +47,10 @@ class Pack:
                 self.startup_splash = path
                 break
 
-        def get(dict: dict, key: str, default: str) -> str | list[str]:
-            return dict[key] if key in dict else default
-
         with open(self.CAPTIONS) as f:
             self.captions = json.loads(f.read())
-            self.denial = get(self.captions, "denial", "Not for you~")
-            self.close_text = get(self.captions, "subtext", "I Submit <3")
+            self.denial = self.captions.get("denial", "Not for you~")
+            self.close_text = self.captions.get("subtext", "I Submit <3")
 
         with open(self.DISCORD) as f:
             image_ids = ["furcock_img", "blacked_img", "censored_img", "goon_img", "goon2_img", "hypno_img", "futa_img", "healslut_img", "gross_img"]
@@ -64,8 +61,8 @@ class Pack:
 
         with open(self.PROMPT) as f:
             self.prompts = json.loads(f.read())
-            self.prompt_command_text = get(self.prompts, "commandtext", "Type for me, slut~")
-            self.prompt_submit_text = get(self.prompts, "subtext", "I Submit <3")
+            self.prompt_command_text = self.prompts.get("commandtext", "Type for me, slut~")
+            self.prompt_submit_text = self.prompts.get("subtext", "I Submit <3")
 
         with open(self.WEB) as f:
             self.web = json.loads(f.read())
