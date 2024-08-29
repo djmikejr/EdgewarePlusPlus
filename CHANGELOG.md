@@ -9,6 +9,15 @@
 
 **Since last version...**
 
+**Version 12.75**
+
+•*A brand new splash screen! and icons! Full size of the splash screen can be found [here](https://x.com/ara10ten/status/1828978778741125477).*
+>Explanation of why this change happened can be found in version 12, as well as the FAQ on the readme.
+
+•*Fixed a minor error in the "Change Default Files" tab*
+
+•*Slightly increased the height of the config window once again, to stop the "Save & Exit" button from being eaten*
+
 **Version 12.5**
 
 •*A new tab: "Change Default Files"! Allows you to configure the default images that come with EdgeWare++ without doing so via manually overwriting folders.*
