@@ -16,17 +16,17 @@ class Pack:
 
     # Files
     CAPTIONS = PACK_PATH / "captions.json"
-    # CONFIG = PACK_PATH / "config.json"
-    # CORRUPTION = PACK_PATH / "corruption.json"
+    CONFIG = PACK_PATH / "config.json"  # TODO
+    CORRUPTION = PACK_PATH / "corruption.json"  # TODO
     DISCORD = PACK_PATH / "discord.dat"
     ICON = PACK_PATH / "icon.ico"
-    # INFO = PACK_PATH / "info.json"
+    INFO = PACK_PATH / "info.json"
     SPLASH = PACK_PATH / "loading_splash"
-    # MEDIA = PACK_PATH / "media.json"
+    MEDIA = PACK_PATH / "media.json"  # TODO
     PROMPT = PACK_PATH / "prompt.json"
     WALLPAPER = PACK_PATH / "wallpaper.png"
     WEB = PACK_PATH / "web.json"
-    # WEB_RESOURCE = PACK_PATH / "webResource.json"
+    WEB_RESOURCE = PACK_PATH / "webResource.json"  # TODO
 
     def __init__(self):
         def list_resources(dir: Path) -> list[Path]:

@@ -33,3 +33,6 @@ class Data:
 
     BACKUPS = ROOT / "backups"
     CONFIG = ROOT / "config.json"
+    MOODS = ROOT / "moods"
+
+    PRESETS = PATH /  "presets"  # TODO: Proper location

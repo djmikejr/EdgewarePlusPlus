@@ -45,14 +45,15 @@ import requests
 import ttkwidgets as tw
 from PIL import Image, ImageTk
 from utils import utils
-from utils.paths import LOG_PATH, Data, Defaults, Process, Resource
-from utils.settings import Settings
-from utils.tooltip import CreateToolTip
+from paths import Data, Assets, PACK_PATH
+from pack import Pack
+from settings import load_config, load_default_config
+from widgets.tooltip import CreateToolTip
 
 PATH = Path(__file__).parent
 os.chdir(PATH)
 
-log_file = utils.init_logging("dbg", "config")
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 
 # if you are working on this i'm just letting you know there's like almost no documentation for ttkwidgets
@@ -85,10 +86,6 @@ class CheckboxTreeview(tw.CheckboxTreeview):
                 # self._uncheck_descendant(item)
                 # self._uncheck_ancestor(item)
 
-
-SYS_ARGS = sys.argv.copy()
-SYS_ARGS.pop(0)
-logging.info(f"args: {SYS_ARGS}")
 
 pil_logger = logging.getLogger("PIL")
 pil_logger.setLevel(logging.INFO)
@@ -141,10 +138,11 @@ INFO_CREATOR_DEFAULT = "Anonymous"
 INFO_VERSION_DEFAULT = "0"
 INFO_DISCORD_DEFAULT = ["[No pack loaded, or the pack does not have a 'discord.dat' file.]", "default"]
 
-if os.path.isfile(Resource.INFO):
+pack = Pack()
+if os.path.isfile(pack.INFO):
     try:
         info_dict = ""
-        with open(Resource.INFO) as r:
+        with open(pack.INFO) as r:
             info_dict = json.loads(r.read())
         info_name = info_dict["name"] if info_dict["name"] else "Unnamed Pack"
         info_description = info_dict["description"] if info_dict["description"] else "No description set."
@@ -174,17 +172,17 @@ UNIQUE_ID = "0"
 
 # creating a semi-parseable unique ID for the pack to make mood saving work, if the pack doesn't have an info.json file.
 # probably could have made it so the user manually has to save/load and not worried about this, but here we are
-if info_id == "0" and os.path.exists(Resource.ROOT):
+if info_id == "0" and os.path.exists(PACK_PATH):
     try:
         # already done the brunt of the work for getting these values in the pack info page, so i'm just using those again here. If this needs to be replaced, look there too
-        im = str(len(os.listdir(Resource.IMAGE))) if os.path.exists(Resource.IMAGE) else "0"
-        au = str(len(os.listdir(Resource.AUDIO))) if os.path.exists(Resource.AUDIO) else "0"
-        vi = str(len(os.listdir(Resource.VIDEO))) if os.path.exists(Resource.VIDEO) else "0"
-        wa = "w" if os.path.isfile(Resource.WALLPAPER) else "x"
-        sp = "s" if Resource.SPLASH else "x"
-        di = "d" if os.path.isfile(Resource.DISCORD) else "x"
-        ic = "i" if os.path.isfile(Resource.ICON) else "x"
-        co = "c" if os.path.isfile(Resource.CORRUPTION) else "x"
+        im = str(len(os.listdir(pack.IMAGE))) if os.path.exists(pack.IMAGE) else "0"
+        au = str(len(os.listdir(pack.AUDIO))) if os.path.exists(pack.AUDIO) else "0"
+        vi = str(len(os.listdir(pack.VIDEO))) if os.path.exists(pack.VIDEO) else "0"
+        wa = "w" if os.path.isfile(pack.WALLPAPER) else "x"
+        sp = "s" if pack.SPLASH else "x"
+        di = "d" if os.path.isfile(pack.DISCORD) else "x"
+        ic = "i" if os.path.isfile(pack.ICON) else "x"
+        co = "c" if os.path.isfile(pack.CORRUPTION) else "x"
         UNIQUE_ID = im + au + vi + wa + sp + di + ic + co
         logging.info(f"generated unique ID. {UNIQUE_ID}")
     except Exception as e:
@@ -196,19 +194,21 @@ if info_id == "0" and os.path.exists(Resource.ROOT):
 UPDCHECK_URL = "http://raw.githubusercontent.com/PetitTournesol/Edgeware/main/EdgeWare/configDefault.dat"
 UPDCHECK_PP_URL = "http://raw.githubusercontent.com/araten10/EdgewarePlusPlus/main/EdgeWare/default_assets/default_config.json"
 
-settings = Settings()
-varNames = settings.default.keys()
-local_version = settings.default["version"]
-local_pp_version = settings.default["versionplusplus"]
+config = load_config()
+default_config = load_default_config()
+varNames = default_config.keys()
+local_version = default_config["version"]
+local_pp_version = default_config["versionplusplus"]
 
 pass_ = ""
 
 
+Data.MOODS.parent.mkdir(parents=True, exist_ok=True)
 MOOD_PATH = "0"
-if settings["toggleMoodSet"] != True:
-    if UNIQUE_ID != "0" and os.path.exists(Resource.ROOT):
+if config["toggleMoodSet"] != True:
+    if UNIQUE_ID != "0" and os.path.exists(PACK_PATH):
         MOOD_PATH = Data.UNNAMED_MOODS / f"{UNIQUE_ID}.json"
-    elif UNIQUE_ID == "0" and os.path.exists(Resource.ROOT):
+    elif UNIQUE_ID == "0" and os.path.exists(PACK_PATH):
         MOOD_PATH = Data.MOODS / f"{info_id}.json"
 
     # creating the mood file if it doesn't exist
@@ -219,18 +219,18 @@ if settings["toggleMoodSet"] != True:
                 mood_dict = {"media": [], "captions": [], "prompts": [], "web": []}
 
                 try:
-                    if os.path.isfile(Resource.MEDIA):
+                    if os.path.isfile(pack.MEDIA):
                         media_dict = ""
-                        with open(Resource.MEDIA) as media:
+                        with open(pack.MEDIA) as media:
                             media_dict = json.loads(media.read())
                             mood_dict["media"] += media_dict
                 except Exception:
                     logging.warning("media mood extraction failed.")
 
                 try:
-                    if os.path.isfile(Resource.CAPTIONS):
+                    if os.path.isfile(pack.CAPTIONS):
                         captions_dict = ""
-                        with open(Resource.CAPTIONS) as captions:
+                        with open(pack.CAPTIONS) as captions:
                             captions_dict = json.loads(captions.read())
                             if "prefix" in captions_dict:
                                 del captions_dict["prefix"]
@@ -245,18 +245,18 @@ if settings["toggleMoodSet"] != True:
                     logging.warning("captions mood extraction failed.")
 
                 try:
-                    if os.path.isfile(Resource.PROMPT):
+                    if os.path.isfile(pack.PROMPT):
                         prompt_dict = ""
-                        with open(Resource.PROMPT) as prompt:
+                        with open(pack.PROMPT) as prompt:
                             prompt_dict = json.loads(prompt.read())
                             mood_dict["prompts"] += prompt_dict["moods"]
                 except Exception:
                     logging.warning("prompt mood extraction failed.")
 
                 try:
-                    if os.path.isfile(Resource.WEB):
+                    if os.path.isfile(pack.WEB):
                         web_dict = ""
-                        with open(Resource.WEB) as web:
+                        with open(pack.WEB) as web:
                             web_dict = json.loads(web.read())
                             for n in web_dict["moods"]:
                                 if n not in mood_dict["web"]:
@@ -271,14 +271,14 @@ if settings["toggleMoodSet"] != True:
 
 
 def show_window():
-    global settings
+    global config
 
     # window things
     root = Tk()
     root.title("Edgeware++ Config")
     root.geometry("740x860")
     try:
-        root.iconbitmap(Defaults.CONFIG_ICON)
+        root.iconbitmap(Assets.CONFIG_ICON)
         logging.info("set iconbitmap.")
     except Exception:
         logging.warning("failed to set iconbitmap.")
@@ -291,123 +291,123 @@ def show_window():
     # painful control variables ._.
     while fail_loop < 2:
         try:
-            delayVar = IntVar(root, value=int(settings["delay"]))
-            popupVar = IntVar(root, value=int(settings["popupMod"]))
-            webVar = IntVar(root, value=int(settings["webMod"]))
-            audioVar = IntVar(root, value=int(settings["audioMod"]))
-            promptVar = IntVar(root, value=int(settings["promptMod"]))
-            fillVar = BooleanVar(root, value=(settings["fill"] == 1))
+            delayVar = IntVar(root, value=int(config["delay"]))
+            popupVar = IntVar(root, value=int(config["popupMod"]))
+            webVar = IntVar(root, value=int(config["webMod"]))
+            audioVar = IntVar(root, value=int(config["audioMod"]))
+            promptVar = IntVar(root, value=int(config["promptMod"]))
+            fillVar = BooleanVar(root, value=(config["fill"] == 1))
 
-            fillDelayVar = IntVar(root, value=int(settings["fill_delay"]))
-            replaceVar = BooleanVar(root, value=(settings["replace"] == 1))
-            replaceThreshVar = IntVar(root, value=int(settings["replaceThresh"]))
-            startLoginVar = BooleanVar(root, value=(settings["start_on_logon"] == 1))
+            fillDelayVar = IntVar(root, value=int(config["fill_delay"]))
+            replaceVar = BooleanVar(root, value=(config["replace"] == 1))
+            replaceThreshVar = IntVar(root, value=int(config["replaceThresh"]))
+            startLoginVar = BooleanVar(root, value=(config["start_on_logon"] == 1))
 
-            hibernateVar = BooleanVar(root, value=(settings["hibernateMode"] == 1))
-            hibernateMinVar = IntVar(root, value=int(settings["hibernateMin"]))
-            hibernateMaxVar = IntVar(root, value=(settings["hibernateMax"]))
-            hibernateTypeVar = StringVar(root, value=(settings["hibernateType"].strip()))
-            wakeupActivityVar = IntVar(root, value=(settings["wakeupActivity"]))
-            hibernateLengthVar = IntVar(root, value=(settings["hibernateLength"]))
-            fixWallpaperVar = BooleanVar(root, value=(settings["fixWallpaper"] == 1))
+            hibernateVar = BooleanVar(root, value=(config["hibernateMode"] == 1))
+            hibernateMinVar = IntVar(root, value=int(config["hibernateMin"]))
+            hibernateMaxVar = IntVar(root, value=(config["hibernateMax"]))
+            hibernateTypeVar = StringVar(root, value=(config["hibernateType"].strip()))
+            wakeupActivityVar = IntVar(root, value=(config["wakeupActivity"]))
+            hibernateLengthVar = IntVar(root, value=(config["hibernateLength"]))
+            fixWallpaperVar = BooleanVar(root, value=(config["fixWallpaper"] == 1))
 
-            discordVar = BooleanVar(root, value=(int(settings["showDiscord"]) == 1))
-            startFlairVar = BooleanVar(root, value=(int(settings["showLoadingFlair"]) == 1))
-            captionVar = BooleanVar(root, value=(int(settings["showCaptions"]) == 1))
-            panicButtonVar = StringVar(root, value=settings["panicButton"])
-            panicVar = BooleanVar(root, value=(int(settings["panicDisabled"]) == 1))
+            discordVar = BooleanVar(root, value=(int(config["showDiscord"]) == 1))
+            startFlairVar = BooleanVar(root, value=(int(config["showLoadingFlair"]) == 1))
+            captionVar = BooleanVar(root, value=(int(config["showCaptions"]) == 1))
+            panicButtonVar = StringVar(root, value=config["panicButton"])
+            panicVar = BooleanVar(root, value=(int(config["panicDisabled"]) == 1))
 
-            promptMistakeVar = IntVar(root, value=int(settings["promptMistakes"]))
-            mitosisVar = BooleanVar(root, value=(int(settings["mitosisMode"]) == 1))
-            onlyVidVar = BooleanVar(root, value=(int(settings["onlyVid"]) == 1))
-            popupWebVar = BooleanVar(root, value=(int(settings["webPopup"]) == 1))
+            promptMistakeVar = IntVar(root, value=int(config["promptMistakes"]))
+            mitosisVar = BooleanVar(root, value=(int(config["mitosisMode"]) == 1))
+            onlyVidVar = BooleanVar(root, value=(int(config["onlyVid"]) == 1))
+            popupWebVar = BooleanVar(root, value=(int(config["webPopup"]) == 1))
 
-            rotateWallpaperVar = BooleanVar(root, value=(int(settings["rotateWallpaper"]) == 1))
-            wallpaperDelayVar = IntVar(root, value=int(settings["wallpaperTimer"]))
-            wpVarianceVar = IntVar(root, value=int(settings["wallpaperVariance"]))
+            rotateWallpaperVar = BooleanVar(root, value=(int(config["rotateWallpaper"]) == 1))
+            wallpaperDelayVar = IntVar(root, value=int(config["wallpaperTimer"]))
+            wpVarianceVar = IntVar(root, value=int(config["wallpaperVariance"]))
 
-            timeoutPopupsVar = BooleanVar(root, value=(int(settings["timeoutPopups"]) == 1))
-            popupTimeoutVar = IntVar(root, value=(int(settings["popupTimeout"])))
-            mitosisStrenVar = IntVar(root, value=(int(settings["mitosisStrength"])))
-            booruNameVar = StringVar(root, value=settings["booruName"])
+            timeoutPopupsVar = BooleanVar(root, value=(int(config["timeoutPopups"]) == 1))
+            popupTimeoutVar = IntVar(root, value=(int(config["popupTimeout"])))
+            mitosisStrenVar = IntVar(root, value=(int(config["mitosisStrength"])))
+            booruNameVar = StringVar(root, value=config["booruName"])
 
-            downloadEnabledVar = BooleanVar(root, value=(int(settings["downloadEnabled"]) == 1))
-            downloadModeVar = StringVar(root, value=settings["downloadMode"])
-            useWebResourceVar = BooleanVar(root, value=(int(settings["useWebResource"]) == 1))
-            fillPathVar = StringVar(root, value=settings["drivePath"])
-            rosVar = BooleanVar(root, value=(int(settings["runOnSaveQuit"]) == 1))
+            downloadEnabledVar = BooleanVar(root, value=(int(config["downloadEnabled"]) == 1))
+            downloadModeVar = StringVar(root, value=config["downloadMode"])
+            useWebResourceVar = BooleanVar(root, value=(int(config["useWebResource"]) == 1))
+            fillPathVar = StringVar(root, value=config["drivePath"])
+            rosVar = BooleanVar(root, value=(int(config["runOnSaveQuit"]) == 1))
 
-            timerVar = BooleanVar(root, value=(int(settings["timerMode"]) == 1))
-            timerTimeVar = IntVar(root, value=int(settings["timerSetupTime"]))
-            lkCorner = IntVar(root, value=int(settings["lkCorner"]))
-            popopOpacity = IntVar(root, value=int(settings["lkScaling"]))
-            lkToggle = BooleanVar(root, value=(int(settings["lkToggle"]) == 1))
+            timerVar = BooleanVar(root, value=(int(config["timerMode"]) == 1))
+            timerTimeVar = IntVar(root, value=int(config["timerSetupTime"]))
+            lkCorner = IntVar(root, value=int(config["lkCorner"]))
+            popopOpacity = IntVar(root, value=int(config["lkScaling"]))
+            lkToggle = BooleanVar(root, value=(int(config["lkToggle"]) == 1))
 
             safewordVar = StringVar(root, value="password")
 
-            videoVolume = IntVar(root, value=int(settings["videoVolume"]))
-            vidVar = IntVar(root, value=int(settings["vidMod"]))
-            denialMode = BooleanVar(root, value=(int(settings["denialMode"]) == 1))
-            denialChance = IntVar(root, value=int(settings["denialChance"]))
-            popupSublim = IntVar(root, value=(int(settings["popupSubliminals"]) == 1))
+            videoVolume = IntVar(root, value=int(config["videoVolume"]))
+            vidVar = IntVar(root, value=int(config["vidMod"]))
+            denialMode = BooleanVar(root, value=(int(config["denialMode"]) == 1))
+            denialChance = IntVar(root, value=int(config["denialChance"]))
+            popupSublim = IntVar(root, value=(int(config["popupSubliminals"]) == 1))
 
-            booruMin = IntVar(root, value=int(settings["booruMinScore"]))
+            booruMin = IntVar(root, value=int(config["booruMinScore"]))
 
-            deskIconVar = BooleanVar(root, value=(int(settings["desktopIcons"]) == 1))
+            deskIconVar = BooleanVar(root, value=(int(config["desktopIcons"]) == 1))
 
-            maxAToggleVar = BooleanVar(root, value=(int(settings["maxAudioBool"]) == 1))
-            maxAudioVar = IntVar(root, value=(int(settings["maxAudio"])))
-            maxVToggleVar = BooleanVar(root, value=(int(settings["maxVideoBool"]) == 1))
-            maxVideoVar = IntVar(root, value=(int(settings["maxVideos"])))
+            maxAToggleVar = BooleanVar(root, value=(int(config["maxAudioBool"]) == 1))
+            maxAudioVar = IntVar(root, value=(int(config["maxAudio"])))
+            maxVToggleVar = BooleanVar(root, value=(int(config["maxVideoBool"]) == 1))
+            maxVideoVar = IntVar(root, value=(int(config["maxVideos"])))
 
-            subliminalsChanceVar = IntVar(root, value=int(settings["subliminalsChance"]))
-            maxSubliminalsVar = IntVar(root, value=int(settings["maxSubliminals"]))
+            subliminalsChanceVar = IntVar(root, value=int(config["subliminalsChance"]))
+            maxSubliminalsVar = IntVar(root, value=int(config["maxSubliminals"]))
 
-            safeModeVar = BooleanVar(root, value=(int(settings["safeMode"]) == 1))
+            safeModeVar = BooleanVar(root, value=(int(config["safeMode"]) == 1))
 
-            antiOrLanczosVar = BooleanVar(root, value=(int(settings["antiOrLanczos"]) == 1))
-            toggleInternetVar = BooleanVar(root, value=(int(settings["toggleInternet"]) == 1))
-            toggleHibSkipVar = BooleanVar(root, value=(int(settings["toggleHibSkip"]) == 1))
-            toggleMoodSetVar = BooleanVar(root, value=(int(settings["toggleMoodSet"]) == 1))
+            antiOrLanczosVar = BooleanVar(root, value=(int(config["antiOrLanczos"]) == 1))
+            toggleInternetVar = BooleanVar(root, value=(int(config["toggleInternet"]) == 1))
+            toggleHibSkipVar = BooleanVar(root, value=(int(config["toggleHibSkip"]) == 1))
+            toggleMoodSetVar = BooleanVar(root, value=(int(config["toggleMoodSet"]) == 1))
 
-            buttonlessVar = BooleanVar(root, value=(int(settings["buttonless"]) == 1))
-            captionFilenameVar = BooleanVar(root, value=(int(settings["captionFilename"]) == 1))
-            singleModeVar = BooleanVar(root, value=(int(settings["singleMode"]) == 1))
+            buttonlessVar = BooleanVar(root, value=(int(config["buttonless"]) == 1))
+            captionFilenameVar = BooleanVar(root, value=(int(config["captionFilename"]) == 1))
+            singleModeVar = BooleanVar(root, value=(int(config["singleMode"]) == 1))
 
-            corruptionModeVar = BooleanVar(root, value=(int(settings["corruptionMode"]) == 1))
-            corruptionDevVar = BooleanVar(root, value=(int(settings["corruptionDevMode"]) == 1))
-            corruptionFullPermVar = BooleanVar(root, value=(int(settings["corruptionFullPerm"]) == 1))
-            corruptionTimeVar = IntVar(root, value=int(settings["corruptionTime"]))
-            corruptionPopupsVar = IntVar(root, value=int(settings["corruptionPopups"]))
-            corruptionLaunchesVar = IntVar(root, value=int(settings["corruptionLaunches"]))
-            corruptionFadeTypeVar = StringVar(root, value=(settings["corruptionFadeType"].strip()))
-            corruptionTriggerVar = StringVar(root, value=(settings["corruptionTrigger"].strip()))
-            corruptionWallpaperCycleVar = BooleanVar(root, value=(int(settings["corruptionWallpaperCycle"]) == 1))
-            corruptionThemeCycleVar = BooleanVar(root, value=(int(settings["corruptionThemeCycle"]) == 1))
-            corruptionPurityModeVar = BooleanVar(root, value=(int(settings["corruptionPurityMode"]) == 1))
+            corruptionModeVar = BooleanVar(root, value=(int(config["corruptionMode"]) == 1))
+            corruptionDevVar = BooleanVar(root, value=(int(config["corruptionDevMode"]) == 1))
+            corruptionFullPermVar = BooleanVar(root, value=(int(config["corruptionFullPerm"]) == 1))
+            corruptionTimeVar = IntVar(root, value=int(config["corruptionTime"]))
+            corruptionPopupsVar = IntVar(root, value=int(config["corruptionPopups"]))
+            corruptionLaunchesVar = IntVar(root, value=int(config["corruptionLaunches"]))
+            corruptionFadeTypeVar = StringVar(root, value=(config["corruptionFadeType"].strip()))
+            corruptionTriggerVar = StringVar(root, value=(config["corruptionTrigger"].strip()))
+            corruptionWallpaperCycleVar = BooleanVar(root, value=(int(config["corruptionWallpaperCycle"]) == 1))
+            corruptionThemeCycleVar = BooleanVar(root, value=(int(config["corruptionThemeCycle"]) == 1))
+            corruptionPurityModeVar = BooleanVar(root, value=(int(config["corruptionPurityMode"]) == 1))
 
-            pumpScareOffsetVar = IntVar(root, value=int(settings["pumpScareOffset"]))
+            pumpScareOffsetVar = IntVar(root, value=int(config["pumpScareOffset"]))
 
-            vlcModeVar = BooleanVar(root, value=(int(settings["vlcMode"]) == 1))
-            multiClickVar = BooleanVar(root, value=(int(settings["multiClick"]) == 1))
+            vlcModeVar = BooleanVar(root, value=(int(config["vlcMode"]) == 1))
+            multiClickVar = BooleanVar(root, value=(int(config["multiClick"]) == 1))
 
-            themeTypeVar = StringVar(root, value=(settings["themeType"].strip()))
-            themeNoConfigVar = BooleanVar(root, value=(int(settings["themeNoConfig"]) == 1))
+            themeTypeVar = StringVar(root, value=(config["themeType"].strip()))
+            themeNoConfigVar = BooleanVar(root, value=(int(config["themeNoConfig"]) == 1))
 
-            presetsDangerVar = BooleanVar(root, value=(int(settings["presetsDanger"]) == 1))
+            presetsDangerVar = BooleanVar(root, value=(int(config["presetsDanger"]) == 1))
 
-            movingChanceVar = IntVar(root, value=int(settings["movingChance"]))
-            movingSpeedVar = IntVar(root, value=int(settings["movingSpeed"]))
-            movingRandomVar = BooleanVar(root, value=(int(settings["movingRandom"]) == 1))
+            movingChanceVar = IntVar(root, value=int(config["movingChance"]))
+            movingSpeedVar = IntVar(root, value=int(config["movingSpeed"]))
+            movingRandomVar = BooleanVar(root, value=(int(config["movingRandom"]) == 1))
 
-            capPopChanceVar = IntVar(root, value=int(settings["capPopChance"]))
-            capPopOpacityVar = IntVar(root, value=int(settings["capPopOpacity"]))
-            capPopTimerVar = IntVar(root, value=int(settings["capPopTimer"]))
-            capPopMoodVar = BooleanVar(root, value=(int(settings["capPopMood"]) == 1))
+            capPopChanceVar = IntVar(root, value=int(config["capPopChance"]))
+            capPopOpacityVar = IntVar(root, value=int(config["capPopOpacity"]))
+            capPopTimerVar = IntVar(root, value=int(config["capPopTimer"]))
+            capPopMoodVar = BooleanVar(root, value=(int(config["capPopMood"]) == 1))
 
-            subliminalsAlphaVar = IntVar(root, value=int(settings["subliminalsAlpha"]))
+            subliminalsAlphaVar = IntVar(root, value=int(config["subliminalsAlpha"]))
 
-            messageOffVar = BooleanVar(root, value=(int(settings["messageOff"]) == 1))
+            messageOffVar = BooleanVar(root, value=(int(config["messageOff"]) == 1))
 
             # grouping for sanity's sake later
             in_var_group = [
@@ -601,14 +601,14 @@ def show_window():
             logging.warning(f"failed config var loading.\n\tReason: {e}")
             emergencySettings = {}
             for var in varNames:
-                emergencySettings[var] = settings.default[var]
+                emergencySettings[var] = default_config[var]
             with open(Data.CONFIG, "w") as f:
                 f.write(json.dumps(emergencySettings))
             with open(Data.CONFIG, "r") as f:
-                settings = json.loads(f.readline())
+                config = json.loads(f.readline())
             fail_loop += 1
 
-    hasWebResourceVar = BooleanVar(root, os.path.exists(Resource.WEB_RESOURCE))
+    hasWebResourceVar = BooleanVar(root, os.path.exists(pack.WEB_RESOURCE))
 
     # done painful control variables
 
@@ -752,14 +752,14 @@ def show_window():
     infoHostFrame = Frame(tabStart, borderwidth=5, relief=RAISED)
     zipGitFrame = Frame(infoHostFrame)
     verFrame = Frame(infoHostFrame)
-    local_verLabel = Label(verFrame, text=f'EdgeWare Local Version:\n{settings.default["version"]}')
-    web_verLabel = Label(verFrame, text=f"EdgeWare GitHub Version:\n{webv}", bg=(BUTTON_FACE if (settings.default["version"] == webv) else "red"))
+    local_verLabel = Label(verFrame, text=f'EdgeWare Local Version:\n{default_config["version"]}')
+    web_verLabel = Label(verFrame, text=f"EdgeWare GitHub Version:\n{webv}", bg=(BUTTON_FACE if (default_config["version"] == webv) else "red"))
     openGitButton = Button(zipGitFrame, text="Open Github (EdgeWare Base)", command=lambda: webbrowser.open("https://github.com/PetitTournesol/Edgeware"))
 
     verPlusFrame = Frame(infoHostFrame)
-    local_verPlusLabel = Label(verPlusFrame, text=f'EdgeWare++ Local Version:\n{settings.default["versionplusplus"]}')
+    local_verPlusLabel = Label(verPlusFrame, text=f'EdgeWare++ Local Version:\n{default_config["versionplusplus"]}')
     web_verPlusLabel = Label(
-        verPlusFrame, text=f"EdgeWare++ GitHub Version:\n{webvpp}", bg=(BUTTON_FACE if (settings.default["versionplusplus"] == webvpp) else "red")
+        verPlusFrame, text=f"EdgeWare++ GitHub Version:\n{webvpp}", bg=(BUTTON_FACE if (default_config["versionplusplus"] == webvpp) else "red")
     )
     openGitPlusButton = Button(zipGitFrame, text="Open Github (EdgeWare++)", command=lambda: webbrowser.open("https://github.com/araten10/EdgewarePlusPlus"))
 
@@ -943,7 +943,7 @@ def show_window():
         toggleAssociateSettings(False, test_group, theme)
 
     testPopupTitle = Label(testThemePopup, text="Popup")
-    testPopupImage = ImageTk.PhotoImage(file=Defaults.THEME_DEMO)
+    testPopupImage = ImageTk.PhotoImage(file=Assets.THEME_DEMO)
     testPopupLabel = Label(testThemePopup, image=testPopupImage, width=150, height=75, borderwidth=2, relief=GROOVE, cursor="question_arrow")
     testPopupButton = Button(testPopupLabel, text="Test~")
     testPopupCaption = Label(testPopupLabel, text="Lewd Caption Here!")
@@ -1167,8 +1167,8 @@ def show_window():
     # put the group here instead of with the rest since it's just a single button
     configpresets_group = []
     configpresets_group.append(configPresetsButton)
-    if os.path.exists(Resource.CONFIG):
-        with open(Resource.CONFIG) as f:
+    if os.path.exists(pack.CONFIG):
+        with open(pack.CONFIG) as f:
             try:
                 l = json.loads(f.read())
                 if "version" in l:
@@ -1213,39 +1213,40 @@ def show_window():
     # directories
     Label(tabFile, text="Directories", font=titleFont, relief=GROOVE).pack(pady=2)
 
-    logNum = len(os.listdir(LOG_PATH)) if os.path.exists(LOG_PATH) else 0
-    logsFrame = Frame(tabFile, borderwidth=5, relief=RAISED)
-    lSubFrame1 = Frame(logsFrame)
-    lSubFrame2 = Frame(logsFrame)
-    openLogsButton = Button(lSubFrame2, text="Open Logs Folder", command=lambda: explorerView(LOG_PATH))
-    clearLogsButton = Button(lSubFrame2, text="Delete All Logs", command=lambda: cleanLogs(), cursor="question_arrow")
-    logStat = Label(lSubFrame1, text=f"Total Logs: {logNum}")
+    # TODO: Decide what to do with log files
+    # logNum = len(os.listdir(LOG_PATH)) if os.path.exists(LOG_PATH) else 0
+    # logsFrame = Frame(tabFile, borderwidth=5, relief=RAISED)
+    # lSubFrame1 = Frame(logsFrame)
+    # lSubFrame2 = Frame(logsFrame)
+    # openLogsButton = Button(lSubFrame2, text="Open Logs Folder", command=lambda: explorerView(LOG_PATH))
+    # clearLogsButton = Button(lSubFrame2, text="Delete All Logs", command=lambda: cleanLogs(), cursor="question_arrow")
+    # logStat = Label(lSubFrame1, text=f"Total Logs: {logNum}")
 
-    clearlogsttp = CreateToolTip(clearLogsButton, "This will delete every log (except the log currently being written).")
+    # clearlogsttp = CreateToolTip(clearLogsButton, "This will delete every log (except the log currently being written).")
 
-    def cleanLogs():
-        try:
-            logNum = len(os.listdir(LOG_PATH)) if os.path.exists(LOG_PATH) else 0
-            if messagebox.askyesno("Confirm Delete", f"Are you sure you want to delete all logs? There are currently {logNum}.", icon="warning") == True:
-                if os.path.exists(LOG_PATH) and os.listdir(LOG_PATH):
-                    logs = os.listdir(LOG_PATH)
-                    for f in logs:
-                        if os.path.splitext(f)[0] == os.path.splitext(log_file)[0]:
-                            continue
-                        e = os.path.splitext(f)[1].lower()
-                        if e == ".txt":
-                            os.remove(LOG_PATH / f)
-                    logNum = len(os.listdir(LOG_PATH)) if os.path.exists(LOG_PATH) else 0
-                    logStat.configure(text=f"Total Logs: {logNum}")
-        except Exception as e:
-            logging.warning(f"could not clear logs. this might be an issue with attempting to delete the log currently in use. if so, ignore this prompt. {e}")
+    # def cleanLogs():
+    #     try:
+    #         logNum = len(os.listdir(LOG_PATH)) if os.path.exists(LOG_PATH) else 0
+    #         if messagebox.askyesno("Confirm Delete", f"Are you sure you want to delete all logs? There are currently {logNum}.", icon="warning") == True:
+    #             if os.path.exists(LOG_PATH) and os.listdir(LOG_PATH):
+    #                 logs = os.listdir(LOG_PATH)
+    #                 for f in logs:
+    #                     if os.path.splitext(f)[0] == os.path.splitext(log_file)[0]:
+    #                         continue
+    #                     e = os.path.splitext(f)[1].lower()
+    #                     if e == ".txt":
+    #                         os.remove(LOG_PATH / f)
+    #                 logNum = len(os.listdir(LOG_PATH)) if os.path.exists(LOG_PATH) else 0
+    #                 logStat.configure(text=f"Total Logs: {logNum}")
+    #     except Exception as e:
+    #         logging.warning(f"could not clear logs. this might be an issue with attempting to delete the log currently in use. if so, ignore this prompt. {e}")
 
-    logsFrame.pack(fill="x", pady=2)
-    lSubFrame1.pack(fill="both", side="left", expand=1)
-    lSubFrame2.pack(fill="both", side="left", expand=1)
-    logStat.pack(fill="both", expand=1)
-    openLogsButton.pack(fill="x", expand=1)
-    clearLogsButton.pack(fill="x", expand=1)
+    # logsFrame.pack(fill="x", pady=2)
+    # lSubFrame1.pack(fill="both", side="left", expand=1)
+    # lSubFrame2.pack(fill="both", side="left", expand=1)
+    # logStat.pack(fill="both", expand=1)
+    # openLogsButton.pack(fill="x", expand=1)
+    # clearLogsButton.pack(fill="x", expand=1)
 
     moodsFileFrame = Frame(tabFile, borderwidth=5, relief=RAISED)
     mfSubFrame1 = Frame(moodsFileFrame)
@@ -1268,7 +1269,7 @@ def show_window():
     uniqueIDLabel.pack(fill="both", expand=1)
     openMoodsButton.pack(fill="x", expand=1)
 
-    openResourcesButton = Button(tabFile, height=2, text="Open Resources Folder", command=lambda: explorerView(Resource.ROOT))
+    openResourcesButton = Button(tabFile, height=2, text="Open Resources Folder", command=lambda: explorerView(PACK_PATH))
     openResourcesButton.pack(fill="x", pady=2)
 
     # ==========={EDGEWARE++ "PACK INFO" TAB STARTS HERE}===========#
@@ -1285,14 +1286,14 @@ def show_window():
     statusIconFrame = Frame(infoStatusFrame)
     statusCorruptionFrame = Frame(infoStatusFrame)
 
-    if os.path.exists(Resource.ROOT):
+    if os.path.exists(PACK_PATH):
         statusPack = True
-        statusAbout = True if os.path.isfile(Resource.INFO) else False
-        statusWallpaper = True if os.path.isfile(Resource.WALLPAPER) else False
-        statusStartup = True if Resource.SPLASH else False
-        statusDiscord = True if os.path.isfile(Resource.DISCORD) else False
-        statusIcon = True if os.path.isfile(Resource.ICON) else False
-        statusCorruption = True if os.path.isfile(Resource.CORRUPTION) else False
+        statusAbout = True if os.path.isfile(pack.INFO) else False
+        statusWallpaper = True if os.path.isfile(pack.WALLPAPER) else False
+        statusStartup = True if pack.SPLASH else False
+        statusDiscord = True if os.path.isfile(pack.DISCORD) else False
+        statusIcon = True if os.path.isfile(pack.ICON) else False
+        statusCorruption = True if os.path.isfile(pack.CORRUPTION) else False
     else:
         statusPack = False
         statusAbout = False
@@ -1368,13 +1369,13 @@ def show_window():
     captionsStatsFrame = Frame(statsFrame2)
     subliminalsStatsFrame = Frame(statsFrame2)
 
-    imageStat = len(os.listdir(Resource.IMAGE)) if os.path.exists(Resource.IMAGE) else 0
-    audioStat = len(os.listdir(Resource.AUDIO)) if os.path.exists(Resource.AUDIO) else 0
-    videoStat = len(os.listdir(Resource.VIDEO)) if os.path.exists(Resource.VIDEO) else 0
+    imageStat = len(os.listdir(pack.IMAGE)) if os.path.exists(pack.IMAGE) else 0
+    audioStat = len(os.listdir(pack.AUDIO)) if os.path.exists(pack.AUDIO) else 0
+    videoStat = len(os.listdir(pack.VIDEO)) if os.path.exists(pack.VIDEO) else 0
 
-    if os.path.exists(Resource.WEB):
+    if os.path.exists(pack.WEB):
         try:
-            with open(Resource.WEB, "r") as f:
+            with open(pack.WEB, "r") as f:
                 webStat = len(json.loads(f.read())["urls"])
         except Exception as e:
             logging.warning(f"error in web.json. Aborting preview load. {e}")
@@ -1383,10 +1384,10 @@ def show_window():
     else:
         webStat = 0
 
-    if os.path.exists(Resource.PROMPT):
+    if os.path.exists(pack.PROMPT):
         # frankly really ugly but the easiest way I found to do it
         try:
-            with open(Resource.PROMPT, "r") as f:
+            with open(pack.PROMPT, "r") as f:
                 l = json.loads(f.read())
                 i = 0
                 if "moods" in l:
@@ -1411,9 +1412,9 @@ def show_window():
     else:
         promptStat = 0
 
-    if os.path.exists(Resource.CAPTIONS):
+    if os.path.exists(pack.CAPTIONS):
         try:
-            with open(Resource.CAPTIONS, "r") as f:
+            with open(pack.CAPTIONS, "r") as f:
                 l = json.loads(f.read())
                 i = 0
                 if "prefix" in l:
@@ -1434,7 +1435,7 @@ def show_window():
     else:
         captionStat = 0
 
-    subliminalStat = len(os.listdir(Resource.SUBLIMINALS)) if os.path.exists(Resource.SUBLIMINALS) else 0
+    subliminalStat = len(os.listdir(pack.SUBLIMINALS)) if os.path.exists(pack.SUBLIMINALS) else 0
 
     statsFrame.pack(fill="x", pady=1)
     statsFrame1.pack(fill="x", side="top")
@@ -1533,7 +1534,7 @@ def show_window():
     discordStatusImageLabel = Label(discordStatusFrame, text="Discord Status Image:", font="Default 10")
     if statusDiscord:
         try:
-            with open((Resource.DISCORD), "r") as f:
+            with open((pack.DISCORD), "r") as f:
                 datfile = f.read()
                 if not datfile == "":
                     info_discord = datfile.split("\n")
@@ -1603,7 +1604,7 @@ def show_window():
     )
 
     tagListBox = Listbox(tagFrame, selectmode=SINGLE)
-    for tag in settings["tagList"].split(">"):
+    for tag in config["tagList"].split(">"):
         tagListBox.insert(1, tag)
     addTag = Button(tagFrame, text="Add Tag", command=lambda: addList(tagListBox, "tagList", "New Tag", "Enter Tag(s)"))
     removeTag = Button(
@@ -1658,58 +1659,58 @@ def show_window():
     #commenting this out because I think this is something very short that should stay regardless of disabling help
     #message_group.append(defFileMessage)
 
-    defSplashImage = Image.open(Defaults.SPLASH).resize((int(root.winfo_screenwidth() * 0.09), int(root.winfo_screenwidth() * 0.09)), Image.NEAREST)
-    defThemeDemo = Image.open(Defaults.THEME_DEMO)
-    defIcon = Image.open(Defaults.ICON).resize((int(root.winfo_screenwidth() * 0.04), int(root.winfo_screenwidth() * 0.04)), Image.NEAREST)
-    defConfIcon = Image.open(Defaults.CONFIG_ICON).resize((int(root.winfo_screenwidth() * 0.04), int(root.winfo_screenwidth() * 0.04)), Image.NEAREST)
-    defPanicIcon = Image.open(Defaults.PANIC_ICON).resize((int(root.winfo_screenwidth() * 0.04), int(root.winfo_screenwidth() * 0.04)), Image.NEAREST)
-    defSpiral = Image.open(Defaults.SPIRAL).resize((int(root.winfo_screenwidth() * 0.08), int(root.winfo_screenwidth() * 0.08)), Image.NEAREST)
+    defSplashImage = Image.open(Assets.DEFAULT_STARTUP_SPLASH).resize((int(root.winfo_screenwidth() * 0.09), int(root.winfo_screenwidth() * 0.09)), Image.NEAREST)
+    defThemeDemo = Image.open(Assets.THEME_DEMO)
+    defIcon = Image.open(Assets.DEFAULT_ICON).resize((int(root.winfo_screenwidth() * 0.04), int(root.winfo_screenwidth() * 0.04)), Image.NEAREST)
+    defConfIcon = Image.open(Assets.CONFIG_ICON).resize((int(root.winfo_screenwidth() * 0.04), int(root.winfo_screenwidth() * 0.04)), Image.NEAREST)
+    defPanicIcon = Image.open(Assets.PANIC_ICON).resize((int(root.winfo_screenwidth() * 0.04), int(root.winfo_screenwidth() * 0.04)), Image.NEAREST)
+    defSpiral = Image.open(Assets.DEFAULT_SUBLIMINAL).resize((int(root.winfo_screenwidth() * 0.08), int(root.winfo_screenwidth() * 0.08)), Image.NEAREST)
 
     def updateDefaultImage(imgtype):
         #workaround- for some reason not using nonlocal and just passing it as an argument wouldn't update the label. Everything else worked fine...
-        if imgtype == Defaults.SPLASH:
+        if imgtype == Assets.DEFAULT_STARTUP_SPLASH:
             nonlocal defSplashImage
             selectedFile = filedialog.askopenfile("rb", filetypes=[("image file", ".jpg .jpeg .png")])
-        elif imgtype == Defaults.THEME_DEMO:
+        elif imgtype == Assets.THEME_DEMO:
             nonlocal defThemeDemo
             selectedFile = filedialog.askopenfile("rb", filetypes=[("image file", ".jpg .jpeg .png")])
-        elif imgtype == Defaults.ICON:
+        elif imgtype == Assets.DEFAULT_ICON:
             nonlocal defIcon
             selectedFile = filedialog.askopenfile("rb", filetypes=[("icon file", ".ico")])
-        elif imgtype == Defaults.CONFIG_ICON:
+        elif imgtype == Assets.CONFIG_ICON:
             nonlocal defConfIcon
             selectedFile = filedialog.askopenfile("rb", filetypes=[("icon file", ".ico")])
-        elif imgtype == Defaults.PANIC_ICON:
+        elif imgtype == Assets.PANIC_ICON:
             nonlocal defPanicIcon
             selectedFile = filedialog.askopenfile("rb", filetypes=[("icon file", ".ico")])
-        elif imgtype == Defaults.SPIRAL:
+        elif imgtype == Assets.DEFAULT_SUBLIMINAL:
             nonlocal defSpiral
             selectedFile = filedialog.askopenfile("rb", filetypes=[("image file", ".jpg .jpeg .png .gif")])
         if not isinstance(selectedFile, type(None)):
             try:
                 img = Image.open(selectedFile.name).convert("RGB")
                 img.save(imgtype)
-                if imgtype == Defaults.SPLASH:
+                if imgtype == Assets.DEFAULT_STARTUP_SPLASH:
                     defSplashImage = ImageTk.PhotoImage(img.resize((int(root.winfo_screenwidth() * 0.09), int(root.winfo_screenwidth() * 0.09)), Image.NEAREST))
                     defSplashLabel.config(image=defSplashImage)
                     defSplashLabel.update_idletasks()
-                if imgtype == Defaults.THEME_DEMO:
+                if imgtype == Assets.THEME_DEMO:
                     defThemeDemo = ImageTk.PhotoImage(img)
                     defThemeLabel.config(image=defThemeDemo)
                     defThemeLabel.update_idletasks()
-                if imgtype == Defaults.ICON:
+                if imgtype == Assets.DEFAULT_ICON:
                     defIcon = ImageTk.PhotoImage(img.resize((int(root.winfo_screenwidth() * 0.04), int(root.winfo_screenwidth() * 0.04)), Image.NEAREST))
                     defIconLabel.config(image=defIcon)
                     defIconLabel.update_idletasks()
-                if imgtype == Defaults.CONFIG_ICON:
+                if imgtype == Assets.CONFIG_ICON:
                     defConfIcon = ImageTk.PhotoImage(img.resize((int(root.winfo_screenwidth() * 0.04), int(root.winfo_screenwidth() * 0.04)), Image.NEAREST))
                     defConfIconLabel.config(image=defConfIcon)
                     defConfIconLabel.update_idletasks()
-                if imgtype == Defaults.PANIC_ICON:
+                if imgtype == Assets.PANIC_ICON:
                     defPanicIcon = ImageTk.PhotoImage(img.resize((int(root.winfo_screenwidth() * 0.04), int(root.winfo_screenwidth() * 0.04)), Image.NEAREST))
                     defPanicIconLabel.config(image=defPanicIcon)
                     defPanicIconLabel.update_idletasks()
-                if imgtype == Defaults.SPIRAL:
+                if imgtype == Assets.DEFAULT_SUBLIMINAL:
                     defSplashImage = ImageTk.PhotoImage(img.resize((int(root.winfo_screenwidth() * 0.08), int(root.winfo_screenwidth() * 0.08)), Image.NEAREST))
                     defSplashLabel.config(image=defSplashImage)
                     defSplashLabel.update_idletasks()
@@ -1721,7 +1722,7 @@ def show_window():
     defSplashFrameL = Frame(defSplashFrame)
     defSplashFrameR = Frame(defSplashFrame)
     splashImage = ImageTk.PhotoImage(defSplashImage)
-    defSplashButton = Button(defSplashFrameL, text="Change Default Loading Splash", command=lambda: updateDefaultImage(Defaults.SPLASH))
+    defSplashButton = Button(defSplashFrameL, text="Change Default Loading Splash", command=lambda: updateDefaultImage(Assets.DEFAULT_STARTUP_SPLASH))
     defSplashLabel = Label(defSplashFrameR, image=splashImage)
 
     defaultsFrame1.pack(fill="x")
@@ -1739,7 +1740,7 @@ def show_window():
     defThemeFrameL = Frame(defThemeFrame)
     defThemeFrameR = Frame(defThemeFrame, width=150)
     themeImage = ImageTk.PhotoImage(defThemeDemo)
-    defThemeButton = Button(defThemeFrameL, text="Change Default Theme Demo", command=lambda: updateDefaultImage(Defaults.THEME_DEMO))
+    defThemeButton = Button(defThemeFrameL, text="Change Default Theme Demo", command=lambda: updateDefaultImage(Assets.THEME_DEMO))
     defThemeLabel = Label(defThemeFrameR, image=themeImage)
 
     defThemeFrame.pack(side="left", fill="both", padx=2, expand=1)
@@ -1757,7 +1758,7 @@ def show_window():
     defIconFrameL = Frame(defIconFrame)
     defIconFrameR = Frame(defIconFrame, width=150)
     iconImage = ImageTk.PhotoImage(defIcon)
-    defIconButton = Button(defIconFrameL, text="Change Default Icon", command=lambda: updateDefaultImage(Defaults.ICON))
+    defIconButton = Button(defIconFrameL, text="Change Default Icon", command=lambda: updateDefaultImage(Assets.DEFAULT_ICON))
     defIconLabel = Label(defIconFrameR, image=iconImage)
 
     defaultsFrame2.pack(fill="x")
@@ -1774,7 +1775,7 @@ def show_window():
     defConfIconFrameL = Frame(defConfIconFrame)
     defConfIconFrameR = Frame(defConfIconFrame, width=150)
     configIconImage = ImageTk.PhotoImage(defConfIcon)
-    defConfIconButton = Button(defConfIconFrameL, text="Change Config Icon", command=lambda: updateDefaultImage(Defaults.CONFIG_ICON))
+    defConfIconButton = Button(defConfIconFrameL, text="Change Config Icon", command=lambda: updateDefaultImage(Assets.CONFIG_ICON))
     defConfIconLabel = Label(defConfIconFrameR, image=configIconImage)
 
     defConfIconFrame.pack(side="left", fill="both", padx=2, expand=1)
@@ -1790,7 +1791,7 @@ def show_window():
     defPanicIconFrameL = Frame(defPanicIconFrame)
     defPanicIconFrameR = Frame(defPanicIconFrame, width=150)
     panicIconImage = ImageTk.PhotoImage(defPanicIcon)
-    defPanicIconButton = Button(defPanicIconFrameL, text="Change Panic Icon", command=lambda: updateDefaultImage(Defaults.PANIC_ICON))
+    defPanicIconButton = Button(defPanicIconFrameL, text="Change Panic Icon", command=lambda: updateDefaultImage(Assets.PANIC_ICON))
     defPanicIconLabel = Label(defPanicIconFrameR, image=panicIconImage)
 
     defPanicIconFrame.pack(side="left", fill="both", padx=2, expand=1)
@@ -1807,7 +1808,7 @@ def show_window():
     defSpiralFrameL = Frame(defSpiralFrame)
     defSpiralFrameR = Frame(defSpiralFrame)
     spiralImage = ImageTk.PhotoImage(defSpiral)
-    defSpiralButton = Button(defSpiralFrameL, text="Change Default Spiral", command=lambda: updateDefaultImage(Defaults.SPIRAL))
+    defSpiralButton = Button(defSpiralFrameL, text="Change Default Spiral", command=lambda: updateDefaultImage(Assets.DEFAULT_SUBLIMINAL))
     defSpiralLabel = Label(defSpiralFrameR, image=spiralImage)
 
     defaultsFrame3.pack(fill="x")
@@ -2230,7 +2231,7 @@ def show_window():
         tabWallpaper, text="Rotate Wallpapers", variable=rotateWallpaperVar, command=lambda: toggleAssociateSettings(rotateWallpaperVar.get(), wallpaper_group)
     )
     wpList = Listbox(tabWallpaper, selectmode=SINGLE)
-    for key in settings["wallpaperDat"]:
+    for key in config["wallpaperDat"]:
         wpList.insert(1, key)
     addWPButton = Button(tabWallpaper, text="Add/Edit Wallpaper", command=lambda: addWallpaper(wpList))
     remWPButton = Button(tabWallpaper, text="Remove Wallpaper", command=lambda: removeWallpaper(wpList))
@@ -2246,7 +2247,7 @@ def show_window():
         command=lambda val: updateMax(varSlider, int(val) - 1),
     )
 
-    pHoldImageR = Image.open(Defaults.PANIC_WALLPAPER).resize((int(root.winfo_screenwidth() * 0.13), int(root.winfo_screenheight() * 0.13)), Image.NEAREST)
+    pHoldImageR = Image.open(Assets.DEFAULT_PANIC_WALLPAPER).resize((int(root.winfo_screenwidth() * 0.13), int(root.winfo_screenheight() * 0.13)), Image.NEAREST)
 
     def updatePanicPaper():
         nonlocal pHoldImageR
@@ -2254,7 +2255,7 @@ def show_window():
         if not isinstance(selectedFile, type(None)):
             try:
                 img = Image.open(selectedFile.name).convert("RGB")
-                img.save(Defaults.PANIC_WALLPAPER)
+                img.save(Assets.DEFAULT_PANIC_WALLPAPER)
                 pHoldImageR = ImageTk.PhotoImage(img.resize((int(root.winfo_screenwidth() * 0.13), int(root.winfo_screenheight() * 0.13)), Image.NEAREST))
                 panicWallpaperLabel.config(image=pHoldImageR)
                 panicWallpaperLabel.update_idletasks()
@@ -2327,9 +2328,9 @@ def show_window():
     mediaScrollbar = ttk.Scrollbar(moodsMediaFrame, orient=VERTICAL, command=mediaTree.yview)
     mediaTree.configure(yscroll=mediaScrollbar.set)
 
-    if os.path.exists(Resource.MEDIA):
+    if os.path.exists(pack.MEDIA):
         try:
-            with open(Resource.MEDIA, "r") as f:
+            with open(pack.MEDIA, "r") as f:
                 l = json.loads(f.read())
                 for m in l:
                     if m == "default":
@@ -2347,9 +2348,9 @@ def show_window():
         mediaTree.insert("", "0", iid="NAmi", text="No media moods found in pack!")
         mediaTree.change_state("NAmi", "disabled")
 
-    if settings["toggleMoodSet"] != True:
+    if config["toggleMoodSet"] != True:
         if len(mediaTree.get_children()) != 0:
-            if MOOD_PATH != "0" and os.path.exists(Resource.ROOT):
+            if MOOD_PATH != "0" and os.path.exists(PACK_PATH):
                 try:
                     with open(MOOD_PATH, "r") as mood:
                         mood_dict = json.loads(mood.read())
@@ -2369,9 +2370,9 @@ def show_window():
     captionsScrollbar = ttk.Scrollbar(moodsCaptionsFrame, orient=VERTICAL, command=captionsTree.yview)
     captionsTree.configure(yscroll=captionsScrollbar.set)
 
-    if os.path.exists(Resource.CAPTIONS):
+    if os.path.exists(pack.CAPTIONS):
         try:
-            with open(Resource.CAPTIONS, "r") as f:
+            with open(pack.CAPTIONS, "r") as f:
                 l = json.loads(f.read())
                 if "prefix" in l:
                     del l["prefix"]
@@ -2397,9 +2398,9 @@ def show_window():
         captionsTree.insert("", "0", iid="NAmi", text="No caption moods found in pack!")
         captionsTree.change_state("NAmi", "disabled")
 
-    if settings["toggleMoodSet"] != True:
+    if config["toggleMoodSet"] != True:
         if len(captionsTree.get_children()) != 0:
-            if MOOD_PATH != "0" and os.path.exists(Resource.ROOT):
+            if MOOD_PATH != "0" and os.path.exists(PACK_PATH):
                 try:
                     with open(MOOD_PATH, "r") as mood:
                         mood_dict = json.loads(mood.read())
@@ -2419,9 +2420,9 @@ def show_window():
     promptsScrollbar = ttk.Scrollbar(moodsPromptsFrame, orient=VERTICAL, command=promptsTree.yview)
     promptsTree.configure(yscroll=promptsScrollbar.set)
 
-    if os.path.exists(Resource.PROMPT):
+    if os.path.exists(pack.PROMPT):
         try:
-            with open(Resource.PROMPT, "r") as f:
+            with open(pack.PROMPT, "r") as f:
                 l = json.loads(f.read())
                 for m in l["moods"]:
                     if m == "default":
@@ -2440,9 +2441,9 @@ def show_window():
         promptsTree.insert("", "0", iid="NAmi", text="No prompt moods found in pack!")
         promptsTree.change_state("NAmi", "disabled")
 
-    if settings["toggleMoodSet"] != True:
+    if config["toggleMoodSet"] != True:
         if len(promptsTree.get_children()) != 0:
-            if MOOD_PATH != "0" and os.path.exists(Resource.ROOT):
+            if MOOD_PATH != "0" and os.path.exists(PACK_PATH):
                 try:
                     with open(MOOD_PATH, "r") as mood:
                         mood_dict = json.loads(mood.read())
@@ -2461,9 +2462,9 @@ def show_window():
     webScrollbar = ttk.Scrollbar(moodsWebFrame, orient=VERTICAL, command=webTree.yview)
     webTree.configure(yscroll=webScrollbar.set)
 
-    if os.path.exists(Resource.WEB):
+    if os.path.exists(pack.WEB):
         try:
-            with open(Resource.WEB, "r") as f:
+            with open(pack.WEB, "r") as f:
                 l = json.loads(f.read())
                 webMoodList = ["default"]
                 for m in l["moods"]:
@@ -2486,9 +2487,9 @@ def show_window():
         webTree.insert("", "0", iid="NAmi", text="No web moods found in pack!")
         webTree.change_state("NAmi", "disabled")
 
-    if settings["toggleMoodSet"] != True:
+    if config["toggleMoodSet"] != True:
         if len(webTree.get_children()) != 0:
-            if MOOD_PATH != "0" and os.path.exists(Resource.ROOT):
+            if MOOD_PATH != "0" and os.path.exists(PACK_PATH):
                 try:
                     with open(MOOD_PATH, "r") as mood:
                         mood_dict = json.loads(mood.read())
@@ -2520,7 +2521,7 @@ def show_window():
         nonlocal fillPathVar
         path_ = str(filedialog.askdirectory(initialdir="/", title="Select Parent Folder"))
         if path_ != "":
-            settings["drivePath"] = path_
+            config["drivePath"] = path_
             pathBox.configure(state="normal")
             pathBox.delete(0, 9999)
             pathBox.insert(1, path_)
@@ -2530,7 +2531,7 @@ def show_window():
     pathBox = Entry(pathFrame)
     pathButton = Button(pathFrame, text="Select", command=local_assignPath)
 
-    pathBox.insert(1, settings["drivePath"])
+    pathBox.insert(1, config["drivePath"])
     pathBox.configure(state="disabled")
 
     fillBox = Checkbutton(
@@ -2564,7 +2565,7 @@ def show_window():
     avoidHostFrame = Frame(hardDriveFrame)
 
     avoidListBox = Listbox(avoidHostFrame, selectmode=SINGLE)
-    for name in settings["avoidList"].split(">"):
+    for name in config["avoidList"].split(">"):
         avoidListBox.insert(2, name)
     addName = Button(
         avoidHostFrame, text="Add Name", command=lambda: addList(avoidListBox, "avoidList", "Folder Name", "Fill/replace will skip any folder with given name.")
@@ -2937,9 +2938,9 @@ def show_window():
     fadeDropdown.configure(width=9, highlightthickness=0)
     fadeDescription = Label(fadeInfoFrame, text="Error loading fade description!", borderwidth=2, relief=GROOVE, wraplength=150)
     fadeDescription.configure(height=3, width=22)
-    fadeImageNormal = ImageTk.PhotoImage(file=Defaults.CORRUPTION_DEFAULT)
-    fadeImageAbrupt = ImageTk.PhotoImage(file=Defaults.CORRUPTION_ABRUPT)
-    fadeImageNoise = ImageTk.PhotoImage(file=Defaults.CORRUPTION_NOISE)
+    fadeImageNormal = ImageTk.PhotoImage(file=Assets.CORRUPTION_DEFAULT)
+    fadeImageAbrupt = ImageTk.PhotoImage(file=Assets.CORRUPTION_ABRUPT)
+    fadeImageNoise = ImageTk.PhotoImage(file=Assets.CORRUPTION_NOISE)
     fadeImageContainer = Label(fadeSubInfo, image=fadeImageNormal, borderwidth=2, relief=GROOVE)
     trigger_types = ["Timed", "Popup", "Launch"]
     triggerDropdown = OptionMenu(triggerSubInfo, corruptionTriggerVar, *trigger_types, command=lambda key: triggerHelper(key, False))
@@ -3156,9 +3157,9 @@ def show_window():
 
     corruptionList = []
     lineWidth = 0
-    # if os.path.isfile(Resource.CORRUPTION):
+    # if os.path.isfile(pack.CORRUPTION):
     #     try:
-    #         with open(Resource.CORRUPTION, 'r') as f:
+    #         with open(pack.CORRUPTION, 'r') as f:
     #             l = json.loads(f.read())
     #             for key in list(l):
     #                 if key == "moods":
@@ -3189,7 +3190,7 @@ def show_window():
 
     def corruptionTutorialHelper(event):
         tab = event.widget.tab("current")["text"]
-        th = settings["themeType"].strip()
+        th = config["themeType"].strip()
         if tab == "Start":
             toggleAssociateSettings_manual(True, ctutorialstart_group, "lime green", "forest green")
             toggleAssociateSettings(True, ctutorialtransition_group)
@@ -3202,22 +3203,22 @@ def show_window():
             toggleAssociateSettings(True, ctutorialstart_group)
             toggleAssociateSettings(True, ctutorialtransition_group)
             triggerHelper(corruptionTriggerVar.get(), False)
-        toggleAssociateSettings(os.path.isfile(Resource.CORRUPTION), corruptionEnabled_group)
+        toggleAssociateSettings(os.path.isfile(pack.CORRUPTION), corruptionEnabled_group)
 
     corruptionTabMaster.bind("<<NotebookTabChanged>>", corruptionTutorialHelper)
 
     # ==========={IN HERE IS ADVANCED TAB ITEM INITS}===========#
     tabMaster.add(tabAdvanced, text="Troubleshooting")
     itemList = []
-    for settingName in settings.config:
+    for settingName in config:
         itemList.append(settingName)
     dropdownObj = StringVar(root, itemList[0])
-    textObj = StringVar(root, settings[dropdownObj.get()])
+    textObj = StringVar(root, config[dropdownObj.get()])
     advPanel = Frame(tabAdvanced)
     textInput = Entry(advPanel)
     textInput.insert(1, textObj.get())
-    expectedLabel = Label(tabAdvanced, text=f"Expected value: {settings.default[dropdownObj.get()]}")
-    dropdownMenu = OptionMenu(advPanel, dropdownObj, *itemList, command=lambda a: updateText([textInput, expectedLabel], settings[a], a))
+    expectedLabel = Label(tabAdvanced, text=f"Expected value: {default_config[dropdownObj.get()]}")
+    dropdownMenu = OptionMenu(advPanel, dropdownObj, *itemList, command=lambda a: updateText([textInput, expectedLabel], config[a], a))
     dropdownMenu.configure(width=10)
     applyButton = Button(advPanel, text="Apply", command=lambda: assignJSON(dropdownObj.get(), textInput.get()))
     Label(tabAdvanced, text="Debug Config Edit", font=titleFont, relief=GROOVE).pack(pady=2)
@@ -3327,7 +3328,7 @@ def show_window():
     Label(tab_corruption, text=CORRUPTION_TEXT, anchor="nw", wraplength=460).pack()
     # ==========={HERE ENDS  ABOUT TAB ITEM INITS}===========#
 
-    themeChange(settings["themeType"].strip(), root, style, windowFont, titleFont)
+    themeChange(config["themeType"].strip(), root, style, windowFont, titleFont)
 
     # ==========={TOGGLE ASSOCIATE SETTINGS}===========#
     # all toggleAssociateSettings goes here, because it is rendered after the appropriate theme change
@@ -3348,7 +3349,7 @@ def show_window():
     hibernateHelper(hibernateTypeVar.get())
     fadeHelper(corruptionFadeTypeVar.get())
     triggerHelper(corruptionTriggerVar.get(), False)
-    toggleAssociateSettings(os.path.isfile(Resource.CORRUPTION), corruptionEnabled_group)
+    toggleAssociateSettings(os.path.isfile(pack.CORRUPTION), corruptionEnabled_group)
 
     #messageOff toggle here, for turning off all help messages
     toggleHelp(messageOffVar.get(), message_group)
@@ -3363,15 +3364,16 @@ def show_window():
     exportResourcesButton.pack(fill="x", side="left", expand=1)
     saveExitButton.pack(fill="x")
 
-    utils.show_file(Data.HID_TIME)
-    if os.path.exists(Data.HID_TIME):
-        with open(Data.HID_TIME, "r") as file:
-            time_ = int(file.readline()) / 60
-            if not time_ == int(settings["timerSetupTime"]):
-                timerToggle.configure(state=DISABLED)
-                for item in timer_group:
-                    item.configure(state=DISABLED)
-    utils.hide_file(Data.HID_TIME)
+    # TODO: Refactor
+    # utils.show_file(Data.HID_TIME)
+    # if os.path.exists(Data.HID_TIME):
+    #     with open(Data.HID_TIME, "r") as file:
+    #         time_ = int(file.readline()) / 60
+    #         if not time_ == int(config["timerSetupTime"]):
+    #             timerToggle.configure(state=DISABLED)
+    #             for item in timer_group:
+    #                 item.configure(state=DISABLED)
+    # utils.hide_file(Data.HID_TIME)
 
     # first time alert popup
     # if not settings['is_configed'] == 1:
@@ -3379,7 +3381,7 @@ def show_window():
     # version alert, if core web version (0.0.0) is different from the github configdefault, alerts user that update is available
     #   if user is a bugfix patch behind, the _X at the end of the 0.0.0, they will not be alerted
     #   the version will still be red to draw attention to it
-    if local_pp_version.split("_")[0] != webvpp.split("_")[0] and not (local_pp_version.endswith("DEV") or settings["toggleInternet"]):
+    if local_pp_version.split("_")[0] != webvpp.split("_")[0] and not (local_pp_version.endswith("DEV") or config["toggleInternet"]):
         messagebox.showwarning(
             "Update Available", "Main local version and web version are not the same.\nPlease visit the Github and download the newer files."
         )
@@ -3411,7 +3413,7 @@ def exportResource() -> bool:
         saveLocation = filedialog.asksaveasfile("w", defaultextension=".zip")
         with zipfile.ZipFile(saveLocation.name, "w", compression=zipfile.ZIP_DEFLATED) as zip:
             beyondRoot = False
-            for root, dirs, files in os.walk(Resource.ROOT):
+            for root, dirs, files in os.walk(PACK_PATH):
                 for file in files:
                     logging.info(f"write {file}")
                     if beyondRoot:
@@ -3434,7 +3436,7 @@ def importResource(parent: Tk) -> bool:
         openLocation = filedialog.askopenfile("r", defaultextension=".zip")
         if openLocation == None:
             return False
-        if os.path.exists(Resource.ROOT):
+        if os.path.exists(PACK_PATH):
             resp = confirmBox(
                 parent,
                 "Confirm",
@@ -3444,10 +3446,10 @@ def importResource(parent: Tk) -> bool:
             if not resp:
                 logging.info("exited import resource overwrite")
                 return False
-            shutil.rmtree(Resource.ROOT)
+            shutil.rmtree(PACK_PATH)
             logging.info("removed old resource folder")
         with zipfile.ZipFile(openLocation.name, "r") as zip:
-            zip.extractall(Resource.ROOT)
+            zip.extractall(PACK_PATH)
             logging.info("extracted all from zip")
         messagebox.showinfo("Done", "Resource importing completed.")
         clearLaunches(False)
@@ -3493,45 +3495,48 @@ def write_save(varList: list[StringVar | IntVar | BooleanVar], nameList: list[st
             return
     logging.info("starting config save write...")
     temp = json.loads("{}")
-    settings["wallpaperDat"] = str(settings["wallpaperDat"])
-    settings["wallpaperDat"] = f'{settings["wallpaperDat"]}'
-    settings["is_configed"] = 1
-    if not os.path.isfile(Resource.CORRUPTION):
-        settings["corruptionMode"] = 0
+    config["wallpaperDat"] = str(config["wallpaperDat"])
+    config["wallpaperDat"] = f'{config["wallpaperDat"]}'
+    config["is_configed"] = 1
+    if not os.path.isfile(pack.CORRUPTION):
+        config["corruptionMode"] = 0
 
     if int(varList[nameList.index("start_on_logon")].get()) == 1:
         utils.toggle_run_at_startup(True)
 
     if int(varList[nameList.index("timerMode")].get()) == 1:
-        # utils.toggle_run_at_startup(True)
+        # TODO: Refactor
+        # # utils.toggle_run_at_startup(True)
 
-        # revealing hidden files
-        utils.show_file(Data.PASS_HASH)
-        utils.show_file(Data.HID_TIME)
-        logging.info("revealed hashed pass and time files")
+        # # revealing hidden files
+        # utils.show_file(Data.PASS_HASH)
+        # utils.show_file(Data.HID_TIME)
+        # logging.info("revealed hashed pass and time files")
 
-        with open(Data.PASS_HASH, "w") as passFile, open(Data.HID_TIME, "w") as timeFile:
-            logging.info("attempting file writes...")
-            passFile.write(hashlib.sha256(passVar.get().encode(encoding="ascii", errors="ignore")).hexdigest())
-            timeFile.write(str(varList[nameList.index("timerSetupTime")].get() * 60))
-            logging.info("wrote files.")
+        # with open(Data.PASS_HASH, "w") as passFile, open(Data.HID_TIME, "w") as timeFile:
+        #     logging.info("attempting file writes...")
+        #     passFile.write(hashlib.sha256(passVar.get().encode(encoding="ascii", errors="ignore")).hexdigest())
+        #     timeFile.write(str(varList[nameList.index("timerSetupTime")].get() * 60))
+        #     logging.info("wrote files.")
 
-        # hiding hash file with saved password hash for panic and time data
-        utils.hide_file(Data.PASS_HASH)
-        utils.hide_file(Data.HID_TIME)
-        logging.info("hid hashed pass and time files")
+        # # hiding hash file with saved password hash for panic and time data
+        # utils.hide_file(Data.PASS_HASH)
+        # utils.hide_file(Data.HID_TIME)
+        # logging.info("hid hashed pass and time files")
+        pass
     else:
         try:
             if not varList[nameList.index("start_on_logon")].get():
                 utils.toggle_run_at_startup(False)
-            if os.path.exists(Data.PASS_HASH):
-                utils.show_file(Data.PASS_HASH)
-                os.remove(Data.PASS_HASH)
-                logging.info("removed password file.")
-            if os.path.exists(Data.HID_TIME):
-                utils.show_file(Data.HID_TIME)
-                os.remove(Data.HID_TIME)
-                logging.info("removed timer file.")
+            # TOOD: Refactor
+            # if os.path.exists(Data.PASS_HASH):
+            #     utils.show_file(Data.PASS_HASH)
+            #     os.remove(Data.PASS_HASH)
+            #     logging.info("removed password file.")
+            # if os.path.exists(Data.HID_TIME):
+            #     utils.show_file(Data.HID_TIME)
+            #     os.remove(Data.HID_TIME)
+            #     logging.info("removed timer file.")
         except Exception as e:
             errText = str(e).replace(getpass.getuser(), "[USERNAME_REDACTED]")
             logging.warning(f"failed timer file modifying\n\tReason: {errText}")
@@ -3545,9 +3550,9 @@ def write_save(varList: list[StringVar | IntVar | BooleanVar], nameList: list[st
         except Exception:
             # nonstandard named variables
             try:
-                temp[name] = int(settings[name])
+                temp[name] = int(config[name])
             except Exception:
-                temp[name] = settings[name]
+                temp[name] = config[name]
 
     with open(Data.CONFIG, "w") as file:
         file.write(json.dumps(temp))
@@ -3643,7 +3648,7 @@ def validateBooru(name: str) -> bool:
 
 
 def getLiveVersion(url: str, pp: bool) -> str:
-    test = settings["toggleInternet"]
+    test = config["toggleInternet"]
     if test == 0 or test == "0":
         try:
             logging.info("fetching github version")
@@ -3663,7 +3668,7 @@ def getLiveVersion(url: str, pp: bool) -> str:
 def addList(tkListObj: Listbox, key: str, title: str, text: str):
     name = simpledialog.askstring(title, text)
     if name != "" and name != None:
-        settings[key] = f"{settings[key]}>{name}"
+        config[key] = f"{config[key]}>{name}"
         tkListObj.insert(2, name)
 
 
@@ -3671,7 +3676,7 @@ def removeList(tkListObj: Listbox, key: str, title: str, text: str):
     index = int(tkListObj.curselection()[0])
     itemName = tkListObj.get(index)
     if index > 0:
-        settings[key] = settings[key].replace(f">{itemName}", "")
+        config[key] = config[key].replace(f">{itemName}", "")
         tkListObj.delete(tkListObj.curselection())
     else:
         messagebox.showwarning(title, text)
@@ -3680,14 +3685,14 @@ def removeList(tkListObj: Listbox, key: str, title: str, text: str):
 def removeList_(tkListObj: Listbox, key: str, title: str, text: str):
     index = int(tkListObj.curselection()[0])
     itemName = tkListObj.get(index)
-    print(settings[key])
+    print(config[key])
     print(itemName)
-    print(len(settings[key].split(">")))
-    if len(settings[key].split(">")) > 1:
+    print(len(config[key].split(">")))
+    if len(config[key].split(">")) > 1:
         if index > 0:
-            settings[key] = settings[key].replace(f">{itemName}", "")
+            config[key] = config[key].replace(f">{itemName}", "")
         else:
-            settings[key] = settings[key].replace(f"{itemName}>", "")
+            config[key] = config[key].replace(f"{itemName}>", "")
         tkListObj.delete(tkListObj.curselection())
     else:
         messagebox.showwarning(title, text)
@@ -3698,8 +3703,8 @@ def resetList(tkListObj: Listbox, key: str, default):
         tkListObj.delete(0, 999)
     except Exception as e:
         print(e)
-    settings[key] = default
-    for setting in settings[key].split(">"):
+    config[key] = default
+    for setting in config[key].split(">"):
         tkListObj.insert(1, setting)
 
 
@@ -3709,7 +3714,7 @@ def addWallpaper(tkListObj: Listbox):
         lname = simpledialog.askstring("Wallpaper Name", "Wallpaper Label\n(Name displayed in list)")
         if not isinstance(lname, type(None)):
             print(file.name.split("/")[-1])
-            settings["wallpaperDat"][lname] = file.name.split("/")[-1]
+            config["wallpaperDat"][lname] = file.name.split("/")[-1]
             tkListObj.insert(1, lname)
 
 
@@ -3717,7 +3722,7 @@ def removeWallpaper(tkListObj):
     index = int(tkListObj.curselection()[0])
     itemName = tkListObj.get(index)
     if index > 0:
-        del settings["wallpaperDat"][itemName]
+        del config["wallpaperDat"][itemName]
         tkListObj.delete(tkListObj.curselection())
     else:
         messagebox.showwarning("Remove Default", "You cannot remove the default wallpaper.")
@@ -3729,15 +3734,15 @@ def autoImportWallpapers(tkListObj: Listbox):
         # clear list
         while True:
             try:
-                del settings["wallpaperDat"][tkListObj.get(1)]
+                del config["wallpaperDat"][tkListObj.get(1)]
                 tkListObj.delete(1)
             except Exception:
                 break
-        for file in os.listdir(Resource.ROOT):
+        for file in os.listdir(PACK_PATH):
             if (file.endswith(".png") or file.endswith(".jpg") or file.endswith(".jpeg")) and file != "wallpaper.png":
                 name_ = file.split(".")[0]
                 tkListObj.insert(1, name_)
-                settings["wallpaperDat"][name_] = file
+                config["wallpaperDat"][name_] = file
 
 
 def updateMax(obj, value: int):
@@ -3751,7 +3756,7 @@ def updateText(objList: Entry or Label, var: str, var_Label: str):
                 obj.delete(0, 9999)
                 obj.insert(1, var)
             elif isinstance(obj, Label):
-                obj.configure(text=f"Expected value: {settings.default[var_Label]}")
+                obj.configure(text=f"Expected value: {default_config[var_Label]}")
     except Exception:
         print("idk what would cause this but just in case uwu")
 
@@ -3762,17 +3767,17 @@ def refresh():
 
 
 def assignJSON(key: str, var: int or str):
-    settings[key] = var
+    config[key] = var
     with open(Data.CONFIG, "w") as f:
-        f.write(json.dumps(settings))
+        f.write(json.dumps(config))
 
 
 def toggleAssociateSettings(ownerState: bool, objList: list, demo: str = False):
     if demo:
         th = demo
     else:
-        th = settings["themeType"].strip()
-    if th == "Original" or (settings["themeNoConfig"] == True and not demo):
+        th = config["themeType"].strip()
+    if th == "Original" or (config["themeNoConfig"] == True and not demo):
         toggleAssociateSettings_manual(ownerState, objList, BUTTON_FACE, "gray35")
     else:
         if th == "Dark":
@@ -3862,10 +3867,10 @@ def getDescriptText(name: str) -> str:
 
 def updateMoods(type: str, id: str, check: bool):
     try:
-        if settings["toggleMoodSet"] != True:
-            if UNIQUE_ID != "0" and os.path.exists(Resource.ROOT):
+        if config["toggleMoodSet"] != True:
+            if UNIQUE_ID != "0" and os.path.exists(PACK_PATH):
                 moodUpdatePath = Data.UNNAMED_MOODS / f"{UNIQUE_ID}.json"
-            elif UNIQUE_ID == "0" and os.path.exists(Resource.ROOT):
+            elif UNIQUE_ID == "0" and os.path.exists(PACK_PATH):
                 moodUpdatePath = Data.MOODS / f"{info_id}.json"
             with open(moodUpdatePath, "r") as mood:
                 mood_dict = json.loads(mood.read())
@@ -3915,7 +3920,7 @@ def all_children(widget):
 
 
 def themeChange(theme: str, root, style, mfont, tfont):
-    if theme == "Original" or settings["themeNoConfig"] == True:
+    if theme == "Original" or config["themeNoConfig"] == True:
         for widget in all_children(root):
             if isinstance(widget, Message):
                 widget.configure(font=(mfont, 8))
@@ -4067,7 +4072,7 @@ def themeChange(theme: str, root, style, mfont, tfont):
 # applyPreset already exists, but there's a reason i'm not using it. I want the per-pack preset to not include every setting unless specified to do so, and
 # I also want the settings to not automatically be saved in case the user does not like what the pack sets.
 def packPreset(varList: list[StringVar | IntVar | BooleanVar], nameList: list[str], presetType: str, danger):
-    with open(Resource.CONFIG) as f:
+    with open(pack.CONFIG) as f:
         try:
             l = json.loads(f.read())
             print(l)

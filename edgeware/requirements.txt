@@ -9,7 +9,7 @@ pygobject; sys_platform == 'linux' # Required for playsound
 pypresence
 pystray
 python-vlc
-# requests
+requests
 screeninfo
 sounddevice
-# ttkwidgets
+ttkwidgets

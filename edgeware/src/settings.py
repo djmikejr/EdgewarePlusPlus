@@ -6,14 +6,27 @@ import shutil
 from paths import Assets, Data
 
 
+def load_config() -> dict:
+    if not os.path.exists(Data.CONFIG):
+        Data.ROOT.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(Assets.DEFAULT_CONFIG, Data.CONFIG)
+
+    with open(Data.CONFIG) as f:
+        config = json.loads(f.read())
+
+    return config
+
+
+def load_default_config() -> dict:
+    with open(Assets.DEFAULT_CONFIG) as f:
+        default_config = json.loads(f.read())
+
+    return default_config
+
+
 class Settings:
     def __init__(self):
-        if not os.path.exists(Data.CONFIG):
-            Data.ROOT.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(Assets.DEFAULT_CONFIG, Data.CONFIG)
-
-        with open(Data.CONFIG) as f:
-            config = json.loads(f.read())
+        config = load_config()
 
         # Impacts other settings
         lowkey_mode = bool(config["lkToggle"])
