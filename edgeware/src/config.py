@@ -1,5 +1,4 @@
 import getpass
-import hashlib
 import json
 import logging
 import os
@@ -12,7 +11,7 @@ import webbrowser
 import zipfile
 from pathlib import Path
 from tkinter import (
-    DISABLED,
+    CENTER,
     END,
     GROOVE,
     RAISED,
@@ -26,6 +25,7 @@ from tkinter import (
     IntVar,
     Label,
     Listbox,
+    Message,
     OptionMenu,
     Scale,
     StringVar,
@@ -37,17 +37,15 @@ from tkinter import (
     messagebox,
     simpledialog,
     ttk,
-    Message,
-    CENTER,
 )
 
 import requests
 import ttkwidgets as tw
-from PIL import Image, ImageTk
-from utils import utils
-from paths import Data, Assets, PACK_PATH
 from pack import Pack
+from paths import PACK_PATH, Assets, Data
+from PIL import Image, ImageTk
 from settings import load_config, load_default_config
+from utils import utils
 from widgets.tooltip import CreateToolTip
 
 PATH = Path(__file__).parent
@@ -91,16 +89,18 @@ pil_logger = logging.getLogger("PIL")
 pil_logger.setLevel(logging.INFO)
 
 # description text for each tab
-START_INTRO_TEXT = 'Welcome to Edgeware++!\nYou can use the tabs at the top of this window to navigate the various config settings for the main program. Annoyance/Runtime is for how the program works while running, Modes is for more complicated and involved settings that change how Edgeware works drastically, and Troubleshooting and About are for learning this program better and fixing errors should anything go wrong.\n\nAside from these helper memos, there are also tooltips on several buttons and sliders. If you see your mouse cursor change to a \"question mark\", hover for a second or two to see more information on the setting.'
-START_PANIC_TEXT = '\"Panic\" is a feature that allows you to instantly halt the program and revert your desktop background back to the \"panic background\" set in the wallpaper sub-tab. (found in the annoyance tab)\n\nThere are a few ways to initiate panic, but one of the easiest to access is setting a hotkey here. You should also make sure to change your panic wallpaper to your currently used wallpaper before using Edgeware!'
+START_INTRO_TEXT = 'Welcome to Edgeware++!\nYou can use the tabs at the top of this window to navigate the various config settings for the main program. Annoyance/Runtime is for how the program works while running, Modes is for more complicated and involved settings that change how Edgeware works drastically, and Troubleshooting and About are for learning this program better and fixing errors should anything go wrong.\n\nAside from these helper memos, there are also tooltips on several buttons and sliders. If you see your mouse cursor change to a "question mark", hover for a second or two to see more information on the setting.'
+START_PANIC_TEXT = '"Panic" is a feature that allows you to instantly halt the program and revert your desktop background back to the "panic background" set in the wallpaper sub-tab. (found in the annoyance tab)\n\nThere are a few ways to initiate panic, but one of the easiest to access is setting a hotkey here. You should also make sure to change your panic wallpaper to your currently used wallpaper before using Edgeware!'
 
-FILE_PRESET_TEXT = 'Please be careful before importing unknown config presets! Double check to make sure you\'re okay with the settings before launching Edgeware.'
+FILE_PRESET_TEXT = (
+    "Please be careful before importing unknown config presets! Double check to make sure you're okay with the settings before launching Edgeware."
+)
 
-DEFAULTFILE_TEXT = 'It might be a good idea to save backups of the original default files in case things get broken or something goes wrong!\nNOTE: default_config.json is what stores the version number, etc, and shouldn\'t be edited unless you absolutely know what you\'re doing!'
-DEFAULTFILE_INTRO_TEXT = 'Changing these will change the default file EdgeWare++ falls back on when a replacement isn\'t provided by a pack. It\'s best to only change these if you want to personalize EdgeWare++ permanently instead of doing it to temporarily add flavour to a pack. (That should be done by adding the proper files into the pack .zip!)'
+DEFAULTFILE_TEXT = "It might be a good idea to save backups of the original default files in case things get broken or something goes wrong!\nNOTE: default_config.json is what stores the version number, etc, and shouldn't be edited unless you absolutely know what you're doing!"
+DEFAULTFILE_INTRO_TEXT = "Changing these will change the default file EdgeWare++ falls back on when a replacement isn't provided by a pack. It's best to only change these if you want to personalize EdgeWare++ permanently instead of doing it to temporarily add flavour to a pack. (That should be done by adding the proper files into the pack .zip!)"
 
-POPUP_INTRO_TEXT = 'Here is where you can change the most important settings of Edgeware: the frequency and behaviour of popups. The \"Popup Timer Delay\" is how long a popup takes to spawn, and the overall \"Popup Chance\" then rolls to see if the popup spawns. Keeping the chance at 100% allows for a consistent experience, while lowering it makes for a more random one.\n\nOnce ready to spawn, a popup can be many things: A regular image, a website link (opens in your default browser), a prompt you need to fill out, autoplaying audio or videos, or a subliminal message. All of these are rolled for corresponding to their respective frequency settings, which can be found in the \"Audio/Video\" tab, \"Captions\" tab, and this tab as well. There are also plenty of other settings there to configure popups to your liking~! '
-POPUP_OVERLAY_TEXT = 'Overlays are more or less modifiers for popups- adding onto them without changing their core behaviour.\n\n•Subliminals add a transparent gif over affected popups, defaulting to a hypnotic spiral if there are none added in the current pack. (this may cause performance issues with lots of popups, try a low max to start)\n•Denial \"censors\" a popup by blurring it, simple as.'
+POPUP_INTRO_TEXT = 'Here is where you can change the most important settings of Edgeware: the frequency and behaviour of popups. The "Popup Timer Delay" is how long a popup takes to spawn, and the overall "Popup Chance" then rolls to see if the popup spawns. Keeping the chance at 100% allows for a consistent experience, while lowering it makes for a more random one.\n\nOnce ready to spawn, a popup can be many things: A regular image, a website link (opens in your default browser), a prompt you need to fill out, autoplaying audio or videos, or a subliminal message. All of these are rolled for corresponding to their respective frequency settings, which can be found in the "Audio/Video" tab, "Captions" tab, and this tab as well. There are also plenty of other settings there to configure popups to your liking~! '
+POPUP_OVERLAY_TEXT = 'Overlays are more or less modifiers for popups- adding onto them without changing their core behaviour.\n\n•Subliminals add a transparent gif over affected popups, defaulting to a hypnotic spiral if there are none added in the current pack. (this may cause performance issues with lots of popups, try a low max to start)\n•Denial "censors" a popup by blurring it, simple as.'
 
 
 # text for the about tab
@@ -652,28 +652,28 @@ def show_window():
     tabSubGeneral = ttk.Frame(tabMaster)
     notebookGeneral = ttk.Notebook(tabSubGeneral)
     tabMaster.add(tabSubGeneral, text="General")
-    tabStart = ttk.Frame(None) # startup screen, info and presets
-    tabFile = ttk.Frame(None) # file management tab
+    tabStart = ttk.Frame(None)  # startup screen, info and presets
+    tabFile = ttk.Frame(None)  # file management tab
     tabPackInfo = ttk.Frame(None)  # pack information
-    tabBooru = ttk.Frame(None) # tab for booru downloader
-    tabDefaultFiles = ttk.Frame(None) # tab for changing default files
+    tabBooru = ttk.Frame(None)  # tab for booru downloader
+    tabDefaultFiles = ttk.Frame(None)  # tab for changing default files
 
     tabSubAnnoyance = ttk.Frame(tabMaster)
     notebookAnnoyance = ttk.Notebook(tabSubAnnoyance)
     tabMaster.add(tabSubAnnoyance, text="Annoyance/Runtime")
-    tabPopups = ttk.Frame(None) # tab for popup settings
+    tabPopups = ttk.Frame(None)  # tab for popup settings
     tabWallpaper = ttk.Frame(None)  # tab for wallpaper rotation settings
-    tabAudioVideo = ttk.Frame(None) # tab for managing audio and video settings
-    tabCaptions = ttk.Frame(None) # tab for caption settings
-    tabMoods = ttk.Frame(None) # tab for mood settings
-    tabDangerous = ttk.Frame(None) # tab for potentially dangerous settings
+    tabAudioVideo = ttk.Frame(None)  # tab for managing audio and video settings
+    tabCaptions = ttk.Frame(None)  # tab for caption settings
+    tabMoods = ttk.Frame(None)  # tab for mood settings
+    tabDangerous = ttk.Frame(None)  # tab for potentially dangerous settings
 
     tabSubModes = ttk.Frame(tabMaster)
     notebookModes = ttk.Notebook(tabSubModes)
     tabMaster.add(tabSubModes, text="Modes")
-    tabBasicModes = ttk.Frame(None) #tab for basic popup modes
-    tabDangerModes = ttk.Frame(None) # tab for timer mode
-    tabHibernate = ttk.Frame(None) # tab for hibernate mode
+    tabBasicModes = ttk.Frame(None)  # tab for basic popup modes
+    tabDangerModes = ttk.Frame(None)  # tab for timer mode
+    tabHibernate = ttk.Frame(None)  # tab for hibernate mode
     tabCorruption = ttk.Frame(None)  # tab for corruption mode
     tabMitosis = ttk.Frame(None)
 
@@ -747,7 +747,7 @@ def show_window():
     startMessage.pack(fill="both")
     message_group.append(startMessage)
 
-    #version information
+    # version information
     Label(tabStart, text="Information", font=titleFont, relief=GROOVE).pack(pady=2)
     infoHostFrame = Frame(tabStart, borderwidth=5, relief=RAISED)
     zipGitFrame = Frame(infoHostFrame)
@@ -1043,7 +1043,7 @@ def show_window():
         toggleSafeMode,
         "Asks you to confirm before saving if certain settings are enabled.\n"
         "Things defined as Dangerous Settings:\n\n"
-        'Extreme (code red! code red! make sure you fully understand what these do before using!):\n'
+        "Extreme (code red! code red! make sure you fully understand what these do before using!):\n"
         "Replace Images\n\n"
         "Major (very dangerous, can affect your computer):\n"
         "Launch on Startup, Fill Drive\n\n"
@@ -1053,7 +1053,7 @@ def show_window():
         "Disable Panic Hotkey, Run on Save & Exit",
     )
 
-    #panic
+    # panic
     Label(tabStart, text="Panic Settings", font=titleFont, relief=GROOVE).pack(pady=2)
 
     panicMessage = Message(tabStart, text=START_PANIC_TEXT, justify=CENTER, width=675)
@@ -1095,7 +1095,7 @@ def show_window():
 
     presetMessage = Message(tabFile, text=FILE_PRESET_TEXT, justify=CENTER, width=675)
     presetMessage.pack(fill="both")
-    #message_group.append(presetMessage)
+    # message_group.append(presetMessage)
 
     presetFrame = Frame(tabFile, borderwidth=5, relief=RAISED)
     dropdownSelectFrame = Frame(presetFrame)
@@ -1208,7 +1208,6 @@ def show_window():
     configPresetsLabel.pack(fill="both", side="top")
     presetsDangerToggle.pack(fill="both", side="top")
     configPresetsButton.pack(fill="both", expand=1)
-
 
     # directories
     Label(tabFile, text="Directories", font=titleFont, relief=GROOVE).pack(pady=2)
@@ -1656,10 +1655,12 @@ def show_window():
 
     defFileMessage = Message(tabDefaultFiles, text=DEFAULTFILE_TEXT, justify=CENTER, width=675)
     defFileMessage.pack(fill="both")
-    #commenting this out because I think this is something very short that should stay regardless of disabling help
-    #message_group.append(defFileMessage)
+    # commenting this out because I think this is something very short that should stay regardless of disabling help
+    # message_group.append(defFileMessage)
 
-    defSplashImage = Image.open(Assets.DEFAULT_STARTUP_SPLASH).resize((int(root.winfo_screenwidth() * 0.09), int(root.winfo_screenwidth() * 0.09)), Image.NEAREST)
+    defSplashImage = Image.open(Assets.DEFAULT_STARTUP_SPLASH).resize(
+        (int(root.winfo_screenwidth() * 0.09), int(root.winfo_screenwidth() * 0.09)), Image.NEAREST
+    )
     defThemeDemo = Image.open(Assets.THEME_DEMO)
     defIcon = Image.open(Assets.DEFAULT_ICON).resize((int(root.winfo_screenwidth() * 0.04), int(root.winfo_screenwidth() * 0.04)), Image.NEAREST)
     defConfIcon = Image.open(Assets.CONFIG_ICON).resize((int(root.winfo_screenwidth() * 0.04), int(root.winfo_screenwidth() * 0.04)), Image.NEAREST)
@@ -1667,7 +1668,7 @@ def show_window():
     defSpiral = Image.open(Assets.DEFAULT_SUBLIMINAL).resize((int(root.winfo_screenwidth() * 0.08), int(root.winfo_screenwidth() * 0.08)), Image.NEAREST)
 
     def updateDefaultImage(imgtype):
-        #workaround- for some reason not using nonlocal and just passing it as an argument wouldn't update the label. Everything else worked fine...
+        # workaround- for some reason not using nonlocal and just passing it as an argument wouldn't update the label. Everything else worked fine...
         if imgtype == Assets.DEFAULT_STARTUP_SPLASH:
             nonlocal defSplashImage
             selectedFile = filedialog.askopenfile("rb", filetypes=[("image file", ".jpg .jpeg .png")])
@@ -1728,11 +1729,16 @@ def show_window():
     defaultsFrame1.pack(fill="x")
     defSplashFrame.pack(side="left", fill="both", padx=2, expand=1)
     defSplashFrameL.pack(side="left", fill="both")
-    defSplashFrameR.pack(side="left", fill="x", padx=(5,0))
-    defSplashButton.pack(side="top", fill="both", padx=1, pady=(0,5))
-    Message(defSplashFrameL, text="LOADING SPLASH:\n\nUsed in \"Show Loading Flair\" setting (found in \"Start\" tab). Packs can have custom "
-                                "splashes, which will appear instead of this. Accepts .jpg or .png and will be shrunk to a slightly smaller size.",
-                                justify=CENTER, borderwidth=5, relief=GROOVE).pack(side="top", fill="both", expand=1)
+    defSplashFrameR.pack(side="left", fill="x", padx=(5, 0))
+    defSplashButton.pack(side="top", fill="both", padx=1, pady=(0, 5))
+    Message(
+        defSplashFrameL,
+        text='LOADING SPLASH:\n\nUsed in "Show Loading Flair" setting (found in "Start" tab). Packs can have custom '
+        "splashes, which will appear instead of this. Accepts .jpg or .png and will be shrunk to a slightly smaller size.",
+        justify=CENTER,
+        borderwidth=5,
+        relief=GROOVE,
+    ).pack(side="top", fill="both", expand=1)
     Label(defSplashFrameR, text="Current Default Loading Splash").pack(fill="both")
     defSplashLabel.pack()
 
@@ -1745,11 +1751,15 @@ def show_window():
 
     defThemeFrame.pack(side="left", fill="both", padx=2, expand=1)
     defThemeFrameL.pack(side="left", fill="both")
-    defThemeFrameR.pack(side="left", fill="x", padx=(5,0))
+    defThemeFrameR.pack(side="left", fill="x", padx=(5, 0))
     defThemeButton.pack(side="top", fill="both", padx=1)
-    Message(defThemeFrameL, text="THEME DEMO:\n\nUsed in the \"Start\" tab, supports .jpg or .png. Must be 150x75! "
-                                "If you don\'t crop your image to that, you\'ll have a bad time!!",
-                                justify=CENTER, borderwidth=5, relief=GROOVE).pack(side="top", fill="both", expand=1)
+    Message(
+        defThemeFrameL,
+        text='THEME DEMO:\n\nUsed in the "Start" tab, supports .jpg or .png. Must be 150x75! ' "If you don't crop your image to that, you'll have a bad time!!",
+        justify=CENTER,
+        borderwidth=5,
+        relief=GROOVE,
+    ).pack(side="top", fill="both", expand=1)
     Label(defThemeFrameR, text="Current Theme Demo").pack(fill="both")
     defThemeLabel.pack()
 
@@ -1764,10 +1774,11 @@ def show_window():
     defaultsFrame2.pack(fill="x")
     defIconFrame.pack(side="left", fill="both", padx=2, expand=1)
     defIconFrameL.pack(side="left", fill="both")
-    defIconFrameR.pack(side="left", fill="x", padx=(5,0))
-    defIconButton.pack(side="top", fill="both", padx=1, pady=(0,5))
-    Message(defIconFrameL, text="ICON:\n\nUsed in desktop shortcuts and tray icon. Only supports .ico files.",
-                                justify=CENTER, borderwidth=5, relief=GROOVE).pack(side="top", fill="both", expand=1)
+    defIconFrameR.pack(side="left", fill="x", padx=(5, 0))
+    defIconButton.pack(side="top", fill="both", padx=1, pady=(0, 5))
+    Message(
+        defIconFrameL, text="ICON:\n\nUsed in desktop shortcuts and tray icon. Only supports .ico files.", justify=CENTER, borderwidth=5, relief=GROOVE
+    ).pack(side="top", fill="both", expand=1)
     Label(defIconFrameR, text="Icon").pack(fill="both")
     defIconLabel.pack()
 
@@ -1780,10 +1791,15 @@ def show_window():
 
     defConfIconFrame.pack(side="left", fill="both", padx=2, expand=1)
     defConfIconFrameL.pack(side="left", fill="both")
-    defConfIconFrameR.pack(side="left", fill="x", padx=(5,0))
-    defConfIconButton.pack(side="top", fill="both", padx=1, pady=(0,5))
-    Message(defConfIconFrameL, text="CONFIG ICON:\n\nUsed in desktop shortcuts and the config window. Only supports .ico files.",
-                                justify=CENTER, borderwidth=5, relief=GROOVE).pack(side="top", fill="both", expand=1)
+    defConfIconFrameR.pack(side="left", fill="x", padx=(5, 0))
+    defConfIconButton.pack(side="top", fill="both", padx=1, pady=(0, 5))
+    Message(
+        defConfIconFrameL,
+        text="CONFIG ICON:\n\nUsed in desktop shortcuts and the config window. Only supports .ico files.",
+        justify=CENTER,
+        borderwidth=5,
+        relief=GROOVE,
+    ).pack(side="top", fill="both", expand=1)
     Label(defConfIconFrameR, text="Config Icon").pack(fill="both")
     defConfIconLabel.pack()
 
@@ -1796,10 +1812,11 @@ def show_window():
 
     defPanicIconFrame.pack(side="left", fill="both", padx=2, expand=1)
     defPanicIconFrameL.pack(side="left", fill="both")
-    defPanicIconFrameR.pack(side="left", fill="x", padx=(5,0))
-    defPanicIconButton.pack(side="top", fill="both", padx=1, pady=(0,5))
-    Message(defPanicIconFrameL, text="PANIC ICON:\n\nUsed in desktop shortcuts. Only supports .ico files.",
-                                justify=CENTER, borderwidth=5, relief=GROOVE).pack(side="top", fill="both", expand=1)
+    defPanicIconFrameR.pack(side="left", fill="x", padx=(5, 0))
+    defPanicIconButton.pack(side="top", fill="both", padx=1, pady=(0, 5))
+    Message(defPanicIconFrameL, text="PANIC ICON:\n\nUsed in desktop shortcuts. Only supports .ico files.", justify=CENTER, borderwidth=5, relief=GROOVE).pack(
+        side="top", fill="both", expand=1
+    )
     Label(defPanicIconFrameR, text="Panic Icon").pack(fill="both")
     defPanicIconLabel.pack()
 
@@ -1814,12 +1831,17 @@ def show_window():
     defaultsFrame3.pack(fill="x")
     defSpiralFrame.pack(side="left", fill="both", padx=2)
     defSpiralFrameL.pack(side="left", fill="both")
-    defSpiralFrameR.pack(side="left", fill="x", padx=(5,0))
-    defSpiralButton.pack(side="top", fill="both", padx=1, pady=(0,5))
-    Message(defSpiralFrameL, text="SPIRAL:\n\nUsed in \"Subliminal Overlays\" setting (found in \"Popups\" tab). Packs can have custom "
-                                "Subliminals, which will appear instead of this. Accepts .jpg, .png, or .gif, but should be animated. "
-                                "(doesn\'t animate on this page to save on resources- try and aim for a small filesize on this image!)",
-                                justify=CENTER, borderwidth=5, relief=GROOVE).pack(side="top", fill="both", expand=1)
+    defSpiralFrameR.pack(side="left", fill="x", padx=(5, 0))
+    defSpiralButton.pack(side="top", fill="both", padx=1, pady=(0, 5))
+    Message(
+        defSpiralFrameL,
+        text='SPIRAL:\n\nUsed in "Subliminal Overlays" setting (found in "Popups" tab). Packs can have custom '
+        "Subliminals, which will appear instead of this. Accepts .jpg, .png, or .gif, but should be animated. "
+        "(doesn't animate on this page to save on resources- try and aim for a small filesize on this image!)",
+        justify=CENTER,
+        borderwidth=5,
+        relief=GROOVE,
+    ).pack(side="top", fill="both", expand=1)
     Label(defSpiralFrameR, text="Current Default Spiral").pack(fill="both")
     defSpiralLabel.pack()
 
@@ -1839,9 +1861,7 @@ def show_window():
 
     popupScale = Scale(popChanceFrame, label="Popup Chance (%)", from_=0, to=100, orient="horizontal", variable=popupVar)
     popupManual = Button(
-        popChanceFrame,
-        text="Manual popup chance...",
-        command=lambda: assign(popupVar, simpledialog.askinteger("Manual Popup Chance", prompt="[0-100]: "))
+        popChanceFrame, text="Manual popup chance...", command=lambda: assign(popupVar, simpledialog.askinteger("Manual Popup Chance", prompt="[0-100]: "))
     )
 
     delayModeFrame.pack(fill="x")
@@ -1951,10 +1971,7 @@ def show_window():
     maxSubliminalsFrame = Frame(subliminalsFrame)
 
     toggleSubliminalButton = Checkbutton(
-        subliminalsFrame,
-        text="Subliminal Overlays",
-        variable=popupSublim,
-        command=lambda: toggleAssociateSettings(popupSublim.get(), subliminals_group)
+        subliminalsFrame, text="Subliminal Overlays", variable=popupSublim, command=lambda: toggleAssociateSettings(popupSublim.get(), subliminals_group)
     )
 
     subliminalsChanceScale = Scale(subliminalsChanceFrame, label="Sublim. Chance (%)", from_=1, to=100, orient="horizontal", variable=subliminalsChanceVar)
@@ -2023,13 +2040,15 @@ def show_window():
 
     # ==========={EDGEWARE++ AUDIO/VIDEO TAB STARTS HERE}==============#
     notebookAnnoyance.add(tabAudioVideo, text="Audio/Video")
-    #Audio
+    # Audio
     Label(tabAudioVideo, text="Audio", font=titleFont, relief=GROOVE).pack(pady=2)
 
     audioFrame = Frame(tabAudioVideo, borderwidth=5, relief=RAISED)
     audioSubFrame = Frame(audioFrame)
     audioScale = Scale(audioSubFrame, label="Audio Popup Chance (%)", from_=0, to=100, orient="horizontal", variable=audioVar)
-    audioManual = Button(audioSubFrame, text="Manual audio chance...", command=lambda: assign(audioVar, simpledialog.askinteger("Manual Audio", prompt="[0-100]: ")))
+    audioManual = Button(
+        audioSubFrame, text="Manual audio chance...", command=lambda: assign(audioVar, simpledialog.askinteger("Manual Audio", prompt="[0-100]: "))
+    )
 
     maxAudioFrame = Frame(audioFrame)
     maxAudioToggle = Checkbutton(
@@ -2053,7 +2072,7 @@ def show_window():
     maxAudio_group.append(maxAudioScale)
     maxAudio_group.append(maxAudioManual)
 
-    #Video
+    # Video
     Label(tabAudioVideo, text="Video", font=titleFont, relief=GROOVE).pack(pady=2)
 
     videoFrame = Frame(tabAudioVideo, borderwidth=5, relief=RAISED)
@@ -2093,7 +2112,7 @@ def show_window():
     maxVideo_group.append(maxVideoScale)
     maxVideo_group.append(maxVideoManual)
 
-    #playback options
+    # playback options
     Label(tabAudioVideo, text="Playback Options", font=titleFont, relief=GROOVE).pack(pady=2)
 
     playbackFrame = Frame(tabAudioVideo, borderwidth=5, relief=RAISED)
@@ -2247,7 +2266,9 @@ def show_window():
         command=lambda val: updateMax(varSlider, int(val) - 1),
     )
 
-    pHoldImageR = Image.open(Assets.DEFAULT_PANIC_WALLPAPER).resize((int(root.winfo_screenwidth() * 0.13), int(root.winfo_screenheight() * 0.13)), Image.NEAREST)
+    pHoldImageR = Image.open(Assets.DEFAULT_PANIC_WALLPAPER).resize(
+        (int(root.winfo_screenwidth() * 0.13), int(root.winfo_screenheight() * 0.13)), Image.NEAREST
+    )
 
     def updatePanicPaper():
         nonlocal pHoldImageR
@@ -2621,7 +2642,7 @@ def show_window():
 
     # ==========={EDGEWARE++ "BASIC MODES" TAB STARTS HERE}===========#
     notebookModes.add(tabBasicModes, text="Basic Modes")
-    #Unsure if not calling this lowkey/moving in the tab will confuse people, consider renaming if people find it annoying
+    # Unsure if not calling this lowkey/moving in the tab will confuse people, consider renaming if people find it annoying
 
     Label(tabBasicModes, text="Lowkey Mode", font=titleFont, relief=GROOVE).pack(pady=2)
     lowkeyFrame = Frame(tabBasicModes, borderwidth=5, relief=RAISED)
@@ -3351,7 +3372,7 @@ def show_window():
     triggerHelper(corruptionTriggerVar.get(), False)
     toggleAssociateSettings(os.path.isfile(pack.CORRUPTION), corruptionEnabled_group)
 
-    #messageOff toggle here, for turning off all help messages
+    # messageOff toggle here, for turning off all help messages
     toggleHelp(messageOffVar.get(), message_group)
 
     tabMaster.pack(expand=1, fill="both")
@@ -4136,6 +4157,7 @@ def clearLaunches(confirmation: bool):
         print(f"failed to clear launches. {e}")
         logging.warning(f"could not delete the corruption launches file. {e}")
 
+
 def toggleHelp(state: bool, messages: list):
     if state == True:
         try:
@@ -4144,6 +4166,7 @@ def toggleHelp(state: bool, messages: list):
         except Exception as e:
             print(f"failed to toggle help off. {e}")
             logging.warning(f"could not properly turn help off. {e}")
+
 
 if __name__ == "__main__":
     try:

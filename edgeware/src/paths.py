@@ -35,4 +35,4 @@ class Data:
     CONFIG = ROOT / "config.json"
     MOODS = ROOT / "moods"
 
-    PRESETS = PATH /  "presets"  # TODO: Proper location
+    PRESETS = PATH / "presets"  # TODO: Proper location
