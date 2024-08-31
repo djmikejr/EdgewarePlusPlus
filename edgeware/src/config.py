@@ -202,7 +202,7 @@ local_pp_version = default_config["versionplusplus"]
 pass_ = ""
 
 
-Data.MOODS.parent.mkdir(parents=True, exist_ok=True)
+Data.MOODS.mkdir(parents=True, exist_ok=True)
 MOOD_PATH = "0"
 if config["toggleMoodSet"] != True:
     if UNIQUE_ID != "0" and os.path.exists(PACK_PATH):
