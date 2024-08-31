@@ -1,4 +1,3 @@
-import getpass
 import json
 import logging
 import os
@@ -343,7 +342,7 @@ def show_window():
             popopOpacity = IntVar(root, value=int(config["lkScaling"]))
             lkToggle = BooleanVar(root, value=(int(config["lkToggle"]) == 1))
 
-            safewordVar = StringVar(root, value="password")
+            safewordVar = StringVar(root, value=(config["safeword"]))
 
             videoVolume = IntVar(root, value=int(config["videoVolume"]))
             vidVar = IntVar(root, value=int(config["vidMod"]))
@@ -501,6 +500,7 @@ def show_window():
                 capPopMoodVar,
                 subliminalsAlphaVar,
                 messageOffVar,
+                safewordVar,
             ]
 
             in_var_names = [
@@ -594,6 +594,7 @@ def show_window():
                 "capPopMood",
                 "subliminalsAlpha",
                 "messageOff",
+                "safeword",
             ]
             break
         except Exception as e:
@@ -613,7 +614,7 @@ def show_window():
     # done painful control variables
 
     if getPresets() is None:
-        write_save(in_var_group, in_var_names, "", False)
+        write_save(in_var_group, in_var_names, False)
         savePreset("Default")
 
     # grouping for enable/disable
@@ -732,7 +733,7 @@ def show_window():
     resourceFrame = Frame(root)
     exportResourcesButton = Button(resourceFrame, text="Export Resource Pack", command=exportResource)
     importResourcesButton = Button(resourceFrame, text="Import Resource Pack", command=lambda: importResource(root))
-    saveExitButton = Button(root, text="Save & Exit", command=lambda: write_save(in_var_group, in_var_names, safewordVar, True))
+    saveExitButton = Button(root, text="Save & Exit", command=lambda: write_save(in_var_group, in_var_names, True))
 
     # --------------------------------------------------------- #
     # ========================================================= #
@@ -1083,7 +1084,7 @@ def show_window():
     importExportFrame = Frame(tabFile, borderwidth=5, relief=RAISED)
     fileTabImportButton = Button(importExportFrame, height=2, text="Import Resource Pack", command=lambda: importResource(root))
     fileTabExportButton = Button(importExportFrame, height=2, text="Export Resource Pack", command=exportResource)
-    fileSaveButton = Button(tabFile, text="Save Config Settings", command=lambda: write_save(in_var_group, in_var_names, safewordVar, False))
+    fileSaveButton = Button(tabFile, text="Save Config Settings", command=lambda: write_save(in_var_group, in_var_names, False))
 
     fileSaveButton.pack(fill="x", pady=2)
     importExportFrame.pack(fill="x", pady=2)
@@ -1118,7 +1119,7 @@ def show_window():
         name_ = simpledialog.askstring("Save Preset", "Preset name")
         existed = os.path.exists(Data.PRESETS / f"{name_.lower()}.cfg")
         if name_ != None and name != "":
-            write_save(in_var_group, in_var_names, safewordVar, False)
+            write_save(in_var_group, in_var_names, False)
             if existed:
                 if messagebox.askquestion("Overwrite", "A preset with this name already exists. Overwrite it?") == "no":
                     return False
@@ -2704,10 +2705,6 @@ def show_window():
 
     def timerHelper():
         toggleAssociateSettings(timerVar.get(), timer_group)
-        if timerVar.get():
-            startLoginVar.set(True)
-        else:
-            startLoginVar.set(False)
 
     timerttp = CreateToolTip(
         timerToggle,
@@ -3385,17 +3382,6 @@ def show_window():
     exportResourcesButton.pack(fill="x", side="left", expand=1)
     saveExitButton.pack(fill="x")
 
-    # TODO: Refactor
-    # utils.show_file(Data.HID_TIME)
-    # if os.path.exists(Data.HID_TIME):
-    #     with open(Data.HID_TIME, "r") as file:
-    #         time_ = int(file.readline()) / 60
-    #         if not time_ == int(config["timerSetupTime"]):
-    #             timerToggle.configure(state=DISABLED)
-    #             for item in timer_group:
-    #                 item.configure(state=DISABLED)
-    # utils.hide_file(Data.HID_TIME)
-
     # first time alert popup
     # if not settings['is_configed'] == 1:
     #    messagebox.showinfo('First Config', 'Config has not been run before. All settings are defaulted to frequency of 0 except for popups.\n[This alert will only appear on the first run of config]')
@@ -3507,10 +3493,7 @@ def confirmBox(parent: Tk, btitle: str, message: str) -> bool:
 
 
 # helper funcs for lambdas =======================================================
-# def checkInfo():
-
-
-def write_save(varList: list[StringVar | IntVar | BooleanVar], nameList: list[str], passVar: str, exitAtEnd: bool):
+def write_save(varList: list[StringVar | IntVar | BooleanVar], nameList: list[str], exitAtEnd: bool):
     if int(varList[nameList.index("safeMode")].get()) == 1 and exitAtEnd:
         if safeCheck(varList, nameList) == False:
             return
@@ -3524,44 +3507,6 @@ def write_save(varList: list[StringVar | IntVar | BooleanVar], nameList: list[st
 
     if int(varList[nameList.index("start_on_logon")].get()) == 1:
         utils.toggle_run_at_startup(True)
-
-    if int(varList[nameList.index("timerMode")].get()) == 1:
-        # TODO: Refactor
-        # # utils.toggle_run_at_startup(True)
-
-        # # revealing hidden files
-        # utils.show_file(Data.PASS_HASH)
-        # utils.show_file(Data.HID_TIME)
-        # logging.info("revealed hashed pass and time files")
-
-        # with open(Data.PASS_HASH, "w") as passFile, open(Data.HID_TIME, "w") as timeFile:
-        #     logging.info("attempting file writes...")
-        #     passFile.write(hashlib.sha256(passVar.get().encode(encoding="ascii", errors="ignore")).hexdigest())
-        #     timeFile.write(str(varList[nameList.index("timerSetupTime")].get() * 60))
-        #     logging.info("wrote files.")
-
-        # # hiding hash file with saved password hash for panic and time data
-        # utils.hide_file(Data.PASS_HASH)
-        # utils.hide_file(Data.HID_TIME)
-        # logging.info("hid hashed pass and time files")
-        pass
-    else:
-        try:
-            if not varList[nameList.index("start_on_logon")].get():
-                utils.toggle_run_at_startup(False)
-            # TOOD: Refactor
-            # if os.path.exists(Data.PASS_HASH):
-            #     utils.show_file(Data.PASS_HASH)
-            #     os.remove(Data.PASS_HASH)
-            #     logging.info("removed password file.")
-            # if os.path.exists(Data.HID_TIME):
-            #     utils.show_file(Data.HID_TIME)
-            #     os.remove(Data.HID_TIME)
-            #     logging.info("removed timer file.")
-        except Exception as e:
-            errText = str(e).replace(getpass.getuser(), "[USERNAME_REDACTED]")
-            logging.warning(f"failed timer file modifying\n\tReason: {errText}")
-            pass
 
     for name in varNames:
         try:

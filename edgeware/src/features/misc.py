@@ -23,7 +23,7 @@ def panic(root: Tk, settings: Settings, state: State, key: str | None = None) ->
 
     if settings.timer_mode and state.timer_active:
         password = simpledialog.askstring("Panic", "Enter Panic Password")
-        if password != "password":  # TODO: Actual password
+        if password != settings.timer_password:
             return
 
     # TODO: https://github.com/araten10/EdgewarePlusPlus/issues/24

@@ -101,6 +101,7 @@ class Settings:
         # Dangerous modes
         self.timer_mode = bool(config["timerMode"])
         self.timer_time = int(config["timerSetupTime"]) * 60 * 1000  # Milliseconds
+        self.timer_password = config["safeword"]
         self.mitosis_mode = bool(config["mitosisMode"]) or self.lowkey_mode
         self.mitosis_strength = int(config["mitosisStrength"]) if not self.lowkey_mode else 1
 
