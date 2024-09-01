@@ -7,6 +7,14 @@ PACK_PATH = PATH / "resource"
 
 
 @dataclass
+class Process:
+    ROOT = PATH / "src"
+
+    CONFIG = PATH / "config.py"
+    MAIN = PATH / "main.py"
+
+
+@dataclass
 class Assets:
     ROOT = PATH / "assets"
 

@@ -3505,8 +3505,7 @@ def write_save(varList: list[StringVar | IntVar | BooleanVar], nameList: list[st
     if not os.path.isfile(pack.CORRUPTION):
         config["corruptionMode"] = 0
 
-    if int(varList[nameList.index("start_on_logon")].get()) == 1:
-        utils.toggle_run_at_startup(True)
+    utils.toggle_run_at_startup(int(varList[nameList.index("start_on_logon")].get()) == 1)
 
     for name in varNames:
         try:

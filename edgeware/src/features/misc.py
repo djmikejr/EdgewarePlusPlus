@@ -8,7 +8,7 @@ from tkinter import Tk, simpledialog
 
 import pystray
 from pack import Pack
-from paths import PACK_PATH, Assets
+from paths import PACK_PATH, Assets, Process
 from PIL import Image
 from playsound import playsound
 from pypresence import Presence
@@ -64,6 +64,12 @@ def make_tray_icon(root: Tk, settings: Settings, pack: Pack, state: State, hiber
 
     icon = pystray.Icon("Edgeware++", Image.open(pack.icon), "Edgeware++", menu)
     Thread(target=icon.run, daemon=True).start()
+
+
+def make_desktop_icons(settings: Settings) -> None:
+    if settings.desktop_icons:
+        utils.make_shortcut("Edgeware++", Process.MAIN, Assets.DEFAULT_ICON)
+        utils.make_shortcut("Edgeware++ Config", Process.CONFIG, Assets.CONFIG_ICON)
 
 
 def handle_wallpaper(root: Tk, settings: Settings, pack: Pack, state: State) -> None:

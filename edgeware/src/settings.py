@@ -34,6 +34,7 @@ class Settings:
         # General
         self.theme = config["themeType"]
         self.startup_splash = bool(config["showLoadingFlair"])
+        self.desktop_icons = bool(config["desktopIcons"])
         self.panic_key = config["panicButton"]
 
         # Popups

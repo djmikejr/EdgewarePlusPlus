@@ -7,7 +7,7 @@ from features.caption_popup import CaptionPopup
 from features.drive import fill_drive, replace_images
 from features.hibernate import main_hibernate
 from features.image_popup import ImagePopup
-from features.misc import handle_discord, handle_mitosis_mode, handle_timer_mode, handle_wallpaper, make_tray_icon, open_web, play_audio
+from features.misc import handle_discord, handle_mitosis_mode, handle_timer_mode, handle_wallpaper, make_desktop_icons, make_tray_icon, open_web, play_audio
 from features.prompt import Prompt
 from features.startup_splash import StartupSplash
 from features.video_popup import VideoPopup
@@ -44,6 +44,7 @@ if __name__ == "__main__":
     def start_main() -> None:
         Thread(target=lambda: replace_images(root, settings, pack), daemon=True).start()  # Thread for performance reasons
         make_tray_icon(root, settings, pack, state, lambda: main_hibernate(root, settings, pack, state, targets))
+        make_desktop_icons(settings)
         handle_discord(root, settings, pack)
         handle_timer_mode(root, settings, state)
         handle_mitosis_mode(root, settings, pack, state)
