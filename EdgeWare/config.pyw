@@ -104,7 +104,7 @@ DEFAULTFILE_INTRO_TEXT = 'Changing these will change the default file EdgeWare++
 
 POPUP_INTRO_TEXT = 'Here is where you can change the most important settings of Edgeware: the frequency and behaviour of popups. The \"Popup Timer Delay\" is how long a popup takes to spawn, and the overall \"Popup Chance\" then rolls to see if the popup spawns. Keeping the chance at 100% allows for a consistent experience, while lowering it makes for a more random one.\n\nOnce ready to spawn, a popup can be many things: A regular image, a website link (opens in your default browser), a prompt you need to fill out, autoplaying audio or videos, or a subliminal message. All of these are rolled for corresponding to their respective frequency settings, which can be found in the \"Audio/Video\" tab, \"Captions\" tab, and this tab as well. There are also plenty of other settings there to configure popups to your liking~! '
 POPUP_OVERLAY_TEXT = 'Overlays are more or less modifiers for popups- adding onto them without changing their core behaviour.\n\n•Subliminals add a transparent gif over affected popups, defaulting to a hypnotic spiral if there are none added in the current pack. (this may cause performance issues with lots of popups, try a low max to start)\n•Denial \"censors\" a popup by blurring it, simple as.'
-
+AUDVID_PLAYBACK_TEXT = '\"Pump-Scare Offset\" is directly tied to the hibernate mode of the same name. In said mode, audio will briefly play as a popup flashes on screen. Due to the large filesize of some audio files, an offset option has been added to delay the popup so the audio has time to properly load in before it cuts out. If you don\'t have hibernate mode enabled or have the hibernate type set to Pump-Scare, you can completely ignore this setting and leave it at 0.\n\nAs for the VLC option, it is highly recommended to set up VLC and enable this setting. While it is an external download and could have it\'s own share of troubleshooting, it will massively increase performance and also fix a potential issue of videos having no audio. More details on this are listed in the hover tooltip for the \"Use VLC to play videos\" setting.'
 
 # text for the about tab
 ANNOYANCE_TEXT = 'The "Annoyance" section consists of the 5 main configurable settings of Edgeware:\nDelay\nPopup Frequency\nWebsite Frequency\nAudio Frequency\nPromptFrequency\n\nEach is fairly self explanatory, but will still be expounded upon in this section. Delay is the forced time delay between each tick of the "clock" for Edgeware. The longer it is, the slower things will happen. Popup frequency is the percent chance that a randomly selected popup will appear on any given tick of the clock, and similarly for the rest, website being the probability of opening a website or video from /resource/vid/, audio for playing a file from /resource/aud/, and prompt for a typing prompt to pop up.\n\nThese values can be set by adjusting the bars, or by clicking the button beneath each respective slider, which will allow you to type in an explicit number instead of searching for it on the scrollbar.\n\nIn order to disable any feature, lower its probability to 0, to ensure that you\'ll be getting as much of any feature as possible, turn it up to 100.\nThe popup setting "Mitosis mode" changes how popups are displayed. Instead of popping up based on the timer, the program create a single popup when it starts. When the submit button on ANY popup is clicked to close it, a number of popups will open up in its place, as given by the "Mitosis Strength" setting.\n\nPopup timeout will result in popups timing out and closing after a certain number of seconds.'
@@ -2095,6 +2095,10 @@ def show_window():
     #playback options
     Label(tabAudioVideo, text="Playback Options", font=titleFont, relief=GROOVE).pack(pady=2)
 
+    audVidPlaybackMessage = Message(tabAudioVideo, text=AUDVID_PLAYBACK_TEXT, justify=CENTER, width=675)
+    audVidPlaybackMessage.pack(fill="both")
+    message_group.append(audVidPlaybackMessage)
+
     playbackFrame = Frame(tabAudioVideo, borderwidth=5, relief=RAISED)
     playbackFrameL = Frame(playbackFrame)
     playbackFrameR = Frame(playbackFrame)
@@ -2144,20 +2148,15 @@ def show_window():
     # ==========={EDGEWARE++ CAPTIONS TAB STARTS HERE}==============#
     notebookAnnoyance.add(tabCaptions, text="Captions")
 
+    Label(tabCaptions, text="Captions", font=titleFont, relief=GROOVE).pack(pady=2)
+
+    enableCaptionsFrame = Frame(tabCaptions, borderwidth=5, relief=RAISED)
     captionsFrame = Frame(tabCaptions, borderwidth=5, relief=RAISED)
-    captionsSubFrame1 = Frame(captionsFrame)
-    capPopFrame = Frame(captionsFrame)
-    capPopOpacityFrame = Frame(captionsFrame)
-    capPopTimerFrame = Frame(captionsFrame)
 
-    toggleCaptionsButton = Checkbutton(captionsSubFrame1, text="Popup Captions", variable=captionVar, cursor="question_arrow")
-    toggleFilenameButton = Checkbutton(captionsSubFrame1, text="Use filename for caption moods", variable=captionFilenameVar, cursor="question_arrow")
-    toggleMultiClickButton = Checkbutton(captionsSubFrame1, text="Multi-Click popups", variable=multiClickVar, cursor="question_arrow")
-    toggleCaptionMood = Checkbutton(captionsSubFrame1, text="Use Cap-Pop specific mood", variable=capPopMoodVar, cursor="question_arrow")
+    toggleCaptionsButton = Checkbutton(enableCaptionsFrame, text="Enable Popup Captions", variable=captionVar)
+    toggleFilenameButton = Checkbutton(captionsFrame, text="Use filename for caption moods", variable=captionFilenameVar, cursor="question_arrow")
+    toggleMultiClickButton = Checkbutton(captionsFrame, text="Multi-Click popups", variable=multiClickVar, cursor="question_arrow")
 
-    captionttp = CreateToolTip(
-        toggleCaptionsButton, "Enables captions on popups. These are short segments of text written by the pack creator that adorn the top of each popup."
-    )
     multiclickttp = CreateToolTip(
         toggleMultiClickButton,
         "If the pack creator uses advanced caption settings, this will enable the feature for certain popups to take multiple clicks "
@@ -2170,57 +2169,64 @@ def show_window():
         'of images named things like "goon300242", "goon-love", "goon_ytur8843", etc.\n\n'
         "This is how EdgeWare processed captions before moods were implemented fully in EdgeWare++. The reason you'd turn this off, however, "
         "is that if the mood doesn't match the filename, it won't display at all.\n\n For example, if you had a mood named \"succubus\", but "
-        'no files started with "succubus", the captions of that mood would never show up. Thus it is recommended to only turn this on if '
+        'no filtered files started with "succubus", the captions of that mood would never show up. Thus it is recommended to only turn this on if '
         "the pack supports it.",
     )
+
+    enableCaptionsFrame.pack(fill="x", pady=(0,5))
+    toggleCaptionsButton.pack(fill="both", expand=1)
+    captionsFrame.pack(fill="x")
+    toggleFilenameButton.pack(fill="y", side="left", expand=1)
+    toggleMultiClickButton.pack(fill="y", side="left",expand=1)
+
+    Label(tabCaptions, text="Subliminal Message Popups", font=titleFont, relief=GROOVE).pack(pady=2)
+    #NOTE: subliminal message popups used to be called "capPop" back when all of this was compressed to a single page and there was little space.
+    #I am not messing about with the variables on this in case users want to import their old settings.
+    #(however, the name was awful and needed to be changed so people could actually understand it)
+    subMessageOptionsFrame = Frame(tabCaptions, borderwidth=5, relief=RAISED)
+    toggleCaptionMood = Checkbutton(subMessageOptionsFrame, text="Use Subliminal specific mood", variable=capPopMoodVar, cursor="question_arrow")
+
     capmoodttp = CreateToolTip(
         toggleCaptionMood,
-        'Caption Popups have the option to use a special mood in the captions.json file called "subliminals". This mood doesn\'t '
+        'Subliminal Message Popups have the option to use a special mood in the captions.json file called "subliminals". This mood doesn\'t '
         "normally appear like other captions, and is meant for short, fast messages that will blink at you very quickly.\n\n"
         "If your pack doesn't support subliminals, this "
         "setting doesn't need to be disabled- it will automatically switch to using regular captions.",
     )
 
-    captionsPopupSlider = Scale(capPopFrame, label="Cap-Pop Chance", from_=0, to=100, orient="horizontal", variable=capPopChanceVar)
+    capPopFrame = Frame(subMessageOptionsFrame)
+    capPopOpacityFrame = Frame(subMessageOptionsFrame)
+    capPopTimerFrame = Frame(subMessageOptionsFrame)
+
+    captionsPopupSlider = Scale(capPopFrame, label="Subliminal Message Chance", from_=0, to=100, orient="horizontal", variable=capPopChanceVar)
     captionsPopupManual = Button(
         capPopFrame,
-        text="Manual Cap-Pop...",
+        text="Manual Subliminal...",
         command=lambda: assign(capPopChanceVar, simpledialog.askinteger("Manual Caption Popup Chance (%)", prompt="[0-100]: ")),
-        cursor="question_arrow",
     )
-    capPopOpacitySlider = Scale(capPopOpacityFrame, label="Cap-Pop Opacity", from_=1, to=100, orient="horizontal", variable=capPopOpacityVar)
+    capPopOpacitySlider = Scale(capPopOpacityFrame, label="Subliminal Message Opacity", from_=1, to=100, orient="horizontal", variable=capPopOpacityVar)
     capPopOpacityManual = Button(
         capPopOpacityFrame,
         text="Manual Opacity...",
         command=lambda: assign(capPopOpacityVar, simpledialog.askinteger("Manual Caption Popup Opacity (%)", prompt="[1-100]: ")),
     )
-    capPopTimerSlider = Scale(capPopTimerFrame, label="Cap-Pop Timer", from_=1, to=1000, orient="horizontal", variable=capPopTimerVar)
+    capPopTimerSlider = Scale(capPopTimerFrame, label="Subliminal Message Timer (ms)", from_=1, to=1000, orient="horizontal", variable=capPopTimerVar)
     capPopTimerManual = Button(
         capPopTimerFrame,
         text="Manual Timer...",
-        command=lambda: assign(capPopTimerVar, simpledialog.askinteger("Manual Caption Popup Timer (ms)", prompt="[1-1000]: ")),
+        command=lambda: assign(capPopTimerVar, simpledialog.askinteger("Manual Subliminal Message Timer (ms)", prompt="[1-1000]: ")),
     )
 
-    cappopttp = CreateToolTip(
-        captionsPopupManual,
-        "Caption Popups are short full-screen popups that flash up briefly before they disappear, similar to subliminal messages. They "
-        'take from the pack\'s captions.json file, and can use a specific "subliminals" mood to have unique captions (if the setting to the left is toggled on).',
-    )
+    subMessageOptionsFrame.pack(fill="x")
+    toggleCaptionMood.pack(fill="y", side="left")
 
-    captionsFrame.pack(fill="x")
-    captionsSubFrame1.pack(fill="y", side="left")
-    toggleCaptionsButton.pack(fill="y", side="top")
-    toggleFilenameButton.pack(fill="y", side="top")
-    toggleMultiClickButton.pack(fill="y", side="top")
-    toggleCaptionMood.pack(fill="y", side="top")
-
-    capPopFrame.pack(fill="y", side="left")
+    capPopFrame.pack(fill="x", side="left", padx=(0, 3), expand=1)
     captionsPopupSlider.pack(fill="x", padx=1, expand=1)
     captionsPopupManual.pack(fill="x")
-    capPopOpacityFrame.pack(fill="y", side="left")
+    capPopOpacityFrame.pack(fill="x", side="left", expand=1)
     capPopOpacitySlider.pack(fill="x", padx=1, expand=1)
     capPopOpacityManual.pack(fill="x")
-    capPopTimerFrame.pack(fill="y", side="left")
+    capPopTimerFrame.pack(fill="x", side="left", padx=(3, 0), expand=1)
     capPopTimerSlider.pack(fill="x", padx=1, expand=1)
     capPopTimerManual.pack(fill="x")
 
