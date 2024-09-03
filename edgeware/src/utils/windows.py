@@ -17,6 +17,10 @@ def set_vlc_window(player: vlc.MediaPlayer, window_id: int) -> None:
     player.set_hwnd(window_id)
 
 
+def open_directory(url: str) -> None:
+    subprocess.Popen(f'explorer "{url}"')
+
+
 def make_shortcut(title: str, process: Path, icon: Path, location: Path | None = None) -> None:
     filename = f"{title}.lnk"
     file = (location if location else Path(os.path.expanduser("~\\Desktop"))) / filename

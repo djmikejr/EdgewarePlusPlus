@@ -1,5 +1,3 @@
-import logging
-import sys
 from threading import Thread
 from tkinter import Tk
 
@@ -14,6 +12,7 @@ from features.video_popup import VideoPopup
 from pack import Pack
 from roll import RollTarget, roll_targets
 from settings import Settings
+from utils import utils
 from utils.utils import State
 
 
@@ -24,6 +23,8 @@ def main(root: Tk, settings: Settings, targets: list[RollTarget]) -> None:
 
 
 if __name__ == "__main__":
+    utils.init_logging("main")
+
     root = Tk()
     settings = Settings()
     pack = Pack()
@@ -38,8 +39,6 @@ if __name__ == "__main__":
         RollTarget(lambda: play_audio(settings, pack, state), settings.audio_chance),
         RollTarget(lambda: open_web(pack), settings.web_chance),
     ]
-
-    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
     def start_main() -> None:
         Thread(target=lambda: replace_images(root, settings, pack), daemon=True).start()  # Thread for performance reasons

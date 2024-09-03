@@ -1,5 +1,8 @@
 import platform
+import time
 from dataclasses import dataclass
+
+from paths import Data
 
 
 @dataclass
@@ -19,6 +22,17 @@ class State:
 
     def reset_wallpaper(self) -> bool:
         return not self.hibernate_active and self.popup_number == 0
+
+
+def init_logging(filename: str) -> str:
+    Data.LOGS.mkdir(parents=True, exist_ok=True)
+    log_time = time.asctime().replace(" ", "_").replace(":", "-")
+    log_file = f"{log_time}-{filename}.txt"
+
+    handlers = [logging.StreamHandler(stream=sys.stdout), logging.FileHandler(filename=Data.LOGS / log_file)]
+    logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG, force=True, handlers=handlers)
+
+    return log_file
 
 
 def is_linux():

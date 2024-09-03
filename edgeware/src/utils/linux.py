@@ -37,6 +37,10 @@ def set_vlc_window(player: vlc.MediaPlayer, window_id: int) -> None:
     player.set_xwindow(window_id)
 
 
+def open_directory(url: str) -> None:
+    subprocess.Popen(["xdg-open", url])
+
+
 def make_shortcut(title: str, process: Path, icon: Path, location: Path | None = None) -> None:
     default_config = load_default_config()
 

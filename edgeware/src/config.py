@@ -50,7 +50,7 @@ from widgets.tooltip import CreateToolTip
 PATH = Path(__file__).parent
 os.chdir(PATH)
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+log_file = utils.init_logging("config")
 
 
 # if you are working on this i'm just letting you know there's like almost no documentation for ttkwidgets
@@ -1213,40 +1213,39 @@ def show_window():
     # directories
     Label(tabFile, text="Directories", font=titleFont, relief=GROOVE).pack(pady=2)
 
-    # TODO: Decide what to do with log files
-    # logNum = len(os.listdir(LOG_PATH)) if os.path.exists(LOG_PATH) else 0
-    # logsFrame = Frame(tabFile, borderwidth=5, relief=RAISED)
-    # lSubFrame1 = Frame(logsFrame)
-    # lSubFrame2 = Frame(logsFrame)
-    # openLogsButton = Button(lSubFrame2, text="Open Logs Folder", command=lambda: explorerView(LOG_PATH))
-    # clearLogsButton = Button(lSubFrame2, text="Delete All Logs", command=lambda: cleanLogs(), cursor="question_arrow")
-    # logStat = Label(lSubFrame1, text=f"Total Logs: {logNum}")
+    logNum = len(os.listdir(Data.LOGS)) if os.path.exists(Data.LOGS) else 0
+    logsFrame = Frame(tabFile, borderwidth=5, relief=RAISED)
+    lSubFrame1 = Frame(logsFrame)
+    lSubFrame2 = Frame(logsFrame)
+    openLogsButton = Button(lSubFrame2, text="Open Logs Folder", command=lambda: explorerView(Data.LOGS))
+    clearLogsButton = Button(lSubFrame2, text="Delete All Logs", command=lambda: cleanLogs(), cursor="question_arrow")
+    logStat = Label(lSubFrame1, text=f"Total Logs: {logNum}")
 
-    # clearlogsttp = CreateToolTip(clearLogsButton, "This will delete every log (except the log currently being written).")
+    clearlogsttp = CreateToolTip(clearLogsButton, "This will delete every log (except the log currently being written).")
 
-    # def cleanLogs():
-    #     try:
-    #         logNum = len(os.listdir(LOG_PATH)) if os.path.exists(LOG_PATH) else 0
-    #         if messagebox.askyesno("Confirm Delete", f"Are you sure you want to delete all logs? There are currently {logNum}.", icon="warning") == True:
-    #             if os.path.exists(LOG_PATH) and os.listdir(LOG_PATH):
-    #                 logs = os.listdir(LOG_PATH)
-    #                 for f in logs:
-    #                     if os.path.splitext(f)[0] == os.path.splitext(log_file)[0]:
-    #                         continue
-    #                     e = os.path.splitext(f)[1].lower()
-    #                     if e == ".txt":
-    #                         os.remove(LOG_PATH / f)
-    #                 logNum = len(os.listdir(LOG_PATH)) if os.path.exists(LOG_PATH) else 0
-    #                 logStat.configure(text=f"Total Logs: {logNum}")
-    #     except Exception as e:
-    #         logging.warning(f"could not clear logs. this might be an issue with attempting to delete the log currently in use. if so, ignore this prompt. {e}")
+    def cleanLogs():
+        try:
+            logNum = len(os.listdir(Data.LOGS)) if os.path.exists(Data.LOGS) else 0
+            if messagebox.askyesno("Confirm Delete", f"Are you sure you want to delete all logs? There are currently {logNum}.", icon="warning") == True:
+                if os.path.exists(Data.LOGS) and os.listdir(Data.LOGS):
+                    logs = os.listdir(Data.LOGS)
+                    for f in logs:
+                        if os.path.splitext(f)[0] == os.path.splitext(log_file)[0]:
+                            continue
+                        e = os.path.splitext(f)[1].lower()
+                        if e == ".txt":
+                            os.remove(Data.LOGS / f)
+                    logNum = len(os.listdir(Data.LOGS)) if os.path.exists(Data.LOGS) else 0
+                    logStat.configure(text=f"Total Logs: {logNum}")
+        except Exception as e:
+            logging.warning(f"could not clear logs. this might be an issue with attempting to delete the log currently in use. if so, ignore this prompt. {e}")
 
-    # logsFrame.pack(fill="x", pady=2)
-    # lSubFrame1.pack(fill="both", side="left", expand=1)
-    # lSubFrame2.pack(fill="both", side="left", expand=1)
-    # logStat.pack(fill="both", expand=1)
-    # openLogsButton.pack(fill="x", expand=1)
-    # clearLogsButton.pack(fill="x", expand=1)
+    logsFrame.pack(fill="x", pady=2)
+    lSubFrame1.pack(fill="both", side="left", expand=1)
+    lSubFrame2.pack(fill="both", side="left", expand=1)
+    logStat.pack(fill="both", expand=1)
+    openLogsButton.pack(fill="x", expand=1)
+    clearLogsButton.pack(fill="x", expand=1)
 
     moodsFileFrame = Frame(tabFile, borderwidth=5, relief=RAISED)
     mfSubFrame1 = Frame(moodsFileFrame)

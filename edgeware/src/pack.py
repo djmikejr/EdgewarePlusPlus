@@ -7,6 +7,7 @@ from paths import PACK_PATH, Assets
 
 
 # TODO: Handle cases where resources are not present
+# TODO: Validate JSON formats
 class Pack:
     # Directories
     AUDIO = PACK_PATH / "aud"
@@ -30,22 +31,18 @@ class Pack:
 
     def __init__(self):
         def list_resources(dir: Path) -> list[Path]:
-            return [dir / file for file in os.listdir(dir)] if os.path.isdir(dir) else []
+            return [dir / file for file in os.listdir(dir)] if dir.is_dir() else []
 
         self.images = list_resources(self.IMAGE)
         self.videos = list_resources(self.VIDEO)
         self.audio = list_resources(self.AUDIO)
         self.subliminals = list_resources(self.SUBLIMINALS)
 
-        self.icon = self.ICON if os.path.isdir(self.ICON) else Assets.DEFAULT_ICON
-        self.wallpaper = self.WALLPAPER
+        self.icon = self.ICON if self.ICON.is_file() else Assets.DEFAULT_ICON
+        self.wallpaper = self.WALLPAPER if self.WALLPAPER.is_file() else Assets.DEFAULT_WALLPAPER
 
-        self.startup_splash = Assets.DEFAULT_STARTUP_SPLASH
-        for suffix in [".png", ".gif", ".jpg", ".jpeg", ".bmp"]:
-            path = self.SPLASH.with_suffix(suffix)
-            if os.path.isfile(path):
-                self.startup_splash = path
-                break
+        splash_paths = [self.SPLASH.with_suffix(suffix) for suffix in [".png", ".gif", ".jpg", ".jpeg", ".bmp"]]
+        self.startup_splash = next((path for path in splash_paths if path.is_file()), Assets.DEFAULT_STARTUP_SPLASH)
 
         with open(self.CAPTIONS) as f:
             self.captions = json.loads(f.read())

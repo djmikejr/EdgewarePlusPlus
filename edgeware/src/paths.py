@@ -41,6 +41,7 @@ class Data:
 
     BACKUPS = ROOT / "backups"
     CONFIG = ROOT / "config.json"
+    LOGS = ROOT / "logs"
     MOODS = ROOT / "moods"
 
     PRESETS = PATH / "presets"  # TODO: Proper location
