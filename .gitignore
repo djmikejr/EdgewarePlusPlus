@@ -163,5 +163,16 @@ cython_debug/
 .vs/
 
 # Ignore anything that could be considered a local file
-edgeware/data/
+edgeware/data/*
 edgeware/resource/
+!edgeware/data/presets
+!edgeware/data/presets/default.cfg
+!edgeware/data/presets/default.txt
+!edgeware/data/presets/hardcore.cfg
+!edgeware/data/presets/hardcore.txt
+!edgeware/data/presets/lowkey.cfg
+!edgeware/data/presets/lowkey.txt
+!edgeware/data/presets/petittournesol.cfg
+!edgeware/data/presets/petittournesol.txt
+!edgeware/data/presets/relaxed.cfg
+!edgeware/data/presets/relaxed.txt
