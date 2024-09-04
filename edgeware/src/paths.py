@@ -12,6 +12,7 @@ class Process:
 
     CONFIG = PATH / "config.py"
     MAIN = PATH / "main.py"
+    PANIC = PATH / "panic.py"
 
 
 @dataclass

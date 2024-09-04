@@ -4,10 +4,11 @@ import time
 import webbrowser
 from collections.abc import Callable
 from threading import Thread
-from tkinter import Tk, simpledialog
+from tkinter import Tk
 
 import pystray
 from pack import Pack
+from panic import panic
 from paths import PACK_PATH, Assets, Process
 from PIL import Image
 from playsound import playsound
@@ -15,20 +16,6 @@ from pypresence import Presence
 from settings import Settings
 from utils import utils
 from utils.utils import State
-
-
-def panic(root: Tk, settings: Settings, state: State, key: str | None = None) -> None:
-    if settings.panic_disabled or (key and key != settings.panic_key):
-        return
-
-    if settings.timer_mode and state.timer_active:
-        password = simpledialog.askstring("Panic", "Enter Panic Password")
-        if password != settings.timer_password:
-            return
-
-    # TODO: https://github.com/araten10/EdgewarePlusPlus/issues/24
-    utils.set_wallpaper(Assets.DEFAULT_PANIC_WALLPAPER)
-    root.destroy()
 
 
 def play_audio(settings: Settings, pack: Pack, state: State) -> None:
@@ -70,6 +57,7 @@ def make_desktop_icons(settings: Settings) -> None:
     if settings.desktop_icons:
         utils.make_shortcut("Edgeware++", Process.MAIN, Assets.DEFAULT_ICON)
         utils.make_shortcut("Edgeware++ Config", Process.CONFIG, Assets.CONFIG_ICON)
+        utils.make_shortcut("Edgeware++ Panic", Process.PANIC, Assets.PANIC_ICON)
 
 
 def handle_wallpaper(root: Tk, settings: Settings, pack: Pack, state: State) -> None:

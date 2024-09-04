@@ -3,9 +3,10 @@ import time
 from threading import Thread
 from tkinter import Button, Label, Tk, Toplevel
 
-from features.misc import open_web, panic
+from features.misc import open_web
 from features.theme import get_theme
 from pack import Pack
+from panic import panic
 from paths import Assets
 from roll import roll
 from screeninfo import get_monitors

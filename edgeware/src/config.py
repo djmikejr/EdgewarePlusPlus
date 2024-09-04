@@ -41,7 +41,8 @@ from tkinter import (
 import requests
 import ttkwidgets as tw
 from pack import Pack
-from paths import PACK_PATH, Assets, Data
+from panic import send_panic
+from paths import PACK_PATH, Assets, Data, Process
 from PIL import Image, ImageTk
 from settings import load_config, load_default_config
 from utils import utils
@@ -1069,7 +1070,7 @@ def show_window():
         command=lambda: getKeyboardInput(setPanicButtonButton, panicButtonVar),
         cursor="question_arrow",
     )
-    doPanicButton = Button(panicFrame, text="Perform Panic", command=lambda: subprocess.Popen([sys.executable, Process.PANIC]))
+    doPanicButton = Button(panicFrame, text="Perform Panic", command=send_panic)
 
     setpanicttp = CreateToolTip(setPanicButtonButton, 'NOTE: To use this hotkey you must be "focused" on a EdgeWare popup. Click on a popup before using.')
 
@@ -3523,7 +3524,7 @@ def write_save(varList: list[StringVar | IntVar | BooleanVar], nameList: list[st
         logging.info(f"wrote config file: {json.dumps(temp)}")
 
     if int(varList[nameList.index("runOnSaveQuit")].get()) == 1 and exitAtEnd:
-        subprocess.Popen([sys.executable, Process.START])
+        subprocess.Popen([sys.executable, Process.MAIN])
 
     if exitAtEnd:
         logging.info("exiting config")

@@ -10,6 +10,7 @@ from features.prompt import Prompt
 from features.startup_splash import StartupSplash
 from features.video_popup import VideoPopup
 from pack import Pack
+from panic import start_panic_listener
 from roll import RollTarget, roll_targets
 from settings import Settings
 from utils import utils
@@ -47,6 +48,7 @@ if __name__ == "__main__":
         handle_discord(root, settings, pack)
         handle_timer_mode(root, settings, state)
         handle_mitosis_mode(root, settings, pack, state)
+        start_panic_listener(root, settings, state)
 
         if settings.hibernate_mode:
             if not settings.hibernate_fix_wallpaper:
