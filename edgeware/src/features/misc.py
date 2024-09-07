@@ -9,7 +9,7 @@ from tkinter import Tk
 import pystray
 from pack import Pack
 from panic import panic
-from paths import PACK_PATH, Assets, Process
+from paths import Assets, Process, Resource
 from PIL import Image
 from playsound import playsound
 from pypresence import Presence
@@ -70,7 +70,7 @@ def handle_wallpaper(root: Tk, settings: Settings, pack: Pack, state: State) -> 
             wallpapers.remove(previous)
 
         wallpaper = random.choice(wallpapers)
-        utils.set_wallpaper(PACK_PATH / wallpaper)
+        utils.set_wallpaper(Resource.ROOT / wallpaper)
 
         t = settings.wallpaper_timer
         v = settings.wallpaper_variance
@@ -91,7 +91,7 @@ def handle_discord(root: Tk, settings: Settings, pack: Pack) -> None:
         presence.connect()
 
         def update() -> None:
-            presence.update(state=pack.discord_text, large_image=pack.discord_image, start=int(time.time()))
+            presence.update(state=pack.discord.text, large_image=pack.discord.image, start=int(time.time()))
             root.after(15000, update)
 
         update()

@@ -79,7 +79,7 @@ class Popup(Toplevel):
         else:
             button = Button(
                 self,
-                text=self.pack.close_text,
+                text=self.pack.captions.close_text,
                 command=self.close,
                 fg=self.theme.fg,
                 bg=self.theme.bg,

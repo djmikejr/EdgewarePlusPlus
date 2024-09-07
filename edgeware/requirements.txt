@@ -13,3 +13,4 @@ requests
 screeninfo
 sounddevice
 ttkwidgets
+voluptuous

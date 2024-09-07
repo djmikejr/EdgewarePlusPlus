@@ -27,7 +27,7 @@ class Prompt(Toplevel):
         y = monitor.y + (monitor.height - height) // 2
         self.geometry(f"{width}x{height}+{x}+{y}")
 
-        Label(self, text="\n" + pack.prompt_command_text + "\n", fg=self.theme.fg, bg=self.theme.bg).pack()
+        Label(self, text="\n" + pack.prompts.command_text + "\n", fg=self.theme.fg, bg=self.theme.bg).pack()
 
         prompt = pack.random_prompt()
         Label(self, text=prompt, wraplength=width, fg=self.theme.fg, bg=self.theme.bg).pack()
@@ -36,7 +36,7 @@ class Prompt(Toplevel):
         input.pack()
         button = Button(
             self,
-            text=pack.prompt_submit_text,
+            text=pack.prompts.submit_text,
             command=lambda: self.submit(settings.prompt_max_mistakes, prompt, input.get(1.0, "end-1c")),
             fg=self.theme.fg,
             bg=self.theme.bg,

@@ -3,8 +3,6 @@ from pathlib import Path
 
 PATH = Path(__file__).parent.parent
 
-PACK_PATH = PATH / "resource"
-
 
 @dataclass
 class Process:
@@ -45,3 +43,28 @@ class Data:
     LOGS = ROOT / "logs"
     MOODS = ROOT / "moods"
     PRESETS = PATH / "presets"
+
+
+@dataclass
+class Resource:
+    ROOT = PATH / "resource"
+
+    # Directories
+    AUDIO = ROOT / "aud"
+    IMAGE = ROOT / "img"
+    SUBLIMINALS = ROOT / "subliminals"
+    VIDEO = ROOT / "vid"
+
+    # Files
+    CAPTIONS = ROOT / "captions.json"
+    CONFIG = ROOT / "config.json"  # TODO
+    CORRUPTION = ROOT / "corruption.json"  # TODO
+    DISCORD = ROOT / "discord.dat"
+    ICON = ROOT / "icon.ico"
+    INFO = ROOT / "info.json"
+    SPLASH = ROOT / "loading_splash"
+    MEDIA = ROOT / "media.json"
+    PROMPT = ROOT / "prompt.json"
+    WALLPAPER = ROOT / "wallpaper.png"
+    WEB = ROOT / "web.json"
+    WEB_RESOURCE = ROOT / "webResource.json"  # TODO
