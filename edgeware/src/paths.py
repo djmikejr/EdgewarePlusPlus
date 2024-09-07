@@ -42,7 +42,7 @@ class Data:
     CONFIG = ROOT / "config.json"
     LOGS = ROOT / "logs"
     MOODS = ROOT / "moods"
-    PRESETS = PATH / "presets"
+    PRESETS = ROOT / "presets"
 
 
 @dataclass
