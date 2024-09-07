@@ -41,6 +41,7 @@ class Popup(Toplevel):
         self.try_caption()
         self.try_button()
         self.try_move()
+        self.try_multi_click()
         self.try_timeout()
         self.try_pump_scare()
         self.geometry(f"{self.width}x{self.height}+{self.x}+{self.y}")
@@ -70,17 +71,17 @@ class Popup(Toplevel):
 
     def try_caption(self) -> None:
         if self.settings.captions_in_popups:
-            label = Label(self, text=self.pack.random_caption(), wraplength=self.width, fg=self.theme.fg, bg=self.theme.bg)
+            label = Label(self, text=self.pack.random_caption(self.media), wraplength=self.width, fg=self.theme.fg, bg=self.theme.bg)
             label.place(x=5, y=5)
 
     def try_button(self) -> None:
         if self.settings.buttonless:
-            self.bind("<ButtonRelease-1>", lambda event: self.close())
+            self.bind("<ButtonRelease-1>", lambda event: self.click())
         else:
             button = Button(
                 self,
                 text=self.pack.captions.close_text,
-                command=self.close,
+                command=self.click,
                 fg=self.theme.fg,
                 bg=self.theme.bg,
                 activeforeground=self.theme.fg,
@@ -118,6 +119,9 @@ class Popup(Toplevel):
 
         if roll(self.settings.moving_chance):
             Thread(target=move, daemon=True).start()
+
+    def try_multi_click(self) -> None:
+        self.clicks_to_close = self.pack.random_clicks_to_close(self.media) if self.settings.multi_click_popups else 1
 
     def try_timeout(self) -> None:
         def fade_out() -> None:
@@ -157,6 +161,11 @@ class Popup(Toplevel):
     def try_reset_wallpaper(self) -> None:
         if self.settings.hibernate_fix_wallpaper and self.state.reset_wallpaper():
             utils.set_wallpaper(Assets.DEFAULT_PANIC_WALLPAPER)
+
+    def click(self) -> None:
+        self.clicks_to_close -= 1
+        if self.clicks_to_close <= 0:
+            self.close()
 
     def close(self) -> None:
         self.state.popup_number -= 1

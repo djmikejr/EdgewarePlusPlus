@@ -14,7 +14,8 @@ class VideoPopup(Popup):
             return
         super().__init__(root, settings, pack, state)
 
-        video = pack.random_video()
+        self.media = pack.random_video()
+        video = self.media
         properties = get_video_properties(video)
 
         self.compute_geometry(properties["width"], properties["height"])

@@ -19,7 +19,8 @@ class ImagePopup(Popup):
 
         self.denial = roll(self.settings.denial_chance)
 
-        image = Image.open(self.pack.random_image())
+        self.media = self.pack.random_image()
+        image = Image.open(self.media)
 
         self.compute_geometry(image.width, image.height)
         ImageLabel(self, self.try_subliminal(image), (self.width, self.height), self.try_denial_filter()).pack()

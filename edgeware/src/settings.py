@@ -72,6 +72,7 @@ class Settings:
 
         # Captions
         self.captions_in_popups = bool(config["showCaptions"])
+        self.multi_click_popups = bool(config["multiClick"])
         self.caption_popup_chance = int(config["capPopChance"])  # 0 to 100
         self.caption_popup_opacity = int(config["capPopOpacity"]) / 100  # Float between 0 and 1
         self.caption_popup_timeout = int(config["capPopTimer"])  # Milliseconds

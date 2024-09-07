@@ -56,19 +56,28 @@ class Pack:
     def filter_captions(self) -> list[CaptionMood]:
         return list(filter(lambda c: c.mood in self.active_moods.captions, self.captions.moods))
 
-    # TODO: If there are none?
-    # TODO: Unused
-    def random_caption_for_media(self, media: Path) -> tuple[str, int]:
-        moods = self.filter_captions()
-        for c in moods:
+    def caption_mood_of_media(self, media: Path) -> CaptionMood | None:
+        for c in self.filter_captions():
             if media.name.startswith(c.mood):
-                return (random.choice(c.captions), random.randint(1, c.max_clicks))
-        return (random.choice(self.captions.default), 1)
+                return c
+        return None
 
     # TODO: If there are none?
-    def random_caption(self) -> str:
+    def random_caption(self, media: Path | None = None) -> str:
+        if media:
+            mood = self.caption_mood_of_media(media)
+            if mood:
+                return random.choice(mood.captions)
+            return random.choice(self.captions.default)
+
         moods = [self.captions.default] + list(map(lambda c: c.captions, self.filter_captions()))
         return random.choice([caption for mood in moods for caption in mood])
+
+    def random_clicks_to_close(self, media: Path) -> int:
+        mood = self.caption_mood_of_media(media)
+        if mood:
+            return random.randint(1, mood.max_clicks)
+        return 1
 
     def random_denial(self) -> str:
         return random.choice(self.captions.denial)  # Guaranteed to be non-empty
