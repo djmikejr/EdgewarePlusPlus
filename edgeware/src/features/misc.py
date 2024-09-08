@@ -14,8 +14,8 @@ from PIL import Image
 from playsound import playsound
 from pypresence import Presence
 from settings import Settings
+from state import State
 from utils import utils
-from utils.utils import State
 
 
 def play_audio(settings: Settings, pack: Pack, state: State) -> None:
@@ -75,6 +75,9 @@ def handle_wallpaper(root: Tk, settings: Settings, pack: Pack, state: State) -> 
         t = settings.wallpaper_timer
         v = settings.wallpaper_variance
         root.after(t + random.randint(-v, v), lambda: rotate(wallpaper))
+
+    if settings.corruption_mode and settings.corruption_wallpaper:
+        return
 
     if settings.rotate_wallpaper and len(settings.wallpapers) > 1:
         rotate()

@@ -7,10 +7,10 @@ from pathlib import Path
 from typing import TypeVar
 
 from paths import Data, Resource
-from voluptuous import ALLOW_EXTRA, PREVENT_EXTRA, All, Equal, In, Length, Number, Optional, Range, Schema, Url
+from voluptuous import ALLOW_EXTRA, PREVENT_EXTRA, All, Any, Equal, In, Length, Number, Optional, Range, Schema, Url
 from voluptuous.error import Invalid
 
-from pack.data import ActiveMoods, CaptionMood, Captions, Discord, Info, Media, PromptMood, Prompts, Web
+from pack.data import ActiveMoods, CaptionMood, Captions, CorruptionLevel, Discord, Info, Media, PromptMood, Prompts, Web
 
 T = TypeVar("T")
 
@@ -47,7 +47,7 @@ def load_captions() -> Captions:
                     str: {
                         Optional("caption"): str,
                         Optional("images"): str,
-                        Optional("chance"): All(Number(), Range(min=0, max=100, min_included=False)),
+                        Optional("chance"): All(Any(int, float), Range(min=0, max=100, min_included=False)),
                         Optional("max"): All(int, Range(min=1)),
                     }
                 },
@@ -69,6 +69,45 @@ def load_captions() -> Captions:
         return Captions(moods, captions.get("subtext", default.close_text), captions.get("denial", default.denial), captions["default"])
 
     return try_load(Resource.CAPTIONS, load) or default
+
+
+# TODO: Config
+def load_corruption():
+    def load(content: str):
+        corruption = json.loads(content)
+
+        Schema(
+            {
+                "moods": {Number(scale=0): {"add": [str], "remove": [str]}},
+                "wallpapers": {Any(Number(scale=0), "default"): str},
+                "config": {Number(scale=0): {str: Any(int, str)}},
+            }
+        )(corruption)
+
+        moods = corruption["moods"]
+        wallpapers = corruption["wallpapers"]
+
+        levels: list[CorruptionLevel] = []
+        for i in range(max(len(moods), len(wallpapers) - (1 if "default" in wallpapers else 0))):
+            n = str(i + 1)
+
+            mood_change = moods.get(n, {"add": [], "remove": []})
+            wallpaper = wallpapers.get(n)
+
+            if i == 0:
+                levels.append(CorruptionLevel(set(mood_change["add"]), wallpaper or wallpapers.get("default")))
+            else:
+                new_moods = levels[i - 1].moods.copy()
+                for mood in mood_change["add"]:
+                    new_moods.add(mood)
+                for mood in mood_change["remove"]:
+                    new_moods.remove(mood)
+
+                levels.append(CorruptionLevel(new_moods, wallpaper or levels[i - 1].wallpaper))
+
+        return levels
+
+    return try_load(Resource.CORRUPTION, load) or []
 
 
 def load_discord() -> Discord:
@@ -127,7 +166,7 @@ def load_prompt() -> Prompts:
         schema = Schema(
             {
                 "moods": All([str], Length(min=1)),
-                "freqList": All([All(Number(), Range(min=0, min_included=False))], Length(min=1)),
+                "freqList": All([All(Any(int, float), Range(min=0, min_included=False))], Length(min=1)),
                 "minLen": All(int, Range(min=1)),
                 "maxLen": All(int, Range(min=1)),
                 Optional("subtext"): str,

@@ -18,6 +18,13 @@ class Captions:
 
 
 @dataclass
+class CorruptionLevel:
+    moods: set[str]
+    wallpaper: str | None
+    # TODO: config
+
+
+@dataclass
 class Discord:
     text: str = "[No discord.dat resource]"
     image: str = "default"

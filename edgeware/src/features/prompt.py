@@ -4,7 +4,7 @@ from features.theme import get_theme
 from pack import Pack
 from screeninfo import get_monitors
 from settings import Settings
-from utils.utils import State
+from state import State
 
 
 class Prompt(Toplevel):

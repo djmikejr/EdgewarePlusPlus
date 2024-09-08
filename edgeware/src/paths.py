@@ -40,6 +40,7 @@ class Data:
 
     BACKUPS = ROOT / "backups"
     CONFIG = ROOT / "config.json"
+    CORRUPTION_LAUNCHES = ROOT / "corruption_launches.dat"
     LOGS = ROOT / "logs"
     MOODS = ROOT / "moods"
     PRESETS = ROOT / "presets"
@@ -58,7 +59,7 @@ class Resource:
     # Files
     CAPTIONS = ROOT / "captions.json"
     CONFIG = ROOT / "config.json"  # TODO
-    CORRUPTION = ROOT / "corruption.json"  # TODO
+    CORRUPTION = ROOT / "corruption.json"
     DISCORD = ROOT / "discord.dat"
     ICON = ROOT / "icon.ico"
     INFO = ROOT / "info.json"

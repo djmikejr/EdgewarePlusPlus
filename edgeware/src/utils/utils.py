@@ -2,28 +2,8 @@ import logging
 import platform
 import sys
 import time
-from dataclasses import dataclass
 
 from paths import Data
-
-
-@dataclass
-class State:
-    audio_number = 0
-    fill_number = 0
-    popup_number = 0
-    prompt_active = False
-    subliminal_number = 0
-    video_number = 0
-
-    timer_active = False
-
-    hibernate_active = False
-    hibernate_id = None
-    pump_scare = False
-
-    def reset_wallpaper(self) -> bool:
-        return not self.hibernate_active and self.popup_number == 0
 
 
 def init_logging(filename: str) -> str:
@@ -32,7 +12,7 @@ def init_logging(filename: str) -> str:
     log_file = f"{log_time}-{filename}.txt"
 
     handlers = [logging.StreamHandler(stream=sys.stdout), logging.FileHandler(filename=Data.LOGS / log_file)]
-    logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG, force=True, handlers=handlers)
+    logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.INFO, force=True, handlers=handlers)
 
     return log_file
 

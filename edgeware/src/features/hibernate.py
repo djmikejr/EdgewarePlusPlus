@@ -1,3 +1,4 @@
+import logging
 import random
 from collections.abc import Callable
 from threading import Thread
@@ -8,7 +9,7 @@ from features.misc import handle_wallpaper
 from pack import Pack
 from roll import RollTarget, roll_targets
 from settings import Settings
-from utils.utils import State
+from state import State
 
 
 def spaced(root: Tk, settings: Settings, targets: list[RollTarget], run: Callable[[], bool]) -> None:
@@ -107,3 +108,5 @@ def main_hibernate(root: Tk, settings: Settings, pack: Pack, state: State, targe
             targets[0].function()  # Image popup
             targets[4].function()  # Audio
             on_end()
+        case _:
+            logging.error(f"Unknown hibernate type {type}.")

@@ -4,8 +4,8 @@ from tkinter import Tk, simpledialog
 
 from paths import Assets
 from settings import Settings
+from state import State
 from utils import utils
-from utils.utils import State
 
 ADDRESS = ("localhost", 6000)
 AUTHKEY = b"Edgeware++"

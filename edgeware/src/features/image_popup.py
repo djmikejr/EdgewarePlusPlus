@@ -6,7 +6,7 @@ from pack import Pack
 from PIL import Image, ImageFilter
 from roll import roll
 from settings import Settings
-from utils.utils import State
+from state import State
 from widgets.image_label import GifLike, ImageLabel
 
 

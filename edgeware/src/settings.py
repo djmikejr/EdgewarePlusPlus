@@ -117,3 +117,16 @@ class Settings:
         self.hibernate_activity_length = int(config["hibernateLength"]) * 1000  # Milliseconds
         # TODO: Pump-scare audio
         # self.pump_scare_offset = int(config["pumpScareOffset"])  # Seconds
+
+        # Corruption mode
+        self.corruption_mode = bool(config["corruptionMode"])
+        # self.corruption_full = bool(config["corruptionFullPerm"])
+        # self.corruption_fade = config["corruptionFadeType"]
+        self.corruption_trigger = config["corruptionTrigger"]
+        self.corruption_time = int(config["corruptionTime"]) * 1000  # Milliseconds
+        self.corruption_popups = int(config["corruptionPopups"])
+        self.corruption_launches = int(config["corruptionLaunches"])
+        self.corruption_wallpaper = not bool(config["corruptionWallpaperCycle"])
+        # self.corruption_themes = not bool(config["corruptionThemeCycle"])
+        self.corruption_purity = bool(config["corruptionPurityMode"])
+        self.corruption_dev_mode = bool(config["corruptionDevMode"])

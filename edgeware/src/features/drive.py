@@ -10,7 +10,7 @@ import filetype
 from pack import Pack
 from paths import Data
 from settings import Settings
-from utils.utils import State
+from state import State
 
 
 def filter_avoid_list(settings: Settings, dirs: list[str]) -> None:

@@ -2,6 +2,7 @@ from threading import Thread
 from tkinter import Tk
 
 from features.caption_popup import CaptionPopup
+from features.corruption import handle_corruption
 from features.drive import fill_drive, replace_images
 from features.hibernate import main_hibernate
 from features.image_popup import ImagePopup
@@ -13,8 +14,8 @@ from pack import Pack
 from panic import start_panic_listener
 from roll import RollTarget, roll_targets
 from settings import Settings
+from state import State
 from utils import utils
-from utils.utils import State
 
 
 def main(root: Tk, settings: Settings, targets: list[RollTarget]) -> None:
@@ -45,6 +46,7 @@ if __name__ == "__main__":
         Thread(target=lambda: replace_images(root, settings, pack), daemon=True).start()  # Thread for performance reasons
         make_tray_icon(root, settings, pack, state, lambda: main_hibernate(root, settings, pack, state, targets))
         make_desktop_icons(settings)
+        handle_corruption(root, settings, pack, state)
         handle_discord(root, settings, pack)
         handle_timer_mode(root, settings, state)
         handle_mitosis_mode(root, settings, pack, state)

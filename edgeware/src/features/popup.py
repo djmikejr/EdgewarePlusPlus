@@ -11,8 +11,8 @@ from paths import Assets
 from roll import roll
 from screeninfo import get_monitors
 from settings import Settings
+from state import State
 from utils import utils
-from utils.utils import State
 
 
 class Popup(Toplevel):
@@ -39,6 +39,7 @@ class Popup(Toplevel):
 
     def init_finish(self) -> None:
         self.try_caption()
+        self.try_corruption_dev()
         self.try_button()
         self.try_move()
         self.try_multi_click()
@@ -73,6 +74,20 @@ class Popup(Toplevel):
         if self.settings.captions_in_popups:
             label = Label(self, text=self.pack.random_caption(self.media), wraplength=self.width, fg=self.theme.fg, bg=self.theme.bg)
             label.place(x=5, y=5)
+
+    def try_corruption_dev(self) -> None:
+        if self.settings.corruption_dev_mode:
+            levels = []
+            mood = self.pack.media_moods.get(self.media.name, None)
+            for level in self.pack.corruption_levels:
+                if mood in level.moods:
+                    levels.append(self.pack.corruption_levels.index(level) + 1)
+
+            label_level = Label(self, text=f"Corruption levels: {levels}", fg=self.theme.fg, bg=self.theme.bg)
+            label_mood = Label(self, text=f"Popup mood: {mood}", fg=self.theme.fg, bg=self.theme.bg)
+
+            label_level.place(x=5, y=(self.height // 2))
+            label_mood.place(x=5, y=(self.height // 2 + label_level.winfo_reqheight() + 2))
 
     def try_button(self) -> None:
         if self.settings.buttonless:

@@ -4,13 +4,14 @@ from pathlib import Path
 from paths import Assets, Resource
 
 from pack.data import CaptionMood
-from pack.load import list_media, load_captions, load_discord, load_info, load_media, load_moods, load_prompt, load_web
+from pack.load import list_media, load_captions, load_corruption, load_discord, load_info, load_media, load_moods, load_prompt, load_web
 
 
 class Pack:
     def __init__(self):
         # Pack files
         self.captions = load_captions()
+        self.corruption_levels = load_corruption()
         self.discord = load_discord()
         self.info = load_info()
         self.media_moods = load_media()
