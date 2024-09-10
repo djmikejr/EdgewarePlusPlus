@@ -49,7 +49,7 @@ echo config.pyw: runs the config window which allows changing Edgeware settings
 echo start.pyw: starts Edgeware with the config settings you have saved
 echo panic.pyw: kills Edgeware and all currently spawned popups
 pause
-start "Edgeware++ Config" "%CD%/EdgeWare/config.pyw"
+start "Edgeware++ Config" "%CD%/config.pyw"
 exit
 :quitPy
 echo Python still could not be found.
