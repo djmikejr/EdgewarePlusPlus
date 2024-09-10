@@ -1,24 +1,17 @@
 import subprocess
 import sys
 
-from EdgeWare.utils.paths import Process
+from src.paths import Process
 
+# TODO: Running individual features
 print("""Which feature would you like to run?
 0. Quit
-1. Edgeware (start.pyw)
-2. Config (config.pyw)
-3. Image popup (popup.pyw)
-4. Video popup (popup.pyw)
-5. Prompt (prompt.pyw)
-6. Subliminal message (sublabel.pyw)""")
+1. Edgeware (start.py)
+2. Config (config.py)""")
 
 processes = [
-    [Process.START],
-    [Process.CONFIG],
-    [Process.POPUP],
-    [Process.POPUP, "-video"],
-    [Process.PROMPT],
-    [Process.SUBLABEL]
+    [Process.MAIN],
+    [Process.CONFIG]
 ]  # fmt: off
 
 while True:
@@ -35,6 +28,6 @@ while True:
         subprocess.run([sys.executable] + processes[num - 1])
         print("Done")
     else:
-        print("Input must be between 0 and 6")
+        print("Input must be between 0 and 2")
 
 print("Goodbye!")
