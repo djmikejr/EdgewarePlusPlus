@@ -37,6 +37,14 @@ class Settings:
         self.desktop_icons = bool(config["desktopIcons"])
         self.panic_key = config["panicButton"]
 
+        # Booru downloader
+        self.booru_download = bool(config["downloadEnabled"])
+        # TODO: Web resource?
+        self.booru_name = config["booruName"]
+        # self.min_score = int(config["booruMinScore"])  # TODO: Can this be used with gallery-dl?
+        self.booru_tags = config["tagList"].replace(">", "+")  # TODO: Store in a better way
+        self.download_path = Data.DOWNLOAD / f"{self.booru_name}-{self.booru_tags}"
+
         # Popups
         self.delay = int(config["delay"])  # Milliseconds
         self.image_chance = int(config["popupMod"])  # 0 to 100
@@ -84,7 +92,7 @@ class Settings:
         self.wallpapers = list(ast.literal_eval(config["wallpaperDat"]).values())  # TODO: Can fail, store in a better way
 
         # Dangerous
-        self.drive_avoid_list = config["avoidList"].split(">")  # TODO: Can fail, store in a better way
+        self.drive_avoid_list = config["avoidList"].split(">")  # TODO: Store in a better way
         self.fill_drive = bool(config["fill"])
         self.drive_path = config["drivePath"]
         self.fill_delay = int(config["fill_delay"]) * 10  # Milliseconds

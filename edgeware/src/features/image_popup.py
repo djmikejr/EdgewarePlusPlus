@@ -1,6 +1,8 @@
+import os
 import random
 from tkinter import Label, Tk
 
+import filetype
 from features.popup import Popup
 from pack import Pack
 from PIL import Image, ImageFilter
@@ -20,6 +22,12 @@ class ImagePopup(Popup):
         self.denial = roll(self.settings.denial_chance)
 
         self.media = self.pack.random_image()
+        # TODO: Better way to use downloaded images
+        if settings.download_path.is_dir() and self.settings.booru_download and roll(50):
+            dir = settings.download_path
+            choices = [dir / file for file in os.listdir(dir) if filetype.is_image(dir / file)]
+            if len(choices) > 0:
+                self.media = random.choice(choices)
         image = Image.open(self.media)
 
         self.compute_geometry(image.width, image.height)

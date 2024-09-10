@@ -11,7 +11,7 @@ from widgets.image_label import ImageLabel
 
 class StartupSplash(Toplevel):
     def __init__(self, pack: Pack, callback: Callable[[], None]):
-        super().__init__()
+        super().__init__(bg="black")
 
         self.callback = callback
 

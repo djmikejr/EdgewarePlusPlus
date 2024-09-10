@@ -8,9 +8,9 @@ PATH = Path(__file__).parent.parent
 class Process:
     ROOT = PATH / "src"
 
-    CONFIG = PATH / "config.py"
-    MAIN = PATH / "main.py"
-    PANIC = PATH / "panic.py"
+    CONFIG = ROOT / "config.py"
+    MAIN = ROOT / "main.py"
+    PANIC = ROOT / "panic.py"
 
 
 @dataclass
@@ -41,6 +41,8 @@ class Data:
     BACKUPS = ROOT / "backups"
     CONFIG = ROOT / "config.json"
     CORRUPTION_LAUNCHES = ROOT / "corruption_launches.dat"
+    DOWNLOAD = ROOT / "download"
+    GALLERY_DL_CONFIG = ROOT / "gallery-dl.json"
     LOGS = ROOT / "logs"
     MOODS = ROOT / "moods"
     PRESETS = ROOT / "presets"

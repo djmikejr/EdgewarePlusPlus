@@ -18,7 +18,7 @@ from utils import utils
 class Popup(Toplevel):
     def __init__(self, root: Tk, settings: Settings, pack: Pack, state: State):
         state.popup_number += 1
-        super().__init__()
+        super().__init__(bg="black")
 
         self.root = root
         self.settings = settings

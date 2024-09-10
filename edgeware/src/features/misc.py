@@ -1,5 +1,7 @@
+import json
 import logging
 import random
+import subprocess
 import time
 import webbrowser
 from collections.abc import Callable
@@ -9,7 +11,7 @@ from tkinter import Tk
 import pystray
 from pack import Pack
 from panic import panic
-from paths import Assets, Process, Resource
+from paths import Assets, Data, Process, Resource
 from PIL import Image
 from playsound import playsound
 from pypresence import Presence
@@ -58,6 +60,20 @@ def make_desktop_icons(settings: Settings) -> None:
         utils.make_shortcut("Edgeware++", Process.MAIN, Assets.DEFAULT_ICON)
         utils.make_shortcut("Edgeware++ Config", Process.CONFIG, Assets.CONFIG_ICON)
         utils.make_shortcut("Edgeware++ Panic", Process.PANIC, Assets.PANIC_ICON)
+
+
+def handle_booru_download(settings: Settings, state: State) -> None:
+    if not settings.booru_download:
+        return
+
+    root = f"https://{settings.booru_name}.booru.org"
+    url = f"{root}/index.php?page=post&s=list&tags={settings.booru_tags}"
+
+    with open(Data.GALLERY_DL_CONFIG, "w") as f:
+        json.dump({"extractor": {"gelbooru_v01": {settings.booru_name: {"root": root}}}}, f)
+
+    args = f'gallery-dl -D "{settings.download_path}" -c "{Data.GALLERY_DL_CONFIG}" "{url}"'
+    state.gallery_dl_process = subprocess.Popen(args, shell=True)
 
 
 def handle_wallpaper(root: Tk, settings: Settings, pack: Pack, state: State) -> None:

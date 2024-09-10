@@ -67,6 +67,9 @@ def launch(settings: Settings, pack: Pack, state: State) -> None:
 
 
 def handle_corruption(root: Tk, settings: Settings, pack: Pack, state: State) -> None:
+    if not settings.corruption_mode:
+        return
+
     if settings.corruption_purity:
         state.corruption_level = len(pack.corruption_levels)
 

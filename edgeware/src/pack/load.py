@@ -44,7 +44,7 @@ def load_captions() -> Captions:
             {
                 "prefix": [str],
                 Optional("prefix_settings"): {
-                    str: {
+                    Optional(str): {
                         Optional("caption"): str,
                         Optional("images"): str,
                         Optional("chance"): All(Any(int, float), Range(min=0, max=100, min_included=False)),

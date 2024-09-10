@@ -34,6 +34,8 @@ class State:
 
     corruption_level = 1
 
+    gallery_dl_process = None
+
     @property
     def popup_number(self) -> int:
         return self._popup_number.value

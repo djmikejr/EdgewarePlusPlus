@@ -1,3 +1,4 @@
+import ast
 import json
 import logging
 import os
@@ -193,6 +194,7 @@ UPDCHECK_URL = "http://raw.githubusercontent.com/PetitTournesol/Edgeware/main/Ed
 UPDCHECK_PP_URL = "http://raw.githubusercontent.com/araten10/EdgewarePlusPlus/main/EdgeWare/default_assets/default_config.json"
 
 config = load_config()
+config["wallpaperDat"] = ast.literal_eval(config["wallpaperDat"])
 default_config = load_default_config()
 varNames = default_config.keys()
 local_version = default_config["version"]
@@ -1589,8 +1591,6 @@ def show_window():
     )
     downloadResourceEnabled = Checkbutton(otherFrame, text="Download from webResource", variable=useWebResourceVar)
     toggleAssociateSettings(hasWebResourceVar.get(), [downloadResourceEnabled])
-    downloadMode = OptionMenu(booruFrame, downloadModeVar, *["All", "First Page", "Random Page"])
-    downloadMode.configure(width=15)
     minScoreSlider = Scale(booruFrame, from_=-50, to=100, orient="horizontal", variable=booruMin, label="Minimum Score")
 
     booruValidate = Button(
@@ -1618,15 +1618,9 @@ def show_window():
     download_group.append(addTag)
     download_group.append(removeTag)
     download_group.append(resetTag)
-    download_group.append(downloadMode)
     download_group.append(minScoreSlider)
 
     Label(tabBooru, text="Image Download Settings").pack(fill="x")
-    Label(
-        downloadHostFrame,
-        text="THE BOORU DOWNLOADER IS OUTDATED AND BROKEN. IT WILL LIKELY BARELY FUNCTION, IF AT ALL.\nNo I will not fix it, this shit is a pain in the ass and I'm stupid.",
-        foreground="red",
-    ).pack(fill="x")
     tagFrame.pack(fill="y", side="left")
     booruFrame.pack(fill="y", side="left")
     otherFrame.pack(fill="both", side="right")
@@ -1641,7 +1635,6 @@ def show_window():
     booruNameEntry.pack(fill="x")
     booruValidate.pack(fill="x")
     Label(booruFrame, text="Download Mode").pack(fill="x")
-    downloadMode.pack(fill="x")
     minScoreSlider.pack(fill="x")
     downloadResourceEnabled.pack(fill="x")
 

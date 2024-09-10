@@ -24,6 +24,8 @@ def panic(root: Tk, settings: Settings, state: State, key: str | None = None) ->
     # TODO: https://github.com/araten10/EdgewarePlusPlus/issues/24
     utils.set_wallpaper(Assets.DEFAULT_PANIC_WALLPAPER)
     root.destroy()
+    if state.gallery_dl_process:
+        state.gallery_dl_process.kill()
 
 
 def start_panic_listener(root: Tk, settings: Settings, state: State) -> None:
