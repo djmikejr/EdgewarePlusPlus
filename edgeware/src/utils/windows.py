@@ -5,7 +5,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-import vlc  # TODO: May fail
+import vlc
 from paths import Assets, Process
 
 

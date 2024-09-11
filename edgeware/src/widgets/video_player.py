@@ -6,7 +6,7 @@ from tkinter import Label, Toplevel
 
 import imageio
 import sounddevice
-import vlc  # TODO: May fail
+import vlc
 from moviepy.editor import AudioFileClip
 from PIL import Image, ImageTk
 from utils import utils

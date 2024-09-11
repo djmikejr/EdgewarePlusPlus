@@ -1,6 +1,6 @@
 from pathlib import Path
 
-import vlc  # TODO: May fail
+import vlc
 
 
 def set_wallpaper(wallpaper: Path) -> None:

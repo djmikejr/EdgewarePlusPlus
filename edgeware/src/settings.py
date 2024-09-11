@@ -2,6 +2,7 @@ import ast
 import json
 import os
 import shutil
+import vlc
 
 from paths import Assets, Data
 
@@ -77,6 +78,11 @@ class Settings:
         self.video_volume = int(config["videoVolume"])  # 0 to 100
         self.max_video = int(config["maxVideos"]) if bool(config["maxVideoBool"]) else float("inf")
         self.vlc_mode = bool(config["vlcMode"])
+        try:
+            vlc.libvlc_hex_version()  # Check if VLC is installed
+        except NameError:
+            self.vlc_mode = False
+
 
         # Captions
         self.captions_in_popups = bool(config["showCaptions"])

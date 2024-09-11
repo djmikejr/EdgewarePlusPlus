@@ -5,7 +5,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-import vlc  # TODO: May fail
+import vlc
 from paths import Assets, Process
 from settings import load_default_config
 from utils.linux_utils import get_desktop_environment, get_wallpaper_commands, set_wallpaper_special_cases
