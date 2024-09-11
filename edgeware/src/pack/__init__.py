@@ -1,6 +1,7 @@
 import random
 from pathlib import Path
 
+import filetype
 from paths import Assets, Resource
 
 from pack.data import CaptionMood
@@ -22,11 +23,10 @@ class Pack:
         self.active_moods = load_moods(self.info.mood_file)
 
         # Media
-        # TODO: Validate file types
-        self.images = list_media(Resource.IMAGE, self.media_moods)
-        self.videos = list_media(Resource.VIDEO, self.media_moods)
-        self.audio = list_media(Resource.AUDIO, self.media_moods)
-        self.subliminals = list_media(Resource.SUBLIMINALS)
+        self.images = list_media(Resource.IMAGE, filetype.is_image, self.media_moods)
+        self.videos = list_media(Resource.VIDEO, filetype.is_video, self.media_moods)
+        self.audio = list_media(Resource.AUDIO, filetype.is_audio, self.media_moods)
+        self.subliminals = list_media(Resource.SUBLIMINALS, filetype.is_image)
 
         # Paths
         self.icon = Resource.ICON if Resource.ICON.is_file() else Assets.DEFAULT_ICON

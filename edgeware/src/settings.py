@@ -2,8 +2,8 @@ import ast
 import json
 import os
 import shutil
-import vlc
 
+import vlc
 from paths import Assets, Data
 
 
@@ -82,7 +82,6 @@ class Settings:
             vlc.libvlc_hex_version()  # Check if VLC is installed
         except NameError:
             self.vlc_mode = False
-
 
         # Captions
         self.captions_in_popups = bool(config["showCaptions"])
