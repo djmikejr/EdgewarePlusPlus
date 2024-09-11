@@ -64,12 +64,15 @@ class Pack:
         return None
 
     # TODO: If there are none?
-    def random_caption(self, media: Path | None = None) -> str:
+    def random_caption(self, media: Path | None = None, subliminal_caption_mood: bool = False) -> str:
         if media:
             mood = self.caption_mood_of_media(media)
             if mood:
                 return random.choice(mood.captions)
             return random.choice(self.captions.default)
+
+        if subliminal_caption_mood and len(self.captions.subliminal) > 0:
+            return random.choice(self.captions.subliminal)
 
         moods = [self.captions.default] + list(map(lambda c: c.captions, self.filter_captions()))
         return random.choice([caption for mood in moods for caption in mood])
