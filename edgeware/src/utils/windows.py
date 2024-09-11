@@ -48,7 +48,7 @@ def make_shortcut(title: str, process: Path, icon: Path, location: Path | None =
     try:
         subprocess.run(bat.name)
     except Exception as e:
-        logging.warning(f"failed to call or remove temp batch file for making shortcuts\n\tReason: {_remove_username(e)}")
+        logging.warning(f"failed to call or remove temp batch file for making shortcuts\n\tReason: {e}")
 
     if os.path.exists(bat.name):
         os.remove(bat.name)
@@ -62,8 +62,4 @@ def toggle_run_at_startup(state: bool) -> None:
         else:
             (startup_path / "Edgeware++.lnk").unlink(missing_ok=True)
     except Exception as e:
-        logging.warning(f"Failed to toggle startup launch. Reason: {_remove_username(e)}")
-
-
-def _remove_username(e):
-    return str(e).lower().replace(os.environ["USERPROFILE"].lower().replace("\\", "\\\\"), "[USERNAME_REDACTED]")
+        logging.warning(f"Failed to toggle startup launch. Reason: {e}")
