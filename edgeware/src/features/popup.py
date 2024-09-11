@@ -1,7 +1,7 @@
 import random
 import time
 from threading import Thread
-from tkinter import Button, Label, Tk, Toplevel
+from tkinter import Button, Label, TclError, Tk, Toplevel
 
 from features.misc import open_web
 from features.theme import get_theme
@@ -129,7 +129,7 @@ class Popup(Toplevel):
 
                     self.geometry(f"{self.width}x{self.height}+{self.x}+{self.y}")
                     time.sleep(0.01)
-            except Exception:
+            except TclError:
                 pass  # Exception thrown when closing
 
         if roll(self.settings.moving_chance):
@@ -146,7 +146,7 @@ class Popup(Toplevel):
                     self.attributes("-alpha", self.opacity)
                     time.sleep(0.015)
                 self.close()
-            except Exception:
+            except TclError:
                 pass  # Exception thrown when manually closed during fade out
 
         if self.settings.timeout_enabled and not self.state.pump_scare:
@@ -169,7 +169,7 @@ class Popup(Toplevel):
             for n in range(self.settings.mitosis_strength):
                 try:
                     popup = random.choices([ImagePopup, VideoPopup], [self.settings.image_chance, self.settings.video_chance], k=1)[0]
-                except Exception:
+                except ValueError:
                     popup = ImagePopup  # Exception thrown when both chances are 0
                 popup(self.root, self.settings, self.pack, self.state)
 

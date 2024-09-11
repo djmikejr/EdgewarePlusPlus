@@ -21,7 +21,7 @@ def set_wallpaper(wallpaper: Path) -> None:
     for command in commands:
         try:
             args = command % wallpaper
-        except Exception:
+        except TypeError:
             args = command
 
         try:
@@ -57,20 +57,14 @@ def make_shortcut(title: str, process: Path, icon: Path, location: Path | None =
         "Categories=Application;",
     ]
 
-    try:
-        file.write_text("\n".join(content))
-        if get_desktop_environment() == "gnome":
-            subprocess.run(f"gio set {str(file.absolute())} metadata::trusted true")
-    except Exception as e:
-        logging.warning(f"Failed to make shortcut. Reason: {e}")
+    file.write_text("\n".join(content))
+    if get_desktop_environment() == "gnome":
+        subprocess.run(f'gio set "{str(file.absolute())}" metadata::trusted true', shell=True)
 
 
 def toggle_run_at_startup(state: bool) -> None:
     autostart_path = Path(os.path.expanduser("~/.config/autostart"))
-    try:
-        if state:
-            make_shortcut("Edgeware++", Process.MAIN, Assets.DEFAULT_ICON, autostart_path)
-        else:
-            (autostart_path / "Edgeware++.desktop").unlink(missing_ok=True)
-    except Exception as e:
-        logging.warning(f"Failed to toggle startup launch. Reason: {e}")
+    if state:
+        make_shortcut("Edgeware++", Process.MAIN, Assets.DEFAULT_ICON, autostart_path)
+    else:
+        (autostart_path / "Edgeware++.desktop").unlink(missing_ok=True)

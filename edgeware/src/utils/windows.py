@@ -56,10 +56,7 @@ def make_shortcut(title: str, process: Path, icon: Path, location: Path | None =
 
 def toggle_run_at_startup(state: bool) -> None:
     startup_path = Path(os.path.expanduser("~\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup"))
-    try:
-        if state:
-            make_shortcut("Edgeware++", Process.MAIN, Assets.DEFAULT_ICON, startup_path)
-        else:
-            (startup_path / "Edgeware++.lnk").unlink(missing_ok=True)
-    except Exception as e:
-        logging.warning(f"Failed to toggle startup launch. Reason: {e}")
+    if state:
+        make_shortcut("Edgeware++", Process.MAIN, Assets.DEFAULT_ICON, startup_path)
+    else:
+        (startup_path / "Edgeware++.lnk").unlink(missing_ok=True)

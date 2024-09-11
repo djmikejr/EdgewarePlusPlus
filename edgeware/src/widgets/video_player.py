@@ -2,7 +2,7 @@ import time
 from itertools import cycle
 from pathlib import Path
 from threading import Thread
-from tkinter import Label, Toplevel
+from tkinter import Label, TclError, Toplevel
 
 import imageio
 import sounddevice
@@ -41,8 +41,8 @@ class VideoPlayer:
                 # audio = [[volume / 100 * v[0], volume / 100 * v[1]] for v in audio]
                 samplerate = len(audio) / float(properties["duration"])
                 sounddevice.play(audio, samplerate=samplerate, loop=True)  # TODO: Can't play multiple sounds at once
-            except Exception:
-                pass
+            except KeyError:
+                pass  # Video has no audio
 
             Thread(target=self.animate, daemon=True).start()
 
@@ -61,7 +61,7 @@ class VideoPlayer:
 
                 end = time.perf_counter()
                 time.sleep(max(0, self.delay - (end - start)))
-        except Exception:
+        except TclError:
             pass  # Exception thrown when closing
 
     def on_close(self) -> None:

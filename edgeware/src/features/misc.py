@@ -43,10 +43,7 @@ def make_tray_icon(root: Tk, settings: Settings, pack: Pack, state: State, hiber
             if state.hibernate_active:
                 return
 
-            try:
-                root.after_cancel(state.hibernate_id)
-            except Exception:
-                pass
+            root.after_cancel(state.hibernate_id)
             hibernate_activity()
 
         menu.append(pystray.MenuItem("Skip to Hibernate", skip_hibernate))
@@ -114,8 +111,8 @@ def handle_discord(root: Tk, settings: Settings, pack: Pack) -> None:
             root.after(15000, update)
 
         update()
-    except Exception:
-        logging.warning("Setting Discord presence failed")
+    except Exception as e:
+        logging.warning(f"Setting Discord presence failed. Reason: {e}")
 
 
 def handle_timer_mode(root: Tk, settings: Settings, state: State) -> None:
