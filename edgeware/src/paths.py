@@ -49,7 +49,7 @@ class Data:
 
 
 @dataclass
-class Resource:
+class _Resource:
     ROOT = PATH / "resource"
 
     # Directories
@@ -60,14 +60,22 @@ class Resource:
 
     # Files
     CAPTIONS = ROOT / "captions.json"
-    CONFIG = ROOT / "config.json"  # TODO
+    CONFIG = ROOT / "config.json"
     CORRUPTION = ROOT / "corruption.json"
     DISCORD = ROOT / "discord.dat"
     ICON = ROOT / "icon.ico"
     INFO = ROOT / "info.json"
-    SPLASH = ROOT / "loading_splash"
+    _SPLASH = ROOT / "loading_splash"
     MEDIA = ROOT / "media.json"
     PROMPT = ROOT / "prompt.json"
     WALLPAPER = ROOT / "wallpaper.png"
     WEB = ROOT / "web.json"
     WEB_RESOURCE = ROOT / "webResource.json"  # TODO
+
+    @property
+    def SPLASH(self) -> Path | None:
+        paths = [self._SPLASH.with_suffix(suffix) for suffix in [".png", ".gif", ".jpg", ".jpeg", ".bmp"]]
+        return next((path for path in paths if path.is_file()), None)
+
+
+Resource = _Resource()  # Store as a variable so @property can be used

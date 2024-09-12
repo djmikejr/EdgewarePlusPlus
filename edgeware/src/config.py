@@ -173,16 +173,7 @@ UNIQUE_ID = "0"
 # probably could have made it so the user manually has to save/load and not worried about this, but here we are
 if info_id == "0" and os.path.exists(Resource.ROOT):
     try:
-        # already done the brunt of the work for getting these values in the pack info page, so i'm just using those again here. If this needs to be replaced, look there too
-        im = str(len(os.listdir(Resource.IMAGE))) if os.path.exists(Resource.IMAGE) else "0"
-        au = str(len(os.listdir(Resource.AUDIO))) if os.path.exists(Resource.AUDIO) else "0"
-        vi = str(len(os.listdir(Resource.VIDEO))) if os.path.exists(Resource.VIDEO) else "0"
-        wa = "w" if os.path.isfile(Resource.WALLPAPER) else "x"
-        sp = "s" if Resource.SPLASH else "x"
-        di = "d" if os.path.isfile(Resource.DISCORD) else "x"
-        ic = "i" if os.path.isfile(Resource.ICON) else "x"
-        co = "c" if os.path.isfile(Resource.CORRUPTION) else "x"
-        UNIQUE_ID = im + au + vi + wa + sp + di + ic + co
+        UNIQUE_ID = utils.compute_mood_id()
         logging.info(f"generated unique ID. {UNIQUE_ID}")
     except Exception as e:
         logging.warning(f"failed to create unique id. {e}")
@@ -207,7 +198,7 @@ Data.MOODS.mkdir(parents=True, exist_ok=True)
 MOOD_PATH = "0"
 if config["toggleMoodSet"] != True:
     if UNIQUE_ID != "0" and os.path.exists(Resource.ROOT):
-        MOOD_PATH = Data.UNNAMED_MOODS / f"{UNIQUE_ID}.json"
+        MOOD_PATH = Data.MOODS / f"{UNIQUE_ID}.json"
     elif UNIQUE_ID == "0" and os.path.exists(Resource.ROOT):
         MOOD_PATH = Data.MOODS / f"{info_id}.json"
 
@@ -3825,7 +3816,7 @@ def updateMoods(type: str, id: str, check: bool):
     try:
         if config["toggleMoodSet"] != True:
             if UNIQUE_ID != "0" and os.path.exists(Resource.ROOT):
-                moodUpdatePath = Data.UNNAMED_MOODS / f"{UNIQUE_ID}.json"
+                moodUpdatePath = Data.MOODS / f"{UNIQUE_ID}.json"
             elif UNIQUE_ID == "0" and os.path.exists(Resource.ROOT):
                 moodUpdatePath = Data.MOODS / f"{info_id}.json"
             with open(moodUpdatePath, "r") as mood:

@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import TypeVar
 
 from paths import Data, Resource
+from utils import utils
 from voluptuous import ALLOW_EXTRA, PREVENT_EXTRA, All, Any, Equal, In, Length, Number, Optional, Range, Schema, Url
 from voluptuous.error import Invalid
 
@@ -135,16 +136,16 @@ def load_discord() -> Discord:
 
 
 def load_info() -> Info:
-    default = Info()
+    default = Info(mood_file=Data.MOODS / f"{utils.compute_mood_id()}.json")
 
     def load(content: str) -> Info:
         info = json.loads(content)
 
         Schema({"name": str, "id": str, "creator": str, "version": str, "description": str}, required=True)(info)
 
-        return Info(info["name"], f"{info["id"]}.json", info["creator"], info["version"], info["description"])
+        return Info(info["name"], Data.MOODS / f"{info["id"]}.json", info["creator"], info["version"], info["description"])
 
-    return try_load(Resource.INFO, load) or default  # TODO: Default mood file
+    return try_load(Resource.INFO, load) or default
 
 
 def load_media() -> dict[str, str]:
@@ -215,7 +216,7 @@ def load_web() -> list[Web]:
     return try_load(Resource.WEB, load) or []
 
 
-def load_moods(mood_file: str) -> ActiveMoods:
+def load_moods(mood_file: Path) -> ActiveMoods:
     def load(content: str) -> ActiveMoods:
         moods = json.loads(content)
 
@@ -224,7 +225,7 @@ def load_moods(mood_file: str) -> ActiveMoods:
 
         return ActiveMoods(True, set(moods["media"]), set(moods["captions"]), set(moods["prompts"]), set(moods["web"]))
 
-    return try_load(Data.MOODS / mood_file, load) or ActiveMoods()
+    return try_load(mood_file, load) or ActiveMoods()
 
 
 def list_media(dir: Path, is_valid: Callable[[str], None], media_moods: dict[str, str] = {}) -> list[Media]:

@@ -34,7 +34,7 @@ class Discord:
 @dataclass
 class Info:
     name: str = "Unnamed Pack"
-    mood_file: str | None = None
+    mood_file: Path = Path()
     creator: str = "Anonymous"
     version: str = "1.0"
     description: str = "No description set."

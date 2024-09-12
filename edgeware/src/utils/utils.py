@@ -4,7 +4,7 @@ import platform
 import sys
 import time
 
-from paths import Data
+from paths import Data, Resource
 
 
 class RedactUsernameFormatter(logging.Formatter):
@@ -25,6 +25,18 @@ def init_logging(filename: str) -> str:
     logging.basicConfig(level=logging.INFO, force=True, handlers=handlers)
 
     return log_file
+
+
+def compute_mood_id() -> str:
+    im = str(len(os.listdir(Resource.IMAGE))) if Resource.IMAGE.is_dir() else "0"
+    au = str(len(os.listdir(Resource.AUDIO))) if Resource.AUDIO.is_dir() else "0"
+    vi = str(len(os.listdir(Resource.VIDEO))) if Resource.VIDEO.is_dir() else "0"
+    wa = "w" if Resource.WALLPAPER.is_file() else "x"
+    sp = "s" if Resource.SPLASH else "x"
+    di = "d" if Resource.DISCORD.is_file() else "x"
+    ic = "i" if Resource.ICON.is_file() else "x"
+    co = "c" if Resource.CORRUPTION.is_file() else "x"
+    return im + au + vi + wa + sp + di + ic + co
 
 
 def is_linux():

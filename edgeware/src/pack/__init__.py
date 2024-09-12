@@ -31,8 +31,7 @@ class Pack:
         # Paths
         self.icon = Resource.ICON if Resource.ICON.is_file() else Assets.DEFAULT_ICON
         self.wallpaper = Resource.WALLPAPER if Resource.WALLPAPER.is_file() else Assets.DEFAULT_WALLPAPER
-        splash_paths = [Resource.SPLASH.with_suffix(suffix) for suffix in [".png", ".gif", ".jpg", ".jpeg", ".bmp"]]
-        self.startup_splash = next((path for path in splash_paths if path.is_file()), Assets.DEFAULT_STARTUP_SPLASH)
+        self.startup_splash = Resource.SPLASH or Assets.DEFAULT_STARTUP_SPLASH
 
     def filter_media(self, media_list: list[Path]) -> list[Path]:
         filter_function = lambda media: media.mood is None or media.mood in self.active_moods.media
