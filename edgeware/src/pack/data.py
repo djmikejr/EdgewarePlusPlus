@@ -65,6 +65,7 @@ class Web:
 
 @dataclass
 class ActiveMoods:
+    exists: bool = False
     media: set[str] = field(default_factory=lambda: set(["default"]))
     captions: set[str] = field(default_factory=lambda: set(["default"]))
     prompts: set[str] = field(default_factory=lambda: set(["default"]))

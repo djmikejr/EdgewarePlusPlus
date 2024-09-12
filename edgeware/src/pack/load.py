@@ -219,9 +219,10 @@ def load_moods(mood_file: str) -> ActiveMoods:
     def load(content: str) -> ActiveMoods:
         moods = json.loads(content)
 
+        # TODO: Validate that moods exist in the pack
         Schema({"media": [str], "captions": [str], "prompts": [str], "web": [str]}, required=True)(moods)
 
-        return ActiveMoods(set(moods["media"]), set(moods["captions"]), set(moods["prompts"]), set(moods["web"]))
+        return ActiveMoods(True, set(moods["media"]), set(moods["captions"]), set(moods["prompts"]), set(moods["web"]))
 
     return try_load(Data.MOODS / mood_file, load) or ActiveMoods()
 

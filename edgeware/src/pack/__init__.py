@@ -35,7 +35,8 @@ class Pack:
         self.startup_splash = next((path for path in splash_paths if path.is_file()), Assets.DEFAULT_STARTUP_SPLASH)
 
     def filter_media(self, media_list: list[Path]) -> list[Path]:
-        return list(filter(lambda media: media.mood is None or media.mood in self.active_moods.media, media_list))
+        filter_function = lambda media: media.mood is None or media.mood in self.active_moods.media
+        return list(filter(filter_function, media_list)) if self.active_moods.exists else media_list
 
     # TODO: If there are none?
     def random_image(self) -> Path:
@@ -55,7 +56,8 @@ class Pack:
         return Assets.DEFAULT_SUBLIMINAL
 
     def filter_captions(self) -> list[CaptionMood]:
-        return list(filter(lambda c: c.mood in self.active_moods.captions, self.captions.moods))
+        filter_function = lambda c: c.mood in self.active_moods.captions
+        return list(filter(filter_function, self.captions.moods)) if self.active_moods.exists else self.captions.moods
 
     def caption_mood_of_media(self, media: Path) -> CaptionMood | None:
         for c in self.filter_captions():
@@ -88,7 +90,8 @@ class Pack:
 
     # TODO: If there are none?
     def random_prompt(self) -> str:
-        moods = list(filter(lambda p: p.mood in self.active_moods.prompts, self.prompts.moods))
+        filter_function = lambda p: p.mood in self.active_moods.prompts
+        moods = list(filter(filter_function, self.prompts.moods)) if self.active_moods.exists else self.prompts.moods
         mood = random.choices(moods, list(map(lambda p: p.weight, moods)), k=1)[0]
         length = random.randint(self.prompts.min_length, self.prompts.max_length)
 
@@ -100,5 +103,6 @@ class Pack:
 
     # TODO: If there are none?
     def random_web(self) -> str:
-        web = random.choice(list(filter(lambda w: w.mood in self.active_moods.web, self.web)))
+        filter_function = lambda w: w.mood in self.active_moods.web
+        web = random.choice(list(filter(filter_function, self.web)) if self.active_moods.exists else self.web)
         return web.url + random.choice(web.args)
