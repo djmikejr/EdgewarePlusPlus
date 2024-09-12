@@ -12,10 +12,6 @@ from utils.linux_utils import get_desktop_environment, get_wallpaper_commands, s
 
 
 def set_wallpaper(wallpaper: Path) -> None:
-    global first_run
-    if "first_run" not in globals():
-        first_run = True
-
     desktop = get_desktop_environment()
     commands = get_wallpaper_commands(wallpaper, desktop)
     for command in commands:
@@ -30,7 +26,6 @@ def set_wallpaper(wallpaper: Path) -> None:
             logging.warning(f"Failed to run {args}. Reason: {e}")
 
     set_wallpaper_special_cases(wallpaper, desktop)
-    first_run = False
 
 
 def set_vlc_window(player: vlc.MediaPlayer, window_id: int) -> None:

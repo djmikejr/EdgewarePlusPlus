@@ -7,12 +7,8 @@ import subprocess
 from configparser import ConfigParser
 from pathlib import Path
 
-# ruff: noqa: E701
-
 
 def set_wallpaper_special_cases(wallpaper: Path, desktop: str) -> None:
-    global first_run
-
     try:
         if desktop == "razor-qt":
             if first_run:
@@ -49,53 +45,42 @@ def set_wallpaper_special_cases(wallpaper: Path, desktop: str) -> None:
         logging.warning("Failed to set wallpaper")
 
 
-# Source (Martin Hansen, Serge Stroobandt): https://stackoverflow.com/a/21213358
+# Modified from https://stackoverflow.com/a/21213358
 def get_desktop_environment() -> str:
-    def is_running(process: str) -> bool:
-        # From http://www.bloggerpolis.com/2011/05/how-to-check-if-a-process-is-running-using-python/
-        process = subprocess.Popen(["ps", "axw"], stdout=subprocess.PIPE)
-        if process.stdout:
-            for line in process.stdout.readlines():
-                if re.search(process, line.decode().strip()):
-                    return True
-        return False
-
-    # From http://stackoverflow.com/questions/2035657/what-is-my-current-desktop-environment
-    # and http://ubuntuforums.org/showthread.php?t=652320
-    # and http://ubuntuforums.org/showthread.php?t=1139057
-    desktop = os.environ.get("XDG_CURRENT_DESKTOP")
-    if not desktop:
-        desktop = os.environ.get("DESKTOP_SESSION")
-
-    # fmt: off
+    desktop = os.environ.get("XDG_CURRENT_DESKTOP") or os.environ.get("DESKTOP_SESSION")
     if desktop:
         desktop = desktop.lower()
 
-        ## Special cases ##
-        # Canonical sets $DESKTOP_SESSION to Lubuntu rather than LXDE if using LXDE.
-        # There is no guarantee that they will not do the same with the other
-        # desktop environments.
-        if "xfce" in desktop or desktop.startswith("xubuntu"): return "xfce4"
-        if desktop.startswith("ubuntustudio"): return "kde"
-        if desktop.startswith("ubuntu"): return "gnome"
-        if desktop.startswith("lubuntu"): return "lxde"
-        if desktop.startswith("kubuntu"): return "kde"
-        if desktop.startswith("razor"): return "razor-qt"  # e.g. razorkwin
-        if desktop.startswith("wmaker"): return "windowmaker"  # e.g. wmaker-common
-        if desktop.startswith("pop"): return "gnome"
+        special_cases = [
+            ("xubuntu", "xfce4"),
+            ("ubuntustudio", "kde"),
+            ("ubuntu", "gnome"),
+            ("lubuntu", "lxde"),
+            ("kubuntu", "kde"),
+            ("razor", "razor-qt"),  # e.g. razorkwin
+            ("wmaker", "windowmaker"),  # e.g. wmaker-common
+            ("pop", "gnome"),
+        ]
+
+        for special, actual in special_cases:
+            if desktop.startswith(special):
+                return actual
+        if "xfce" in desktop:
+            return "xfce4"
         return desktop
-    if os.environ.get("KDE_FULL_SESSION") == "true": return "kde"
-    if os.environ.get("GNOME_DESKTOP_SESSION_ID") and "deprecated" not in os.environ.get("GNOME_DESKTOP_SESSION_ID"): return "gnome2"
-    if is_running("xfce-mcs-manage"): return "xfce4"
-    if is_running("ksmserver"): return "kde"
-    # fmt: on
+    if os.environ.get("KDE_FULL_SESSION") == "true":
+        return "kde"
+    if os.environ.get("GNOME_DESKTOP_SESSION_ID") and "deprecated" not in os.environ.get("GNOME_DESKTOP_SESSION_ID"):
+        return "gnome2"
+    if is_running("xfce-mcs-manage"):
+        return "xfce4"
+    if is_running("ksmserver"):
+        return "kde"
 
     return "unknown"
 
 
 def get_wallpaper_commands(wallpaper: Path, desktop: str) -> list[str]:
-    global first_run
-
     # fmt: off
     if desktop in ["gnome", "unity", "cinnamon"]:
         return [
@@ -126,7 +111,7 @@ def get_wallpaper_commands(wallpaper: Path, desktop: str) -> list[str]:
 
     if desktop == "hyprland":
         if not shutil.which("hyprctl"):
-            first_run_warning("hyprpaper requires hyprctl.")
+            logging.warning("hyprpaper requires hyprctl.")
             return []
         preloaded = False
         process = subprocess.Popen("hyprctl hyprpaper listloaded", shell=True, stdout=subprocess.PIPE)
@@ -166,7 +151,7 @@ def get_wm_wallpaper_commands() -> list[str]:
     elif session == "wayland":
         wallpaper_setters = []
     else:
-        first_run_warning(f"Unknown session: {session}")
+        logging.warning(f"Unknown session: {session}")
 
     for setter in wallpaper_setters:
         # fmt: off
@@ -187,33 +172,34 @@ def get_wm_wallpaper_commands() -> list[str]:
         if setter == "nitrogen":
             # nitrogen can only set the wallpaper per-display, so get a list
             # of the display IDs and use multiple commands
-            process = subprocess.Popen("xrandr --listmonitors | grep -Eo '[0-9]:' | tr -d ':'", shell=True, stdout=subprocess.PIPE)
-            if not process.stdout:
-                first_run_warning("Couldn't find any X11 displays")
+            s = subprocess.Popen("xrandr --listmonitors | grep -Eo '[0-9]:' | tr -d ':'", shell=True, stdout=subprocess.PIPE)
+            if not s.stdout:
+                logging.warning("Couldn't find any X11 displays")
                 return []
             format = "nitrogen --head=%s --set-zoom-fill %s"
-            return [format % (line.decode().strip(), "%s") for line in process.stdout.readlines()]
+            return [format % (line.decode().strip(), "%s") for line in s.stdout.readlines()]
 
         if setter == "Esetroot":
             # Esetroot needs libImlib
-            process = subprocess.Popen(["ldd", "Esetroot"], stdout=subprocess.PIPE)
-            if not process.stdout:
-                first_run_warning("There was a problem running ldd on Esetroot.")
+            s = subprocess.Popen(["ldd", "Esetroot"], stdout=subprocess.PIPE)
+            if not s.stdout:
+                logging.warning("There was a problem running ldd on Esetroot.")
                 return []
-            for line in process.stdout:
+            for line in s.stdout:
                 if not re.search("libImlib", line):
-                    first_run_warning("No wallpaper support for Esetroot: missing libImlib.")
+                    logging.warning("No wallpaper support for Esetroot: missing libImlib.")
                     return []
                 return ["Esetroot -scale %s"]
 
         if setter == "display":
             if not shutil.which("xwininfo"):
-                first_run_warning("display needs xwininfo to query the size of the root window.")
+                logging.warning("display needs xwininfo to query the size of the root window.")
                 return []
             return ["display -sample `xwininfo -root 2> /dev/null|awk '/geom/{print $2}'` -window root"]
 
 
-def first_run_warning(text: str) -> None:
-    global first_run
-    if first_run:
-        logging.warning(text)
+def is_running(process: str) -> bool:
+    s = subprocess.Popen(["ps", "axw"], stdout=subprocess.PIPE)
+    if s.stdout:
+        return any(re.search(process, line.decode().strip()) for line in s.stdout)
+    return False
