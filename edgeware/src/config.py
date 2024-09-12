@@ -601,8 +601,6 @@ def show_window():
                 config = json.loads(f.readline())
             fail_loop += 1
 
-    hasWebResourceVar = BooleanVar(root, os.path.exists(Resource.WEB_RESOURCE))
-
     # done painful control variables
 
     if getPresets() is None:
@@ -1580,8 +1578,6 @@ def show_window():
         variable=downloadEnabledVar,
         command=lambda: (toggleAssociateSettings_manual(downloadEnabledVar.get(), download_group, "white", "gray25")),
     )
-    downloadResourceEnabled = Checkbutton(otherFrame, text="Download from webResource", variable=useWebResourceVar)
-    toggleAssociateSettings(hasWebResourceVar.get(), [downloadResourceEnabled])
     minScoreSlider = Scale(booruFrame, from_=-50, to=100, orient="horizontal", variable=booruMin, label="Minimum Score")
 
     booruValidate = Button(
@@ -1627,7 +1623,6 @@ def show_window():
     booruValidate.pack(fill="x")
     Label(booruFrame, text="Download Mode").pack(fill="x")
     minScoreSlider.pack(fill="x")
-    downloadResourceEnabled.pack(fill="x")
 
     # ==========={EDGEWARE++ CHANGE DEFAULTS TAB STARTS HERE}==============#
     notebookGeneral.add(tabDefaultFiles, text="Change Default Files")

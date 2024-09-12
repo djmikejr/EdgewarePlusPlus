@@ -70,7 +70,6 @@ class _Resource:
     PROMPT = ROOT / "prompt.json"
     WALLPAPER = ROOT / "wallpaper.png"
     WEB = ROOT / "web.json"
-    WEB_RESOURCE = ROOT / "webResource.json"  # TODO
 
     @property
     def SPLASH(self) -> Path | None:
