@@ -23,7 +23,7 @@ from features.video_popup import VideoPopup
 from pack import Pack
 from panic import start_panic_listener
 from roll import RollTarget, roll_targets
-from settings import Settings
+from settings import Settings, first_launch_configure
 from state import State
 from utils import utils
 
@@ -36,6 +36,8 @@ def main(root: Tk, settings: Settings, targets: list[RollTarget]) -> None:
 
 if __name__ == "__main__":
     utils.init_logging("main")
+
+    first_launch_configure()
 
     root = Tk()
     settings = Settings()

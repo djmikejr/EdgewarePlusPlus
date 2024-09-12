@@ -3505,7 +3505,7 @@ def write_save(varList: list[StringVar | IntVar | BooleanVar], nameList: list[st
         file.write(json.dumps(temp))
         logging.info(f"wrote config file: {json.dumps(temp)}")
 
-    if int(varList[nameList.index("runOnSaveQuit")].get()) == 1 and exitAtEnd:
+    if not (len(sys.argv) > 1 and sys.argv[1] == "--first-launch-configure") and int(varList[nameList.index("runOnSaveQuit")].get()) == 1 and exitAtEnd:
         subprocess.Popen([sys.executable, Process.MAIN])
 
     if exitAtEnd:

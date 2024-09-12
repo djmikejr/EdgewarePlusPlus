@@ -1,14 +1,20 @@
 import ast
 import json
-import os
 import shutil
+import subprocess
+import sys
 
 import vlc
-from paths import Assets, Data
+from paths import Assets, Data, Process
+
+
+def first_launch_configure() -> None:
+    if not Data.CONFIG.is_file():
+        subprocess.run([sys.executable, Process.CONFIG, "--first-launch-configure"])
 
 
 def load_config() -> dict:
-    if not os.path.exists(Data.CONFIG):
+    if not Data.CONFIG.is_file():
         Data.ROOT.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(Assets.DEFAULT_CONFIG, Data.CONFIG)
 
@@ -85,6 +91,7 @@ class Settings:
 
         # Captions
         self.captions_in_popups = bool(config["showCaptions"])
+        # self.filename_caption_moods = bool(config["captionFilename"])
         self.multi_click_popups = bool(config["multiClick"])
         self.subliminal_caption_mood = bool(config["capPopMood"])
         self.caption_popup_chance = int(config["capPopChance"])  # 0 to 100
