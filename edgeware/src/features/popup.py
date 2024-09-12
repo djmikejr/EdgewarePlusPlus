@@ -7,12 +7,10 @@ from features.misc import open_web
 from features.theme import get_theme
 from pack import Pack
 from panic import panic
-from paths import Assets
 from roll import roll
 from screeninfo import get_monitors
 from settings import Settings
 from state import State
-from utils import utils
 
 
 class Popup(Toplevel):
@@ -173,10 +171,6 @@ class Popup(Toplevel):
                     popup = ImagePopup  # Exception thrown when both chances are 0
                 popup(self.root, self.settings, self.pack, self.state)
 
-    def try_reset_wallpaper(self) -> None:
-        if self.settings.hibernate_fix_wallpaper and self.state.reset_wallpaper():
-            utils.set_wallpaper(Assets.DEFAULT_PANIC_WALLPAPER)
-
     def click(self) -> None:
         self.clicks_to_close -= 1
         if self.clicks_to_close <= 0:
@@ -186,5 +180,4 @@ class Popup(Toplevel):
         self.state.popup_number -= 1
         self.try_web_open()
         self.try_mitosis()
-        self.try_reset_wallpaper()
         self.destroy()

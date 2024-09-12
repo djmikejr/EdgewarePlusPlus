@@ -16,7 +16,6 @@ class Subject:
         self.observers.append(observer)
 
 
-# TODO: Check if there are other uses for observers
 @dataclass
 class State:
     audio_number = 0
@@ -28,7 +27,7 @@ class State:
 
     timer_active = False
 
-    hibernate_active = False
+    _hibernate_active = Subject(False)
     hibernate_id = None
     pump_scare = False
 
@@ -45,5 +44,11 @@ class State:
         self._popup_number.value = value
         self._popup_number.notify()
 
-    def reset_wallpaper(self) -> bool:
-        return not self.hibernate_active and self.popup_number == 0
+    @property
+    def hibernate_active(self) -> bool:
+        return self._hibernate_active.value
+
+    @hibernate_active.setter
+    def hibernate_active(self, value: bool) -> None:
+        self._hibernate_active.value = value
+        self._hibernate_active.notify()

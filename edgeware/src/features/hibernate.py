@@ -7,9 +7,18 @@ from tkinter import Tk
 from features.drive import fill_drive
 from features.misc import handle_wallpaper
 from pack import Pack
+from paths import Assets
 from roll import RollTarget, roll_targets
 from settings import Settings
 from state import State
+from utils import utils
+
+
+def reset_wallpaper(settings: Settings, state: State) -> None:
+    if not (settings.hibernate_fix_wallpaper and state.popup_number == 0 and not state.hibernate_active):
+        return
+
+    utils.set_wallpaper(Assets.DEFAULT_PANIC_WALLPAPER)
 
 
 def spaced(root: Tk, settings: Settings, targets: list[RollTarget], run: Callable[[], bool]) -> None:
@@ -110,3 +119,14 @@ def main_hibernate(root: Tk, settings: Settings, pack: Pack, state: State, targe
             on_end()
         case _:
             logging.error(f"Unknown hibernate type {type}.")
+
+
+def start_main_hibernate(root: Tk, settings: Settings, pack: Pack, state: State, targets: list[RollTarget]) -> None:
+    if not settings.hibernate_fix_wallpaper:
+        handle_wallpaper(root, settings, pack, state)
+
+    observer = lambda: reset_wallpaper(settings, state)
+    state._popup_number.attach(observer)
+    state._hibernate_active.attach(observer)
+
+    main_hibernate(root, settings, pack, state, targets)

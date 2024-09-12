@@ -4,7 +4,7 @@ from tkinter import Tk
 from features.caption_popup import CaptionPopup
 from features.corruption import handle_corruption
 from features.drive import fill_drive, replace_images
-from features.hibernate import main_hibernate
+from features.hibernate import main_hibernate, start_main_hibernate
 from features.image_popup import ImagePopup
 from features.misc import (
     handle_booru_download,
@@ -64,9 +64,7 @@ if __name__ == "__main__":
         start_panic_listener(root, settings, state)
 
         if settings.hibernate_mode:
-            if not settings.hibernate_fix_wallpaper:
-                handle_wallpaper(root, settings, pack, state)
-            main_hibernate(root, settings, pack, state, targets)
+            start_main_hibernate(root, settings, pack, state, targets)
         else:
             handle_wallpaper(root, settings, pack, state)
             main(root, settings, targets)
