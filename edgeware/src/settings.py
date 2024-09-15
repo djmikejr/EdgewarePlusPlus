@@ -37,6 +37,7 @@ class Settings:
 
         # Impacts other settings
         lowkey_mode = bool(config["lkToggle"])
+        mitosis_mode = bool(config["mitosisMode"]) or lowkey_mode
 
         # General
         self.theme = config["themeType"]
@@ -54,7 +55,7 @@ class Settings:
 
         # Popups
         self.delay = int(config["delay"])  # Milliseconds
-        self.image_chance = int(config["popupMod"])  # 0 to 100
+        self.image_chance = int(config["popupMod"]) if not mitosis_mode else 0  # 0 to 100
         self.opacity = int(config["lkScaling"]) / 100  # Float between 0 and 1
         self.timeout_enabled = bool(config["timeoutPopups"]) or lowkey_mode
         self.timeout = int(config["popupTimeout"]) * 1000 if not lowkey_mode else self.delay  # Milliseconds
@@ -80,7 +81,7 @@ class Settings:
         self.max_audio = int(config["maxAudio"]) if bool(config["maxAudioBool"]) else float("inf")
 
         # Video
-        self.video_chance = int(config["vidMod"])  # 0 to 100
+        self.video_chance = int(config["vidMod"]) if not mitosis_mode else 0  # 0 to 100
         self.video_volume = int(config["videoVolume"])  # 0 to 100
         self.max_video = int(config["maxVideos"]) if bool(config["maxVideoBool"]) else float("inf")
         self.vlc_mode = bool(config["vlcMode"])
@@ -125,7 +126,7 @@ class Settings:
         self.timer_mode = bool(config["timerMode"])
         self.timer_time = int(config["timerSetupTime"]) * 60 * 1000  # Milliseconds
         self.timer_password = config["safeword"]
-        self.mitosis_mode = bool(config["mitosisMode"]) or self.lowkey_mode
+        self.mitosis_mode = mitosis_mode
         self.mitosis_strength = int(config["mitosisStrength"]) if not self.lowkey_mode else 1
 
         # Hibernate mode

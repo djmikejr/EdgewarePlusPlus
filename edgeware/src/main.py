@@ -46,8 +46,8 @@ if __name__ == "__main__":
 
     # TODO: Use a dict?
     targets = [
-        RollTarget(lambda: ImagePopup(root, settings, pack, state), settings.image_chance if not settings.mitosis_mode else 0),
-        RollTarget(lambda: VideoPopup(root, settings, pack, state), settings.video_chance if not settings.mitosis_mode else 0),
+        RollTarget(lambda: ImagePopup(root, settings, pack, state), settings.image_chance),
+        RollTarget(lambda: VideoPopup(root, settings, pack, state), settings.video_chance),
         RollTarget(lambda: CaptionPopup(settings, pack), settings.caption_popup_chance),
         RollTarget(lambda: Prompt(settings, pack, state), settings.prompt_chance),
         RollTarget(lambda: play_audio(settings, pack, state), settings.audio_chance),
