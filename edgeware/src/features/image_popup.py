@@ -15,7 +15,7 @@ from widgets.image_label import GifLike, ImageLabel
 class ImagePopup(Popup):
     def __init__(self, root: Tk, settings: Settings, pack: Pack, state: State):
         self.subliminal = roll(settings.subliminal_chance)
-        if not self.should_init(settings, state):
+        if not self.should_init(settings, pack, state):
             return
         super().__init__(root, settings, pack, state)
 
@@ -36,7 +36,10 @@ class ImagePopup(Popup):
         self.try_denial_text()
         self.init_finish()
 
-    def should_init(self, settings: Settings, state: State) -> bool:
+    def should_init(self, settings: Settings, pack: Pack, state: State) -> bool:
+        if not pack.has_image():
+            return False
+
         if not self.subliminal:
             return True
 

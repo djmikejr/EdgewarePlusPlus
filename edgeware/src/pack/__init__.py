@@ -37,15 +37,21 @@ class Pack:
         filter_function = lambda media: media.mood is None or media.mood in self.active_moods.media
         return list(filter(filter_function, media_list)) if self.active_moods.exists else media_list
 
-    # TODO: If there are none?
+    def has_image(self) -> bool:
+        return len(self.filter_media(self.images)) > 0
+
     def random_image(self) -> Path:
         return random.choice(self.filter_media(self.images)).path
 
-    # TODO: If there are none?
+    def has_video(self) -> bool:
+        return len(self.filter_media(self.videos)) > 0
+
     def random_video(self) -> Path:
         return random.choice(self.filter_media(self.videos)).path
 
-    # TODO: If there are none?
+    def has_audio(self) -> bool:
+        return len(self.filter_media(self.audio)) > 0
+
     def random_audio(self) -> Path:
         return random.choice(self.filter_media(self.audio)).path
 

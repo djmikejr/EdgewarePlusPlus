@@ -27,7 +27,7 @@ def play_audio(settings: Settings, pack: Pack, state: State) -> None:
         playsound(str(pack.random_audio()))
         state.audio_number -= 1
 
-    if state.audio_number < settings.max_audio:
+    if state.audio_number < settings.max_audio and pack.has_audio():
         Thread(target=play, daemon=True).start()
 
 
