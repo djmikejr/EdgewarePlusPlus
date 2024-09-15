@@ -3,6 +3,7 @@ from pathlib import Path
 
 import filetype
 from paths import Assets, Resource
+from settings import Settings
 
 from pack.data import CaptionMood
 from pack.load import list_media, load_captions, load_corruption, load_discord, load_info, load_media, load_moods, load_prompt, load_web
@@ -71,14 +72,12 @@ class Pack:
         return None
 
     # TODO: If there are none?
-    def random_caption(self, media: Path | None = None, subliminal_caption_mood: bool = False) -> str:
+    def random_caption(self, settings: Settings, media: Path | None = None) -> str:
         if media:
-            mood = self.caption_mood_of_media(media)
-            if mood:
-                return random.choice(mood.captions)
-            return random.choice(self.captions.default)
-
-        if subliminal_caption_mood and len(self.captions.subliminal) > 0:
+            if settings.filename_caption_moods:
+                mood = self.caption_mood_of_media(media)
+                return random.choice(mood.captions) if mood else random.choice(self.captions.default)
+        elif settings.subliminal_caption_mood and len(self.captions.subliminal) > 0:
             return random.choice(self.captions.subliminal)
 
         moods = [self.captions.default] + list(map(lambda c: c.captions, self.filter_captions()))

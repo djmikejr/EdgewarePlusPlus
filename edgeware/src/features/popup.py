@@ -70,7 +70,7 @@ class Popup(Toplevel):
 
     def try_caption(self) -> None:
         if self.settings.captions_in_popups:
-            label = Label(self, text=self.pack.random_caption(self.media), wraplength=self.width, fg=self.theme.fg, bg=self.theme.bg)
+            label = Label(self, text=self.pack.random_caption(self.settings, self.media), wraplength=self.width, fg=self.theme.fg, bg=self.theme.bg)
             label.place(x=5, y=5)
 
     def try_corruption_dev(self) -> None:

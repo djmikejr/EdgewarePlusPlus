@@ -92,7 +92,7 @@ class Settings:
 
         # Captions
         self.captions_in_popups = bool(config["showCaptions"])
-        # self.filename_caption_moods = bool(config["captionFilename"])
+        self.filename_caption_moods = bool(config["captionFilename"])
         self.multi_click_popups = bool(config["multiClick"])
         self.subliminal_caption_mood = bool(config["capPopMood"])
         self.caption_popup_chance = int(config["capPopChance"])  # 0 to 100

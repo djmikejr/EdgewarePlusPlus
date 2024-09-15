@@ -25,7 +25,7 @@ class CaptionPopup(Toplevel):
         font = (self.theme.font, min(monitor.width, monitor.height) // 10)
         label = Label(
             self,
-            text=pack.random_caption(subliminal_caption_mood=settings.subliminal_caption_mood),
+            text=pack.random_caption(settings),
             font=font,
             wraplength=monitor.width / 1.5,
             fg=self.theme.fg,
