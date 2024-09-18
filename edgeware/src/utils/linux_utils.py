@@ -95,10 +95,13 @@ def get_wallpaper_commands(wallpaper: Path, desktop: str) -> list[str]:
         "windowmaker": [f"wmsetbg -s -u {wallpaper}"],
         "sway": [f'swaybg -o "*" -i {wallpaper} -m fill'],
         "hyprland": [f'hyprctl hyprpaper preload "{wallpaper}"', f'hyprctl hyprpaper wallpaper ",{wallpaper}"'],
-        **dict.fromkeys(["gnome", "unity", "cinnamon"], [
-            f"gsettings set org.gnome.desktop.background picture-uri file://{wallpaper}",
-            f"gsettings set org.gnome.desktop.background picture-uri-dark file://{wallpaper}",
-        ]),
+        **dict.fromkeys(
+            ["gnome", "unity", "cinnamon"],
+            [
+                f"gsettings set org.gnome.desktop.background picture-uri file://{wallpaper}",
+                f"gsettings set org.gnome.desktop.background picture-uri-dark file://{wallpaper}",
+            ],
+        ),
         **dict.fromkeys(["kde3", "trinity"], [f'dcop kdesktop KBackgroundIface setWallpaper 0 "{wallpaper}" 6']),
         **dict.fromkeys(["fluxbox", "jwm", "openbox", "afterstep"], [f"fbsetbg {wallpaper}"]),
     }
@@ -122,7 +125,7 @@ def get_wm_wallpaper_commands(wallpaper: Path) -> list[str]:
             ("xsetbg", [f"xsetbg -fullscreen -border black {wallpaper}"]),
             ("fvwm-root", [f"fvwm-root -r {wallpaper}"]),
             ("wmsetbg", [f"wmsetbg -s -S {wallpaper}"]),
-            ("Esetroot", [f"Esetroot -scale {wallpaper}"])
+            ("Esetroot", [f"Esetroot -scale {wallpaper}"]),
             ("display", [f"display -sample `xwininfo -root 2> /dev/null|awk '/geom/{{print $2}}'` -window root {wallpaper}"]),
         ],
         "wayland": [],
