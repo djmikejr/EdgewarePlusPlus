@@ -106,71 +106,41 @@ def get_wallpaper_commands(wallpaper: Path, desktop: str) -> list[str]:
     return commands.get(desktop) or (get_wm_wallpaper_commands() if desktop in ["i3", "awesome", "dwm", "xmonad", "bspwm"] else [])
 
 
-def get_wm_wallpaper_commands() -> list[str]:
-    # Check if the session is X11 or Wayland so we can pick which wallpaper
-    # setters to use. Otherwise may run into issues trying to use X11 wallpaper
-    # utilities on Wayland and vice-versa
-    session = os.environ.get("XDG_SESSION_TYPE")  # "x11" or "wayland"
-    if session == "x11":
-        wallpaper_setters = [
-            "nitrogen",
-            "feh",
-            "habak",  # not tested
-            "hsetroot",  # not tested
-            "chbg",  # not tested
-            "qiv",  # not tested
-            "xv",  # not tested
-            "xsri",  # not tested
-            "xli",  # not tested
-            "xsetbg",  # not tested
-            "fvwm-root",  # not tested
-            "wmsetbg",  # not tested
-            "Esetroot",  # not tested
-            "display",  # not tested
-        ]
-    elif session == "wayland":
-        wallpaper_setters = []
-    else:
-        logging.warning(f"Unknown session: {session}")
+def get_wm_wallpaper_commands(wallpaper: Path) -> list[str]:
+    session = os.environ.get("XDG_SESSION_TYPE", "").lower()  # "x11" or "wayland"
+    setters = {
+        "x11": [
+            ("nitrogen", []),
+            ("feh", [f"feh --bg-scale {wallpaper}"]),
+            ("habak", [f"habak -ms {wallpaper}"]),
+            ("hsetroot", [f"hsetroot -fill {wallpaper}"]),
+            ("chbg", [f"chbg -once -mode maximize {wallpaper}"]),
+            ("qiv", [f"qiv --root_s {wallpaper}"]),
+            ("xv", [f"xv -max -smooth -root -quit {wallpaper}"]),
+            ("xsri", [f"xsri --center-x --center-y --scale-width=100 --scale-height=100 {wallpaper}"]),
+            ("xli", [f"xli -fullscreen -onroot -quiet -border black {wallpaper}"]),
+            ("xsetbg", [f"xsetbg -fullscreen -border black {wallpaper}"]),
+            ("fvwm-root", [f"fvwm-root -r {wallpaper}"]),
+            ("wmsetbg", [f"wmsetbg -s -S {wallpaper}"]),
+            ("Esetroot", [f"Esetroot -scale {wallpaper}"])
+            ("display", [f"display -sample `xwininfo -root 2> /dev/null|awk '/geom/{{print $2}}'` -window root {wallpaper}"]),
+        ],
+        "wayland": [],
+    }
 
-    for setter in wallpaper_setters:
-        # fmt: off
-        if not shutil.which(setter): continue
-        if setter == "feh": return ["feh --bg-scale %s"]
-        if setter == "habak": return ["habak -ms %s"]
-        if setter == "hsetroot": return ["hsetroot -fill %s"]
-        if setter == "chbg": return ["chbg -once -mode maximize %s"]
-        if setter == "qiv": return ["qiv --root_s %s"]
-        if setter == "xv": return ["xv -max -smooth -root -quit %s"]
-        if setter == "xsri": return ["xsri --center-x --center-y --scale-width=100 --scale-height=100 %s"]
-        if setter == "xli": return ["xli -fullscreen -onroot -quiet -border black %s"]
-        if setter == "xsetbg": return ["xsetbg -fullscreen -border black %s"]
-        if setter == "fvwm-root": return ["fvwm-root -r %s"]
-        if setter == "wmsetbg": return ["wmsetbg -s -S %s"]
-        if setter == "display": return ["display -sample `xwininfo -root 2> /dev/null|awk '/geom/{print $2}'` -window root"]
-        # fmt: on
-
-        if setter == "nitrogen":
-            # nitrogen can only set the wallpaper per-display, so get a list
-            # of the display IDs and use multiple commands
-            s = subprocess.Popen("xrandr --listmonitors | grep -Eo '[0-9]:' | tr -d ':'", shell=True, stdout=subprocess.PIPE)
-            if not s.stdout:
-                logging.warning("Couldn't find any X11 displays")
-                return []
-            format = "nitrogen --head=%s --set-zoom-fill %s"
-            return [format % (line.decode().strip(), "%s") for line in s.stdout.readlines()]
-
-        if setter == "Esetroot":
-            # Esetroot needs libImlib
-            s = subprocess.Popen(["ldd", "Esetroot"], stdout=subprocess.PIPE)
-            if not s.stdout:
-                logging.warning("There was a problem running ldd on Esetroot.")
-                return []
-            for line in s.stdout:
-                if not re.search("libImlib", line):
-                    logging.warning("No wallpaper support for Esetroot: missing libImlib.")
+    for program, commands in setters.get(session, []):
+        if shutil.which(program):
+            if program == "nitrogen":
+                # nitrogen can only set the wallpaper per-display, so get a list
+                # of the display IDs and use multiple commands
+                s = subprocess.Popen("xrandr --listmonitors | grep -Eo '[0-9]:' | tr -d ':'", shell=True, stdout=subprocess.PIPE)
+                if not s.stdout:
+                    logging.warning("Couldn't find any X11 displays")
                     return []
-                return ["Esetroot -scale %s"]
+                return [f"nitrogen --head=%s --set-zoom-fill {wallpaper}" % (line.decode().strip(), "%s") for line in s.stdout.readlines()]
+            return commands
+
+    return []
 
 
 def is_running(process: str) -> bool:
