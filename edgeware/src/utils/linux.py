@@ -8,24 +8,27 @@ from pathlib import Path
 import vlc
 from paths import Assets, Process
 from settings import load_default_config
-from utils.linux_utils import get_desktop_environment, get_wallpaper_commands, set_wallpaper_special_cases
+from utils.linux_utils import get_desktop_environment, get_wallpaper_commands, get_wallpaper_function
 
 
 def set_wallpaper(wallpaper: Path) -> None:
     desktop = get_desktop_environment()
     commands = get_wallpaper_commands(wallpaper, desktop)
-    for command in commands:
-        try:
-            args = command % wallpaper
-        except TypeError:
-            args = command
+    function = get_wallpaper_function(wallpaper, desktop)
 
+    if len(commands) > 0:
+        for command in commands:
+            try:
+                subprocess.Popen(command, shell=True)
+            except Exception as e:
+                logging.warning(f"Failed to run {command}. Reason: {e}")
+    elif function:
         try:
-            subprocess.Popen(args, shell=True)
+            function()
         except Exception as e:
-            logging.warning(f"Failed to run {args}. Reason: {e}")
-
-    set_wallpaper_special_cases(wallpaper, desktop)
+            logging.warning(f"Failed to set wallpaper. Reason: {e}")
+    else:
+        logging.info(f"Can't set wallpaper for desktop environment {desktop}")
 
 
 def set_vlc_window(player: vlc.MediaPlayer, window_id: int) -> None:

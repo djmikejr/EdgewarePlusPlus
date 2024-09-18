@@ -1,45 +1,11 @@
 import codecs
-import logging
 import os
 import re
 import shutil
 import subprocess
+from collections.abc import Callable
 from configparser import ConfigParser
 from pathlib import Path
-
-
-def set_wallpaper_special_cases(wallpaper: Path, desktop: str) -> None:
-    try:
-        if desktop == "razor-qt":
-            desktop_conf = ConfigParser()
-
-            config_home = os.environ.get("XDG_CONFIG_HOME")
-            if not config_home:
-                config_home = os.environ.get("XDG_HOME_CONFIG", os.path.expanduser(".config"))
-            config_dir = os.path.join(config_home, "razor")
-
-            # Development version
-            desktop_conf_file = os.path.join(config_dir, "desktop.conf")
-            if os.path.isfile(desktop_conf_file):
-                config_option = r"screens\1\desktops\1\wallpaper"
-            else:
-                desktop_conf_file = os.path.expanduser(".razor/desktop.conf")
-                config_option = r"desktops\1\wallpaper"
-            desktop_conf.read(os.path.join(desktop_conf_file))
-            try:
-                if desktop_conf.has_option("razor", config_option):  # only replacing a value
-                    desktop_conf.set("razor", config_option, wallpaper)
-                    with codecs.open(
-                        desktop_conf_file,
-                        "w",
-                        encoding="utf-8",
-                        errors="replace",
-                    ) as f:
-                        desktop_conf.write(f)
-            except Exception:
-                pass
-    except Exception:
-        logging.warning("Failed to set wallpaper")
 
 
 # Modified from https://stackoverflow.com/a/21213358
@@ -113,7 +79,7 @@ def get_wm_wallpaper_commands(wallpaper: Path) -> list[str]:
     session = os.environ.get("XDG_SESSION_TYPE", "").lower()  # "x11" or "wayland"
     setters = {
         "x11": [
-            ("nitrogen", []),
+            ("nitrogen", [f"nitrogen --set-zoom-fill {wallpaper}"]),
             ("feh", [f"feh --bg-scale {wallpaper}"]),
             ("habak", [f"habak -ms {wallpaper}"]),
             ("hsetroot", [f"hsetroot -fill {wallpaper}"]),
@@ -133,17 +99,42 @@ def get_wm_wallpaper_commands(wallpaper: Path) -> list[str]:
 
     for program, commands in setters.get(session, []):
         if shutil.which(program):
-            if program == "nitrogen":
-                # nitrogen can only set the wallpaper per-display, so get a list
-                # of the display IDs and use multiple commands
-                s = subprocess.Popen("xrandr --listmonitors | grep -Eo '[0-9]:' | tr -d ':'", shell=True, stdout=subprocess.PIPE)
-                if not s.stdout:
-                    logging.warning("Couldn't find any X11 displays")
-                    return []
-                return [f"nitrogen --head=%s --set-zoom-fill {wallpaper}" % (line.decode().strip(), "%s") for line in s.stdout.readlines()]
             return commands
 
     return []
+
+
+def get_wallpaper_function(wallpaper: Path, desktop: str) -> Callable[[], None] | None:
+    def razor_qt():
+        desktop_conf = ConfigParser()
+
+        config_home = os.environ.get("XDG_CONFIG_HOME") or os.environ.get("XDG_HOME_CONFIG", os.path.expanduser(".config"))
+        config_dir = os.path.join(config_home, "razor")
+
+        # Development version
+        desktop_conf_file = os.path.join(config_dir, "desktop.conf")
+        if os.path.isfile(desktop_conf_file):
+            config_option = r"screens\1\desktops\1\wallpaper"
+        else:
+            desktop_conf_file = os.path.expanduser(".razor/desktop.conf")
+            config_option = r"desktops\1\wallpaper"
+        desktop_conf.read(os.path.join(desktop_conf_file))
+        try:
+            if desktop_conf.has_option("razor", config_option):  # only replacing a value
+                desktop_conf.set("razor", config_option, wallpaper)
+                with codecs.open(
+                    desktop_conf_file,
+                    "w",
+                    encoding="utf-8",
+                    errors="replace",
+                ) as f:
+                    desktop_conf.write(f)
+        except Exception:
+            pass
+
+    functions = {"razor-qt": razor_qt}
+
+    return functions.get(desktop)
 
 
 def is_running(process: str) -> bool:
