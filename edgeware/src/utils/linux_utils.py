@@ -11,36 +11,33 @@ from pathlib import Path
 def set_wallpaper_special_cases(wallpaper: Path, desktop: str) -> None:
     try:
         if desktop == "razor-qt":
-            if first_run:
-                desktop_conf = ConfigParser()
+            desktop_conf = ConfigParser()
 
-                config_home = os.environ.get("XDG_CONFIG_HOME")
-                if not config_home:
-                    config_home = os.environ.get("XDG_HOME_CONFIG", os.path.expanduser(".config"))
-                config_dir = os.path.join(config_home, "razor")
+            config_home = os.environ.get("XDG_CONFIG_HOME")
+            if not config_home:
+                config_home = os.environ.get("XDG_HOME_CONFIG", os.path.expanduser(".config"))
+            config_dir = os.path.join(config_home, "razor")
 
-                # Development version
-                desktop_conf_file = os.path.join(config_dir, "desktop.conf")
-                if os.path.isfile(desktop_conf_file):
-                    config_option = r"screens\1\desktops\1\wallpaper"
-                else:
-                    desktop_conf_file = os.path.expanduser(".razor/desktop.conf")
-                    config_option = r"desktops\1\wallpaper"
-                desktop_conf.read(os.path.join(desktop_conf_file))
-                try:
-                    if desktop_conf.has_option("razor", config_option):  # only replacing a value
-                        desktop_conf.set("razor", config_option, wallpaper)
-                        with codecs.open(
-                            desktop_conf_file,
-                            "w",
-                            encoding="utf-8",
-                            errors="replace",
-                        ) as f:
-                            desktop_conf.write(f)
-                except Exception:
-                    pass
+            # Development version
+            desktop_conf_file = os.path.join(config_dir, "desktop.conf")
+            if os.path.isfile(desktop_conf_file):
+                config_option = r"screens\1\desktops\1\wallpaper"
             else:
-                pass  # TODO: Reload desktop when possible
+                desktop_conf_file = os.path.expanduser(".razor/desktop.conf")
+                config_option = r"desktops\1\wallpaper"
+            desktop_conf.read(os.path.join(desktop_conf_file))
+            try:
+                if desktop_conf.has_option("razor", config_option):  # only replacing a value
+                    desktop_conf.set("razor", config_option, wallpaper)
+                    with codecs.open(
+                        desktop_conf_file,
+                        "w",
+                        encoding="utf-8",
+                        errors="replace",
+                    ) as f:
+                        desktop_conf.write(f)
+            except Exception:
+                pass
     except Exception:
         logging.warning("Failed to set wallpaper")
 
@@ -81,49 +78,32 @@ def get_desktop_environment() -> str:
 
 
 def get_wallpaper_commands(wallpaper: Path, desktop: str) -> list[str]:
-    # fmt: off
-    if desktop in ["gnome", "unity", "cinnamon"]:
-        return [
-            "gsettings set org.gnome.desktop.background picture-uri file://%s",
-            "gsettings set org.gnome.desktop.background picture-uri-dark file://%s",
-        ]
-    if desktop == "mate":
-        return [
-            "gsettings set org.mate.background picture-filename %s",  # MATE >= 1.6
-            "mateconftool-2 -t string --set /desktop/mate/background/picture_filename %s",  # MATE < 1.6
-        ]
-    if desktop == "xfce4":
-        return [
-            "xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor0/image-path -s %s",
+    commands = {
+        "mate": [
+            f"gsettings set org.mate.background picture-filename {wallpaper}",  # MATE >= 1.6
+            f"mateconftool-2 -t string --set /desktop/mate/background/picture_filename {wallpaper}",  # MATE < 1.6
+        ],
+        "xfce4": [
+            f"xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor0/image-path -s {wallpaper}",
             "xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor0/image-style -s 3",
             "xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor0/image-show -s true",
-        ] if first_run else ["xfdesktop --reload"]
-    if desktop == "gnome2": return ["gconftool-2 -t string --set /desktop/gnome/background/picture_filename %s"]
-    if desktop in ["kde3", "trinity"]: return ['dcop kdesktop KBackgroundIface setWallpaper 0 "%s" 6']
-    if desktop in ["fluxbox", "jwm", "openbox", "afterstep"]: return ["fbsetbg %s"]
-    if desktop == "icewm": return ["icewmbg %s"]
-    if desktop == "blackbox": return ["bsetbg -full %s"]
-    if desktop == "lxde": return ["pcmanfm --set-wallpaper %s --wallpaper-mode=scaled"]
-    if desktop == "windowmaker": return ["wmsetbg -s -u %s"]
-    if desktop == "sway": return ['swaybg -o "*" -i %s -m fill']
-    if desktop in ["i3", "awesome", "dwm", "xmonad", "bspwm"]: return get_wm_wallpaper_commands()
-    # fmt: on
+        ],
+        "gnome2": [f"gconftool-2 -t string --set /desktop/gnome/background/picture_filename {wallpaper}"],
+        "icewm": [f"icewmbg {wallpaper}"],
+        "blackbox": [f"bsetbg -full {wallpaper}"],
+        "lxde": [f"pcmanfm --set-wallpaper {wallpaper} --wallpaper-mode=scaled"],
+        "windowmaker": [f"wmsetbg -s -u {wallpaper}"],
+        "sway": [f'swaybg -o "*" -i {wallpaper} -m fill'],
+        "hyprland": [f'hyprctl hyprpaper preload "{wallpaper}"', f'hyprctl hyprpaper wallpaper ",{wallpaper}"'],
+        **dict.fromkeys(["gnome", "unity", "cinnamon"], [
+            f"gsettings set org.gnome.desktop.background picture-uri file://{wallpaper}",
+            f"gsettings set org.gnome.desktop.background picture-uri-dark file://{wallpaper}",
+        ]),
+        **dict.fromkeys(["kde3", "trinity"], [f'dcop kdesktop KBackgroundIface setWallpaper 0 "{wallpaper}" 6']),
+        **dict.fromkeys(["fluxbox", "jwm", "openbox", "afterstep"], [f"fbsetbg {wallpaper}"]),
+    }
 
-    if desktop == "hyprland":
-        if not shutil.which("hyprctl"):
-            logging.warning("hyprpaper requires hyprctl.")
-            return []
-        preloaded = False
-        process = subprocess.Popen("hyprctl hyprpaper listloaded", shell=True, stdout=subprocess.PIPE)
-        if process.stdout:
-            for line in process.stdout.readlines():
-                if re.search(wallpaper, line.decode().strip()):
-                    preloaded = True
-                    break
-        preload = [] if preloaded else ['hyprctl hyprpaper preload "%s"']
-        return preload + ['hyprctl hyprpaper wallpaper ",%s"']
-
-    return []
+    return commands.get(desktop) or (get_wm_wallpaper_commands() if desktop in ["i3", "awesome", "dwm", "xmonad", "bspwm"] else [])
 
 
 def get_wm_wallpaper_commands() -> list[str]:
@@ -167,6 +147,7 @@ def get_wm_wallpaper_commands() -> list[str]:
         if setter == "xsetbg": return ["xsetbg -fullscreen -border black %s"]
         if setter == "fvwm-root": return ["fvwm-root -r %s"]
         if setter == "wmsetbg": return ["wmsetbg -s -S %s"]
+        if setter == "display": return ["display -sample `xwininfo -root 2> /dev/null|awk '/geom/{print $2}'` -window root"]
         # fmt: on
 
         if setter == "nitrogen":
@@ -190,12 +171,6 @@ def get_wm_wallpaper_commands() -> list[str]:
                     logging.warning("No wallpaper support for Esetroot: missing libImlib.")
                     return []
                 return ["Esetroot -scale %s"]
-
-        if setter == "display":
-            if not shutil.which("xwininfo"):
-                logging.warning("display needs xwininfo to query the size of the root window.")
-                return []
-            return ["display -sample `xwininfo -root 2> /dev/null|awk '/geom/{print $2}'` -window root"]
 
 
 def is_running(process: str) -> bool:
