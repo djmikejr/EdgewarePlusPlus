@@ -16,8 +16,8 @@ class Prompt(Toplevel):
 
         self.theme = get_theme(settings)
 
-        self.wm_attributes("-topmost", True)
-        self.wm_attributes("-type", "splash")
+        self.attributes("-topmost", True)
+        self.attributes("-type", "splash")
         self.configure(background=self.theme.bg)
 
         monitor = next(m for m in get_monitors() if m.is_primary)

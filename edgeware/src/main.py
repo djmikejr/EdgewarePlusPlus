@@ -72,9 +72,9 @@ if __name__ == "__main__":
             main(root, settings, targets)
 
     if settings.startup_splash:
-        root.after(0, lambda: StartupSplash(pack, start_main))
+        StartupSplash(pack, start_main)
     else:
-        root.after(0, start_main)
+        start_main()
 
     root.withdraw()
     root.mainloop()

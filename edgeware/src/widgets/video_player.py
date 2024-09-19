@@ -35,14 +35,15 @@ class VideoPlayer:
             self.delay = float(frame_rate[1]) / float(frame_rate[0])
             self.frames = cycle(imageio.get_reader(video).iter_data())
 
-            try:
-                audio = AudioFileClip(str(video)).to_soundarray()
-                # TODO: Setting the volume this way is extremely slow
-                # audio = [[volume / 100 * v[0], volume / 100 * v[1]] for v in audio]
-                samplerate = len(audio) / float(properties["duration"])
-                sounddevice.play(audio, samplerate=samplerate, loop=True)  # TODO: Can't play multiple sounds at once
-            except KeyError:
-                pass  # Video has no audio
+            # TODO: Find a better solution for audio / video
+            # try:
+            #     audio = AudioFileClip(str(video)).to_soundarray()
+            #     # TODO: Setting the volume this way is extremely slow
+            #     # audio = [[volume / 100 * v[0], volume / 100 * v[1]] for v in audio]
+            #     samplerate = len(audio) / float(properties["duration"])
+            #     sounddevice.play(audio, samplerate=samplerate, loop=True)  # TODO: Can't play multiple sounds at once
+            # except KeyError:
+            #     pass  # Video has no audio
 
             Thread(target=self.animate, daemon=True).start()
 

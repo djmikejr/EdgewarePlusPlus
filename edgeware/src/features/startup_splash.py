@@ -14,9 +14,10 @@ class StartupSplash(Toplevel):
         super().__init__(bg="black")
 
         self.callback = callback
+        self.opacity = 0
 
-        self.wm_attributes("-topmost", True)
-        self.wm_attributes("-type", "splash")
+        self.attributes("-topmost", True)
+        self.attributes("-type", "splash")
 
         monitor = next(m for m in get_monitors() if m.is_primary)
 
@@ -31,20 +32,21 @@ class StartupSplash(Toplevel):
 
         self.geometry(f"{width}x{height}+{x}+{y}")
         ImageLabel(self, image, (width, height)).pack()
-        Thread(target=self.animate, daemon=True).start()
+        self.fade_in()
 
-    def animate(self) -> None:
-        opacity = 0
-        while opacity < 1:
-            opacity += 0.01
-            self.attributes("-alpha", opacity)
-            time.sleep(0.01)
+    def fade_in(self) -> None:
+        if self.opacity < 1:
+            self.opacity += 0.01
+            self.attributes("-alpha", self.opacity)
+            self.after(10, self.fade_in)
+        else:
+            self.after(2000, self.fade_out)
 
-        time.sleep(2)
-        while opacity > 0:
-            opacity -= 2 * 0.01
-            self.attributes("-alpha", opacity)
-            time.sleep(0.01 / 4)
-
-        self.destroy()
-        self.callback()
+    def fade_out(self) -> None:
+        if self.opacity > 0:
+            self.opacity -= 2 * 0.01
+            self.attributes("-alpha", self.opacity)
+            self.after(10 // 4, self.fade_out)
+        else:
+            self.destroy()
+            self.callback()

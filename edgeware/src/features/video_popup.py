@@ -19,7 +19,6 @@ class VideoPopup(Popup):
         properties = get_video_properties(video)
 
         self.compute_geometry(properties["width"], properties["height"])
-        # TODO: Might be necessary to fix bugs
         self.wait_visibility()
         self.player = VideoPlayer(self, video, (self.width, self.height), self.settings.video_volume, self.settings.vlc_mode)
 
