@@ -4,7 +4,7 @@ echo +==============[ Welcome to Edgeware Setup~ ]==============+
 echo Python version:
 py --version
 echo:
-echo NOTE: Python versions older than 3.10.2 might have compatability issues.
+echo NOTE: Python versions older than 3.12 might have compatability issues.
 echo If you are on one of these versions and experience issues with Edgeware, try uninstalling them
 echo and running this installer again. (or download it yourself if you know what you're doing!)
 echo:
@@ -14,8 +14,8 @@ goto checkPip
 echo Could not find Python.
 echo Now downloading installer from python.org, please wait...
 reg Query "HKLM\Hardware\Description\System\CentralProcessor\0" | find /i "x86" > NUL && set OS=32BIT || set OS=64BIT
-if %OS%==32BIT powershell -Command "(New-Object Net.WebClient).DownloadFile('https://www.python.org/ftp/python/3.10.2/python-3.10.2.exe', 'pyinstaller.exe')"
-if %OS%==64BIT powershell -Command "(New-Object Net.WebClient).DownloadFile('https://www.python.org/ftp/python/3.10.2/python-3.10.2-amd64.exe', 'pyinstaller.exe')"
+if %OS%==32BIT powershell -Command "(New-Object Net.WebClient).DownloadFile('https://www.python.org/ftp/python/3.12.6/python-3.12.6.exe', 'pyinstaller.exe')"
+if %OS%==64BIT powershell -Command "(New-Object Net.WebClient).DownloadFile('https://www.python.org/ftp/python/3.12.6/python-3.12.6-amd64.exe', 'pyinstaller.exe')"
 echo Done downloading executable.
 echo Please complete installation through the installer before continuing.
 start %CD%\pyinstaller.exe
