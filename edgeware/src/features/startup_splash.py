@@ -17,7 +17,9 @@ class StartupSplash(Toplevel):
         self.opacity = 0
 
         self.attributes("-topmost", True)
-        self.attributes("-type", "splash")
+        self.overrideredirect(True)
+        # TODO: Doesn't work on Windows
+        # self.attributes("-type", "splash")
 
         monitor = next(m for m in get_monitors() if m.is_primary)
 

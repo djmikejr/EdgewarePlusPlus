@@ -26,10 +26,12 @@ class Popup(Toplevel):
 
         self.bind("<KeyPress>", lambda event: panic(self.root, self.settings, self.state, event.keysym))
         self.attributes("-topmost", True)
-        self.attributes("-type", "splash")
+        self.overrideredirect(True)
+        # TODO: Doesn't work on Windows
+        # self.attributes("-type", "splash")
+
         # TODO: May be needed for opacity on some Linux setups
         # self.update_idletasks()
-        # self.overrideredirect(True)
         # self.wait_visibility()
 
         self.opacity = self.settings.opacity
