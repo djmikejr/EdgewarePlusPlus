@@ -11,6 +11,7 @@ from roll import roll
 from screeninfo import get_monitors
 from settings import Settings
 from state import State
+from utils import utils
 
 
 class Popup(Toplevel):
@@ -26,10 +27,7 @@ class Popup(Toplevel):
 
         self.bind("<KeyPress>", lambda event: panic(self.root, self.settings, self.state, event.keysym))
         self.attributes("-topmost", True)
-        self.overrideredirect(True)
-        # TODO: Doesn't work on Windows
-        # self.attributes("-type", "splash")
-
+        utils.set_borderless(self)
         # TODO: May be needed for opacity on some Linux setups
         # self.update_idletasks()
         # self.wait_visibility()

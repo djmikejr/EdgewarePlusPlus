@@ -4,11 +4,16 @@ import shlex
 import subprocess
 import sys
 from pathlib import Path
+from tkinter import Toplevel
 
 import vlc
 from paths import Assets, Process
 from settings import load_default_config
 from utils.linux_utils import get_desktop_environment, get_wallpaper_commands, get_wallpaper_function
+
+
+def set_borderless(window: Toplevel) -> None:
+    window.attributes("-type", "splash")
 
 
 def set_wallpaper(wallpaper: Path) -> None:

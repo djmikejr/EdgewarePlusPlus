@@ -15,9 +15,7 @@ class CaptionPopup(Toplevel):
         self.theme = get_theme(settings)
 
         self.attributes("-topmost", True)
-        self.overrideredirect(True)
-        # TODO: Doesn't work on Windows
-        # self.attributes("-type", "splash")
+        utils.set_borderless(self)
         self.attributes("-alpha", settings.opacity)
         if utils.is_windows():
             self.wm_attributes("-transparentcolor", self.theme.transparent_bg)

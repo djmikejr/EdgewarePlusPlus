@@ -5,9 +5,7 @@ from threading import Thread
 from tkinter import Label, TclError, Toplevel
 
 import imageio
-import sounddevice
 import vlc
-from moviepy.editor import AudioFileClip
 from PIL import Image, ImageTk
 from utils import utils
 from videoprops import get_video_properties

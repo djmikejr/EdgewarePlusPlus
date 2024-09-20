@@ -1,11 +1,10 @@
-import time
 from collections.abc import Callable
-from threading import Thread
 from tkinter import Toplevel
 
 from pack import Pack
 from PIL import Image
 from screeninfo import get_monitors
+from utils import utils
 from widgets.image_label import ImageLabel
 
 
@@ -17,9 +16,7 @@ class StartupSplash(Toplevel):
         self.opacity = 0
 
         self.attributes("-topmost", True)
-        self.overrideredirect(True)
-        # TODO: Doesn't work on Windows
-        # self.attributes("-type", "splash")
+        utils.set_borderless(self)
 
         monitor = next(m for m in get_monitors() if m.is_primary)
 

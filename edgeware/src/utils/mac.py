@@ -1,6 +1,11 @@
 from pathlib import Path
+from tkinter import Toplevel
 
 import vlc
+
+
+def set_borderless(window: Toplevel) -> None:
+    pass
 
 
 def set_wallpaper(wallpaper: Path) -> None:

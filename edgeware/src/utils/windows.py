@@ -4,9 +4,14 @@ import os
 import subprocess
 import tempfile
 from pathlib import Path
+from tkinter import Toplevel
 
 import vlc
 from paths import Assets, Process
+
+
+def set_borderless(window: Toplevel) -> None:
+    window.overrideredirect(True)
 
 
 def set_wallpaper(wallpaper: Path) -> None:
