@@ -9,6 +9,12 @@
 
 **Since last version...**
 
+•*A huge code backend rewrite has been finished!*
+>This might not mean much to to the end user, but for any developer who wishes to work on edgeware (including us!), this should make things a lot easier.
+
+•*Gifs now properly animate in the loading splash*
+>Coincidentally you can test this with the [EdgeWare++ Test Pack](https://mega.nz/file/VbsEmbLD#gCLx6Ftv161oT7u3yiU8altS07QSElTz-Xo9kRmcugM)
+
 **Version 12.75**
 
 •*A brand new splash screen! and icons! Full size of the splash screen can be found [here](https://x.com/ara10ten/status/1828978778741125477).*
