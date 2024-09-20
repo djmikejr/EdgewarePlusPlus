@@ -69,7 +69,7 @@ class Popup(Toplevel):
             self.y = random.randint(self.monitor.y, self.monitor.y + self.monitor.height - self.height)
 
     def try_caption(self) -> None:
-        if self.settings.captions_in_popups:
+        if self.settings.captions_in_popups and self.pack.has_captions(self.settings, self.media):
             label = Label(self, text=self.pack.random_caption(self.settings, self.media), wraplength=self.width, fg=self.theme.fg, bg=self.theme.bg)
             label.place(x=5, y=5)
 

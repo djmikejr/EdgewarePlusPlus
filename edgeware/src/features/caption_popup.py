@@ -10,6 +10,8 @@ from utils import utils
 
 class CaptionPopup(Toplevel):
     def __init__(self, settings: Settings, pack: Pack):
+        if not self.should_init(settings, pack):
+            return
         super().__init__()
 
         self.theme = get_theme(settings)
@@ -38,3 +40,6 @@ class CaptionPopup(Toplevel):
 
         self.geometry(f"+{x}+{y}")
         self.after(settings.caption_popup_timeout, self.destroy)
+
+    def should_init(self, settings: Settings, pack: Pack) -> bool:
+        return pack.has_captions(settings)

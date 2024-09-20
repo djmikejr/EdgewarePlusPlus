@@ -202,14 +202,15 @@ def load_web() -> list[Web]:
     def load(content: str) -> list[Web]:
         web = json.loads(content)
 
-        Schema({"urls": All([Url()], Length(min=1)), "args": All([str], Length(min=1)), "moods": All([str], Length(min=1))}, required=True)(web)
+        Schema({"urls": All([Url()], Length(min=1)), "args": All([str], Length(min=1)), Optional("moods"): All([str], Length(min=1))}, required=True)(web)
 
         length_equal_to(web, "args", "urls")
-        length_equal_to(web, "moods", "urls")
+        if "moods" in web:
+            length_equal_to(web, "moods", "urls")
 
         web_list = []
         for i in range(len(web["urls"])):
-            web_list.append(Web(web["urls"][i], web["args"][i].split(","), web["moods"][i]))
+            web_list.append(Web(web["urls"][i], web["args"][i].split(","), web["moods"][i] if "moods" in web else None))
 
         return web_list
 

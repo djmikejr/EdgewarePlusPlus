@@ -5,7 +5,7 @@ import filetype
 from paths import Assets, Resource
 from settings import Settings
 
-from pack.data import CaptionMood
+from pack.data import CaptionMood, PromptMood, Web
 from pack.load import list_media, load_captions, load_corruption, load_discord, load_info, load_media, load_moods, load_prompt, load_web
 
 
@@ -71,17 +71,22 @@ class Pack:
                 return c
         return None
 
-    # TODO: If there are none?
-    def random_caption(self, settings: Settings, media: Path | None = None) -> str:
+    def find_caption_list(self, settings: Settings, media: Path | None = None) -> list[str]:
         if media:
             if settings.filename_caption_moods:
                 mood = self.caption_mood_of_media(media)
-                return random.choice(mood.captions) if mood else random.choice(self.captions.default)
+                return mood.captions if mood else self.captions.default
         elif settings.subliminal_caption_mood and len(self.captions.subliminal) > 0:
-            return random.choice(self.captions.subliminal)
+            return self.captions.subliminal
 
         moods = [self.captions.default] + list(map(lambda c: c.captions, self.filter_captions()))
-        return random.choice([caption for mood in moods for caption in mood])
+        return [caption for mood in moods for caption in mood]
+
+    def has_captions(self, settings: Settings, media: Path | None = None) -> bool:
+        return len(self.find_caption_list(settings, media)) > 0
+
+    def random_caption(self, settings: Settings, media: Path | None = None) -> str:
+        return random.choice(self.find_caption_list(settings, media))
 
     def random_clicks_to_close(self, media: Path) -> int:
         mood = self.caption_mood_of_media(media)
@@ -92,10 +97,15 @@ class Pack:
     def random_denial(self) -> str:
         return random.choice(self.captions.denial)  # Guaranteed to be non-empty
 
-    # TODO: If there are none?
-    def random_prompt(self) -> str:
+    def filter_prompts(self) -> list[PromptMood]:
         filter_function = lambda p: p.mood in self.active_moods.prompts
-        moods = list(filter(filter_function, self.prompts.moods)) if self.active_moods.exists else self.prompts.moods
+        return list(filter(filter_function, self.prompts.moods)) if self.active_moods.exists else self.prompts.moods
+
+    def has_prompts(self) -> bool:
+        return len(self.filter_prompts()) > 0
+
+    def random_prompt(self) -> str:
+        moods = self.filter_prompts()
         mood = random.choices(moods, list(map(lambda p: p.weight, moods)), k=1)[0]
         length = random.randint(self.prompts.min_length, self.prompts.max_length)
 
@@ -105,8 +115,13 @@ class Pack:
 
         return prompt.strip()
 
-    # TODO: If there are none?
+    def filter_web(self) -> list[Web]:
+        filter_function = lambda w: w.mood is None or w.mood in self.active_moods.web
+        return list(filter(filter_function, self.web)) if self.active_moods.exists else self.web
+
+    def has_web(self) -> bool:
+        return len(self.filter_web()) > 0
+
     def random_web(self) -> str:
-        filter_function = lambda w: w.mood in self.active_moods.web
-        web = random.choice(list(filter(filter_function, self.web)) if self.active_moods.exists else self.web)
+        web = random.choice(self.filter_web())
         return web.url + random.choice(web.args)

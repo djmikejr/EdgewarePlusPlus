@@ -60,7 +60,7 @@ class Prompts:
 class Web:
     url: str
     args: list[str]
-    mood: str
+    mood: str | None
 
 
 @dataclass

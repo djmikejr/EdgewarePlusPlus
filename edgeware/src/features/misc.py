@@ -32,7 +32,8 @@ def play_audio(settings: Settings, pack: Pack, state: State) -> None:
 
 
 def open_web(pack: Pack) -> None:
-    webbrowser.open(pack.random_web())
+    if pack.has_web():
+        webbrowser.open(pack.random_web())
 
 
 def make_tray_icon(root: Tk, settings: Settings, pack: Pack, state: State, hibernate_activity: Callable[[], None]) -> None:

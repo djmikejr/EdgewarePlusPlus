@@ -11,7 +11,7 @@ from utils import utils
 class Prompt(Toplevel):
     def __init__(self, settings: Settings, pack: Pack, state: State):
         self.state = state
-        if not self.should_init():
+        if not self.should_init(pack):
             return
         super().__init__()
 
@@ -46,8 +46,8 @@ class Prompt(Toplevel):
         )
         button.place(x=-10, y=-10, relx=1, rely=1, anchor="se")
 
-    def should_init(self) -> bool:
-        if not self.state.prompt_active:
+    def should_init(self, pack: Pack) -> bool:
+        if not self.state.prompt_active and pack.has_prompts():
             self.state.prompt_active = True
             return True
         return False
