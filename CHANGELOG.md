@@ -40,6 +40,9 @@ Hello everyone! The huge rewrite by LewdDevelopment is finally done (big round o
 
 •*More help dialogue in the config window has been added, along with some minor UI changes*
 
+•*Replace images now takes backups of the files it replaced*
+>directory of backed up files is edgeware/data/backups. Not much testing has been done on windows side for this feature as I don't use replace images much- let me know if anything is wonky with this
+
 **Version 12.75**
 
 •*A brand new splash screen! and icons! Full size of the splash screen can be found [here](https://x.com/ara10ten/status/1828978778741125477).*
