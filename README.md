@@ -77,6 +77,12 @@ The EdgeWare++ Pack Editor is now live [here](https://github.com/araten10/Edgewa
 
 •*Speaking of default images, the splash screen and icons have been changed to shiny new ones! (why? answer is below in the FAQ!)*
 
+•*Backend has been rewritten and simplified for easier developer editing*
+
+•*Booru downloader has been updated*
+
+•*Replace Images now saves backups of images replaced*
+
 ## Planned Additions
 
 Planned additions, as well as currently known issues, can now be found on the [issues page](https://github.com/araten10/EdgewarePlusPlus/issues).
