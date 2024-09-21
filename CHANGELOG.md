@@ -9,6 +9,40 @@
 
 **Since last version...**
 
+**Version 13b**
+
+Hello everyone! The huge rewrite by LewdDevelopment is finally done (big round of applause)! This means lots of bugfixes and general stability improvements.... hopefully! I label this as a "beta" because due to both of us working on different platforms (araten windows/LewdDevelopment linux) there might be some huge OS-specific bugs that slipped through the cracks. These will be fixed as they are reported, but for the time being know that some temporary instability might occur. In the future however, it will hopefully be much smoother to use!
+
+•*A huge code backend rewrite has been finished!*
+>This might not mean much to to the end user, but for any developer who wishes to work on edgeware (including us!), this should make things a lot easier.
+
+•*Gifs now properly animate in the loading splash*
+>Coincidentally you can test this with the [EdgeWare++ Test Pack](https://mega.nz/file/VbsEmbLD#gCLx6Ftv161oT7u3yiU8altS07QSElTz-Xo9kRmcugM)
+
+•*Further checks have been added to fix compatibility with packs that are missing certain resources*
+>Packs that are missing things like caption files (or have strange .json configuration in general) will probably still be buggy, but they will function better on average now. Examples include subliminal caption popups, prompts no longer crashing, etc. Once again, this won't create content for packs that don't have these features properly implemented in the first place!
+
+•*Issues with hibernate mode and lowkey mode should be fixed now*
+>Hibernate and lowkey modes were temporarily broken for some users, but should be back up and running. Let us know if it still is broken for you!
+
+•*Wallpaper rotation is now compatible with "fix wallpaper" in hibernate mode*
+
+•*The booru downloader has been given a fresh coat of paint, and is pretty much brand new!*
+>Could also be given new features in the future, let us know if you have anything specific (and reasonable) in mind!
+
+•*Moods no longer break if the config window isn't launched before the main program*
+
+•*Panic in timer mode should work consistently now*
+
+•*Web moods have been fully implemented*
+
+•*"Timed" and "Popup" transitions in corruption mode have been fixed*
+
+•*More help dialogue in the config window has been added, along with some minor UI changes*
+
+•*Replace images now takes backups of the files it replaced*
+>directory of backed up files is edgeware/data/backups. Not much testing has been done on windows side for this feature as I don't use replace images much- let me know if anything is wonky with this
+
 **Version 12.75**
 
 •*A brand new splash screen! and icons! Full size of the splash screen can be found [here](https://x.com/ara10ten/status/1828978778741125477).*

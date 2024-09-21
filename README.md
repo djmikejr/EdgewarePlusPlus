@@ -1,5 +1,5 @@
 # Edgeware++
-![Edgeware++ running on Windows 11](EdgeWare/default_assets/readme/demo2.png)
+![Edgeware++ running on Windows 11](screenshots/demo.png)
 ## What is EdgeWare?
 
 Going to say immediately: **EdgeWare is not a virus, nor does it install itself onto your computer**. All it installs onto your computer by default is python 3.10 and a few extra libraries, which is needed for it to run. EdgeWare **can** potentially modify files on your computer, including deleting or replacing things, but these are all *user set* settings that are not on by default. That being said, other people can download EdgeWare, modify it to be malicious, and upload it elsewhere, so exercise caution when downloading versions from other sites. This project is open source, so feel free to peruse the source code if you're unsure.
@@ -76,6 +76,12 @@ The EdgeWare++ Pack Editor is now live [here](https://github.com/araten10/Edgewa
 •*User friendly way to change default images, such as splash screens or icons*
 
 •*Speaking of default images, the splash screen and icons have been changed to shiny new ones! (why? answer is below in the FAQ!)*
+
+•*Backend has been rewritten and simplified for easier developer editing*
+
+•*Booru downloader has been updated*
+
+•*Replace Images now saves backups of images replaced*
 
 ## Planned Additions
 
