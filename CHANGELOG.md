@@ -15,6 +15,9 @@
 •*Gifs now properly animate in the loading splash*
 >Coincidentally you can test this with the [EdgeWare++ Test Pack](https://mega.nz/file/VbsEmbLD#gCLx6Ftv161oT7u3yiU8altS07QSElTz-Xo9kRmcugM)
 
+•*Further checks have been added to fix compatibility with packs that are missing certain resources*
+>Packs that are missing things like caption files (or have strange .json configuration in general) will probably still be buggy, but they will function better on average now. Examples include subliminal caption popups, prompts no longer crashing, etc. Once again, this won't create content for packs that don't have these features properly implemented in the first place!
+
 **Version 12.75**
 
 •*A brand new splash screen! and icons! Full size of the splash screen can be found [here](https://x.com/ara10ten/status/1828978778741125477).*
