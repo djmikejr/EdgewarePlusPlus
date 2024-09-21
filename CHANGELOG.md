@@ -13,6 +13,8 @@
 
 Hello everyone! The huge rewrite by LewdDevelopment is finally done (big round of applause)! This means lots of bugfixes and general stability improvements.... hopefully! I label this as a "beta" because due to both of us working on different platforms (araten windows/LewdDevelopment linux) there might be some huge OS-specific bugs that slipped through the cracks. These will be fixed as they are reported, but for the time being know that some temporary instability might occur. In the future however, it will hopefully be much smoother to use!
 
+First and foremost: you will likely need to **update your version of python** to run this version properly! For reference, we are using 3.12. Uninstall using your OS specific uninstaller, then feel free to run the EdgewareSetup batch file to redownload python automatically!
+
 •*A huge code backend rewrite has been finished!*
 >This might not mean much to to the end user, but for any developer who wishes to work on edgeware (including us!), this should make things a lot easier.
 
