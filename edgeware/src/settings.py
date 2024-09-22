@@ -4,8 +4,12 @@ import shutil
 import subprocess
 import sys
 
-import vlc
 from paths import Assets, Data, Process
+
+try:
+    import vlc
+except FileNotFoundError:
+    pass
 
 
 def first_launch_configure() -> None:

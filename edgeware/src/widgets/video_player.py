@@ -5,10 +5,14 @@ from threading import Thread
 from tkinter import Label, TclError, Toplevel
 
 import imageio
-import vlc
 from PIL import Image, ImageTk
 from utils import utils
 from videoprops import get_video_properties
+
+try:
+    import vlc
+except FileNotFoundError:
+    pass
 
 
 class VideoPlayer:

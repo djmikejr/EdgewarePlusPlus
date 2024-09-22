@@ -6,8 +6,14 @@ import tempfile
 from pathlib import Path
 from tkinter import Toplevel
 
-import vlc
 from paths import Assets, Process
+
+try:
+    import vlc
+except FileNotFoundError:
+    # Defined for type hints
+    class vlc:
+        MediaPlayer = None
 
 
 def set_borderless(window: Toplevel) -> None:
