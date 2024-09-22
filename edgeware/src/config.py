@@ -184,7 +184,7 @@ if info_id == "0" and os.path.exists(Resource.ROOT):
 
 # url to check online version
 UPDCHECK_URL = "http://raw.githubusercontent.com/PetitTournesol/Edgeware/main/EdgeWare/configDefault.dat"
-UPDCHECK_PP_URL = "http://raw.githubusercontent.com/araten10/EdgewarePlusPlus/main/EdgeWare/default_assets/default_config.json"
+UPDCHECK_PP_URL = "http://raw.githubusercontent.com/araten10/EdgewarePlusPlus/main/edgeware/assets/default_config.json"
 
 config = load_config()
 config["wallpaperDat"] = ast.literal_eval(config["wallpaperDat"])
