@@ -13,7 +13,10 @@ from utils.linux_utils import get_desktop_environment, get_wallpaper_commands, g
 
 
 def set_borderless(window: Toplevel) -> None:
-    window.attributes("-type", "splash")
+    if get_desktop_environment() == "kde":
+        window.overrideredirect(True)
+    else:
+        window.attributes("-type", "splash")
 
 
 def set_wallpaper(wallpaper: Path) -> None:
