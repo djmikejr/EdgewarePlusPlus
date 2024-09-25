@@ -34,7 +34,6 @@ shortcut() {
         echo "#!/bin/sh" >> $script.sh
         echo ".venv/bin/python3 src/${source}.py" >> $script.sh
         chmod +x $script.sh
-        rm $script.pyw
     fi
 }
 
