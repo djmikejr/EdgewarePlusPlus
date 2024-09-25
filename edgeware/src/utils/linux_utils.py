@@ -33,8 +33,6 @@ def get_desktop_environment() -> str:
         return desktop
     if os.environ.get("KDE_FULL_SESSION") == "true":
         return "kde"
-    if os.environ.get("GNOME_DESKTOP_SESSION_ID") and "deprecated" not in os.environ.get("GNOME_DESKTOP_SESSION_ID"):
-        return "gnome2"
     if is_running("xfce-mcs-manage"):
         return "xfce4"
     if is_running("ksmserver"):
@@ -45,16 +43,12 @@ def get_desktop_environment() -> str:
 
 def get_wallpaper_commands(wallpaper: Path, desktop: str) -> list[str]:
     commands = {
-        "mate": [
-            f"gsettings set org.mate.background picture-filename {wallpaper}",  # MATE >= 1.6
-            f"mateconftool-2 -t string --set /desktop/mate/background/picture_filename {wallpaper}",  # MATE < 1.6
-        ],
         "xfce4": [
             f"xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor0/image-path -s {wallpaper}",
             "xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor0/image-style -s 3",
             "xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor0/image-show -s true",
         ],
-        "gnome2": [f"gconftool-2 -t string --set /desktop/gnome/background/picture_filename {wallpaper}"],
+        "mate": [f"gsettings set org.mate.background picture-filename {wallpaper}"],
         "icewm": [f"icewmbg {wallpaper}"],
         "blackbox": [f"bsetbg -full {wallpaper}"],
         "lxde": [f"pcmanfm --set-wallpaper {wallpaper} --wallpaper-mode=scaled"],
@@ -68,7 +62,7 @@ def get_wallpaper_commands(wallpaper: Path, desktop: str) -> list[str]:
                 f"gsettings set org.gnome.desktop.background picture-uri-dark file://{wallpaper}",
             ],
         ),
-        **dict.fromkeys(["kde3", "trinity"], [f'dcop kdesktop KBackgroundIface setWallpaper 0 "{wallpaper}" 6']),
+        **dict.fromkeys(["trinity"], [f'dcop kdesktop KBackgroundIface setWallpaper 0 "{wallpaper}" 6']),
         **dict.fromkeys(["fluxbox", "jwm", "openbox", "afterstep"], [f"fbsetbg {wallpaper}"]),
     }
 
