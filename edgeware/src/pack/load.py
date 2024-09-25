@@ -229,5 +229,5 @@ def load_moods(mood_file: Path) -> ActiveMoods:
     return try_load(mood_file, load) or ActiveMoods()
 
 
-def list_media(dir: Path, is_valid: Callable[[str], None], media_moods: dict[str, str] = {}) -> list[Media]:
+def list_media(dir: Path, is_valid: Callable[[str], bool], media_moods: dict[str, str] = {}) -> list[Media]:
     return [Media(dir / file, media_moods.get(file, None)) for file in os.listdir(dir) if is_valid(dir / file)] if dir.is_dir() else []
