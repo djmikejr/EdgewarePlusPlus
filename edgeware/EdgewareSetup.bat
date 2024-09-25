@@ -46,7 +46,7 @@ echo Edgeware is ready, and will now start the config file for you.
 echo:
 echo For first time users, here are the files you'll want to run to use Edgeware in the future:
 echo config.pyw: runs the config window which allows changing Edgeware settings
-echo start.pyw: starts Edgeware with the config settings you have saved
+echo edgeware.pyw: starts Edgeware with the config settings you have saved
 echo panic.pyw: kills Edgeware and all currently spawned popups
 pause
 start "Edgeware++ Config" "%CD%/config.pyw"
