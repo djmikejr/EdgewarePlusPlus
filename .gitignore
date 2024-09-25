@@ -163,6 +163,9 @@ cython_debug/
 .vs/
 
 # Ignore anything that could be considered a local file
+edgeware/config.sh
+edgeware/edgeware.sh
+edgeware/panic.sh
 edgeware/data/*
 edgeware/resource/
 !edgeware/data/presets
