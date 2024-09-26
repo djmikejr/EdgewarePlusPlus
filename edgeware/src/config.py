@@ -3254,7 +3254,6 @@ def show_window():
     troubleshootingFrame1 = Frame(troubleshootingHostFrame)
     troubleshootingFrame2 = Frame(troubleshootingHostFrame)
 
-    toggleLanczos = Checkbutton(troubleshootingFrame1, text="Use Lanczos instead of Antialias", variable=antiOrLanczosVar, cursor="question_arrow")
     toggleInternetSetting = Checkbutton(troubleshootingFrame2, text="Disable Connection to Github", variable=toggleInternetVar, cursor="question_arrow")
     toggleHibernateSkip = Checkbutton(troubleshootingFrame1, text="Toggle Tray Hibernate Skip", variable=toggleHibSkipVar, cursor="question_arrow")
     toggleMoodSettings = Checkbutton(troubleshootingFrame2, text="Turn Off Mood Settings", variable=toggleMoodSetVar, cursor="question_arrow")
@@ -3262,18 +3261,10 @@ def show_window():
     troubleshootingHostFrame.pack(fill="x")
     troubleshootingFrame1.pack(fill="both", side="left", expand=1)
     troubleshootingFrame2.pack(fill="both", side="left", expand=1)
-    toggleLanczos.pack(fill="x", side="top")
     toggleInternetSetting.pack(fill="x", side="top")
     toggleHibernateSkip.pack(fill="x", side="top")
     toggleMoodSettings.pack(fill="x", side="top")
 
-    lanczosttp = CreateToolTip(
-        toggleLanczos,
-        "Are popups and the startup image inexplicably not showing up for you? Try this setting.\n\n"
-        "I am not entirely sure why, but the Lanczos image resizing algorithm sometimes works for people when the antialiasing one does not.\n\n"
-        "This is not something changed in EdgeWare++, so if normal EdgeWare also didn't work for you, this might fix it?\n\n"
-        "Enabled by default as i've encountered way more people where antialiasing doesn't work than people who have it work fine.",
-    )
     internetttp = CreateToolTip(
         toggleInternetSetting,
         "In some cases, having a slow internet connection can cause the config window to delay opening for a long time.\n\n"
