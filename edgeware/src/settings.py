@@ -22,8 +22,20 @@ def load_config() -> dict:
         Data.ROOT.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(Assets.DEFAULT_CONFIG, Data.CONFIG)
 
-    with open(Data.CONFIG) as f:
+    default_config = load_default_config()
+    with open(Data.CONFIG, "r+") as f:
         config = json.loads(f.read())
+
+        new_keys = False
+        for key, value in default_config.items():
+            if key not in config:
+                config[key] = value
+                new_keys = True
+
+        if new_keys:
+            f.seek(0)
+            f.write(json.dumps(config))
+            f.truncate()
 
     return config
 
