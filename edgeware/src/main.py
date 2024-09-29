@@ -1,7 +1,6 @@
 from threading import Thread
 from tkinter import Tk
 
-from features.caption_popup import CaptionPopup
 from features.corruption import handle_corruption
 from features.drive import fill_drive, replace_images
 from features.hibernate import main_hibernate, start_main_hibernate
@@ -20,6 +19,7 @@ from features.misc import (
 )
 from features.prompt import Prompt
 from features.startup_splash import StartupSplash
+from features.subliminal_message_popup import SubliminalMessagePopup
 from features.video_popup import VideoPopup
 from pack import Pack
 from panic import start_panic_listener
@@ -49,7 +49,7 @@ if __name__ == "__main__":
     targets = [
         RollTarget(lambda: ImagePopup(root, settings, pack, state), settings.image_chance),
         RollTarget(lambda: VideoPopup(root, settings, pack, state), settings.video_chance),
-        RollTarget(lambda: CaptionPopup(settings, pack), settings.caption_popup_chance),
+        RollTarget(lambda: SubliminalMessagePopup(settings, pack), settings.subliminal_message_popup_chance),
         RollTarget(lambda: Prompt(settings, pack, state), settings.prompt_chance),
         RollTarget(lambda: play_audio(settings, pack, state), settings.audio_chance),
         RollTarget(lambda: open_web(pack), settings.web_chance),

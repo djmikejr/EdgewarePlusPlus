@@ -111,9 +111,9 @@ class Settings:
         self.filename_caption_moods = bool(config["captionFilename"])
         self.multi_click_popups = bool(config["multiClick"])
         self.subliminal_caption_mood = bool(config["capPopMood"])
-        self.caption_popup_chance = int(config["capPopChance"])  # 0 to 100
-        self.caption_popup_opacity = int(config["capPopOpacity"]) / 100  # Float between 0 and 1
-        self.caption_popup_timeout = int(config["capPopTimer"])  # Milliseconds
+        self.subliminal_message_popup_chance = int(config["capPopChance"])  # 0 to 100
+        self.subliminal_message_popup_opacity = int(config["capPopOpacity"]) / 100  # Float between 0 and 1
+        self.subliminal_message_popup_timeout = int(config["capPopTimer"])  # Milliseconds
         self.notification_mood = bool(config["notificationMood"])
         self.notification_chance = int(config["notificationChance"])  # 0 to 100
         self.notification_image_chance = int(config["notificationImageChance"])  # 0 to 100

@@ -2261,7 +2261,9 @@ def show_window():
     )
 
     notificationImageFrame = Frame(notificationFrame)
-    notificationImageSlider = Scale(notificationImageFrame, label="Notification Image Chance", from_=0, to=100, orient="horizontal", variable=notificationImageVar)
+    notificationImageSlider = Scale(
+        notificationImageFrame, label="Notification Image Chance", from_=0, to=100, orient="horizontal", variable=notificationImageVar
+    )
     notificationImageManual = Button(
         notificationImageFrame,
         text="Manual Notification Image...",

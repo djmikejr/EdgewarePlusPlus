@@ -8,7 +8,7 @@ from settings import Settings
 from utils import utils
 
 
-class CaptionPopup(Toplevel):
+class SubliminalMessagePopup(Toplevel):
     def __init__(self, settings: Settings, pack: Pack):
         if not self.should_init(settings, pack):
             return
@@ -18,7 +18,7 @@ class CaptionPopup(Toplevel):
 
         self.attributes("-topmost", True)
         utils.set_borderless(self)
-        self.attributes("-alpha", settings.opacity)
+        self.attributes("-alpha", settings.subliminal_message_popup_opacity)
         if utils.is_windows():
             self.wm_attributes("-transparentcolor", self.theme.transparent_bg)
 
@@ -39,7 +39,7 @@ class CaptionPopup(Toplevel):
         y = monitor.y + (monitor.height - label.winfo_reqheight()) // 2
 
         self.geometry(f"+{x}+{y}")
-        self.after(settings.caption_popup_timeout, self.destroy)
+        self.after(settings.subliminal_message_popup_timeout, self.destroy)
 
     def should_init(self, settings: Settings, pack: Pack) -> bool:
         return pack.has_subliminal_messages(settings)
