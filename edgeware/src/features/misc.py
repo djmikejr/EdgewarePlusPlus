@@ -9,12 +9,15 @@ from threading import Thread
 from tkinter import Tk
 
 import pystray
+from desktop_notifier.common import Attachment, Icon
+from desktop_notifier.sync import DesktopNotifierSync
 from pack import Pack
 from panic import panic
 from paths import Assets, Data, Process, Resource
 from PIL import Image
 from playsound import playsound
 from pypresence import Presence
+from roll import roll
 from settings import Settings
 from state import State
 from utils import utils
@@ -34,6 +37,18 @@ def play_audio(settings: Settings, pack: Pack, state: State) -> None:
 def open_web(pack: Pack) -> None:
     if pack.has_web():
         webbrowser.open(pack.random_web())
+
+
+def display_notification(settings: Settings, pack: Pack) -> None:
+    if not pack.has_notifications(settings):
+        return
+
+    notifier = DesktopNotifierSync(app_name="Edgeware++", app_icon=Icon(pack.icon))
+    notifier.send(
+        title=pack.info.name,
+        message=pack.random_notification(settings),
+        attachment=Attachment(pack.random_image()) if roll(settings.notification_image_chance) and pack.has_image() else None,
+    )
 
 
 def make_tray_icon(root: Tk, settings: Settings, pack: Pack, state: State, hibernate_activity: Callable[[], None]) -> None:

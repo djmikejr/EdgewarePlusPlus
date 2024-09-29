@@ -27,7 +27,7 @@ class CaptionPopup(Toplevel):
         font = (self.theme.font, min(monitor.width, monitor.height) // 10)
         label = Label(
             self,
-            text=pack.random_caption(settings),
+            text=pack.random_subliminal_message(settings),
             font=font,
             wraplength=monitor.width / 1.5,
             fg=self.theme.fg,
@@ -42,4 +42,4 @@ class CaptionPopup(Toplevel):
         self.after(settings.caption_popup_timeout, self.destroy)
 
     def should_init(self, settings: Settings, pack: Pack) -> bool:
-        return pack.has_captions(settings)
+        return pack.has_subliminal_messages(settings)

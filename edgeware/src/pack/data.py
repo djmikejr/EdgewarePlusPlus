@@ -15,6 +15,7 @@ class Captions:
     close_text: str = "I Submit <3"
     denial: list[str] = field(default_factory=lambda: ["Not for you~"])
     subliminal: list[str] = field(default_factory=list)
+    notification: list[str] = field(default_factory=list)
     default: list[str] = field(default_factory=list)
 
 

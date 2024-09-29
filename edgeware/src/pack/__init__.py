@@ -72,12 +72,9 @@ class Pack:
         return None
 
     def find_caption_list(self, settings: Settings, media: Path | None = None) -> list[str]:
-        if media:
-            if settings.filename_caption_moods:
-                mood = self.caption_mood_of_media(media)
-                return mood.captions if mood else self.captions.default
-        elif settings.subliminal_caption_mood and len(self.captions.subliminal) > 0:
-            return self.captions.subliminal
+        if media and settings.filename_caption_moods:
+            mood = self.caption_mood_of_media(media)
+            return mood.captions if mood else self.captions.default
 
         moods = [self.captions.default] + list(map(lambda c: c.captions, self.filter_captions()))
         return [caption for mood in moods for caption in mood]
@@ -93,6 +90,18 @@ class Pack:
         if mood:
             return random.randint(1, mood.max_clicks)
         return 1
+
+    def has_subliminal_messages(self, settings: Settings) -> bool:
+        return len(self.captions.subliminal) > 0 if settings.subliminal_caption_mood else self.has_captions(settings)
+
+    def random_subliminal_message(self, settings: Settings) -> str:
+        return random.choice(self.captions.subliminal) if settings.subliminal_caption_mood else self.random_caption(settings)
+
+    def has_notifications(self, settings: Settings) -> bool:
+        return len(self.captions.notification) > 0 if settings.notification_mood else self.has_captions(settings)
+
+    def random_notification(self, settings: Settings) -> str:
+        return random.choice(self.captions.notification) if settings.notification_mood else self.random_caption(settings)
 
     def random_denial(self) -> str:
         return random.choice(self.captions.denial)  # Guaranteed to be non-empty

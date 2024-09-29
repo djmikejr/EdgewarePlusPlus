@@ -326,7 +326,6 @@ def show_window():
 
             downloadEnabledVar = BooleanVar(root, value=(int(config["downloadEnabled"]) == 1))
             downloadModeVar = StringVar(root, value=config["downloadMode"])
-            useWebResourceVar = BooleanVar(root, value=(int(config["useWebResource"]) == 1))
             fillPathVar = StringVar(root, value=config["drivePath"])
             rosVar = BooleanVar(root, value=(int(config["runOnSaveQuit"]) == 1))
 
@@ -358,7 +357,6 @@ def show_window():
 
             safeModeVar = BooleanVar(root, value=(int(config["safeMode"]) == 1))
 
-            antiOrLanczosVar = BooleanVar(root, value=(int(config["antiOrLanczos"]) == 1))
             toggleInternetVar = BooleanVar(root, value=(int(config["toggleInternet"]) == 1))
             toggleHibSkipVar = BooleanVar(root, value=(int(config["toggleHibSkip"]) == 1))
             toggleMoodSetVar = BooleanVar(root, value=(int(config["toggleMoodSet"]) == 1))
@@ -397,6 +395,9 @@ def show_window():
             capPopOpacityVar = IntVar(root, value=int(config["capPopOpacity"]))
             capPopTimerVar = IntVar(root, value=int(config["capPopTimer"]))
             capPopMoodVar = BooleanVar(root, value=(int(config["capPopMood"]) == 1))
+            notificationMoodVar = BooleanVar(root, value=(int(config["notificationMood"]) == 1))
+            notificationChanceVar = IntVar(root, value=int(config["notificationChance"]))
+            notificationImageVar = IntVar(root, value=int(config["notificationImageChance"]))
 
             subliminalsAlphaVar = IntVar(root, value=int(config["subliminalsAlpha"]))
 
@@ -436,7 +437,6 @@ def show_window():
                 booruNameVar,
                 downloadEnabledVar,
                 downloadModeVar,
-                useWebResourceVar,
                 fillPathVar,
                 rosVar,
                 timerVar,
@@ -458,7 +458,6 @@ def show_window():
                 subliminalsChanceVar,
                 maxSubliminalsVar,
                 safeModeVar,
-                antiOrLanczosVar,
                 toggleInternetVar,
                 buttonlessVar,
                 hibernateTypeVar,
@@ -495,6 +494,9 @@ def show_window():
                 subliminalsAlphaVar,
                 messageOffVar,
                 safewordVar,
+                notificationMoodVar,
+                notificationChanceVar,
+                notificationImageVar,
             ]
 
             in_var_names = [
@@ -530,7 +532,6 @@ def show_window():
                 "booruName",
                 "downloadEnabled",
                 "downloadMode",
-                "useWebResource",
                 "drivePath",
                 "runOnSaveQuit",
                 "timerMode",
@@ -552,7 +553,6 @@ def show_window():
                 "subliminalsChance",
                 "maxSubliminals",
                 "safeMode",
-                "antiOrLanczos",
                 "toggleInternet",
                 "buttonless",
                 "hibernateType",
@@ -589,6 +589,9 @@ def show_window():
                 "subliminalsAlpha",
                 "messageOff",
                 "safeword",
+                "notificationMood",
+                "notificationChance",
+                "notificationImageChance",
             ]
             break
         except Exception as e:
@@ -2243,6 +2246,36 @@ def show_window():
     capPopTimerFrame.pack(fill="x", side="left", padx=(3, 0), expand=1)
     capPopTimerSlider.pack(fill="x", padx=1, expand=1)
     capPopTimerManual.pack(fill="x")
+
+    Label(tabCaptions, text="Notifications", font=titleFont, relief=GROOVE).pack(pady=2)
+
+    notificationFrame = Frame(tabCaptions, borderwidth=5, relief=RAISED)
+    notificationMoodToggle = Checkbutton(notificationFrame, text="Use Notification specific mood", variable=notificationMoodVar)
+
+    notificationChanceFrame = Frame(notificationFrame)
+    notificationChanceSlider = Scale(notificationChanceFrame, label="Notification Chance", from_=0, to=100, orient="horizontal", variable=notificationChanceVar)
+    notificationChanceManual = Button(
+        notificationChanceFrame,
+        text="Manual Notification...",
+        command=lambda: assign(notificationChanceVar, simpledialog.askinteger("Manual Notification Chance (%)", prompt="[0-100]: ")),
+    )
+
+    notificationImageFrame = Frame(notificationFrame)
+    notificationImageSlider = Scale(notificationImageFrame, label="Notification Image Chance", from_=0, to=100, orient="horizontal", variable=notificationImageVar)
+    notificationImageManual = Button(
+        notificationImageFrame,
+        text="Manual Notification Image...",
+        command=lambda: assign(notificationImageVar, simpledialog.askinteger("Manual Notification Image Chance (%)", prompt="[0-100]: ")),
+    )
+
+    notificationFrame.pack(fill="x")
+    notificationMoodToggle.pack(fill="y", side="left")
+    notificationChanceFrame.pack(fill="x", side="left", padx=(0, 3), expand=1)
+    notificationChanceSlider.pack(fill="x", padx=1, expand=1)
+    notificationChanceManual.pack(fill="x")
+    notificationImageFrame.pack(fill="x", side="left", padx=(0, 3), expand=1)
+    notificationImageSlider.pack(fill="x", padx=1, expand=1)
+    notificationImageManual.pack(fill="x")
 
     # ==========={WALLPAPER TAB ITEMS} ========================#
     notebookAnnoyance.add(tabWallpaper, text="Wallpaper")

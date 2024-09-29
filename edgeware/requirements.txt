@@ -1,3 +1,4 @@
+desktop-notifier
 filetype
 gallery-dl
 get-video-properties

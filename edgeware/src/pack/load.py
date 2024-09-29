@@ -55,6 +55,7 @@ def load_captions() -> Captions:
                 Optional("subtext"): str,
                 Optional("denial"): All([str], Length(min=1)),
                 Optional("subliminals"): All([str], Length(min=1)),
+                Optional("notifications"): All([str], Length(min=1)),
                 "default": [str],
             },
             required=True,
@@ -68,11 +69,13 @@ def load_captions() -> Captions:
         for prefix in captions["prefix"]:
             prefix_settings = captions.get("prefix_settings", {}).get(prefix, {})
             moods.append(CaptionMood(prefix, prefix_settings.get("max", 1), captions[prefix]))
+
         return Captions(
             moods,
             captions.get("subtext", default.close_text),
             captions.get("denial", default.denial),
             captions.get("subliminals", default.subliminal),
+            captions.get("notifications", default.notification),
             captions["default"],
         )
 

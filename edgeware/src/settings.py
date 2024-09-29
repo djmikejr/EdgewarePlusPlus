@@ -114,6 +114,9 @@ class Settings:
         self.caption_popup_chance = int(config["capPopChance"])  # 0 to 100
         self.caption_popup_opacity = int(config["capPopOpacity"]) / 100  # Float between 0 and 1
         self.caption_popup_timeout = int(config["capPopTimer"])  # Milliseconds
+        self.notification_mood = bool(config["notificationMood"])
+        self.notification_chance = int(config["notificationChance"])  # 0 to 100
+        self.notification_image_chance = int(config["notificationImageChance"])  # 0 to 100
 
         # Wallpaper
         self.rotate_wallpaper = bool(config["rotateWallpaper"])

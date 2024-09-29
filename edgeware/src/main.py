@@ -7,6 +7,7 @@ from features.drive import fill_drive, replace_images
 from features.hibernate import main_hibernate, start_main_hibernate
 from features.image_popup import ImagePopup
 from features.misc import (
+    display_notification,
     handle_booru_download,
     handle_discord,
     handle_mitosis_mode,
@@ -52,6 +53,7 @@ if __name__ == "__main__":
         RollTarget(lambda: Prompt(settings, pack, state), settings.prompt_chance),
         RollTarget(lambda: play_audio(settings, pack, state), settings.audio_chance),
         RollTarget(lambda: open_web(pack), settings.web_chance),
+        RollTarget(lambda: display_notification(settings, pack), settings.notification_chance),
     ]
 
     def start_main() -> None:
