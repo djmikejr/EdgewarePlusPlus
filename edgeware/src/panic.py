@@ -1,3 +1,4 @@
+import logging
 from multiprocessing.connection import Client, Listener
 from threading import Thread
 from tkinter import Tk, simpledialog
@@ -30,11 +31,14 @@ def panic(root: Tk, settings: Settings, state: State, key: str | None = None) ->
 
 def start_panic_listener(root: Tk, settings: Settings, state: State) -> None:
     def listen() -> None:
-        with Listener(address=ADDRESS, authkey=AUTHKEY) as listener:
-            with listener.accept() as connection:
-                message = connection.recv()
-                if message == PANIC_MESSAGE:
-                    panic(root, settings, state)
+        try:
+            with Listener(address=ADDRESS, authkey=AUTHKEY) as listener:
+                with listener.accept() as connection:
+                    message = connection.recv()
+                    if message == PANIC_MESSAGE:
+                        panic(root, settings, state)
+        except OSError as e:
+            logging.warning(f"Failed to start panic listener, some panic sources may not be functional. Reason: {e}")
 
     Thread(target=listen, daemon=True).start()
 
