@@ -91,7 +91,7 @@ def handle_booru_download(settings: Settings, state: State) -> None:
 
 def handle_wallpaper(root: Tk, settings: Settings, pack: Pack, state: State) -> None:
     def rotate(previous: str = None) -> None:
-        if settings.hibernate_fix_wallpaper and state.reset_wallpaper():
+        if settings.hibernate_fix_wallpaper and not state.hibernate_active and state.popup_number == 0:
             return
 
         wallpapers = settings.wallpapers.copy()
