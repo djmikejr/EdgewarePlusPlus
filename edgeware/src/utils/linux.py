@@ -7,7 +7,7 @@ from pathlib import Path
 from tkinter import Toplevel
 
 import vlc
-from paths import Assets, Process
+from paths import CustomAssets, Process
 from settings import load_default_config
 from utils.linux_utils import get_desktop_environment, get_wallpaper_commands, get_wallpaper_function
 
@@ -71,6 +71,6 @@ def make_shortcut(title: str, process: Path, icon: Path, location: Path | None =
 def toggle_run_at_startup(state: bool) -> None:
     autostart_path = Path(os.path.expanduser("~/.config/autostart"))
     if state:
-        make_shortcut("Edgeware++", Process.MAIN, Assets.DEFAULT_ICON, autostart_path)
+        make_shortcut("Edgeware++", Process.MAIN, CustomAssets.icon(), autostart_path)
     else:
         (autostart_path / "Edgeware++.desktop").unlink(missing_ok=True)

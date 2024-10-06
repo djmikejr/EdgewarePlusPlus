@@ -52,7 +52,7 @@ class ImagePopup(Popup):
         single_frame = not hasattr(image, "n_frames") or image.n_frames == 1
         if self.subliminal and single_frame:
             blend_image = image.convert("RGBA")
-            subliminal = Image.open(self.pack.random_subliminal())
+            subliminal = Image.open(self.pack.random_subliminal_overlay())
 
             if hasattr(subliminal, "n_frames") and subliminal.n_frames > 1:
                 frames = []

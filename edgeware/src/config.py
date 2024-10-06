@@ -42,7 +42,7 @@ from tkinter import (
 import requests
 import ttkwidgets as tw
 from panic import send_panic
-from paths import Assets, Data, Process, Resource
+from paths import Assets, CustomAssets, Data, Process, Resource
 from PIL import Image, ImageTk
 from settings import load_config, load_default_config
 from utils import utils
@@ -271,7 +271,7 @@ def show_window():
     root.title("Edgeware++ Config")
     root.geometry("740x860")
     try:
-        root.iconbitmap(Assets.CONFIG_ICON)
+        root.iconbitmap(CustomAssets.config_icon())
         logging.info("set iconbitmap.")
     except Exception:
         logging.warning("failed to set iconbitmap.")
@@ -939,7 +939,7 @@ def show_window():
         toggleAssociateSettings(False, test_group, theme)
 
     testPopupTitle = Label(testThemePopup, text="Popup")
-    testPopupImage = ImageTk.PhotoImage(file=Assets.THEME_DEMO)
+    testPopupImage = ImageTk.PhotoImage(file=CustomAssets.theme_demo())
     testPopupLabel = Label(testThemePopup, image=testPopupImage, width=150, height=75, borderwidth=2, relief=GROOVE, cursor="question_arrow")
     testPopupButton = Button(testPopupLabel, text="Test~")
     testPopupCaption = Label(testPopupLabel, text="Lewd Caption Here!")
@@ -1641,63 +1641,65 @@ def show_window():
     # commenting this out because I think this is something very short that should stay regardless of disabling help
     # message_group.append(defFileMessage)
 
-    defSplashImage = Image.open(Assets.DEFAULT_STARTUP_SPLASH).resize(
+    defSplashImage = Image.open(CustomAssets.startup_splash()).resize(
         (int(root.winfo_screenwidth() * 0.09), int(root.winfo_screenwidth() * 0.09)), Image.NEAREST
     )
-    defThemeDemo = Image.open(Assets.THEME_DEMO)
-    defIcon = Image.open(Assets.DEFAULT_ICON).resize((int(root.winfo_screenwidth() * 0.04), int(root.winfo_screenwidth() * 0.04)), Image.NEAREST)
-    defConfIcon = Image.open(Assets.CONFIG_ICON).resize((int(root.winfo_screenwidth() * 0.04), int(root.winfo_screenwidth() * 0.04)), Image.NEAREST)
-    defPanicIcon = Image.open(Assets.PANIC_ICON).resize((int(root.winfo_screenwidth() * 0.04), int(root.winfo_screenwidth() * 0.04)), Image.NEAREST)
-    defSpiral = Image.open(Assets.DEFAULT_SUBLIMINAL).resize((int(root.winfo_screenwidth() * 0.08), int(root.winfo_screenwidth() * 0.08)), Image.NEAREST)
+    defThemeDemo = Image.open(CustomAssets.theme_demo())
+    defIcon = Image.open(CustomAssets.icon()).resize((int(root.winfo_screenwidth() * 0.04), int(root.winfo_screenwidth() * 0.04)), Image.NEAREST)
+    defConfIcon = Image.open(CustomAssets.config_icon()).resize((int(root.winfo_screenwidth() * 0.04), int(root.winfo_screenwidth() * 0.04)), Image.NEAREST)
+    defPanicIcon = Image.open(CustomAssets.panic_icon()).resize((int(root.winfo_screenwidth() * 0.04), int(root.winfo_screenwidth() * 0.04)), Image.NEAREST)
+    defSpiral = Image.open(CustomAssets.subliminal_overlay()).resize(
+        (int(root.winfo_screenwidth() * 0.08), int(root.winfo_screenwidth() * 0.08)), Image.NEAREST
+    )
 
     def updateDefaultImage(imgtype):
         # workaround- for some reason not using nonlocal and just passing it as an argument wouldn't update the label. Everything else worked fine...
-        if imgtype == Assets.DEFAULT_STARTUP_SPLASH:
+        if imgtype == Data.STARTUP_SPLASH:
             nonlocal defSplashImage
             selectedFile = filedialog.askopenfile("rb", filetypes=[("image file", ".jpg .jpeg .png")])
-        elif imgtype == Assets.THEME_DEMO:
+        elif imgtype == Data.THEME_DEMO:
             nonlocal defThemeDemo
             selectedFile = filedialog.askopenfile("rb", filetypes=[("image file", ".jpg .jpeg .png")])
-        elif imgtype == Assets.DEFAULT_ICON:
+        elif imgtype == Data.ICON:
             nonlocal defIcon
             selectedFile = filedialog.askopenfile("rb", filetypes=[("icon file", ".ico")])
-        elif imgtype == Assets.CONFIG_ICON:
+        elif imgtype == Data.CONFIG_ICON:
             nonlocal defConfIcon
             selectedFile = filedialog.askopenfile("rb", filetypes=[("icon file", ".ico")])
-        elif imgtype == Assets.PANIC_ICON:
+        elif imgtype == Data.PANIC_ICON:
             nonlocal defPanicIcon
             selectedFile = filedialog.askopenfile("rb", filetypes=[("icon file", ".ico")])
-        elif imgtype == Assets.DEFAULT_SUBLIMINAL:
+        elif imgtype == Data.SUBLIMINAL_OVERLAY:
             nonlocal defSpiral
             selectedFile = filedialog.askopenfile("rb", filetypes=[("image file", ".jpg .jpeg .png .gif")])
         if not isinstance(selectedFile, type(None)):
             try:
                 img = Image.open(selectedFile.name).convert("RGB")
                 img.save(imgtype)
-                if imgtype == Assets.DEFAULT_STARTUP_SPLASH:
+                if imgtype == Data.STARTUP_SPLASH:
                     defSplashImage = ImageTk.PhotoImage(img.resize((int(root.winfo_screenwidth() * 0.09), int(root.winfo_screenwidth() * 0.09)), Image.NEAREST))
                     defSplashLabel.config(image=defSplashImage)
                     defSplashLabel.update_idletasks()
-                if imgtype == Assets.THEME_DEMO:
+                if imgtype == Data.THEME_DEMO:
                     defThemeDemo = ImageTk.PhotoImage(img)
                     defThemeLabel.config(image=defThemeDemo)
                     defThemeLabel.update_idletasks()
-                if imgtype == Assets.DEFAULT_ICON:
+                if imgtype == Data.ICON:
                     defIcon = ImageTk.PhotoImage(img.resize((int(root.winfo_screenwidth() * 0.04), int(root.winfo_screenwidth() * 0.04)), Image.NEAREST))
                     defIconLabel.config(image=defIcon)
                     defIconLabel.update_idletasks()
-                if imgtype == Assets.CONFIG_ICON:
+                if imgtype == Data.CONFIG_ICON:
                     defConfIcon = ImageTk.PhotoImage(img.resize((int(root.winfo_screenwidth() * 0.04), int(root.winfo_screenwidth() * 0.04)), Image.NEAREST))
                     defConfIconLabel.config(image=defConfIcon)
                     defConfIconLabel.update_idletasks()
-                if imgtype == Assets.PANIC_ICON:
+                if imgtype == Data.PANIC_ICON:
                     defPanicIcon = ImageTk.PhotoImage(img.resize((int(root.winfo_screenwidth() * 0.04), int(root.winfo_screenwidth() * 0.04)), Image.NEAREST))
                     defPanicIconLabel.config(image=defPanicIcon)
                     defPanicIconLabel.update_idletasks()
-                if imgtype == Assets.DEFAULT_SUBLIMINAL:
-                    defSplashImage = ImageTk.PhotoImage(img.resize((int(root.winfo_screenwidth() * 0.08), int(root.winfo_screenwidth() * 0.08)), Image.NEAREST))
-                    defSplashLabel.config(image=defSplashImage)
-                    defSplashLabel.update_idletasks()
+                if imgtype == Data.SUBLIMINAL_OVERLAY:
+                    defSpiralImage = ImageTk.PhotoImage(img.resize((int(root.winfo_screenwidth() * 0.08), int(root.winfo_screenwidth() * 0.08)), Image.NEAREST))
+                    defSpiralLabel.config(image=defSpiralImage)
+                    defSpiralLabel.update_idletasks()
             except Exception as e:
                 logging.warning(f"failed to open/change default image\n{e}")
 
@@ -1706,7 +1708,7 @@ def show_window():
     defSplashFrameL = Frame(defSplashFrame)
     defSplashFrameR = Frame(defSplashFrame)
     splashImage = ImageTk.PhotoImage(defSplashImage)
-    defSplashButton = Button(defSplashFrameL, text="Change Default Loading Splash", command=lambda: updateDefaultImage(Assets.DEFAULT_STARTUP_SPLASH))
+    defSplashButton = Button(defSplashFrameL, text="Change Default Loading Splash", command=lambda: updateDefaultImage(Data.STARTUP_SPLASH))
     defSplashLabel = Label(defSplashFrameR, image=splashImage)
 
     defaultsFrame1.pack(fill="x")
@@ -1729,7 +1731,7 @@ def show_window():
     defThemeFrameL = Frame(defThemeFrame)
     defThemeFrameR = Frame(defThemeFrame, width=150)
     themeImage = ImageTk.PhotoImage(defThemeDemo)
-    defThemeButton = Button(defThemeFrameL, text="Change Default Theme Demo", command=lambda: updateDefaultImage(Assets.THEME_DEMO))
+    defThemeButton = Button(defThemeFrameL, text="Change Default Theme Demo", command=lambda: updateDefaultImage(Data.THEME_DEMO))
     defThemeLabel = Label(defThemeFrameR, image=themeImage)
 
     defThemeFrame.pack(side="left", fill="both", padx=2, expand=1)
@@ -1751,7 +1753,7 @@ def show_window():
     defIconFrameL = Frame(defIconFrame)
     defIconFrameR = Frame(defIconFrame, width=150)
     iconImage = ImageTk.PhotoImage(defIcon)
-    defIconButton = Button(defIconFrameL, text="Change Default Icon", command=lambda: updateDefaultImage(Assets.DEFAULT_ICON))
+    defIconButton = Button(defIconFrameL, text="Change Default Icon", command=lambda: updateDefaultImage(Data.ICON))
     defIconLabel = Label(defIconFrameR, image=iconImage)
 
     defaultsFrame2.pack(fill="x")
@@ -1769,7 +1771,7 @@ def show_window():
     defConfIconFrameL = Frame(defConfIconFrame)
     defConfIconFrameR = Frame(defConfIconFrame, width=150)
     configIconImage = ImageTk.PhotoImage(defConfIcon)
-    defConfIconButton = Button(defConfIconFrameL, text="Change Config Icon", command=lambda: updateDefaultImage(Assets.CONFIG_ICON))
+    defConfIconButton = Button(defConfIconFrameL, text="Change Config Icon", command=lambda: updateDefaultImage(Data.CONFIG_ICON))
     defConfIconLabel = Label(defConfIconFrameR, image=configIconImage)
 
     defConfIconFrame.pack(side="left", fill="both", padx=2, expand=1)
@@ -1790,7 +1792,7 @@ def show_window():
     defPanicIconFrameL = Frame(defPanicIconFrame)
     defPanicIconFrameR = Frame(defPanicIconFrame, width=150)
     panicIconImage = ImageTk.PhotoImage(defPanicIcon)
-    defPanicIconButton = Button(defPanicIconFrameL, text="Change Panic Icon", command=lambda: updateDefaultImage(Assets.PANIC_ICON))
+    defPanicIconButton = Button(defPanicIconFrameL, text="Change Panic Icon", command=lambda: updateDefaultImage(Data.PANIC_ICON))
     defPanicIconLabel = Label(defPanicIconFrameR, image=panicIconImage)
 
     defPanicIconFrame.pack(side="left", fill="both", padx=2, expand=1)
@@ -1808,7 +1810,7 @@ def show_window():
     defSpiralFrameL = Frame(defSpiralFrame)
     defSpiralFrameR = Frame(defSpiralFrame)
     spiralImage = ImageTk.PhotoImage(defSpiral)
-    defSpiralButton = Button(defSpiralFrameL, text="Change Default Spiral", command=lambda: updateDefaultImage(Assets.DEFAULT_SUBLIMINAL))
+    defSpiralButton = Button(defSpiralFrameL, text="Change Default Spiral", command=lambda: updateDefaultImage(Data.SUBLIMINAL_OVERLAY))
     defSpiralLabel = Label(defSpiralFrameR, image=spiralImage)
 
     defaultsFrame3.pack(fill="x")
@@ -2301,7 +2303,7 @@ def show_window():
         command=lambda val: updateMax(varSlider, int(val) - 1),
     )
 
-    pHoldImageR = Image.open(Assets.DEFAULT_PANIC_WALLPAPER).resize(
+    pHoldImageR = Image.open(CustomAssets.panic_wallpaper()).resize(
         (int(root.winfo_screenwidth() * 0.13), int(root.winfo_screenheight() * 0.13)), Image.NEAREST
     )
 
@@ -2311,7 +2313,7 @@ def show_window():
         if not isinstance(selectedFile, type(None)):
             try:
                 img = Image.open(selectedFile.name).convert("RGB")
-                img.save(Assets.DEFAULT_PANIC_WALLPAPER)
+                img.save(Data.PANIC_WALLPAPER)
                 pHoldImageR = ImageTk.PhotoImage(img.resize((int(root.winfo_screenwidth() * 0.13), int(root.winfo_screenheight() * 0.13)), Image.NEAREST))
                 panicWallpaperLabel.config(image=pHoldImageR)
                 panicWallpaperLabel.update_idletasks()

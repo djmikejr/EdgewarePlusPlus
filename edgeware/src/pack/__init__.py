@@ -2,7 +2,7 @@ import random
 from pathlib import Path
 
 import filetype
-from paths import Assets, Resource
+from paths import Assets, CustomAssets, Resource
 from settings import Settings
 
 from pack.data import CaptionMood, PromptMood, Web
@@ -27,12 +27,12 @@ class Pack:
         self.images = list_media(Resource.IMAGE, filetype.is_image, self.media_moods)
         self.videos = list_media(Resource.VIDEO, filetype.is_video, self.media_moods)
         self.audio = list_media(Resource.AUDIO, filetype.is_audio, self.media_moods)
-        self.subliminals = list_media(Resource.SUBLIMINALS, filetype.is_image)
+        self.subliminal_overlays = list_media(Resource.SUBLIMINALS, filetype.is_image)
 
         # Paths
-        self.icon = Resource.ICON if Resource.ICON.is_file() else Assets.DEFAULT_ICON
+        self.icon = Resource.ICON if Resource.ICON.is_file() else CustomAssets.icon()
         self.wallpaper = Resource.WALLPAPER if Resource.WALLPAPER.is_file() else Assets.DEFAULT_WALLPAPER
-        self.startup_splash = Resource.SPLASH or Assets.DEFAULT_STARTUP_SPLASH
+        self.startup_splash = next((path for path in Resource.SPLASH if path.is_file()), None) or CustomAssets.startup_splash()
 
     def filter_media(self, media_list: list[Path]) -> list[Path]:
         filter_function = lambda media: media.mood is None or media.mood in self.active_moods.media
@@ -56,10 +56,10 @@ class Pack:
     def random_audio(self) -> Path:
         return random.choice(self.filter_media(self.audio)).path
 
-    def random_subliminal(self) -> Path:
-        if len(self.subliminals) > 0:
-            return random.choice(self.subliminals).path
-        return Assets.DEFAULT_SUBLIMINAL
+    def random_subliminal_overlay(self) -> Path:
+        if len(self.subliminal_overlays) > 0:
+            return random.choice(self.subliminal_overlays).path
+        return CustomAssets.subliminal_overlay()
 
     def filter_captions(self) -> list[CaptionMood]:
         filter_function = lambda c: c.mood in self.active_moods.captions

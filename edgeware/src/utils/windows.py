@@ -6,7 +6,7 @@ import tempfile
 from pathlib import Path
 from tkinter import Toplevel
 
-from paths import Assets, Process
+from paths import CustomAssets, Process
 
 try:
     import vlc
@@ -68,6 +68,6 @@ def make_shortcut(title: str, process: Path, icon: Path, location: Path | None =
 def toggle_run_at_startup(state: bool) -> None:
     startup_path = Path(os.path.expanduser("~\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup"))
     if state:
-        make_shortcut("Edgeware++", Process.MAIN, Assets.DEFAULT_ICON, startup_path)
+        make_shortcut("Edgeware++", Process.MAIN, CustomAssets.icon(), startup_path)
     else:
         (startup_path / "Edgeware++.lnk").unlink(missing_ok=True)

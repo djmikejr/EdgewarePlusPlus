@@ -3,7 +3,7 @@ from multiprocessing.connection import Client, Listener
 from threading import Thread
 from tkinter import Tk, simpledialog
 
-from paths import Assets
+from paths import CustomAssets
 from settings import Settings
 from state import State
 from utils import utils
@@ -22,8 +22,7 @@ def panic(root: Tk, settings: Settings, state: State, key: str | None = None) ->
         if password != settings.timer_password:
             return
 
-    # TODO: https://github.com/araten10/EdgewarePlusPlus/issues/24
-    utils.set_wallpaper(Assets.DEFAULT_PANIC_WALLPAPER)
+    utils.set_wallpaper(CustomAssets.panic_wallpaper())
     root.destroy()
     if state.gallery_dl_process:
         state.gallery_dl_process.kill()

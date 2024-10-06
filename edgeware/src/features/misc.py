@@ -13,7 +13,7 @@ from desktop_notifier.common import Attachment, Icon
 from desktop_notifier.sync import DesktopNotifierSync
 from pack import Pack
 from panic import panic
-from paths import Assets, Data, Process, Resource
+from paths import CustomAssets, Data, Process, Resource
 from PIL import Image
 from playsound import playsound
 from pypresence import Presence
@@ -70,9 +70,9 @@ def make_tray_icon(root: Tk, settings: Settings, pack: Pack, state: State, hiber
 
 def make_desktop_icons(settings: Settings) -> None:
     if settings.desktop_icons:
-        utils.make_shortcut("Edgeware++", Process.MAIN, Assets.DEFAULT_ICON)
-        utils.make_shortcut("Edgeware++ Config", Process.CONFIG, Assets.CONFIG_ICON)
-        utils.make_shortcut("Edgeware++ Panic", Process.PANIC, Assets.PANIC_ICON)
+        utils.make_shortcut("Edgeware++", Process.MAIN, CustomAssets.icon())
+        utils.make_shortcut("Edgeware++ Config", Process.CONFIG, CustomAssets.config_icon())
+        utils.make_shortcut("Edgeware++ Panic", Process.PANIC, CustomAssets.panic_icon())
 
 
 def handle_booru_download(settings: Settings, state: State) -> None:
