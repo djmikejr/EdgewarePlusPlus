@@ -13,6 +13,8 @@
 
 •*Increased the default popup delay to 5 seconds instead of 1 second, so new users don't have their computer detonated (and I don't have to remember to increase it every time I flush settings)*
 
+•*Changed the "change default assets" tab to store the original defaults somewhere rather than completely overwrite them*
+
 **Version 13b**
 
 Hello everyone! The huge rewrite by LewdDevelopment is finally done (big round of applause)! This means lots of bugfixes and general stability improvements.... hopefully! I label this as a "beta" because due to both of us working on different platforms (araten windows/LewdDevelopment linux) there might be some huge OS-specific bugs that slipped through the cracks. These will be fixed as they are reported, but for the time being know that some temporary instability might occur. In the future however, it will hopefully be much smoother to use!
