@@ -6,8 +6,7 @@ get-video-properties
 imageio
 moviepy
 pillow
-playsound==1.2.2
-pygobject; sys_platform == 'linux' # Required for playsound
+pygame
 pypresence
 pystray
 python-vlc
@@ -16,4 +15,3 @@ screeninfo
 sounddevice
 ttkwidgets
 voluptuous
-pygame

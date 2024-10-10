@@ -15,21 +15,21 @@ from pack import Pack
 from panic import panic
 from paths import CustomAssets, Data, Process, Resource
 from PIL import Image
-from playsound import playsound
+from pygame import mixer
 from pypresence import Presence
 from roll import roll
 from settings import Settings
 from state import State
 from utils import utils
-from pygame import mixer
 
 
-def play_audio(settings: Settings, pack: Pack, state: State) -> None:
+def play_audio(pack: Pack) -> None:
     if pack.has_audio():
         sound = mixer.Sound(str(pack.random_audio()))
-        #TODO POTENTIAL SETTINGS: Volume, fadein, fadeout, separating music from sounds
-        #https://www.pygame.org/docs/ref/mixer.html#pygame.mixer.Sound
+        # TODO POTENTIAL SETTINGS: Volume, fadein, fadeout, separating music from sounds
+        # https://www.pygame.org/docs/ref/mixer.html#pygame.mixer.Sound
         sound.play()
+
 
 def open_web(pack: Pack) -> None:
     if pack.has_web():

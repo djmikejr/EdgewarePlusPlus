@@ -23,17 +23,17 @@ from features.subliminal_message_popup import SubliminalMessagePopup
 from features.video_popup import VideoPopup
 from pack import Pack
 from panic import start_panic_listener
+from pygame import mixer
 from roll import RollTarget, roll_targets
 from settings import Settings, first_launch_configure
 from state import State
 from utils import utils
-from pygame import mixer
 
 
-def main(root: Tk, settings: Settings, targets: list[RollTarget]) -> None:
+def main(root: Tk, settings: Settings, pack: Pack, targets: list[RollTarget]) -> None:
     roll_targets(settings, targets)
     Thread(target=lambda: fill_drive(root, settings, pack, state), daemon=True).start()  # Thread for performance reasons
-    root.after(settings.delay, lambda: main(root, settings, targets))
+    root.after(settings.delay, lambda: main(root, settings, pack, targets))
 
 
 if __name__ == "__main__":
@@ -46,7 +46,7 @@ if __name__ == "__main__":
     pack = Pack()
     state = State()
 
-    #if sound is laggy or strange try changing buffer size (doc: https://www.pygame.org/docs/ref/mixer.html)
+    # if sound is laggy or strange try changing buffer size (doc: https://www.pygame.org/docs/ref/mixer.html)
     # TODO: check if pygame.mixer.quit() is preferable to use in panic? seems fine without it
     mixer.init()
     mixer.set_num_channels(settings.max_audio)
@@ -57,7 +57,7 @@ if __name__ == "__main__":
         RollTarget(lambda: VideoPopup(root, settings, pack, state), settings.video_chance),
         RollTarget(lambda: SubliminalMessagePopup(settings, pack), settings.subliminal_message_popup_chance),
         RollTarget(lambda: Prompt(settings, pack, state), settings.prompt_chance),
-        RollTarget(lambda: play_audio(settings, pack, state), settings.audio_chance),
+        RollTarget(lambda: play_audio(pack), settings.audio_chance),
         RollTarget(lambda: open_web(pack), settings.web_chance),
         RollTarget(lambda: display_notification(settings, pack), settings.notification_chance),
     ]
@@ -77,7 +77,7 @@ if __name__ == "__main__":
             start_main_hibernate(root, settings, pack, state, targets)
         else:
             handle_wallpaper(root, settings, pack, state)
-            main(root, settings, targets)
+            main(root, settings, pack, targets)
 
     if settings.startup_splash:
         StartupSplash(pack, start_main)

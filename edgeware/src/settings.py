@@ -94,7 +94,7 @@ class Settings:
 
         # Audio
         self.audio_chance = int(config["audioMod"])  # 0 to 100
-        self.max_audio = int(config["maxAudio"]) if bool(config["maxAudioBool"]) else float("inf")
+        self.max_audio = int(config["maxAudio"])
 
         # Video
         self.video_chance = int(config["vidMod"]) if not mitosis_mode else 0  # 0 to 100

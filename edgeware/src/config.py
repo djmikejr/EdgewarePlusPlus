@@ -94,7 +94,7 @@ START_PANIC_TEXT = '"Panic" is a feature that allows you to instantly halt the p
 FILE_PRESET_TEXT = (
     "Please be careful before importing unknown config presets! Double check to make sure you're okay with the settings before launching Edgeware."
 )
-DEFAULTFILE_INTRO_TEXT = "Changing these will change the default file EdgeWare++ falls back on when a replacement isn't provided by a pack. The files you choose will be stored under \"data.\""
+DEFAULTFILE_INTRO_TEXT = 'Changing these will change the default file EdgeWare++ falls back on when a replacement isn\'t provided by a pack. The files you choose will be stored under "data."'
 
 POPUP_INTRO_TEXT = 'Here is where you can change the most important settings of Edgeware: the frequency and behaviour of popups. The "Popup Timer Delay" is how long a popup takes to spawn, and the overall "Popup Chance" then rolls to see if the popup spawns. Keeping the chance at 100% allows for a consistent experience, while lowering it makes for a more random one.\n\nOnce ready to spawn, a popup can be many things: A regular image, a website link (opens in your default browser), a prompt you need to fill out, autoplaying audio or videos, or a subliminal message. All of these are rolled for corresponding to their respective frequency settings, which can be found in the "Audio/Video" tab, "Captions" tab, and this tab as well. There are also plenty of other settings there to configure popups to your liking~! '
 POPUP_OVERLAY_TEXT = 'Overlays are more or less modifiers for popups- adding onto them without changing their core behaviour.\n\n•Subliminals add a transparent gif over affected popups, defaulting to a hypnotic spiral if there are none added in the current pack. (this may cause performance issues with lots of popups, try a low max to start)\n•Denial "censors" a popup by blurring it, simple as.'
@@ -1924,7 +1924,7 @@ def show_window():
         "For example, if you have audio, videos, and prompts all turned on, there's a very real chance you will get all of them popping up at the same "
         "time if the percentage for each is high enough.\n\nThis mode ensures that only one of these types will spawn whenever a popup is created. It "
         "delivers a more consistent experience and less double (or triple) popups.\n\nADVANCED DETAILS: In this mode, the chance of a popup appearing "
-        "is used as a weight to choose a single popup type to spawn."
+        "is used as a weight to choose a single popup type to spawn.",
     )
 
     popupOptionsFrame.pack(fill="x")
