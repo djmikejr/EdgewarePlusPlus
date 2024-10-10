@@ -2029,9 +2029,6 @@ def show_window():
     )
 
     maxAudioFrame = Frame(audioFrame)
-    maxAudioToggle = Checkbutton(
-        maxAudioFrame, text="Cap Audio", variable=maxAToggleVar, command=lambda: toggleAssociateSettings(maxAToggleVar.get(), maxAudio_group)
-    )
     maxAudioScale = Scale(maxAudioFrame, label="Max Audio Popups", from_=1, to=50, orient="horizontal", variable=maxAudioVar)
     maxAudioManual = Button(
         maxAudioFrame, text="Manual Max Audio...", command=lambda: assign(maxAudioVar, simpledialog.askinteger("Manual Max Audio", prompt="[1-50]: "))
@@ -2039,11 +2036,10 @@ def show_window():
 
     audioFrame.pack(fill="x")
     audioSubFrame.pack(fill="x", side="left", padx=(3, 0), expand=1)
-    audioScale.pack(fill="x", pady=(25, 0), expand=1)
+    audioScale.pack(fill="x", expand=1)
     audioManual.pack(fill="x")
 
     maxAudioFrame.pack(fill="x", side="left", padx=(0, 3), expand=1)
-    maxAudioToggle.pack(fill="x")
     maxAudioScale.pack(fill="x", expand=1)
     maxAudioManual.pack(fill="x")
 
@@ -3381,7 +3377,6 @@ def show_window():
     toggleAssociateSettings(timerVar.get(), timer_group)
     toggleAssociateSettings(lkToggle.get(), lowkey_group)
     toggleAssociateSettings(denialMode.get(), denial_group)
-    toggleAssociateSettings(maxAToggleVar.get(), maxAudio_group)
     toggleAssociateSettings(maxVToggleVar.get(), maxVideo_group)
     toggleAssociateSettings(popupSublim.get(), subliminals_group)
     hibernateHelper(hibernateTypeVar.get())

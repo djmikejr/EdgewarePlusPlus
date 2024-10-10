@@ -27,6 +27,7 @@ from roll import RollTarget, roll_targets
 from settings import Settings, first_launch_configure
 from state import State
 from utils import utils
+from pygame import mixer
 
 
 def main(root: Tk, settings: Settings, targets: list[RollTarget]) -> None:
@@ -44,6 +45,11 @@ if __name__ == "__main__":
     settings = Settings()
     pack = Pack()
     state = State()
+
+    #if sound is laggy or strange try changing buffer size (doc: https://www.pygame.org/docs/ref/mixer.html)
+    # TODO: check if pygame.mixer.quit() is preferable to use in panic? seems fine without it
+    mixer.init()
+    mixer.set_num_channels(settings.max_audio)
 
     # TODO: Use a dict?
     targets = [

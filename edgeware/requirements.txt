@@ -16,3 +16,4 @@ screeninfo
 sounddevice
 ttkwidgets
 voluptuous
+pygame

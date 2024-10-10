@@ -21,18 +21,15 @@ from roll import roll
 from settings import Settings
 from state import State
 from utils import utils
+from pygame import mixer
 
 
 def play_audio(settings: Settings, pack: Pack, state: State) -> None:
-    # TODO: Race conditions?
-    def play():
-        state.audio_number += 1
-        playsound(str(pack.random_audio()))
-        state.audio_number -= 1
-
-    if state.audio_number < settings.max_audio and pack.has_audio():
-        Thread(target=play, daemon=True).start()
-
+    if pack.has_audio():
+        sound = mixer.Sound(str(pack.random_audio()))
+        #TODO POTENTIAL SETTINGS: Volume, fadein, fadeout, separating music from sounds
+        #https://www.pygame.org/docs/ref/mixer.html#pygame.mixer.Sound
+        sound.play()
 
 def open_web(pack: Pack) -> None:
     if pack.has_web():
