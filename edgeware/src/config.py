@@ -311,7 +311,6 @@ def show_window():
 
             promptMistakeVar = IntVar(root, value=int(config["promptMistakes"]))
             mitosisVar = BooleanVar(root, value=(int(config["mitosisMode"]) == 1))
-            onlyVidVar = BooleanVar(root, value=(int(config["onlyVid"]) == 1))
             popupWebVar = BooleanVar(root, value=(int(config["webPopup"]) == 1))
 
             rotateWallpaperVar = BooleanVar(root, value=(int(config["rotateWallpaper"]) == 1))
@@ -324,7 +323,6 @@ def show_window():
             booruNameVar = StringVar(root, value=config["booruName"])
 
             downloadEnabledVar = BooleanVar(root, value=(int(config["downloadEnabled"]) == 1))
-            downloadModeVar = StringVar(root, value=config["downloadMode"])
             fillPathVar = StringVar(root, value=config["drivePath"])
             rosVar = BooleanVar(root, value=(int(config["runOnSaveQuit"]) == 1))
 
@@ -346,7 +344,6 @@ def show_window():
 
             deskIconVar = BooleanVar(root, value=(int(config["desktopIcons"]) == 1))
 
-            maxAToggleVar = BooleanVar(root, value=(int(config["maxAudioBool"]) == 1))
             maxAudioVar = IntVar(root, value=(int(config["maxAudio"])))
             maxVToggleVar = BooleanVar(root, value=(int(config["maxVideoBool"]) == 1))
             maxVideoVar = IntVar(root, value=(int(config["maxVideos"])))
@@ -425,7 +422,6 @@ def show_window():
                 panicVar,
                 promptMistakeVar,
                 mitosisVar,
-                onlyVidVar,
                 popupWebVar,
                 rotateWallpaperVar,
                 wallpaperDelayVar,
@@ -435,7 +431,6 @@ def show_window():
                 mitosisStrenVar,
                 booruNameVar,
                 downloadEnabledVar,
-                downloadModeVar,
                 fillPathVar,
                 rosVar,
                 timerVar,
@@ -450,7 +445,6 @@ def show_window():
                 popupSublim,
                 booruMin,
                 deskIconVar,
-                maxAToggleVar,
                 maxAudioVar,
                 maxVToggleVar,
                 maxVideoVar,
@@ -520,7 +514,6 @@ def show_window():
                 "panicDisabled",
                 "promptMistakes",
                 "mitosisMode",
-                "onlyVid",
                 "webPopup",
                 "rotateWallpaper",
                 "wallpaperTimer",
@@ -530,7 +523,6 @@ def show_window():
                 "mitosisStrength",
                 "booruName",
                 "downloadEnabled",
-                "downloadMode",
                 "drivePath",
                 "runOnSaveQuit",
                 "timerMode",
@@ -545,7 +537,6 @@ def show_window():
                 "popupSubliminals",
                 "booruMinScore",
                 "desktopIcons",
-                "maxAudioBool",
                 "maxAudio",
                 "maxVideoBool",
                 "maxVideos",
