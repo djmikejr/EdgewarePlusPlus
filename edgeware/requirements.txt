@@ -5,11 +5,14 @@ get-video-properties
 # git+https://github.com/Zulko/moviepy.git # The current version v1.0.3 has a bug with to_soundarray
 imageio
 moviepy
+numpy
+opencv_python
 pillow
 pygame
 pypresence
 pystray
 python-vlc
+pyvidplayer2
 requests
 screeninfo
 sounddevice
