@@ -7,7 +7,6 @@ from tkinter import Label, Canvas, TclError, Toplevel
 import imageio
 from PIL import Image, ImageTk
 from utils import utils
-from videoprops import get_video_properties
 from pyvidplayer2 import VideoTkinter
 
 try:
@@ -29,42 +28,25 @@ class VideoPlayer:
             self.player.set_media(vlc.Media(video))
             self.player.play()
         else:
-            #self.label = Label(master)
-            #self.label.pack()
             self.canvas = Canvas(master, width=size[0], height=size[1], highlightthickness=0)
             self.canvas.pack()
-            self.size = size
 
-            properties = get_video_properties(video)
-            frame_rate = properties["avg_frame_rate"].split("/")
-            self.delay = float(frame_rate[1]) / float(frame_rate[0])
-            self.frames = cycle(imageio.get_reader(video).iter_data())
+            self.video = video
             self.player = VideoTkinter(video)
-            self.player.resize(self.size)
-            self.player.set_volume(float(volume/100))
+            self.player.resize(size)
+            self.player.set_volume(float(volume / 100))
 
-            # TODO: Find a better solution for audio / video
-            # try:
-            #     audio = AudioFileClip(str(video)).to_soundarray()
-            #     # TODO: Setting the volume this way is extremely slow
-            #     # audio = [[volume / 100 * v[0], volume / 100 * v[1]] for v in audio]
-            #     samplerate = len(audio) / float(properties["duration"])
-            #     sounddevice.play(audio, samplerate=samplerate, loop=True)  # TODO: Can't play multiple sounds at once
-            # except KeyError:
-            #     pass  # Video has no audio
-
-            Thread(target=self.animate, daemon=True).start()
+            self.restart = False
+            self.animate()
 
     def animate(self) -> None:
-        try:
-            while True:
-                start = time.perf_counter()
-                self.player.draw(self.canvas, (self.player.current_size[0] / 2, self.player.current_size[1] / 2), force_draw=False)
-                end = time.perf_counter()
-                time.sleep(max(0, self.delay - (end - start)))
+        if self.player.draw(self.canvas, (self.player.current_size[0] / 2, self.player.current_size[1] / 2), force_draw=False):
+            self.restart = True  # The draw method can return False before the first frame is drawn
+        elif self.restart:
+            self.player.restart()
+            self.restart = False
 
-        except TclError:
-            pass  # Exception thrown when closing
+        self.canvas.after(int(1 / self.player.frame_rate * 1000), self.animate)
 
     def on_close(self) -> None:
         if self.vlc_mode:
