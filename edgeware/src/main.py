@@ -1,3 +1,8 @@
+import os
+from paths import PATH
+os.environ["PYTHON_VLC_LIB_PATH"] = str(PATH / "libvlc.dll")
+os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
+
 from threading import Thread
 from tkinter import Tk
 
