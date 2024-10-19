@@ -25,7 +25,7 @@ def update_corruption_level(settings: Settings, pack: Pack, state: State) -> Non
 
 def timed(root: Tk, settings: Settings, pack: Pack, state: State) -> None:
     update_corruption_level(settings, pack, state)
-    root.after(settings.corruption_time, timed)
+    root.after(settings.corruption_time, lambda: timed(root, settings, pack, state))
 
 
 def popup(settings: Settings, pack: Pack, state: State) -> None:
@@ -76,7 +76,7 @@ def handle_corruption(root: Tk, settings: Settings, pack: Pack, state: State) ->
     match settings.corruption_trigger:
         case "Timed":
             apply_corruption_level(settings, pack, state)
-            root.after(settings.corruption_time, timed)
+            root.after(settings.corruption_time, lambda: timed(root, settings, pack, state))
         case "Popup":
             apply_corruption_level(settings, pack, state)
             popup(settings, pack, state)
