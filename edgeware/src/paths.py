@@ -103,7 +103,7 @@ class Resource:
     DISCORD = ROOT / "discord.dat"
     ICON = ROOT / "icon.ico"
     INFO = ROOT / "info.json"
-    SPLASH = [PATH / "resource" / f"loading_splash.{extension}" for extension in [".png", ".gif", ".jpg", ".jpeg", ".bmp"]]
+    SPLASH = [PATH / "resource" / f"loading_splash.{extension}" for extension in ["png", "gif", "jpg", "jpeg", "bmp"]]
     MEDIA = ROOT / "media.json"
     PROMPT = ROOT / "prompt.json"
     WALLPAPER = ROOT / "wallpaper.png"
