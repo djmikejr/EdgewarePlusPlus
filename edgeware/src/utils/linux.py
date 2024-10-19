@@ -54,7 +54,7 @@ def make_shortcut(title: str, process: Path, icon: Path, location: Path | None =
     file = (location if location else Path(os.path.expanduser("~/Desktop"))) / filename
     content = [
         "[Desktop Entry]",
-        f"Version={default_config["versionplusplus"]}",
+        f"Version={default_config['versionplusplus']}",
         f"Name={title}",
         f"Exec={shlex.join([str(sys.executable), str(process)])}",
         f"Icon={icon}",

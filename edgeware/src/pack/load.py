@@ -146,7 +146,7 @@ def load_info() -> Info:
 
         Schema({"name": str, "id": str, "creator": str, "version": str, "description": str}, required=True)(info)
 
-        return Info(info["name"], Data.MOODS / f"{info["id"]}.json", info["creator"], info["version"], info["description"])
+        return Info(info["name"], Data.MOODS / f"{info['id']}.json", info["creator"], info["version"], info["description"])
 
     return try_load(Resource.INFO, load) or default
 
