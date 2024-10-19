@@ -26,13 +26,13 @@ import yaml
 from voluptuous import ALLOW_EXTRA, All, Optional, Range, Schema, Union, Url
 
 
-def write_json(dictionary, path):
+def write_json(data: dict, path: Path):
     logging.info(f"Writing {path.name}")
     with open(path, "w") as f:
-        json.dump(dictionary, f)
+        json.dump(data, f)
 
 
-def make_media(source_path, build_path) -> set[str]:
+def make_media(source_path: Path, build_path: Path) -> set[str]:
     """Returns a set of existing, valid moods"""
 
     media = dict()
@@ -81,7 +81,7 @@ def make_media(source_path, build_path) -> set[str]:
     return set(media.keys())
 
 
-def make_subliminals(source_path, build_path):
+def make_subliminals(source_path: Path, build_path: Path) -> None:
     subliminal_path = source_path / "subliminals"
     if not os.path.isdir(subliminal_path):
         return
@@ -100,7 +100,7 @@ def make_subliminals(source_path, build_path):
             logging.warning(f"{file_path} is not an image")
 
 
-def make_wallpapers(source_path, build_path):
+def make_wallpapers(source_path: Path, build_path: Path) -> None:
     wallpaper_path = source_path / "wallpapers"
 
     if not os.path.isdir(wallpaper_path):
@@ -126,7 +126,7 @@ def make_wallpapers(source_path, build_path):
         logging.warning("No default wallpaper.png found")
 
 
-def make_icon(source_path, build_path):
+def make_icon(source_path: Path, build_path: Path) -> None:
     icon_path = source_path / "icon.ico"
     if not os.path.exists(icon_path):
         return
@@ -138,7 +138,7 @@ def make_icon(source_path, build_path):
         logging.warning(f"{icon_path} is not an image")
 
 
-def make_loading_splash(source_path, build_path):
+def make_loading_splash(source_path: Path, build_path: Path) -> None:
     loading_splash_found = False
     for extension in ["png", "gif", "jpg", "jpeg", "bmp"]:
         filename = f"loading_splash.{extension}"
@@ -158,7 +158,7 @@ def make_loading_splash(source_path, build_path):
             logging.warning(f"{loading_splash_path} is not an image")
 
 
-def make_info(pack, build_path):
+def make_info(pack: yaml.Node, build_path: Path) -> None:
     if not pack["info"]["generate"]:
         logging.info("Skipping info.json")
         return
@@ -187,7 +187,7 @@ def make_info(pack, build_path):
     write_json(info, build_path / "info.json")
 
 
-def make_discord(pack, build_path):
+def make_discord(pack: yaml.Node, build_path: Path) -> None:
     if not pack["discord"]["generate"]:
         logging.info("Skipping discord.dat")
         return
@@ -199,7 +199,7 @@ def make_discord(pack, build_path):
         f.write(pack["discord"]["status"])
 
 
-def make_captions(pack, build_path):
+def make_captions(pack: yaml.Node, build_path: Path) -> None:
     if not pack["captions"]["generate"]:
         logging.info("Skipping captions.json")
         return
@@ -252,7 +252,7 @@ def make_captions(pack, build_path):
     write_json(captions, build_path / "captions.json")
 
 
-def make_prompt(pack, build_path):
+def make_prompt(pack: yaml.Node, build_path: Path) -> None:
     if not pack["prompt"]["generate"]:
         logging.info("Skipping prompt.json")
         return
@@ -308,7 +308,7 @@ def make_prompt(pack, build_path):
     write_json(prompt, build_path / "prompt.json")
 
 
-def make_web(pack, build_path):
+def make_web(pack: yaml.Node, build_path: Path) -> None:
     if not pack["web"]["generate"]:
         logging.info("Skipping web.json")
         return
@@ -343,7 +343,7 @@ def make_web(pack, build_path):
     write_json(web, build_path / "web.json")
 
 
-def make_corruption(pack, build_path, moods):
+def make_corruption(pack: yaml.Node, build_path: Path, moods: set[str]) -> None:
     if not pack["corruption"]["generate"]:
         logging.info("Skipping corruption.json")
         return
@@ -403,7 +403,7 @@ def make_corruption(pack, build_path, moods):
 # TODO: config.json
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("source", help="pack source directory")
     parser.add_argument("-o", "--output", default="build", help="output directory name")
