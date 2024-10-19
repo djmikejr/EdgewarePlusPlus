@@ -118,7 +118,7 @@ web:
       mood: "github"
 
 corruption:
-  generate: true
+  generate: false
 
   # List of corruption levels.
   #

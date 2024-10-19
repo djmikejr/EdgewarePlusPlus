@@ -23,7 +23,7 @@ from pathlib import Path
 
 import filetype
 import yaml
-from voluptuous import All, Optional, Range, Schema, Union, Url
+from voluptuous import ALLOW_EXTRA, All, Optional, Range, Schema, Union, Url
 
 
 def write_json(dictionary, path):
@@ -163,14 +163,18 @@ def make_info(pack, build_path):
         logging.info("Skipping info.json")
         return
 
-    Schema({
-        "generate": bool,
-        "name": str,
-        "id": str,
-        "creator": str,
-        "version": str,
-        "description": str,
-    })(pack["info"])  # fmt: skip
+    Schema(
+        {
+            "generate": bool,
+            "name": str,
+            "id": str,
+            "creator": str,
+            "version": str,
+            "description": str,
+        },
+        required=True,
+        extra=ALLOW_EXTRA,
+    )(pack["info"])
 
     info = {
         "name": pack["info"]["name"],
@@ -188,7 +192,7 @@ def make_discord(pack, build_path):
         logging.info("Skipping discord.dat")
         return
 
-    Schema({"generate": bool, "status": str})(pack["discord"])
+    Schema({"generate": bool, "status": str}, required=True, extra=ALLOW_EXTRA)(pack["discord"])
 
     with open(build_path / "discord.dat", "w") as f:
         logging.info("Writing discord.dat")
@@ -200,22 +204,26 @@ def make_captions(pack, build_path):
         logging.info("Skipping captions.json")
         return
 
-    Schema({
-        "generate": bool,
-        "close-text": str,
-        "default-captions": [str],
-        "prefixes": Union(
-            [
-                {
-                    "name": str,
-                    Optional("chance"): All(Union(int, float), Range(min=0, max=100)),
-                    Optional("max-clicks"): All(int, Range(min=1)),
-                    "captions": [str],
-                }
-            ],
-            None,
-        ),
-    })(pack["captions"])  # fmt: skip
+    Schema(
+        {
+            "generate": bool,
+            "close-text": str,
+            "default-captions": [str],
+            "prefixes": Union(
+                [
+                    {
+                        "name": str,
+                        Optional("chance"): All(Union(int, float), Range(min=0, max=100)),
+                        Optional("max-clicks"): All(int, Range(min=1)),
+                        "captions": [str],
+                    }
+                ],
+                None,
+            ),
+        },
+        required=True,
+        extra=ALLOW_EXTRA,
+    )(pack["captions"])
 
     captions = {
         "subtext": pack["captions"]["close-text"],
@@ -249,26 +257,30 @@ def make_prompt(pack, build_path):
         logging.info("Skipping prompt.json")
         return
 
-    Schema({
-        "generate": bool,
-        "submit-text": str,
-        "minimum-length": All(int, Range(min=1)),
-        "maximum-length": All(int, Range(min=pack["prompt"]["minimum-length"])),
-        "default-prompts": {
-            "weight": All(int, Range(min=0)),
-            "prompts": Union([str], None),
+    Schema(
+        {
+            "generate": bool,
+            "submit-text": str,
+            "minimum-length": All(int, Range(min=1)),
+            "maximum-length": All(int, Range(min=pack["prompt"]["minimum-length"])),
+            "default-prompts": {
+                "weight": All(int, Range(min=0)),
+                "prompts": Union([str], None),
+            },
+            "moods": Union(
+                [
+                    {
+                        "name": str,
+                        "weight": All(int, Range(min=0)),
+                        "prompts": [str],
+                    }
+                ],
+                None,
+            ),
         },
-        "moods": Union(
-            [
-                {
-                    "name": str,
-                    "weight": All(int, Range(min=0)),
-                    "prompts": [str],
-                }
-            ],
-            None,
-        ),
-    })(pack["prompt"])  # fmt: skip
+        required=True,
+        extra=ALLOW_EXTRA,
+    )(pack["prompt"])
 
     prompt = {
         "subtext": pack["prompt"]["submit-text"],
@@ -301,16 +313,14 @@ def make_web(pack, build_path):
         logging.info("Skipping web.json")
         return
 
-    Schema({
-        "generate": bool,
-        "urls": [
-            {
-                "url": Url(),
-                "mood": str,
-                Optional("args"): [str]
-            }
-        ],
-    })(pack["web"])  # fmt: skip
+    Schema(
+        {
+            "generate": bool,
+            "urls": [{"url": Url(), "mood": str, Optional("args"): [str]}],
+        },
+        required=True,
+        extra=ALLOW_EXTRA,
+    )(pack["web"])
 
     web = {"urls": [], "moods": [], "args": []}
 
@@ -338,17 +348,21 @@ def make_corruption(pack, build_path, moods):
         logging.info("Skipping corruption.json")
         return
 
-    Schema({
-        "generate": bool,
-        "levels": [
-            {
-                Optional("add-moods"): [str],
-                Optional("remove-moods"): [str],
-                Optional("wallpaper"): str,
-                Optional("config"): dict,
-            }
-        ],
-    })(pack["corruption"])  # fmt: skip
+    Schema(
+        {
+            "generate": bool,
+            "levels": [
+                {
+                    Optional("add-moods"): [str],
+                    Optional("remove-moods"): [str],
+                    Optional("wallpaper"): str,
+                    Optional("config"): dict,
+                }
+            ],
+        },
+        required=True,
+        extra=ALLOW_EXTRA,
+    )(pack["corruption"])
 
     corruption = {"moods": {}, "wallpapers": {}, "config": {}}
 
