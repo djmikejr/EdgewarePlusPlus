@@ -24,7 +24,9 @@ from utils import utils
 
 
 def play_audio(pack: Pack) -> None:
-    if pack.has_audio():
+    # Pygame will not stop additional sounds from being played when the max is
+    # reached, so we need to check if there are empty channels
+    if pack.has_audio() and mixer.find_channel():
         sound = mixer.Sound(str(pack.random_audio()))
         # TODO POTENTIAL SETTINGS: Volume, fadein, fadeout, separating music from sounds
         # https://www.pygame.org/docs/ref/mixer.html#pygame.mixer.Sound
