@@ -44,26 +44,26 @@ def get_desktop_environment() -> str:
 def get_wallpaper_commands(wallpaper: Path, desktop: str) -> list[str]:
     commands = {
         "xfce4": [
-            f"xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor0/image-path -s {wallpaper}",
+            f'xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor0/image-path -s "{wallpaper}"',
             "xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor0/image-style -s 3",
             "xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor0/image-show -s true",
         ],
-        "mate": [f"gsettings set org.mate.background picture-filename {wallpaper}"],
-        "icewm": [f"icewmbg {wallpaper}"],
-        "blackbox": [f"bsetbg -full {wallpaper}"],
-        "lxde": [f"pcmanfm --set-wallpaper {wallpaper} --wallpaper-mode=scaled"],
-        "windowmaker": [f"wmsetbg -s -u {wallpaper}"],
-        "sway": [f'swaybg -o "*" -i {wallpaper} -m fill'],
+        "mate": [f'gsettings set org.mate.background picture-filename "{wallpaper}"'],
+        "icewm": [f'icewmbg "{wallpaper}"'],
+        "blackbox": [f'bsetbg -full "{wallpaper}"'],
+        "lxde": [f'pcmanfm --set-wallpaper "{wallpaper}" --wallpaper-mode=scaled'],
+        "windowmaker": [f'wmsetbg -s -u "{wallpaper}"'],
+        "sway": [f'swaybg -o "*" -i "{wallpaper}" -m fill'],
         "hyprland": [f'hyprctl hyprpaper preload "{wallpaper}"', f'hyprctl hyprpaper wallpaper ",{wallpaper}"'],
         **dict.fromkeys(
             ["gnome", "unity", "cinnamon"],
             [
-                f"gsettings set org.gnome.desktop.background picture-uri file://{wallpaper}",
-                f"gsettings set org.gnome.desktop.background picture-uri-dark file://{wallpaper}",
+                f'gsettings set org.gnome.desktop.background picture-uri "file://{wallpaper}"',
+                f'gsettings set org.gnome.desktop.background picture-uri-dark "file://{wallpaper}"',
             ],
         ),
         **dict.fromkeys(["trinity"], [f'dcop kdesktop KBackgroundIface setWallpaper 0 "{wallpaper}" 6']),
-        **dict.fromkeys(["fluxbox", "jwm", "openbox", "afterstep"], [f"fbsetbg {wallpaper}"]),
+        **dict.fromkeys(["fluxbox", "jwm", "openbox", "afterstep"], [f'fbsetbg "{wallpaper}"']),
     }
 
     return commands.get(desktop) or (get_wm_wallpaper_commands() if desktop in ["i3", "awesome", "dwm", "xmonad", "bspwm"] else [])
@@ -73,20 +73,20 @@ def get_wm_wallpaper_commands(wallpaper: Path) -> list[str]:
     session = os.environ.get("XDG_SESSION_TYPE", "").lower()  # "x11" or "wayland"
     setters = {
         "x11": [
-            ("nitrogen", [f"nitrogen --set-zoom-fill {wallpaper}"]),
-            ("feh", [f"feh --bg-scale {wallpaper}"]),
-            ("habak", [f"habak -ms {wallpaper}"]),
-            ("hsetroot", [f"hsetroot -fill {wallpaper}"]),
-            ("chbg", [f"chbg -once -mode maximize {wallpaper}"]),
-            ("qiv", [f"qiv --root_s {wallpaper}"]),
-            ("xv", [f"xv -max -smooth -root -quit {wallpaper}"]),
-            ("xsri", [f"xsri --center-x --center-y --scale-width=100 --scale-height=100 {wallpaper}"]),
-            ("xli", [f"xli -fullscreen -onroot -quiet -border black {wallpaper}"]),
-            ("xsetbg", [f"xsetbg -fullscreen -border black {wallpaper}"]),
-            ("fvwm-root", [f"fvwm-root -r {wallpaper}"]),
-            ("wmsetbg", [f"wmsetbg -s -S {wallpaper}"]),
-            ("Esetroot", [f"Esetroot -scale {wallpaper}"]),
-            ("display", [f"display -sample `xwininfo -root 2> /dev/null|awk '/geom/{{print $2}}'` -window root {wallpaper}"]),
+            ("nitrogen", [f'nitrogen --set-zoom-fill "{wallpaper}"']),
+            ("feh", [f'feh --bg-scale "{wallpaper}"']),
+            ("habak", [f'habak -ms "{wallpaper}"']),
+            ("hsetroot", [f'hsetroot -fill "{wallpaper}"']),
+            ("chbg", [f'chbg -once -mode maximize "{wallpaper}"']),
+            ("qiv", [f'qiv --root_s "{wallpaper}"']),
+            ("xv", [f'xv -max -smooth -root -quit "{wallpaper}"']),
+            ("xsri", [f'xsri --center-x --center-y --scale-width=100 --scale-height=100 "{wallpaper}"']),
+            ("xli", [f'xli -fullscreen -onroot -quiet -border black "{wallpaper}"']),
+            ("xsetbg", [f'xsetbg -fullscreen -border black "{wallpaper}"']),
+            ("fvwm-root", [f'fvwm-root -r "{wallpaper}"']),
+            ("wmsetbg", [f'wmsetbg -s -S "{wallpaper}"']),
+            ("Esetroot", [f'Esetroot -scale "{wallpaper}"']),
+            ("display", [f'display -sample `xwininfo -root 2> /dev/null|awk "/geom/{{print $2}}"` -window root "{wallpaper}"']),
         ],
         "wayland": [],
     }
