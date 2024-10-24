@@ -2,6 +2,7 @@
 format: "1.0"
 
 info:
+  # Generate info.json, true or false.
   generate: true
 
   # Name of your pack. (~20 char max)
@@ -21,12 +22,14 @@ info:
     Pack description
 
 discord:
+  # Generate discord.dat, true or false.
   generate: true
 
   # Discord status message when running the pack.
   status: "Discord status"
 
 captions:
+  # Generate captions.json, true or false.
   generate: true
 
   # Text for the close button of a popup window.
@@ -62,6 +65,7 @@ captions:
         - "Bar caption"
 
 prompt:
+  # Generate prompt.json, true or false.
   generate: true
 
   # Text for the submit button of a prompt window.
@@ -102,6 +106,7 @@ prompt:
         - "Kinky prompt 2"
 
 web:
+  # Generate web.json, true or false.
   generate: true
 
   # List of websites that can be opened by Edgeware.
@@ -121,6 +126,7 @@ web:
       mood: "github"
 
 corruption:
+  # Generate corruption.json, true or false.
   generate: false
 
   # List of corruption levels.
