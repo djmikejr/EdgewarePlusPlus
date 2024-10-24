@@ -51,15 +51,15 @@ captions:
   #                caption from the prefix. (Optional, omit to not use)
   #   captions   - List of captions for the prefix.
   prefixes:
-  # - name: "foo"
-  #   chance: 50
-  #   max-clicks: 1
-  #   captions:
-  #     - "Foo caption 1"
-  #     - "Foo caption 2"
-  # - name: "bar"
-  #   captions:
-  #     - "Bar caption"
+    - name: "foo"
+      chance: 50
+      max-clicks: 1
+      captions:
+        - "Foo caption 1"
+        - "Foo caption 2"
+    - name: "bar"
+      captions:
+        - "Bar caption"
 
 prompt:
   generate: true
@@ -90,16 +90,16 @@ prompt:
   #           moods' weights.
   # prompts - List of prompts for the mood.
   moods:
-  # - name: "vanilla"
-  #   weight: 50
-  #   prompts:
-  #     - "Vanilla propmt 1"
-  #     - "Vanilla prompt 2"
-  # - name: "kinky"
-  #   weight: 75
-  #   prompts:
-  #     - "Kinky propmt 1"
-  #     - "Kinky prompt 2"
+    - name: "vanilla"
+      weight: 50
+      prompts:
+        - "Vanilla propmt 1"
+        - "Vanilla prompt 2"
+    - name: "kinky"
+      weight: 75
+      prompts:
+        - "Kinky propmt 1"
+        - "Kinky prompt 2"
 
 web:
   generate: true
@@ -134,19 +134,19 @@ corruption:
   #                  (Optional, omit to not use)
   #   config       - Config to use at this level. (Optional, omit to not use)
   levels:
-  # # Level 1
-  # - add-moods:
-  #     - "first"
-  #     - "second"
-  #   wallpaper: "wallpaper-1.png"
-  #
-  # # Level 2
-  # - add-moods:
-  #     - "third"
-  #   remove-moods:
-  #     - "first"
-  #   wallpaper: "wallpaper-2.png"
-  #
-  # # Level 3
-  # - remove-moods:
-  #     - "second"
+    # Level 1
+    - add-moods:
+        - "first"
+        - "second"
+      wallpaper: "wallpaper-1.png"
+
+    # Level 2
+    - add-moods:
+        - "third"
+      remove-moods:
+        - "first"
+      wallpaper: "wallpaper-2.png"
+
+    # Level 3
+    - remove-moods:
+        - "second"

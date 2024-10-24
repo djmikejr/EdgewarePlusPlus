@@ -26,7 +26,7 @@ import yaml
 from voluptuous import ALLOW_EXTRA, All, Optional, Range, Schema, Union, Url
 
 
-def write_json(data: dict, path: Path):
+def write_json(data: dict, path: Path) -> None:
     logging.info(f"Writing {path.name}")
     with open(path, "w") as f:
         json.dump(data, f)
