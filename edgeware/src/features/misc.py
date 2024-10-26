@@ -120,12 +120,7 @@ def handle_discord(root: Tk, settings: Settings, pack: Pack) -> None:
     try:
         presence = Presence("820204081410736148")
         presence.connect()
-
-        def update() -> None:
-            presence.update(state=pack.discord.text, large_image=pack.discord.image, start=int(time.time()))
-            root.after(15000, update)
-
-        update()
+        presence.update(state=pack.discord.text, large_image=pack.discord.image, start=int(time.time()))
     except Exception as e:
         logging.warning(f"Setting Discord presence failed. Reason: {e}")
 
