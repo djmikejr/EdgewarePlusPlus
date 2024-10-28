@@ -25,6 +25,48 @@ import filetype
 import yaml
 from voluptuous import ALLOW_EXTRA, All, Optional, Range, Schema, Union, Url
 
+PATH = Path(__file__).parent
+DEFAULT_PACK = PATH / "default_pack.yml"
+
+
+class Source:
+    def __init__(self, root: str):
+        self.root = PATH / root
+
+        # Directories
+        self.media = self.root / "media"
+        self.subliminals = self.root / "subliminals"
+        self.wallpapers = self.root / "wallpapers"
+
+        # Files
+        self.icon = self.root / "icon.ico"
+        self.pack = self.root / "pack.yml"
+        self.splash = self.root / "loading_splash"
+
+
+class Build:
+    def __init__(self, root: str):
+        self.root = PATH / root
+
+        # Directories
+        self.audio = self.root / "aud"
+        self.image = self.root / "img"
+        self.subliminals = self.root / "subliminals"
+        self.video = self.root / "vid"
+
+        # Files
+        self.captions = self.root / "captions.json"
+        self.config = self.root / "config.json"
+        self.corruption = self.root / "corruption.json"
+        self.discord = self.root / "discord.dat"
+        self.icon = self.root / "icon.ico"
+        self.info = self.root / "info.json"
+        self.splash = self.root / "loading_splash"
+        self.media = self.root / "media.json"
+        self.prompt = self.root / "prompt.json"
+        self.wallpaper = self.root / "wallpaper.png"
+        self.web = self.root / "web.json"
+
 
 def write_json(data: dict, path: Path) -> None:
     logging.info(f"Writing {path.name}")
@@ -32,24 +74,23 @@ def write_json(data: dict, path: Path) -> None:
         json.dump(data, f)
 
 
-def make_media(source_path: Path, build_path: Path) -> set[str]:
+def make_media(source: Source, build: Build) -> set[str]:
     """Returns a set of existing, valid moods"""
 
-    media = dict()
-    media_path = source_path / "media"
+    media = {}
 
-    if not os.path.isdir(media_path):
-        logging.error(f"{media_path} does not exist or is not a directory, unable to read media")
+    if not source.media.is_dir():
+        logging.error(f"{source.media} does not exist or is not a directory, unable to read media")
         return set()
 
-    moods = os.listdir(media_path)
+    moods = os.listdir(source.media)
     if len(moods) == 0:
         logging.error("Media directory exists, but it is empty")
         return set()
 
     for mood in moods:
-        mood_path = media_path / mood
-        if not os.path.isdir(mood_path):
+        mood_path = source.media / mood
+        if not mood_path.is_dir():
             logging.warning(f"{mood_path} is not a directory")
             continue
 
@@ -63,51 +104,50 @@ def make_media(source_path: Path, build_path: Path) -> set[str]:
         for filename in mood_media:
             file_path = mood_path / filename
 
-            file_type = None
+            location = None
             if filetype.is_image(file_path):
-                file_type = "img"
+                location = build.image
             elif filetype.is_video(file_path):
-                file_type = "vid"
+                location = build.video
             elif filetype.is_audio(file_path):
-                file_type = "aud"
+                location = build.audion
 
-            if file_type:
-                shutil.copyfile(file_path, build_path / file_type / filename)
+            if location:
+                location.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(file_path, location / filename)
                 media[mood].append(filename)
             else:
                 logging.warning(f"{file_path} is not an image, video, or audio file")
 
-    write_json(media, build_path / "media.json")
+    write_json(media, build.media)
     return set(media.keys())
 
 
-def make_subliminals(source_path: Path, build_path: Path) -> None:
-    subliminal_path = source_path / "subliminals"
-    if not os.path.isdir(subliminal_path):
+def make_subliminals(source: Source, build: Build) -> None:
+    if not source.subliminals.is_dir():
         return
 
-    subliminals = os.listdir(subliminal_path)
+    subliminals = os.listdir(source.subliminals)
     if len(subliminals) == 0:
         logging.warning("Subliminals directory exists, but it is empty")
+        return
 
     logging.info("Copying subliminals")
-    os.makedirs(build_path / "subliminals", exist_ok=True)
+    build.subliminals.mkdir(parents=True, exist_ok=True)
     for filename in subliminals:
-        file_path = subliminal_path / filename
+        file_path = source.subliminals / filename
         if filetype.is_image(file_path):
-            shutil.copyfile(file_path, build_path / "subliminals" / filename)
+            shutil.copyfile(file_path, build.subliminals / filename)
         else:
             logging.warning(f"{file_path} is not an image")
 
 
-def make_wallpapers(source_path: Path, build_path: Path) -> None:
-    wallpaper_path = source_path / "wallpapers"
-
-    if not os.path.isdir(wallpaper_path):
-        logging.warning(f"{wallpaper_path} does not exist or is not a directory")
+def make_wallpapers(source: Source, build: Build) -> None:
+    if not source.wallpapers.is_dir():
+        logging.warning(f"{source.wallpapers} does not exist or is not a directory")
         return
 
-    wallpapers = os.listdir(wallpaper_path)
+    wallpapers = os.listdir(source.wallpapers)
     if len(wallpapers) == 0:
         logging.warning("Wallpaper directory exists, but it is empty")
         return
@@ -115,10 +155,10 @@ def make_wallpapers(source_path: Path, build_path: Path) -> None:
     logging.info("Copying wallpapers")
     default_found = False
     for filename in wallpapers:
-        file_path = wallpaper_path / filename
+        file_path = source.wallpapers / filename
         default_found = default_found or filename == "wallpaper.png"
         if filetype.is_image(file_path):
-            shutil.copyfile(file_path, build_path / filename)
+            shutil.copyfile(file_path, build.root / filename)
         else:
             logging.warning(f"{file_path} is not an image")
 
@@ -126,23 +166,21 @@ def make_wallpapers(source_path: Path, build_path: Path) -> None:
         logging.warning("No default wallpaper.png found")
 
 
-def make_icon(source_path: Path, build_path: Path) -> None:
-    icon_path = source_path / "icon.ico"
-    if not os.path.exists(icon_path):
+def make_icon(source: Source, build: Build) -> None:
+    if not os.path.exists(source.icon):
         return
 
-    if filetype.is_image(icon_path):
+    if filetype.is_image(source.icon):
         logging.info("Copying icon")
-        shutil.copyfile(icon_path, build_path / "icon.ico")
+        shutil.copyfile(source.icon, build.icon)
     else:
-        logging.warning(f"{icon_path} is not an image")
+        logging.warning(f"{source.icon} is not an image")
 
 
-def make_loading_splash(source_path: Path, build_path: Path) -> None:
+def make_loading_splash(source: Source, build: Build) -> None:
     loading_splash_found = False
-    for extension in ["png", "gif", "jpg", "jpeg", "bmp"]:
-        filename = f"loading_splash.{extension}"
-        loading_splash_path = source_path / filename
+    for extension in [".png", ".gif", ".jpg", ".jpeg", ".bmp"]:
+        loading_splash_path = source.splash.with_suffix(extension)
         if not os.path.exists(loading_splash_path):
             continue
 
@@ -152,13 +190,13 @@ def make_loading_splash(source_path: Path, build_path: Path) -> None:
 
         if filetype.is_image(loading_splash_path):
             logging.info("Copying loading splash")
-            shutil.copyfile(loading_splash_path, build_path / filename)
+            shutil.copyfile(loading_splash_path, build.splash.with_suffix(extension))
             loading_splash_found = True
         else:
             logging.warning(f"{loading_splash_path} is not an image")
 
 
-def make_info(pack: yaml.Node, build_path: Path) -> None:
+def make_info(pack: yaml.Node, build: Build) -> None:
     if not pack["info"]["generate"]:
         logging.info("Skipping info.json")
         return
@@ -184,22 +222,22 @@ def make_info(pack: yaml.Node, build_path: Path) -> None:
         "description": pack["info"]["description"].strip(),
     }
 
-    write_json(info, build_path / "info.json")
+    write_json(info, build.info)
 
 
-def make_discord(pack: yaml.Node, build_path: Path) -> None:
+def make_discord(pack: yaml.Node, build: Build) -> None:
     if not pack["discord"]["generate"]:
         logging.info("Skipping discord.dat")
         return
 
     Schema({"generate": bool, "status": str}, required=True, extra=ALLOW_EXTRA)(pack["discord"])
 
-    with open(build_path / "discord.dat", "w") as f:
+    with open(build.discord, "w") as f:
         logging.info("Writing discord.dat")
         f.write(pack["discord"]["status"])
 
 
-def make_captions(pack: yaml.Node, build_path: Path) -> None:
+def make_captions(pack: yaml.Node, build: Build) -> None:
     if not pack["captions"]["generate"]:
         logging.info("Skipping captions.json")
         return
@@ -249,10 +287,10 @@ def make_captions(pack: yaml.Node, build_path: Path) -> None:
             if prefix_settings:
                 captions["prefix_settings"][prefix_name] = prefix_settings
 
-    write_json(captions, build_path / "captions.json")
+    write_json(captions, build.captions)
 
 
-def make_prompt(pack: yaml.Node, build_path: Path) -> None:
+def make_prompt(pack: yaml.Node, build: Build) -> None:
     if not pack["prompt"]["generate"]:
         logging.info("Skipping prompt.json")
         return
@@ -305,10 +343,10 @@ def make_prompt(pack: yaml.Node, build_path: Path) -> None:
             prompt["freqList"].append(mood["weight"])
             prompt[mood_name] = mood["prompts"]
 
-    write_json(prompt, build_path / "prompt.json")
+    write_json(prompt, build.prompt)
 
 
-def make_web(pack: yaml.Node, build_path: Path) -> None:
+def make_web(pack: yaml.Node, build: Build) -> None:
     if not pack["web"]["generate"]:
         logging.info("Skipping web.json")
         return
@@ -340,10 +378,10 @@ def make_web(pack: yaml.Node, build_path: Path) -> None:
 
         web["args"].append(args_string)
 
-    write_json(web, build_path / "web.json")
+    write_json(web, build.web)
 
 
-def make_corruption(pack: yaml.Node, build_path: Path, moods: set[str]) -> None:
+def make_corruption(pack: yaml.Node, build: Build, moods: set[str]) -> None:
     if not pack["corruption"]["generate"]:
         logging.info("Skipping corruption.json")
         return
@@ -397,7 +435,7 @@ def make_corruption(pack: yaml.Node, build_path: Path, moods: set[str]) -> None:
         if "config" in level:
             corruption["config"][n] = level["config"]
 
-    write_json(corruption, build_path / "corruption.json")
+    write_json(corruption, build.corruption)
 
 
 # TODO: config.json
@@ -412,45 +450,41 @@ def main() -> None:
 
     logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
-    root = Path(__file__).parent
-    source_path = root / args.source
+    source = Source(args.source)
+    build = Build(args.output)
+
     if args.new:
-        if os.path.exists(source_path):
-            logging.error(f"{source_path} already exists")
+        if source.root.exists():
+            logging.error(f"{source.root} already exists")
         else:
-            os.makedirs(source_path / "media" / "default", exist_ok=True)
-            os.makedirs(source_path / "subliminals", exist_ok=True)
-            os.makedirs(source_path / "wallpapers", exist_ok=True)
-            shutil.copyfile(root / "default_pack.yml", source_path / "pack.yml")
+            (source.media / "default").mkdir(parents=True, exist_ok=True)
+            source.subliminals.mkdir(parents=True, exist_ok=True)
+            source.wallpapers.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(DEFAULT_PACK, source.pack)
 
-            logging.info(f"Created a template for a new pack at {source_path}")
+            logging.info(f"Created a template for a new pack at {source.root}")
 
         sys.exit()
-    elif not os.path.isdir(source_path):
-        logging.error(f"{source_path} does not exist or is not a direcory")
+    elif not source.root.is_dir():
+        logging.error(f"{source.root} does not exist or is not a direcory")
         sys.exit()
-
-    build_path = root / args.output
 
     try:
-        os.makedirs(build_path / "img", exist_ok=True)
-        os.makedirs(build_path / "vid", exist_ok=True)
-        os.makedirs(build_path / "aud", exist_ok=True)
+        build.root.mkdir(parents=True, exist_ok=True)
+        moods = make_media(source, build)
+        make_subliminals(source, build)
+        make_wallpapers(source, build)
+        make_icon(source, build)
+        make_loading_splash(source, build)
 
-        moods = make_media(source_path, build_path)
-        make_subliminals(source_path, build_path)
-        make_wallpapers(source_path, build_path)
-        make_icon(source_path, build_path)
-        make_loading_splash(source_path, build_path)
-
-        with open(source_path / "pack.yml", "r") as f:
+        with open(source.pack, "r") as f:
             pack = yaml.safe_load(f)
-            make_info(pack, build_path)
-            make_discord(pack, build_path)
-            make_captions(pack, build_path)
-            make_prompt(pack, build_path)
-            make_web(pack, build_path)
-            make_corruption(pack, build_path, moods)
+            make_info(pack, build)
+            make_discord(pack, build)
+            make_captions(pack, build)
+            make_prompt(pack, build)
+            make_web(pack, build)
+            make_corruption(pack, build, moods)
     except Exception as e:
         logging.error(e)
 
