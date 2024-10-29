@@ -1,3 +1,4 @@
 filetype
 pyyaml
+ruamel.yaml
 voluptuous

@@ -1,5 +1,5 @@
 # DO NOT CHANGE THIS VALUE UNLESS YOU KNOW WHAT YOU'RE DOING!
-format: "1.0"
+format: "1.1"
 
 info:
   # Generate info.json, true or false.
@@ -35,10 +35,25 @@ captions:
   # Text for the close button of a popup window.
   close-text: "Close"
 
+  # List of captions used in denial overlays. (Optional, leave the list empty
+  # to not use)
+  denial:
+    - "Denied"
+
   # List of generic captions without a prefix.
   default-captions:
     - "Caption 1"
     - "Caption 2"
+
+  # List of captions used in subliminal message popups. (Optional, leave the
+  # list empty to not use)
+  subliminal-messages:
+    - "Subliminal message"
+
+  # List of captions used in system notifications. (Optional, leave the list
+  # empty to not use)
+  notifications:
+    - "Notification"
 
   # List of caption prefixes, or "moods," to display particular captions on
   # particular images. For example, the captions under a prefix with the name
@@ -67,6 +82,10 @@ captions:
 prompt:
   # Generate prompt.json, true or false.
   generate: true
+
+  # Text for the command at the top of prompt windows. (Optional, leave empty
+  # to not use)
+  command: "Type below"
 
   # Text for the submit button of a prompt window.
   submit-text: "Submit"

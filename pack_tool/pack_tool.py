@@ -19,11 +19,15 @@ import logging
 import os
 import shutil
 import sys
+import time
 from pathlib import Path
 
 import filetype
 import yaml
+from ruamel.yaml import YAML
 from voluptuous import ALLOW_EXTRA, All, Optional, Range, Schema, Union, Url
+
+CURRENT_FORMAT = "1.1"
 
 PATH = Path(__file__).parent
 DEFAULT_PACK = PATH / "default_pack.yml"
@@ -246,7 +250,10 @@ def make_captions(pack: yaml.Node, build: Build) -> None:
         {
             "generate": bool,
             "close-text": str,
+            "denial": Union([str], None),
             "default-captions": [str],
+            "subliminal-messages": Union([str], None),
+            "notifications": Union([str], None),
             "prefixes": Union(
                 [
                     {
@@ -269,6 +276,18 @@ def make_captions(pack: yaml.Node, build: Build) -> None:
         "prefix": [],
         "prefix_settings": {},
     }
+
+    denial = pack["captions"]["denial"]
+    if denial:
+        captions["denial"] = denial
+
+    subliminal_messages = pack["captions"]["subliminal-messages"]
+    if subliminal_messages:
+        captions["subliminals"] = subliminal_messages
+
+    notifications = pack["captions"]["notifications"]
+    if notifications:
+        captions["notifications"] = notifications
 
     prefixes = pack["captions"]["prefixes"]
     if prefixes:
@@ -298,6 +317,7 @@ def make_prompt(pack: yaml.Node, build: Build) -> None:
     Schema(
         {
             "generate": bool,
+            "command": Union(str, None),
             "submit-text": str,
             "minimum-length": All(int, Range(min=1)),
             "maximum-length": All(int, Range(min=pack["prompt"]["minimum-length"])),
@@ -327,6 +347,10 @@ def make_prompt(pack: yaml.Node, build: Build) -> None:
         "moods": [],
         "freqList": [],
     }
+
+    command = pack["prompt"]["command"]
+    if command:
+        prompt["commandtext"] = command
 
     default = pack["prompt"]["default-prompts"]
     if default["prompts"]:
@@ -441,11 +465,76 @@ def make_corruption(pack: yaml.Node, build: Build, moods: set[str]) -> None:
 # TODO: config.json
 
 
+def new_pack(source: Source) -> None:
+    if source.root.exists():
+        logging.error(f"{source.root} already exists")
+    else:
+        (source.media / "default").mkdir(parents=True, exist_ok=True)
+        source.subliminals.mkdir(parents=True, exist_ok=True)
+        source.wallpapers.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(DEFAULT_PACK, source.pack)
+
+        logging.info(f"Created a template for a new pack at {source.root}")
+
+    sys.exit()
+
+
+def upgrade_pack(source: Source) -> None:
+    current_time = time.asctime().replace(" ", "_").replace(":", "-")
+    backup = source.pack.with_suffix(f".yml.{current_time}.bak")
+    shutil.copyfile(source.pack, backup)
+    logging.info(f"Created a backup {backup.name} of pack.yml")
+
+    with open(DEFAULT_PACK, "r") as default_f, open(source.pack, "r") as pack_f:
+        ruamel_yaml = YAML()
+        ruamel_yaml.indent(mapping=2, sequence=4, offset=2)
+        ruamel_yaml.preserve_quotes = True
+
+        upgrade = ruamel_yaml.load(default_f)
+        original = ruamel_yaml.load(pack_f)
+
+        for a in original:
+            if a == "format":
+                continue
+
+            for b in original[a]:
+                if a == "prompt" and b == "default-prompts":
+                    for c in original[a][b]:
+                        upgrade[a][b][c] = original[a][b][c]
+                else:
+                    upgrade[a][b] = original[a][b]
+
+        ruamel_yaml.dump(upgrade, source.pack)
+
+    logging.info(f"Pack format upgraded to {CURRENT_FORMAT}, but some comments may be incorrect, please check default_pack.yml for correct comments")
+    sys.exit()
+
+
+def check_version(source: Source) -> None:
+    with open(source.pack, "r") as f:
+        pack = yaml.safe_load(f)
+
+        format = pack["format"]
+        major, minor = format.split(".")
+        current_major, current_minor = CURRENT_FORMAT.split(".")
+
+        if current_major < major or current_minor < minor:
+            logging.error(f"Your pack's format {format} is not supported by this version of Pack Tool, please upgrade Pack Tool to the newest version")
+            sys.exit()
+
+        if current_major > major or current_minor > minor:
+            logging.info(
+                f"Your pack's format {format} is outdated (current version is {CURRENT_FORMAT}), please run Pack Tool again with the -u flag to upgrade your pack"
+            )
+            sys.exit()
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("source", help="pack source directory")
     parser.add_argument("-o", "--output", default="build", help="output directory name")
     parser.add_argument("-n", "--new", action="store_true", help="create a new pack template and exit")
+    parser.add_argument("-u", "--upgrade", action="store_true", help="upgrades an outdated pack format")
     args = parser.parse_args()
 
     logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
@@ -454,20 +543,15 @@ def main() -> None:
     build = Build(args.output)
 
     if args.new:
-        if source.root.exists():
-            logging.error(f"{source.root} already exists")
-        else:
-            (source.media / "default").mkdir(parents=True, exist_ok=True)
-            source.subliminals.mkdir(parents=True, exist_ok=True)
-            source.wallpapers.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(DEFAULT_PACK, source.pack)
-
-            logging.info(f"Created a template for a new pack at {source.root}")
-
-        sys.exit()
+        new_pack(source)
     elif not source.root.is_dir():
         logging.error(f"{source.root} does not exist or is not a direcory")
         sys.exit()
+
+    if args.upgrade:
+        upgrade_pack(source)
+
+    check_version(source)
 
     try:
         build.root.mkdir(parents=True, exist_ok=True)
