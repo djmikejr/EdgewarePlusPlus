@@ -19,56 +19,12 @@ import logging
 import os
 import shutil
 import sys
-import time
 from pathlib import Path
 
 import filetype
 import yaml
-from voluptuous import ALLOW_EXTRA, All, Optional, Range, Schema, Union, Url
-
-CURRENT_FORMAT = "1.1"
-
-PATH = Path(__file__).parent
-DEFAULT_PACK = PATH / "default_pack.yml"
-
-
-class Source:
-    def __init__(self, root: str):
-        self.root = PATH / root
-
-        # Directories
-        self.media = self.root / "media"
-        self.subliminals = self.root / "subliminals"
-        self.wallpapers = self.root / "wallpapers"
-
-        # Files
-        self.icon = self.root / "icon.ico"
-        self.pack = self.root / "pack.yml"
-        self.splash = self.root / "loading_splash"
-
-
-class Build:
-    def __init__(self, root: str):
-        self.root = PATH / root
-
-        # Directories
-        self.audio = self.root / "aud"
-        self.image = self.root / "img"
-        self.subliminals = self.root / "subliminals"
-        self.video = self.root / "vid"
-
-        # Files
-        self.captions = self.root / "captions.json"
-        self.config = self.root / "config.json"
-        self.corruption = self.root / "corruption.json"
-        self.discord = self.root / "discord.dat"
-        self.icon = self.root / "icon.ico"
-        self.info = self.root / "info.json"
-        self.splash = self.root / "loading_splash"
-        self.media = self.root / "media.json"
-        self.prompt = self.root / "prompt.json"
-        self.wallpaper = self.root / "wallpaper.png"
-        self.web = self.root / "web.json"
+from paths import DEFAULT_PACK, Build, Source
+from schemas import Schemas
 
 
 def write_json(data: dict, path: Path) -> None:
@@ -113,7 +69,7 @@ def make_media(source: Source, build: Build) -> set[str]:
             elif filetype.is_video(file_path):
                 location = build.video
             elif filetype.is_audio(file_path):
-                location = build.audion
+                location = build.audio
 
             if location:
                 location.mkdir(parents=True, exist_ok=True)
@@ -204,18 +160,7 @@ def make_info(pack: yaml.Node, build: Build) -> None:
         logging.info("Skipping info.json")
         return
 
-    Schema(
-        {
-            "generate": bool,
-            "name": str,
-            "id": str,
-            "creator": str,
-            "version": str,
-            "description": str,
-        },
-        required=True,
-        extra=ALLOW_EXTRA,
-    )(pack["info"])
+    Schemas.INFO(pack["info"])
 
     info = {
         "name": pack["info"]["name"],
@@ -233,7 +178,7 @@ def make_discord(pack: yaml.Node, build: Build) -> None:
         logging.info("Skipping discord.dat")
         return
 
-    Schema({"generate": bool, "status": str}, required=True, extra=ALLOW_EXTRA)(pack["discord"])
+    Schemas.DISCORD(pack["discord"])
 
     with open(build.discord, "w") as f:
         logging.info("Writing discord.dat")
@@ -245,29 +190,7 @@ def make_captions(pack: yaml.Node, build: Build) -> None:
         logging.info("Skipping captions.json")
         return
 
-    Schema(
-        {
-            "generate": bool,
-            "close-text": str,
-            Optional("denial"): Union([str], None),
-            "default-captions": [str],
-            Optional("subliminal-messages"): Union([str], None),
-            Optional("notifications"): Union([str], None),
-            "prefixes": Union(
-                [
-                    {
-                        "name": str,
-                        Optional("chance"): All(Union(int, float), Range(min=0, max=100)),
-                        Optional("max-clicks"): All(int, Range(min=1)),
-                        "captions": [str],
-                    }
-                ],
-                None,
-            ),
-        },
-        required=True,
-        extra=ALLOW_EXTRA,
-    )(pack["captions"])
+    Schemas.CAPTION(pack["captions"])
 
     captions = {
         "subtext": pack["captions"]["close-text"],
@@ -313,31 +236,7 @@ def make_prompt(pack: yaml.Node, build: Build) -> None:
         logging.info("Skipping prompt.json")
         return
 
-    Schema(
-        {
-            "generate": bool,
-            Optional("command"): Union(str, None),
-            "submit-text": str,
-            "minimum-length": All(int, Range(min=1)),
-            "maximum-length": All(int, Range(min=pack["prompt"]["minimum-length"])),
-            "default-prompts": {
-                "weight": All(int, Range(min=0)),
-                "prompts": Union([str], None),
-            },
-            "moods": Union(
-                [
-                    {
-                        "name": str,
-                        "weight": All(int, Range(min=0)),
-                        "prompts": [str],
-                    }
-                ],
-                None,
-            ),
-        },
-        required=True,
-        extra=ALLOW_EXTRA,
-    )(pack["prompt"])
+    Schemas.PROMPT(pack["prompt"])
 
     prompt = {
         "subtext": pack["prompt"]["submit-text"],
@@ -374,14 +273,7 @@ def make_web(pack: yaml.Node, build: Build) -> None:
         logging.info("Skipping web.json")
         return
 
-    Schema(
-        {
-            "generate": bool,
-            "urls": [{"url": Url(), "mood": str, Optional("args"): [str]}],
-        },
-        required=True,
-        extra=ALLOW_EXTRA,
-    )(pack["web"])
+    Schemas.WEB(pack["web"])
 
     web = {"urls": [], "moods": [], "args": []}
 
@@ -409,21 +301,7 @@ def make_corruption(pack: yaml.Node, build: Build, moods: set[str]) -> None:
         logging.info("Skipping corruption.json")
         return
 
-    Schema(
-        {
-            "generate": bool,
-            "levels": [
-                {
-                    Optional("add-moods"): [str],
-                    Optional("remove-moods"): [str],
-                    Optional("wallpaper"): str,
-                    Optional("config"): dict,
-                }
-            ],
-        },
-        required=True,
-        extra=ALLOW_EXTRA,
-    )(pack["corruption"])
+    Schemas.CORRUPTION(pack["corruption"])
 
     corruption = {"moods": {}, "wallpapers": {}, "config": {}}
 
