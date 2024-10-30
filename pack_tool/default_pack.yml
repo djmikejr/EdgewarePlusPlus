@@ -1,6 +1,3 @@
-# DO NOT CHANGE THIS VALUE UNLESS YOU KNOW WHAT YOU'RE DOING!
-format: "1.1"
-
 info:
   # Generate info.json, true or false.
   generate: true

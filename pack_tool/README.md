@@ -53,17 +53,3 @@ Optionally, you may also specify another output directory:
 ```
 $ python3 pack_tool.py -o my_pack_build my_pack
 ```
-
-## Upgrading packs
-
-When the pack format has been updated with new features, you may get a message
-that your pack's format is outdated. When this happens, run the following
-command to upgrade your pack:
-
-```
-$ python3 pack_tool.py -u my_pack
-```
-
-The upgrade copies all of the changes from your `pack.yml` to the new
-`default_pack.yml`, however some comments may display incorrectly or be lost in
-the upgraded `pack.yml`.
