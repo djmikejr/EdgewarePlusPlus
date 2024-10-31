@@ -6,14 +6,12 @@ echo What would you like to run?
 echo 1: PackTool Setup (first time user? Start here!)
 echo 2: Create New Pack
 echo 3: Finish Pack (compile and build)
-echo 4: Upgrade Pack (when your pack is outdated)
-echo 5: Exit
+echo 4: Exit
 set /p usrSelect=Select number:
 if %usrSelect%==1 goto ptSetup
 if %usrSelect%==2 goto ptCreate
 if %usrSelect%==3 goto ptCompile
-if %usrSelect%==4 goto ptUpgrade
-if %usrSelect%==5 goto ptQuit
+if %usrSelect%==4 goto ptQuit
 echo Must enter selection number (1, 2, 3, 4)
 pause
 goto top
@@ -39,7 +37,7 @@ echo in newer updates, it might help to use this again in case there are new dep
 pause
 goto top
 :ptCreate
-echo What do you want to name your pack's directory?
+echo What do you want to name your pack's directory? 
 echo (use valid filename characters, with underscores instead of spaces!)
 set /p packName=Directory Name:
 pack_tool.py -n "%packName%"
@@ -69,12 +67,6 @@ pack_tool.py "%compileName%"
 echo Done.
 pause
 goto top
-:ptUpgrade
-echo What pack would you like to upgrade?
-set /p packName=Directory Name:
-pack_tool.py -u "%packName%"
-echo Done.
-pause
 :ptQuit
 echo Goodbye!
 pause

@@ -19,59 +19,15 @@ import logging
 import os
 import shutil
 import sys
-import time
 from pathlib import Path
 
 import filetype
 import yaml
-from ruamel.yaml import YAML
-from voluptuous import ALLOW_EXTRA, All, Optional, Range, Schema, Union, Url
+from paths import DEFAULT_PACK, Build, Source
+from schemas import Schemas
 from pyffmpeg import FFmpeg
 
-CURRENT_FORMAT = "1.1"
-
 PATH = Path(__file__).parent
-DEFAULT_PACK = PATH / "default_pack.yml"
-
-
-class Source:
-    def __init__(self, root: str):
-        self.root = PATH / root
-
-        # Directories
-        self.media = self.root / "media"
-        self.subliminals = self.root / "subliminals"
-        self.wallpapers = self.root / "wallpapers"
-
-        # Files
-        self.icon = self.root / "icon.ico"
-        self.pack = self.root / "pack.yml"
-        self.splash = self.root / "loading_splash"
-
-
-class Build:
-    def __init__(self, root: str):
-        self.root = PATH / root
-
-        # Directories
-        self.audio = self.root / "aud"
-        self.image = self.root / "img"
-        self.subliminals = self.root / "subliminals"
-        self.video = self.root / "vid"
-
-        # Files
-        self.captions = self.root / "captions.json"
-        self.config = self.root / "config.json"
-        self.corruption = self.root / "corruption.json"
-        self.discord = self.root / "discord.dat"
-        self.icon = self.root / "icon.ico"
-        self.info = self.root / "info.json"
-        self.splash = self.root / "loading_splash"
-        self.media = self.root / "media.json"
-        self.prompt = self.root / "prompt.json"
-        self.wallpaper = self.root / "wallpaper.png"
-        self.web = self.root / "web.json"
-
 
 def write_json(data: dict, path: Path) -> None:
     logging.info(f"Writing {path.name}")
@@ -115,7 +71,7 @@ def make_media(source: Source, build: Build) -> set[str]:
             elif filetype.is_video(file_path):
                 location = build.video
             elif filetype.is_audio(file_path):
-                location = build.audion
+                location = build.audio
 
             if location:
                 location.mkdir(parents=True, exist_ok=True)
@@ -206,18 +162,7 @@ def make_info(pack: yaml.Node, build: Build) -> None:
         logging.info("Skipping info.json")
         return
 
-    Schema(
-        {
-            "generate": bool,
-            "name": str,
-            "id": str,
-            "creator": str,
-            "version": str,
-            "description": str,
-        },
-        required=True,
-        extra=ALLOW_EXTRA,
-    )(pack["info"])
+    Schemas.INFO(pack["info"])
 
     info = {
         "name": pack["info"]["name"],
@@ -235,7 +180,7 @@ def make_discord(pack: yaml.Node, build: Build) -> None:
         logging.info("Skipping discord.dat")
         return
 
-    Schema({"generate": bool, "status": str}, required=True, extra=ALLOW_EXTRA)(pack["discord"])
+    Schemas.DISCORD(pack["discord"])
 
     with open(build.discord, "w") as f:
         logging.info("Writing discord.dat")
@@ -247,29 +192,7 @@ def make_captions(pack: yaml.Node, build: Build) -> None:
         logging.info("Skipping captions.json")
         return
 
-    Schema(
-        {
-            "generate": bool,
-            "close-text": str,
-            "denial": Union([str], None),
-            "default-captions": [str],
-            "subliminal-messages": Union([str], None),
-            "notifications": Union([str], None),
-            "prefixes": Union(
-                [
-                    {
-                        "name": str,
-                        Optional("chance"): All(Union(int, float), Range(min=0, max=100)),
-                        Optional("max-clicks"): All(int, Range(min=1)),
-                        "captions": [str],
-                    }
-                ],
-                None,
-            ),
-        },
-        required=True,
-        extra=ALLOW_EXTRA,
-    )(pack["captions"])
+    Schemas.CAPTION(pack["captions"])
 
     captions = {
         "subtext": pack["captions"]["close-text"],
@@ -278,15 +201,15 @@ def make_captions(pack: yaml.Node, build: Build) -> None:
         "prefix_settings": {},
     }
 
-    denial = pack["captions"]["denial"]
+    denial = pack["captions"].get("denial", None)
     if denial:
         captions["denial"] = denial
 
-    subliminal_messages = pack["captions"]["subliminal-messages"]
+    subliminal_messages = pack["captions"].get("subliminal-messages", None)
     if subliminal_messages:
         captions["subliminals"] = subliminal_messages
 
-    notifications = pack["captions"]["notifications"]
+    notifications = pack["captions"].get("notifications", None)
     if notifications:
         captions["notifications"] = notifications
 
@@ -315,31 +238,7 @@ def make_prompt(pack: yaml.Node, build: Build) -> None:
         logging.info("Skipping prompt.json")
         return
 
-    Schema(
-        {
-            "generate": bool,
-            "command": Union(str, None),
-            "submit-text": str,
-            "minimum-length": All(int, Range(min=1)),
-            "maximum-length": All(int, Range(min=pack["prompt"]["minimum-length"])),
-            "default-prompts": {
-                "weight": All(int, Range(min=0)),
-                "prompts": Union([str], None),
-            },
-            "moods": Union(
-                [
-                    {
-                        "name": str,
-                        "weight": All(int, Range(min=0)),
-                        "prompts": [str],
-                    }
-                ],
-                None,
-            ),
-        },
-        required=True,
-        extra=ALLOW_EXTRA,
-    )(pack["prompt"])
+    Schemas.PROMPT(pack["prompt"])
 
     prompt = {
         "subtext": pack["prompt"]["submit-text"],
@@ -349,7 +248,7 @@ def make_prompt(pack: yaml.Node, build: Build) -> None:
         "freqList": [],
     }
 
-    command = pack["prompt"]["command"]
+    command = pack["prompt"].get("command", None)
     if command:
         prompt["commandtext"] = command
 
@@ -376,14 +275,7 @@ def make_web(pack: yaml.Node, build: Build) -> None:
         logging.info("Skipping web.json")
         return
 
-    Schema(
-        {
-            "generate": bool,
-            "urls": [{"url": Url(), "mood": str, Optional("args"): [str]}],
-        },
-        required=True,
-        extra=ALLOW_EXTRA,
-    )(pack["web"])
+    Schemas.WEB(pack["web"])
 
     web = {"urls": [], "moods": [], "args": []}
 
@@ -411,21 +303,7 @@ def make_corruption(pack: yaml.Node, build: Build, moods: set[str]) -> None:
         logging.info("Skipping corruption.json")
         return
 
-    Schema(
-        {
-            "generate": bool,
-            "levels": [
-                {
-                    Optional("add-moods"): [str],
-                    Optional("remove-moods"): [str],
-                    Optional("wallpaper"): str,
-                    Optional("config"): dict,
-                }
-            ],
-        },
-        required=True,
-        extra=ALLOW_EXTRA,
-    )(pack["corruption"])
+    Schemas.CORRUPTION(pack["corruption"])
 
     corruption = {"moods": {}, "wallpapers": {}, "config": {}}
 
@@ -479,74 +357,24 @@ def new_pack(source: Source) -> None:
 
     sys.exit()
 
-
-def upgrade_pack(source: Source) -> None:
-    current_time = time.asctime().replace(" ", "_").replace(":", "-")
-    backup = source.pack.with_suffix(f".yml.{current_time}.bak")
-    shutil.copyfile(source.pack, backup)
-    logging.info(f"Created a backup {backup.name} of pack.yml")
-
-    with open(DEFAULT_PACK, "r") as default_f, open(source.pack, "r") as pack_f:
-        ruamel_yaml = YAML()
-        ruamel_yaml.indent(mapping=2, sequence=4, offset=2)
-        ruamel_yaml.preserve_quotes = True
-
-        upgrade = ruamel_yaml.load(default_f)
-        original = ruamel_yaml.load(pack_f)
-
-        for a in original:
-            if a == "format":
-                continue
-
-            for b in original[a]:
-                if a == "prompt" and b == "default-prompts":
-                    for c in original[a][b]:
-                        upgrade[a][b][c] = original[a][b][c]
-                else:
-                    upgrade[a][b] = original[a][b]
-
-        ruamel_yaml.dump(upgrade, source.pack)
-
-    logging.info(f"Pack format upgraded to {CURRENT_FORMAT}, but some comments may be incorrect, please check default_pack.yml for correct comments")
-    sys.exit()
-
 def compress_videos(source: Source) -> None:
-    #ff = FFmpeg()
+    ff = FFmpeg()
     with open(source.pack, "r") as f:
         compress_count = 0
         for root, dirs, files in os.walk(PATH):
             for file in files:
-                if file.endswith('.mp4'):
-                    vid = os.path.join(root, file)
-                    relative_path = os.path.relpath(vid, PATH)
-                    #ff.options(f"-i {vid} -vcodec libx265 -crf 30 {vid}")
-                    print(relative_path)
-
-def check_version(source: Source) -> None:
-    with open(source.pack, "r") as f:
-        pack = yaml.safe_load(f)
-
-        format = pack["format"]
-        major, minor = format.split(".")
-        current_major, current_minor = CURRENT_FORMAT.split(".")
-
-        if current_major < major or current_minor < minor:
-            logging.error(f"Your pack's format {format} is not supported by this version of Pack Tool, please upgrade Pack Tool to the newest version")
-            sys.exit()
-
-        if current_major > major or current_minor > minor:
-            logging.info(
-                f"Your pack's format {format} is outdated (current version is {CURRENT_FORMAT}), please run Pack Tool again with the -u flag to upgrade your pack"
-            )
-            sys.exit()
-
+                if file.endswith(".mp4"):
+                    relative_path = os.path.relpath(os.path.join(root, file), PATH)
+                    temp_path = os.path.relpath(os.path.join(root, "tmp_" + file), PATH)
+                    ff.options(f"-i {relative_path} -vcodec libx265 -crf 30 {temp_path}")
+                    os.replace(temp_path, relative_path)
+                    #print(relative_path)
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("source", help="pack source directory")
     parser.add_argument("-o", "--output", default="build", help="output directory name")
     parser.add_argument("-n", "--new", action="store_true", help="create a new pack template and exit")
-    parser.add_argument("-u", "--upgrade", action="store_true", help="upgrades an outdated pack format")
     parser.add_argument("-c", "--compress", action="store_true", help="compresses video files using ffmpeg")
     args = parser.parse_args()
 
@@ -561,14 +389,8 @@ def main() -> None:
         logging.error(f"{source.root} does not exist or is not a direcory")
         sys.exit()
 
-    if args.upgrade:
-        upgrade_pack(source)
-
     if args.compress:
         compress_videos(source)
-
-    check_version(source)
-
     try:
         build.root.mkdir(parents=True, exist_ok=True)
         moods = make_media(source, build)
