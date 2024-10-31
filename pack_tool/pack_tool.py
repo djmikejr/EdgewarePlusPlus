@@ -35,7 +35,7 @@ def write_json(data: dict, path: Path) -> None:
         json.dump(data, f)
 
 
-def make_media(source: Source, build: Build) -> set[str]:
+def make_media(source: Source, build: Build, compress: bool) -> set[str]:
     """Returns a set of existing, valid moods"""
 
     media = {}
@@ -75,7 +75,11 @@ def make_media(source: Source, build: Build) -> set[str]:
 
             if location:
                 location.mkdir(parents=True, exist_ok=True)
-                shutil.copyfile(file_path, location / filename)
+                #can remove the endswith once we support more filetypes for compression
+                if compress and filetype.is_video(file_path) and filename.endswith(".mp4"):
+                    compress_videos(file_path, location, filename)
+                else:
+                    shutil.copyfile(file_path, location / filename)
                 media[mood].append(filename)
             else:
                 logging.warning(f"{file_path} is not an image, video, or audio file")
@@ -83,6 +87,17 @@ def make_media(source: Source, build: Build) -> set[str]:
     write_json(media, build.media)
     return set(media.keys())
 
+def compress_videos(file_path: str, location: str, filename: str) -> None:
+    ff = FFmpeg()
+    if filename.endswith(".mp4"):
+        input_path = os.path.relpath(file_path, PATH)
+        output_path = os.path.relpath(os.path.join(location, filename), PATH)
+        try:
+            #if h265 causes issues, change (or add setting) back down to h264
+            ff.options(f"-i {input_path} -vcodec libx265 -crf 30 {output_path}")
+        except Exception as e:
+            print(f"Error compressing file. {e}")
+            logging.warning(f"Could not compress file. {e}")
 
 def make_subliminals(source: Source, build: Build) -> None:
     if not source.subliminals.is_dir():
@@ -357,17 +372,6 @@ def new_pack(source: Source) -> None:
 
     sys.exit()
 
-def compress_videos(source: Source) -> None:
-    ff = FFmpeg()
-    with open(source.pack, "r") as f:
-        compress_count = 0
-        for root, dirs, files in os.walk(PATH):
-            for file in files:
-                if file.endswith(".mp4"):
-                    relative_path = os.path.relpath(os.path.join(root, file), PATH)
-                    temp_path = os.path.relpath(os.path.join(root, "tmp_" + file), PATH)
-                    ff.options(f"-i {relative_path} -vcodec libx265 -crf 30 {temp_path}")
-                    os.replace(temp_path, relative_path)
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("source", help="pack source directory")
@@ -387,11 +391,9 @@ def main() -> None:
         logging.error(f"{source.root} does not exist or is not a direcory")
         sys.exit()
 
-    if args.compress:
-        compress_videos(source)
     try:
         build.root.mkdir(parents=True, exist_ok=True)
-        moods = make_media(source, build)
+        moods = make_media(source, build, args.compress)
         make_subliminals(source, build)
         make_wallpapers(source, build)
         make_icon(source, build)
