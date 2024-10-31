@@ -2,3 +2,4 @@ filetype
 pyyaml
 ruamel.yaml
 voluptuous
+pyffmpeg

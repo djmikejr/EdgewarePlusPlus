@@ -49,6 +49,22 @@ goto top
 :ptCompile
 echo What pack would you like to compile?
 set /p compileName=Directory Name:
+:ptCompress
+echo Do you want to compress video files with ffmpeg?
+echo 1: Yes
+echo 2: No
+set /p compressSelect=Select number:
+if %compressSelect%==1 goto pressYes
+if %compressSelect%==2 goto pressNo
+echo Must enter selection number (1, 2)
+pause
+goto ptCompress
+:pressYes
+pack_tool.py -c "%compileName%"
+echo Done.
+pause
+goto top
+:pressNo
 pack_tool.py "%compileName%"
 echo Done.
 pause

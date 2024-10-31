@@ -26,6 +26,7 @@ import filetype
 import yaml
 from ruamel.yaml import YAML
 from voluptuous import ALLOW_EXTRA, All, Optional, Range, Schema, Union, Url
+from pyffmpeg import FFmpeg
 
 CURRENT_FORMAT = "1.1"
 
@@ -509,6 +510,17 @@ def upgrade_pack(source: Source) -> None:
     logging.info(f"Pack format upgraded to {CURRENT_FORMAT}, but some comments may be incorrect, please check default_pack.yml for correct comments")
     sys.exit()
 
+def compress_videos(source: Source) -> None:
+    #ff = FFmpeg()
+    with open(source.pack, "r") as f:
+        compress_count = 0
+        for root, dirs, files in os.walk(PATH):
+            for file in files:
+                if file.endswith('.mp4'):
+                    vid = os.path.join(root, file)
+                    relative_path = os.path.relpath(vid, PATH)
+                    #ff.options(f"-i {vid} -vcodec libx265 -crf 30 {vid}")
+                    print(relative_path)
 
 def check_version(source: Source) -> None:
     with open(source.pack, "r") as f:
@@ -535,6 +547,7 @@ def main() -> None:
     parser.add_argument("-o", "--output", default="build", help="output directory name")
     parser.add_argument("-n", "--new", action="store_true", help="create a new pack template and exit")
     parser.add_argument("-u", "--upgrade", action="store_true", help="upgrades an outdated pack format")
+    parser.add_argument("-c", "--compress", action="store_true", help="compresses video files using ffmpeg")
     args = parser.parse_args()
 
     logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
@@ -550,6 +563,9 @@ def main() -> None:
 
     if args.upgrade:
         upgrade_pack(source)
+
+    if args.compress:
+        compress_videos(source)
 
     check_version(source)
 
