@@ -1,4 +1,4 @@
 filetype
+pyffmpeg
 pyyaml
 voluptuous
-pyffmpeg
