@@ -49,6 +49,7 @@ echo What pack would you like to compile?
 set /p compileName=Directory Name:
 :ptCompress
 echo Do you want to compress video files with ffmpeg?
+echo This will take some time, but may drastically reduce filesize.
 echo 1: Yes
 echo 2: No
 set /p compressSelect=Select number:

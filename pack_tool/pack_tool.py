@@ -368,8 +368,6 @@ def compress_videos(source: Source) -> None:
                     temp_path = os.path.relpath(os.path.join(root, "tmp_" + file), PATH)
                     ff.options(f"-i {relative_path} -vcodec libx265 -crf 30 {temp_path}")
                     os.replace(temp_path, relative_path)
-                    #print(relative_path)
-
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("source", help="pack source directory")
