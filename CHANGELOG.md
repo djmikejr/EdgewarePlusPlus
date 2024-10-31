@@ -17,6 +17,11 @@
 
 •*Audio now runs on pygame, allowing for various features to be used. Requires running edgeware setup to install new dependency*
 
+•*Pack creator tool has been expanded with more compatibility for features added since it's inclusion*
+
+•*Additionally, the pack creator has also been given the option to compress .mp4 files, asking you before you build your final project.*
+>Some notes on this: This will not overwrite your original files, and compresses the videos by converting them to a smaller h265 file. This file might not play on every media player as h265 is a newer format, but should hopefully be supported by VLC and most players. We will tweak this feature as feedback comes in, if many people have issues with it then I will see about adding an option for h264 or having it default to that instead. (If you're curious, h265 is used due to it being much smaller while still retaining most of it's video quality)
+
 **Version 13b**
 
 Hello everyone! The huge rewrite by LewdDevelopment is finally done (big round of applause)! This means lots of bugfixes and general stability improvements.... hopefully! I label this as a "beta" because due to both of us working on different platforms (araten windows/LewdDevelopment linux) there might be some huge OS-specific bugs that slipped through the cracks. These will be fixed as they are reported, but for the time being know that some temporary instability might occur. In the future however, it will hopefully be much smoother to use!
