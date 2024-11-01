@@ -89,14 +89,8 @@ def make_media(source: Source, build: Build, compress: bool) -> set[str]:
 
 def compress_videos(file_path: Path, location: Path) -> None:
     ff = FFmpeg()
-    print("-----------------------------", ff._ffmpeg_file)
     input_path = os.path.relpath(file_path, PATH)
     output_path = os.path.relpath(location / file_path.name, PATH)
-
-    import subprocess
-    subprocess.run(f'{ff._ffmpeg_file} -y -i "{file_path}" -vcodec libx265 -crf 30 "{location / file_path.name}"', shell=True)
-
-    return
     try:
         # if h265 causes issues, change (or add setting) back down to h264
         ff.options(f"-i {input_path} -vcodec libx265 -crf 30 {output_path}")
