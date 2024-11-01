@@ -15,7 +15,7 @@
 
 from pathlib import Path
 
-PATH = Path(__file__).parent
+PATH = Path(__file__).parent.parent
 DEFAULT_PACK = PATH / "default_pack.yml"
 
 
