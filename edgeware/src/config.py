@@ -102,6 +102,10 @@ AUDVID_PLAYBACK_TEXT = '"Pump-Scare Offset" is directly tied to the hibernate mo
 CAPTION_INTRO_TEXT = "Captions are small bits of randomly chosen text that adorn the top of each popup, and can be set by the pack creator. Many packs include captions, so don't be shy in trying them out!"
 CAPTION_ADV_TEXT = "These settings below will only work for compatible packs, but use captions to add new features. The first checks the caption's mood with the filename of the popup image, and links the caption if they match. The second allows for captions of a certain mood to make the popup require multiple clicks to close. More detailed info on both these settings can be found in the hover tooltip."
 CAPTION_SUB_TEXT = 'Subliminal message popups briefly flash a caption on screen in big, bold text before disappearing.\n\nThis is largely meant to be for short, minimal captions such as "OBEY", "DROOL", and other vaguely fetishy things. "Use Subliminal specific mood" allows for this without interfering with other captions, as it uses the special mood "subliminals" which don\'t appear in the regular caption pool. However, these subliminals are set by the pack creator, so if none are set the default will be used instead.'
+WALLPAPER_ROTATE_TEXT = 'Turning on wallpaper rotate disables built-in pack wallpapers, allowing you to cycle through your own instead. Keep in mind some packs use the corruption feature to rotate wallpapers without this setting enabled.'
+WALLPAPER_PANIC_TEXT = 'This is the panic wallpaper, make sure to set it to your default wallpaper ASAP! Otherwise quitting edgeware via panic will leave you with a nice and generic windows one instead.'
+MOOD_TEXT = 'Moods are a very important part of edgeware, but also something completely optional to the end-user. Every piece of media has a mood attached to it, and edgeware checks to see if that mood is enabled before deciding to show it. Think of moods like booru tags, categories, or genres.\n\nIn this tab you can disable or enable moods. Don\'t like a particular fetish included in a pack? Turn it off! By default, all moods are turned on...\n\n...Except for packs that utilize corruption. A more in-depth explanation can be found on the \"corruption\" tab (under modes), but the quick summary is that corruption turns on and off moods automatically over a period of time.\n\nPS: Moods date back all the way to the original edgeware- they just had no purpose. Because of this, every pack is \"compatible\" with the moods feature- but most older ones just have everything set to \"default\", which might not show up in this window.'
+
 LOWKEY_TEXT = 'Lowkey mode makes it so all window-based popups will spawn in a corner of your screen rather than random locations. This is meant for more passive use as it generally makes popups interrupt other actions less often.\n\nBest used with the "Popup Timeout" feature along with a relatively high delay, as popups will stack on top of eachother.'
 
 # text for the about tab
@@ -2263,6 +2267,9 @@ def show_window():
 
     # ==========={WALLPAPER TAB ITEMS} ========================#
     notebookAnnoyance.add(tabWallpaper, text="Wallpaper")
+    wallpaperMessage = Message(tabWallpaper, text=WALLPAPER_ROTATE_TEXT, justify=CENTER, width=675)
+    wallpaperMessage.pack(fill="both")
+    message_group.append(wallpaperMessage)
     rotateCheckbox = Checkbutton(
         tabWallpaper, text="Rotate Wallpapers", variable=rotateWallpaperVar, command=lambda: toggleAssociateSettings(rotateWallpaperVar.get(), wallpaper_group)
     )
@@ -2300,6 +2307,8 @@ def show_window():
             except Exception as e:
                 logging.warning(f"failed to open/change default wallpaper\n{e}")
 
+    panicWallMessage = Message(tabWallpaper, text=WALLPAPER_PANIC_TEXT, justify=CENTER, width=675)
+    message_group.append(panicWallMessage)
     panicWPFrame = Frame(tabWallpaper)
     panicWPFrameL = Frame(panicWPFrame)
     panicWPFrameR = Frame(panicWPFrame)
@@ -2328,6 +2337,7 @@ def show_window():
     autoImport.pack(fill="x")
     wpDelaySlider.pack(fill="x")
     varSlider.pack(fill="x")
+    panicWallMessage.pack(fill="both")
     panicWPFrame.pack(fill="x", expand=1)
     panicWPFrameL.pack(side="left", fill="y")
     panicWPFrameR.pack(side="right", fill="x", expand=1)
@@ -2340,6 +2350,10 @@ def show_window():
 
     Label(tabMoods, text="Moods", font=titleFont, relief=GROOVE).pack(pady=2)
 
+    moodsMessage = Message(tabMoods, text=MOOD_TEXT, justify=CENTER, width=675)
+    moodsMessage.pack(fill="both")
+    message_group.append(moodsMessage)
+
     moodsFrame = Frame(tabMoods, borderwidth=5, relief=RAISED)
     moodsListFrame = Frame(moodsFrame)
     tabMoodsMaster = ttk.Notebook(moodsListFrame)
@@ -2349,7 +2363,7 @@ def show_window():
     moodsWebFrame = Frame(tabMoodsMaster)
 
     moodsFrame.pack(fill="x")
-    moodsListFrame.grid(row=0, column=0, sticky="nsew")
+    moodsListFrame.pack(fill="x")
     tabMoodsMaster.pack(fill="x")
     moodsMediaFrame.pack(fill="both")
     moodsCaptionsFrame.pack(fill="both")
@@ -2362,7 +2376,7 @@ def show_window():
     tabMoodsMaster.add(moodsWebFrame, text="Web")
 
     # Media frame
-    mediaTree = CheckboxTreeview(moodsMediaFrame, height=7, show="tree", name="mediaTree")
+    mediaTree = CheckboxTreeview(moodsMediaFrame, height=15, show="tree", name="mediaTree")
     mediaScrollbar = ttk.Scrollbar(moodsMediaFrame, orient=VERTICAL, command=mediaTree.yview)
     mediaTree.configure(yscroll=mediaScrollbar.set)
 
@@ -2454,7 +2468,7 @@ def show_window():
     captionsScrollbar.pack(side="left", fill="y")
 
     # Prompts frame
-    promptsTree = CheckboxTreeview(moodsPromptsFrame, height=7, show="tree", name="promptsTree")
+    promptsTree = CheckboxTreeview(moodsPromptsFrame, height=15, show="tree", name="promptsTree")
     promptsScrollbar = ttk.Scrollbar(moodsPromptsFrame, orient=VERTICAL, command=promptsTree.yview)
     promptsTree.configure(yscroll=promptsScrollbar.set)
 
@@ -2496,7 +2510,7 @@ def show_window():
     promptsTree.pack(side="left", fill="both", expand=1)
     promptsScrollbar.pack(side="left", fill="y")
     # Web frame
-    webTree = CheckboxTreeview(moodsWebFrame, height=7, show="tree", name="webTree")
+    webTree = CheckboxTreeview(moodsWebFrame, height=15, show="tree", name="webTree")
     webScrollbar = ttk.Scrollbar(moodsWebFrame, orient=VERTICAL, command=webTree.yview)
     webTree.configure(yscroll=webScrollbar.set)
 
