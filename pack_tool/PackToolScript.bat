@@ -37,10 +37,10 @@ echo in newer updates, it might help to use this again in case there are new dep
 pause
 goto top
 :ptCreate
-echo What do you want to name your pack's directory? 
+echo What do you want to name your pack's directory?
 echo (use valid filename characters, with underscores instead of spaces!)
 set /p packName=Directory Name:
-pack_tool.py -n "%packName%"
+src\main.py -n "%packName%"
 echo Done.
 pause
 goto top
@@ -59,12 +59,12 @@ echo Must enter selection number (1, 2)
 pause
 goto ptCompress
 :pressYes
-pack_tool.py -c "%compileName%"
+src\main.py -c "%compileName%"
 echo Done.
 pause
 goto top
 :pressNo
-pack_tool.py "%compileName%"
+src\main.py "%compileName%"
 echo Done.
 pause
 goto top
