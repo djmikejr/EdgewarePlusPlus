@@ -10,48 +10,63 @@ try:
     import vlc
 except FileNotFoundError:
     pass
-#TODO/TO CONSIDER FOR BLACKLIST:
-#would rotate_wallpaper even work at all if the user didn't have any set? can packs set the rotating wallpapers somehow? (other than via corruption levels)
-#you could maybe set wallpaperdat but not sure how many people would bother with this
-config_blacklist = [ "version", #version, etc, things that make no sense to change
-"versionplusplus",
-"panicButton", #while disabling panic could be used for danger-chasing fetishists, changing the hotkey serves little purpose
-"safeword", #imo, the safeword is a safeword for a reason (timer mode)
-"drivePath", #this could be in dangerous instead but I see changing this leading to too many logistical problems
-"safeMode", #optional warning in config to warn of dangerous settings. being able to disable remotely doesn't affect anything horny, just allows you to be a dick
-"toggleInternet", #troubleshooting settings
-"toggleHibSkip",
-"toggleMoodSet",
-"corruptionMode", #if you're turning off corruption mode with corruption just make it the final level lmao
-"vlcMode", #we might get rid of this anyways if we force vlc, but also people shouldn't be able to disable/enable this forcibly
-"presetsDanger", #see safeMode
-"corruptionDevMode",
-"corruptionFullPerm",
-"messageOff"
+
+# TODO/TO CONSIDER FOR BLACKLIST:
+# would rotate_wallpaper even work at all if the user didn't have any set? can packs set the rotating wallpapers somehow? (other than via corruption levels)
+# you could maybe set wallpaperdat but not sure how many people would bother with this
+config_blacklist = [
+    "version",  # version, etc, things that make no sense to change
+    "versionplusplus",
+    "panicButton",  # while disabling panic could be used for danger-chasing fetishists, changing the hotkey serves little purpose
+    "safeword",  # imo, the safeword is a safeword for a reason (timer mode)
+    "drivePath",  # We can't know what paths exist and they look different on Linux and Windows
+    "safeMode",  # optional warning in config to warn of dangerous settings. being able to disable remotely doesn't affect anything horny, just allows you to be a dick
+    "toggleInternet",  # troubleshooting settings
+    "toggleHibSkip",
+    "toggleMoodSet",
+    "corruptionMode",  # if you're turning off corruption mode with corruption just make it the final level lmao
+    "vlcMode",  # we might get rid of this anyways if we force vlc, but also people shouldn't be able to disable/enable this forcibly
+    "presetsDanger",  # see safeMode
+    "corruptionDevMode",
+    "corruptionFullPerm",
+    "messageOff",
+    "runOnSaveQuit",
+    "themeNoConfig",
+
+    # Changing these settings would most likely not do anything with their current implementation
+    "desktopIcons",
+    "showLoadingFlair",
+    "rotateWallpaper",
+    "replace",  # replace images
+    "replaceThresh",
+    "start_on_logon",
+    "showDiscord",  # show discord status, technically not PC dangerous but socially dangerous
+    "timerMode",  # locks out panic until certain time has passed
+    "timerSetupTime",
+    "hibernateMode",
+    "start_on_logon",
+
+    # TODO: Test changing these, they will probably work but may have strange interactions
+    "lkToggle",
+    "mitosisMode",
 ]
 
-#TODO/TO CONSIDER FOR DANGEROUS:
-#delay under certain period of time. maxvideos/video popup % could also contribute to performance issues but maybe this is splitting hairs
-#wakeupActivity for hibernate (as well as very low hibernate durations)?
-#mitosismode/mitosis_strength can potentially cause a dangerous payload of popups if set incorrectly
-#capPopTimer could potentially cause seizures if low enough
-config_dangerous = [ "fill", #fill drive
-"fill_delay",
-"maxFillThreads",
-"replace", #replace images
-"replaceThresh",
-"avoidList", #avoid list for replace images, also might not work considering pc differences
-"start_on_logon",
-"showDiscord", #show discord status, technically not PC dangerous but socially dangerous
-"panicDisabled", #disables panic in hotkey/system tray, can still be run via panic.pyw
-"webPopup", #opens up web popup on popup close, this one could be cut from this list as it's not listed as dangerous in config but could lead to bad performance
-"timerMode", #locks out panic until certain time has passed
-"timerSetupTime"
+# TODO/TO CONSIDER FOR DANGEROUS:
+# delay under certain period of time. maxvideos/video popup % could also contribute to performance issues but maybe this is splitting hairs
+# wakeupActivity for hibernate (as well as very low hibernate durations)?
+# mitosismode/mitosis_strength can potentially cause a dangerous payload of popups if set incorrectly
+# capPopTimer could potentially cause seizures if low enough
+config_dangerous = [
+    "fill",  # fill drive
+    "fill_delay",
+    "maxFillThreads",
+    "avoidList",  # avoid list for replace images, also might not work considering pc differences
+    "panicDisabled",  # disables panic in hotkey/system tray, can still be run via panic.pyw
+    "webPopup",  # opens up web popup on popup close, this one could be cut from this list as it's not listed as dangerous in config but could lead to bad performance
 ]
 
-#Settings I found that are maybe dead currently since I can't find use (feel free to delete this once it's taken care of):
-#useWebResource
-#pumpScareOffset (used to be for offsetting the pumpscare audio, might be irrelevant once we force vlc)
+# Settings I found that are maybe dead currently since I can't find use (feel free to delete this once it's taken care of):
+# pumpScareOffset (used to be for offsetting the pumpscare audio, might be irrelevant once we force vlc)
 
 
 def first_launch_configure() -> None:
@@ -105,7 +120,6 @@ class Settings:
 
         # Booru downloader
         self.booru_download = bool(config["downloadEnabled"])
-        # TODO: Web resource?
         self.booru_name = config["booruName"]
         # self.min_score = int(config["booruMinScore"])  # TODO: Can this be used with gallery-dl?
         self.booru_tags = config["tagList"].replace(">", "+")  # TODO: Store in a better way
