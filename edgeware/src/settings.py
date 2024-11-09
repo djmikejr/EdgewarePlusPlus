@@ -32,7 +32,6 @@ config_blacklist = [
     "messageOff",
     "runOnSaveQuit",
     "themeNoConfig",
-
     # Changing these settings would most likely not do anything with their current implementation
     "desktopIcons",
     "showLoadingFlair",
@@ -45,7 +44,6 @@ config_blacklist = [
     "timerSetupTime",
     "hibernateMode",
     "start_on_logon",
-
     # TODO: Test changing these, they will probably work but may have strange interactions
     "lkToggle",
     "mitosisMode",
