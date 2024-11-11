@@ -4,7 +4,7 @@ import shutil
 import subprocess
 import sys
 
-from paths import Assets, Data, Process
+from paths import Assets, Data, Process, Resource
 
 try:
     import vlc
@@ -51,10 +51,9 @@ config_blacklist = [
 ]
 
 # TODO/TO CONSIDER FOR DANGEROUS:
-# delay under certain period of time. maxvideos/video popup % could also contribute to performance issues but maybe this is splitting hairs
 # wakeupActivity for hibernate (as well as very low hibernate durations)?
 # mitosismode/mitosis_strength can potentially cause a dangerous payload of popups if set incorrectly
-# capPopTimer could potentially cause seizures if low enough
+# capPopTimer could potentially cause seizures if low enough... however, considering not bothering with this as so many settings have to be set right
 config_dangerous = [
     "fill",  # fill drive
     "fill_delay",
@@ -106,6 +105,37 @@ class Settings:
     def __init__(self):
         self.config = load_config()
         self.load_settings()
+
+        if self.config["corruptionMode"] and self.config["corruptionFullPerm"]:
+            self.dangers = self.danger_check()
+            print(self.dangers)
+
+
+    def set_config(key, value):
+        if key not in config_blacklist:
+            self.config[key] = value
+
+    def danger_check(self):
+        danger_list = []
+        with open(Resource.CORRUPTION) as f:
+            corruption_data = json.loads(f.read())
+            for level in corruption_data["config"]:
+                for key in corruption_data["config"][level]:
+                    if key in config_dangerous and not danger_list:
+                        danger_list.append(key)
+                    if key == "delay":
+                        if corruption_data["config"][level]["delay"] < 2000:
+                            danger_list.append(f"Low delay ({corruption_data["config"][level]['delay']}ms)")
+                    if key == "wakeupActivity":
+                        if corruption_data["config"][level]["wakeupActivity"] > 35:
+                            danger_list.append(f"High hibernate wakeup ({corruption_data["config"][level]['wakeupActivity']})")
+                    if key == "hibernateMax":
+                        if corruption_data["config"][level]["hibernateMax"] < 10:
+                            danger_list.append(f"Low max hibernate delay ({corruption_data["config"][level]['hibernateMax']})")
+        return danger_list
+
+
+
 
 
     def load_settings(self):
@@ -218,7 +248,7 @@ class Settings:
 
         # Corruption mode
         self.corruption_mode = bool(self.config["corruptionMode"])
-        # self.corruption_full = bool(self.config["corruptionFullPerm"])
+        self.corruption_full = bool(self.config["corruptionFullPerm"])
         # self.corruption_fade = self.config["corruptionFadeType"]
         self.corruption_trigger = self.config["corruptionTrigger"]
         self.corruption_time = int(self.config["corruptionTime"]) * 1000  # Milliseconds
