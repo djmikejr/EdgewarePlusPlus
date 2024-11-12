@@ -18,6 +18,7 @@ import json
 import logging
 import os
 import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -69,16 +70,16 @@ def make_media(source: Source, build: Build, compress: bool) -> set[str]:
                 location = build.image
             elif filetype.is_video(file_path):
                 location = build.video
+                # can remove the endswith once we support more filetypes for compression
+                if compress and filename.endswith(".mp4"):
+                    compress_video(file_path, location)
+                    continue
             elif filetype.is_audio(file_path):
                 location = build.audio
 
             if location:
                 location.mkdir(parents=True, exist_ok=True)
-                # can remove the endswith once we support more filetypes for compression
-                if compress and filetype.is_video(file_path) and filename.endswith(".mp4"):
-                    compress_videos(file_path, location)
-                else:
-                    shutil.copyfile(file_path, location / filename)
+                shutil.copyfile(file_path, location / filename)
                 media[mood].append(filename)
             else:
                 logging.warning(f"{file_path} is not an image, video, or audio file")
@@ -87,13 +88,11 @@ def make_media(source: Source, build: Build, compress: bool) -> set[str]:
     return set(media.keys())
 
 
-def compress_videos(file_path: Path, location: Path) -> None:
+def compress_video(file_path: Path, location: Path) -> None:
     ff = FFmpeg()
-    input_path = os.path.relpath(file_path, PATH)
-    output_path = os.path.relpath(location / file_path.name, PATH)
     try:
         # if h265 causes issues, change (or add setting) back down to h264
-        ff.options(f"-i {input_path} -vcodec libx265 -crf 30 {output_path}")
+        subprocess.run(f'"{ff._ffmpeg_file}" -y -i "{file_path}" -vcodec libx265 -crf 30 "{location / file_path.name}"', shell=True)
     except Exception as e:
         logging.warning(f"Could not compress file. {e}")
 
