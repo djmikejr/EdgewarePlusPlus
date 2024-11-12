@@ -18,6 +18,7 @@ import json
 import logging
 import os
 import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -68,19 +69,21 @@ def make_media(source: Source, build: Build, compimg: bool, compvid: bool) -> se
             location = None
             if filetype.is_image(file_path):
                 location = build.image
+                if compimg:
+                    compress_image(file_path, location, filename)
+                    continue
             elif filetype.is_video(file_path):
                 location = build.video
+                # can remove the endswith once we support more filetypes for compression
+                if compvid and filename.endswith(".mp4"):
+                    compress_video(file_path, location)
+                    continue
             elif filetype.is_audio(file_path):
                 location = build.audio
 
             if location:
                 location.mkdir(parents=True, exist_ok=True)
-                if compimg and filetype.is_image(file_path):
-                        compress_image(file_path, location, filename)
-                elif compvid and filetype.is_video(file_path) and filename.endswith(".mp4"):
-                    compress_video(file_path, location)
-                else:
-                    shutil.copyfile(file_path, location / filename)
+                shutil.copyfile(file_path, location / filename)
                 media[mood].append(filename)
             else:
                 logging.warning(f"{file_path} is not an image, video, or audio file")
@@ -91,11 +94,9 @@ def make_media(source: Source, build: Build, compimg: bool, compvid: bool) -> se
 
 def compress_video(file_path: Path, location: Path) -> None:
     ff = FFmpeg()
-    input_path = os.path.relpath(file_path, PATH)
-    output_path = os.path.relpath(location / file_path.name, PATH)
     try:
         # if h265 causes issues, change (or add setting) back down to h264
-        ff.options(f"-i {input_path} -vcodec libx265 -crf 30 {output_path}")
+        subprocess.run(f'"{ff._ffmpeg_file}" -y -i "{file_path}" -vcodec libx265 -crf 30 "{location / file_path.name}"', shell=True)
     except Exception as e:
         logging.warning(f"Error compressing video: {e}")
 
