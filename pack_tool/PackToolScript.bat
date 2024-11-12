@@ -48,22 +48,37 @@ goto top
 echo What pack would you like to compile?
 set /p compileName=Directory Name:
 :ptCompress
-echo Do you want to compress video files with ffmpeg?
+echo Do you want to compress your image and video files?
 echo This will take some time, but may drastically reduce filesize.
-echo 1: Yes
-echo 2: No
+echo (video files are compressed via ffmpeg, while image files are compressed via pillow)
+echo 1: Compress Images
+echo 2: Compress Videos
+echo 3: Compress Both
+echo 4: Compress Neither
 set /p compressSelect=Select number:
-if %compressSelect%==1 goto pressYes
-if %compressSelect%==2 goto pressNo
-echo Must enter selection number (1, 2)
+if %compressSelect%==1 goto compImg
+if %compressSelect%==2 goto compVid
+if %compressSelect%==3 goto compBoth
+if %compressSelect%==4 goto compNeither
+echo Must enter selection number (1, 2, 3, 4)
 pause
 goto ptCompress
-:pressYes
-src\main.py -c "%compileName%"
+:compImg
+src\main.py -i "%compileName%"
 echo Done.
 pause
 goto top
-:pressNo
+:compVid
+src\main.py -v "%compileName%"
+echo Done.
+pause
+goto top
+:compBoth
+src\main.py -i -v "%compileName%"
+echo Done.
+pause
+goto top
+:compNeither
 src\main.py "%compileName%"
 echo Done.
 pause

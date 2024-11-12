@@ -25,6 +25,7 @@ import filetype
 import yaml
 from paths import DEFAULT_PACK, PATH, Build, Source
 from pyffmpeg import FFmpeg
+from PIL import Image
 from schemas import Schemas
 
 
@@ -34,7 +35,7 @@ def write_json(data: dict, path: Path) -> None:
         json.dump(data, f)
 
 
-def make_media(source: Source, build: Build, compress: bool) -> set[str]:
+def make_media(source: Source, build: Build, compimg: bool, compvid: bool) -> set[str]:
     """Returns a set of existing, valid moods"""
 
     media = {}
@@ -74,9 +75,10 @@ def make_media(source: Source, build: Build, compress: bool) -> set[str]:
 
             if location:
                 location.mkdir(parents=True, exist_ok=True)
-                # can remove the endswith once we support more filetypes for compression
-                if compress and filetype.is_video(file_path) and filename.endswith(".mp4"):
-                    compress_videos(file_path, location)
+                if compimg and filetype.is_image(file_path):
+                        compress_image(file_path, location, filename)
+                elif compvid and filetype.is_video(file_path) and filename.endswith(".mp4"):
+                    compress_video(file_path, location)
                 else:
                     shutil.copyfile(file_path, location / filename)
                 media[mood].append(filename)
@@ -87,7 +89,7 @@ def make_media(source: Source, build: Build, compress: bool) -> set[str]:
     return set(media.keys())
 
 
-def compress_videos(file_path: Path, location: Path) -> None:
+def compress_video(file_path: Path, location: Path) -> None:
     ff = FFmpeg()
     input_path = os.path.relpath(file_path, PATH)
     output_path = os.path.relpath(location / file_path.name, PATH)
@@ -95,8 +97,15 @@ def compress_videos(file_path: Path, location: Path) -> None:
         # if h265 causes issues, change (or add setting) back down to h264
         ff.options(f"-i {input_path} -vcodec libx265 -crf 30 {output_path}")
     except Exception as e:
-        logging.warning(f"Could not compress file. {e}")
+        logging.warning(f"Error compressing video: {e}")
 
+def compress_image(file_path: Path, location: Path, filename: str) -> None:
+    try:
+        img = Image.open(file_path)
+        img.save(location / filename, optimize=True, quality=85)
+        print(f"{filename} successfully compressed.")
+    except Exception as e:
+        print(f"Error compressing image: {e}")
 
 def make_subliminals(source: Source, build: Build) -> None:
     if not source.subliminals.is_dir():
@@ -377,7 +386,8 @@ def main() -> None:
     parser.add_argument("source", help="pack source directory")
     parser.add_argument("-o", "--output", default="build", help="output directory name")
     parser.add_argument("-n", "--new", action="store_true", help="create a new pack template and exit")
-    parser.add_argument("-c", "--compress", action="store_true", help="compresses video files using ffmpeg")
+    parser.add_argument("-v", "--compvid", action="store_true", help="compresses video files using ffmpeg")
+    parser.add_argument("-i", "--compimg", action="store_true", help="compresses image files using pillow")
     args = parser.parse_args()
 
     logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
@@ -393,7 +403,7 @@ def main() -> None:
 
     try:
         build.root.mkdir(parents=True, exist_ok=True)
-        moods = make_media(source, build, args.compress)
+        moods = make_media(source, build, args.compimg, args.compvid)
         make_subliminals(source, build)
         make_wallpapers(source, build)
         make_icon(source, build)
