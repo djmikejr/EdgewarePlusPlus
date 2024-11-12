@@ -69,7 +69,8 @@ def make_media(source: Source, build: Build, compimg: bool, compvid: bool) -> se
             location = None
             if filetype.is_image(file_path):
                 location = build.image
-                if compimg:
+                #animated gifs compress down to a single frame, so they are skipped until we find a sane solution
+                if compimg and not filename.endswith(".gif"):
                     compress_image(file_path, location, filename)
                     continue
             elif filetype.is_video(file_path):
