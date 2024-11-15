@@ -40,7 +40,20 @@ goto requirements
 echo Installing requirements...
 py -m pip install -r requirements.txt
 if NOT %errorlevel%==0 goto quitRequirements
+goto shorcuts
+:shortcuts
+call :makePyw "CONFIG" "config"
+call :makePyw "MAIN" "edgeware"
+call :makePyw "PANIC" "panic"
 goto run
+:makePyw
+(
+  @echo import subprocess
+  @echo import sys
+  @echo from src.paths import Process
+  @echo subprocess.run^([sys.executable, Process.%~1]^)
+) > %~2.pyw
+goto :eof
 :run
 echo Edgeware is ready, and will now start the config file for you.
 echo:
