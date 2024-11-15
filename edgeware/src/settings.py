@@ -125,13 +125,13 @@ class Settings:
                         danger_list.append(key)
                     if key == "delay":
                         if corruption_data["config"][level]["delay"] < 2000:
-                            danger_list.append(f"Low delay ({corruption_data["config"][level]['delay']}ms)")
+                            danger_list.append(f"Low delay ({corruption_data['config'][level]['delay']}ms)")
                     if key == "wakeupActivity":
                         if corruption_data["config"][level]["wakeupActivity"] > 35:
-                            danger_list.append(f"High hibernate wakeup ({corruption_data["config"][level]['wakeupActivity']})")
+                            danger_list.append(f"High hibernate wakeup ({corruption_data['config'][level]['wakeupActivity']})")
                     if key == "hibernateMax":
                         if corruption_data["config"][level]["hibernateMax"] < 10:
-                            danger_list.append(f"Low max hibernate delay ({corruption_data["config"][level]['hibernateMax']})")
+                            danger_list.append(f"Low max hibernate delay ({corruption_data['config'][level]['hibernateMax']})")
         return danger_list
 
 
