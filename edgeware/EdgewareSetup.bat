@@ -40,7 +40,7 @@ goto requirements
 echo Installing requirements...
 py -m pip install -r requirements.txt
 if NOT %errorlevel%==0 goto quitRequirements
-goto shorcuts
+goto shortcuts
 :shortcuts
 call :makePyw "CONFIG" "config"
 call :makePyw "MAIN" "edgeware"
