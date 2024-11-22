@@ -94,20 +94,22 @@ def make_media(source: Source, build: Build, compimg: bool, compvid: bool) -> se
 
 
 def compress_video(file_path: Path, location: Path) -> None:
-    ff = FFmpeg()
+    ffm_instance = FFmpeg()
     try:
         # if h265 causes issues, change (or add setting) back down to h264
-        subprocess.run(f'"{ff._ffmpeg_file}" -y -i "{file_path}" -vcodec libx265 -crf 30 "{location / file_path.name}"', shell=True)
+        subprocess.run(f'"{ffm_instance._ffmpeg_file}" -y -i "{file_path}" -vcodec libx265 -crf 30 "{location / file_path.name}"', shell=True)
     except Exception as e:
+        print(f"Error compressing video: {e}")
         logging.warning(f"Error compressing video: {e}")
 
 def compress_image(file_path: Path, location: Path, filename: str) -> None:
     try:
         img = Image.open(file_path)
         img.save(location / filename, optimize=True, quality=85)
-        print(f"{filename} successfully compressed.")
+        logging.info(f"{filename} successfully compressed.")
     except Exception as e:
         print(f"Error compressing image: {e}")
+        logging.warning(f"Error compressing image: {e}")
 
 def make_subliminals(source: Source, build: Build) -> None:
     if not source.subliminals.is_dir():

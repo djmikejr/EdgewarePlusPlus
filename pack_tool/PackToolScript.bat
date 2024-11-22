@@ -56,29 +56,29 @@ echo 2: Compress Videos
 echo 3: Compress Both
 echo 4: Compress Neither
 set /p compressSelect=Select number:
-if %compressSelect%==1 goto compImg
-if %compressSelect%==2 goto compVid
-if %compressSelect%==3 goto compBoth
-if %compressSelect%==4 goto compNeither
+if %compressSelect%==1 goto compressImg
+if %compressSelect%==2 goto compressVid
+if %compressSelect%==3 goto compressBoth
+if %compressSelect%==4 goto compressNeither
 echo Must enter selection number (1, 2, 3, 4)
 pause
 goto ptCompress
-:compImg
+:compressImg
 src\main.py -i "%compileName%"
 echo Done.
 pause
 goto top
-:compVid
+:compressVid
 src\main.py -v "%compileName%"
 echo Done.
 pause
 goto top
-:compBoth
+:compressBoth
 src\main.py -i -v "%compileName%"
 echo Done.
 pause
 goto top
-:compNeither
+:compressNeither
 src\main.py "%compileName%"
 echo Done.
 pause
