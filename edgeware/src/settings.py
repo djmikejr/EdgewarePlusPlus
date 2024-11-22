@@ -111,11 +111,11 @@ class Settings:
             print(self.dangers)
 
 
-    def set_config(key, value):
+    def set_config(key: str, value: str):
         if key not in config_blacklist:
             self.config[key] = value
 
-    def danger_check(self):
+    def danger_check(self) -> list:
         danger_list = []
         with open(Resource.CORRUPTION) as f:
             corruption_data = json.loads(f.read())
