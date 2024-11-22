@@ -24,9 +24,9 @@ from pathlib import Path
 
 import filetype
 import yaml
-from paths import DEFAULT_PACK, PATH, Build, Source
-from pyffmpeg import FFmpeg
+from paths import DEFAULT_PACK, Build, Source
 from PIL import Image
+from pyffmpeg import FFmpeg
 from schemas import Schemas
 
 
@@ -67,24 +67,23 @@ def make_media(source: Source, build: Build, compimg: bool, compvid: bool) -> se
             file_path = mood_path / filename
 
             location = None
+            copy = shutil.copyfile
             if filetype.is_image(file_path):
                 location = build.image
-                #animated gifs compress down to a single frame, so they are skipped until we find a sane solution
+                # animated gifs compress down to a single frame, so they are skipped until we find a sane solution
                 if compimg and not filename.endswith(".gif"):
-                    compress_image(file_path, location, filename)
-                    continue
+                    copy = compress_image
             elif filetype.is_video(file_path):
                 location = build.video
-                # can remove the endswith once we support more filetypes for compression
-                if compvid and filename.endswith(".mp4"):
-                    compress_video(file_path, location)
-                    continue
+                # Can remove video type check once we support more filetypes for compression
+                if compvid and filetype.video_match(file_path).mime == "video/mp4":
+                    copy = compress_video
             elif filetype.is_audio(file_path):
                 location = build.audio
 
             if location:
                 location.mkdir(parents=True, exist_ok=True)
-                shutil.copyfile(file_path, location / filename)
+                copy(file_path, location / filename)
                 media[mood].append(filename)
             else:
                 logging.warning(f"{file_path} is not an image, video, or audio file")
@@ -93,23 +92,22 @@ def make_media(source: Source, build: Build, compimg: bool, compvid: bool) -> se
     return set(media.keys())
 
 
-def compress_video(file_path: Path, location: Path) -> None:
+def compress_video(source: Path, destination: Path) -> None:
     ffm_instance = FFmpeg()
     try:
         # if h265 causes issues, change (or add setting) back down to h264
-        subprocess.run(f'"{ffm_instance._ffmpeg_file}" -y -i "{file_path}" -vcodec libx265 -crf 30 "{location / file_path.name}"', shell=True)
+        subprocess.run(f'"{ffm_instance._ffmpeg_file}" -y -i "{source}" -vcodec libx265 -crf 30 "{destination}"', shell=True)
     except Exception as e:
-        print(f"Error compressing video: {e}")
         logging.warning(f"Error compressing video: {e}")
 
-def compress_image(file_path: Path, location: Path, filename: str) -> None:
+
+def compress_image(source: Path, destination: Path) -> None:
     try:
-        img = Image.open(file_path)
-        img.save(location / filename, optimize=True, quality=85)
-        logging.info(f"{filename} successfully compressed.")
+        img = Image.open(source)
+        img.save(destination, optimize=True, quality=85)
     except Exception as e:
-        print(f"Error compressing image: {e}")
         logging.warning(f"Error compressing image: {e}")
+
 
 def make_subliminals(source: Source, build: Build) -> None:
     if not source.subliminals.is_dir():
