@@ -97,6 +97,7 @@ def load_corruption():
 
         moods = corruption["moods"]
         wallpapers = corruption["wallpapers"]
+        configs = corruption["config"]
 
         levels: list[CorruptionLevel] = []
         for i in range(max(len(moods), len(wallpapers) - (1 if "default" in wallpapers else 0))):
@@ -104,9 +105,9 @@ def load_corruption():
 
             mood_change = moods.get(n, {"add": [], "remove": []})
             wallpaper = wallpapers.get(n)
-
+            config_change = configs.get(n)
             if i == 0:
-                levels.append(CorruptionLevel(set(mood_change["add"]), wallpaper or wallpapers.get("default")))
+                levels.append(CorruptionLevel(set(mood_change["add"]), wallpaper or wallpapers.get("default"), config_change))
             else:
                 new_moods = levels[i - 1].moods.copy()
                 for mood in mood_change["add"]:
@@ -114,7 +115,7 @@ def load_corruption():
                 for mood in mood_change["remove"]:
                     new_moods.remove(mood)
 
-                levels.append(CorruptionLevel(new_moods, wallpaper or levels[i - 1].wallpaper))
+                levels.append(CorruptionLevel(new_moods, wallpaper or levels[i - 1].wallpaper, config_change))
 
         return levels
 

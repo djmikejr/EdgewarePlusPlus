@@ -23,7 +23,7 @@ class Captions:
 class CorruptionLevel:
     moods: set[str]
     wallpaper: str | None
-    # TODO: config
+    config: set[str]
 
 
 @dataclass

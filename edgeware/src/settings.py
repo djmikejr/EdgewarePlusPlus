@@ -106,9 +106,9 @@ class Settings:
         self.config = load_config()
         self.load_settings()
 
-        if self.config["corruptionMode"] and self.config["corruptionFullPerm"]:
-            self.dangers = self.danger_check()
-            print(self.dangers)
+        #if self.config["corruptionMode"] and self.config["corruptionFullPerm"]:
+            #self.dangers = self.danger_check()
+            #print(self.dangers)
 
 
     def set_config(key: str, value: str):
