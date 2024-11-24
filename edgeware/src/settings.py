@@ -106,12 +106,11 @@ class Settings:
         self.config = load_config()
         self.load_settings()
 
-        #if self.config["corruptionMode"] and self.config["corruptionFullPerm"]:
-            #self.dangers = self.danger_check()
-            #print(self.dangers)
+        # if self.config["corruptionMode"] and self.config["corruptionFullPerm"]:
+        # self.dangers = self.danger_check()
+        # print(self.dangers)
 
-
-    def set_config(key: str, value: str):
+    def set_config(key: str, value: str | int) -> None:
         if key not in config_blacklist:
             self.config[key] = value
 
@@ -134,11 +133,7 @@ class Settings:
                             danger_list.append(f"Low max hibernate delay ({corruption_data['config'][level]['hibernateMax']})")
         return danger_list
 
-
-
-
-
-    def load_settings(self):
+    def load_settings(self) -> None:
         # Impacts other settings
         lowkey_mode = bool(self.config["lkToggle"])
         mitosis_mode = bool(self.config["mitosisMode"]) or lowkey_mode
